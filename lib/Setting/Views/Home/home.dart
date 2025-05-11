@@ -583,6 +583,38 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                         ),
+                        Card(
+                          child: Container(
+                            color: Colors.white,
+                            child: ListTile(
+                              leading:  Image.asset("${ImagePath}StatementOffline.png",width: 50.h),
+                              title: ThemeHelper().buildText(context,'StringACC_STA_H', Colors.black,'M'),
+                              onTap: () {
+                                if(controller.UPIN_COS!=1  ){
+                                  controller.buildShowDialogPRIV();
+                                }else{
+                                  Get.toNamed('/Account_Statement',arguments: 4);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        Card(
+                          child: Container(
+                            color: Colors.white,
+                            child: ListTile(
+                              leading:  Image.asset("${ImagePath}StatementOffline.png",width: 50.h),
+                              title: ThemeHelper().buildText(context,'StringACC_COS_STA', Colors.black,'M'),
+                              onTap: () {
+                                if(controller.UPIN_MAIN!=1  ){
+                                  controller.buildShowDialogPRIV();
+                                }else{
+                                  Get.toNamed('/Account_Statement',arguments: 3);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                         buildCard('StrinSto_Num'.tr,'Sto_Num.png',0,'/Sto_NUM'),
                         buildCard('StrinInvoices_Archive'.tr,'Invoices_Archive.png',0,'/Invoices_Archive'),
                         buildCard('StringAccountsArchive'.tr,'AccountsArchive.png',0,'/Accounts_Archive'),

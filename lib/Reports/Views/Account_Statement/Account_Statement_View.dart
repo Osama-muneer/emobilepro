@@ -1,4 +1,5 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../Reports/Views/Account_Statement/show_acc_statement.dart';
 import '../../../Reports/controllers/Account_Statement_Controller.dart';
 import '../../../Setting/controllers/login_controller.dart';
@@ -35,6 +36,18 @@ class _Account_Statement_ViewState extends State<Account_Statement_View> {
     return GetBuilder<Account_Statement_Controller>(
         init: Account_Statement_Controller(),
         builder: ((controller) {
+          if (controller.loading.value == false) {
+            return SpinKitFadingCircle(
+              //  controller: AnimationController(duration: const Duration(milliseconds: 1200), vsync: ),
+              itemBuilder: (BuildContext context, int index) {
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: index.isEven ? Colors.red : Colors.grey,
+                  ),
+                );
+              },
+            );
+          }
           return Scaffold(
             appBar: AppBar(
               backgroundColor: AppColors.MainColor,

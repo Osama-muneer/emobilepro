@@ -103,17 +103,10 @@ class Sale_Invoices_Controller extends GetxController {
   RxBool loading = false.obs,BMATY_SHOW = false.obs,RSID_SHOW = false.obs,
       REID_SHOW = false.obs,RTID_SHOW = false.obs,SHOW_MAT_DES = false.obs;
   bool value = false, edit = false,isTablet= false,
-      SHOW_GRO = false,
-      SHOW_ITEM = true,
-      Price_include_Tax = false,
-      SEND_SMS = false,
-      isloadingInstallData = false,
-      Serch_MINO = false,
-      Serch_MINA = true,
-      Serch_MUBCB = false,
-      Show_Inv_Pay = true,isChecked=false,isChecked2=false,isChecked3=false,
-      isCheckedSer=false,
-      PRINT_BALANCE_ALR=false;
+      SHOW_GRO = false, SHOW_ITEM = true, Price_include_Tax = false,
+      SEND_SMS = false, isloadingInstallData = false, Serch_MINO = false, Serch_MINA = true,
+      Serch_MUBCB = false, Show_Inv_Pay = true,isChecked=false,isChecked2=false,isChecked3=false,
+      isCheckedSer=false, PRINT_BALANCE_ALR=false;
   var isloadingvalidator = false.obs, SUM_M, detailsField, detailsMap,selectedRowIndex = (-1).obs;
   late FocusNode myFocusNode;
   late FocusNode myFocusBMMAM;
@@ -757,6 +750,7 @@ class Sale_Invoices_Controller extends GetxController {
       if (Get.arguments is int) {
         (Get.arguments == 3 || BMKID == 3) ? BMKID = 3
             : (Get.arguments == 1 || BMKID == 1) ? BMKID = 1
+            : (Get.arguments == 2 || BMKID == 2) ? BMKID = 2
             : (Get.arguments == 12 || BMKID == 12) ? BMKID = 12
             : (Get.arguments == 4 || BMKID == 4) ? BMKID = 4
             : (Get.arguments == 5 || BMKID == 5) ? BMKID = 5
@@ -1168,8 +1162,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   Future UpdateDataGUID_P() async {
-    await UpdateDataGUID(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M');
+    await UpdateDataGUID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M');
   }
 
   //التأكد من السنة المالية من انه فعالة
@@ -1185,9 +1178,14 @@ class Sale_Invoices_Controller extends GetxController {
   //صلاحيات فاتورة
   Future GET_USR_PRI() async {
     PRIVLAGE(LoginController().SUID,
-        BMKID == 3 ? 601 : BMKID == 1 ? 901 : BMKID == 4 ? 611
-            : BMKID == 5 ? 621 : BMKID == 7 ? 641 :
-        BMKID == 10 ? 645 : BMKID == 12 ? 2272 : 2207).then((data) {
+          BMKID == 3 ? 601
+        : BMKID == 1 ? 901
+        : BMKID == 2 ? 911
+        : BMKID == 4 ? 611
+        : BMKID == 5 ? 621
+        : BMKID == 7 ? 641 :
+          BMKID == 10 ? 645 :
+          BMKID == 12 ? 2272 : 2207).then((data) {
       USR_PRI = data;
       if (USR_PRI.isNotEmpty) {
         UPIN = USR_PRI
@@ -1233,10 +1231,9 @@ class Sale_Invoices_Controller extends GetxController {
   //جلب تذلبل المستندات
   Future GET_SYS_DOC_D() async {
     Get_SYS_DOC_D(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 'BO' : BMKID ==
-            1 ? 'BI' : BMKID == 5 ? 'BS' : 'BF',
-        BMKID == 3 ? 3 : BMKID == 4 ? 4 : BMKID == 1 ? 1 : BMKID == 5
-            ? 5
+        (BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10) ? 'BO' : (BMKID ==
+            1 || BMKID == 2) ? 'BI' : BMKID == 5 ? 'BS' : 'BF',
+        BMKID == 3 ? 3 : BMKID == 4 ? 4 : BMKID == 1 ? 1 : BMKID == 2 ? 2 : BMKID == 5 ? 5
             : BMKID == 7 ? 7 : BMKID == 10 ? 10 :
         BMKID == 12 ? 12 : 11,
         LoginController().BIID).then((data) {
@@ -1448,8 +1445,8 @@ class Sale_Invoices_Controller extends GetxController {
   //مع ربط الضريبة بالانظمة جلب انواع الضريبة الفعالة
   Future GET_TAX_TYP_P() async {
     await GET_TAX_TYP(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 'BO' : BMKID ==
-            1 ? 'BI' : BMKID == 5 ? 'BS' : 'BF').then((userList) async {
+        (BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10) ? 'BO' :
+        (BMKID == 1 || BMKID == 2)? 'BI' : BMKID == 5 ? 'BS' : 'BF').then((userList) async {
       if (userList.isNotEmpty) {
         for (var i = 0; i < userList.length; i++) {
           try {
@@ -1524,8 +1521,7 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب التصنيف الضريبي الاصناف والمجموعات
   Future GET_TAX_LIN_P(String GETTLTY, String GETTLNO, String GETTLNO2) async {
-    await GET_TAX_LIN(BMKID!, TTID1.toString(), GETTLTY, GETTLNO, GETTLNO2)
-        .then((userList) async {
+    await GET_TAX_LIN(BMKID!, TTID1.toString(), GETTLTY, GETTLNO, GETTLNO2).then((userList) async {
       if (userList.isNotEmpty) {
         TCID_D = userList[0].TCID;
         TCSY_D = userList[0].TCSY.toString();
@@ -1543,10 +1539,7 @@ class Sale_Invoices_Controller extends GetxController {
         }
 
         if (BMKID == 1 || BMKID == 2) {
-          TCRA = userList
-              .elementAt(0)
-              .TLRAI!
-              .toDouble();
+          TCRA = userList.elementAt(0).TLRAI!.toDouble();
 
           if (TSCT1 == 1) {
             BMDTXController.text = (userList
@@ -1848,28 +1841,18 @@ class Sale_Invoices_Controller extends GetxController {
   //احتساب ضريبة مبيعات في المبيعات
   Future GET_TAX_INVO() async {
     GET_SYS_VAR(
-        BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10
-            ? 659
-            : BMKID == 1 ? 660 : 701).then((data) {
+        BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10 ? 659
+            : (BMKID == 1 || BMKID == 2) ? 660 : 701).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        print('SVVL_TAX');
-        print(SYS_VAR
-            .elementAt(0)
-            .SVVL);
-        SVVL_TAX = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        SVVL_TAX = SYS_VAR.elementAt(0).SVVL;
         //SVVL_TAX = '2';
         if (SVVL_TAX == '5') {
           //نسبة الضريبه في فاتورة المبيعات
           GET_SYS_VAR(BMKID == 3 ? 751 : BMKID == 1 ? 752 : 726).then((data) {
             SYS_VAR = data;
             if (SYS_VAR.isNotEmpty) {
-              BMDTXController.text = SYS_VAR
-                  .elementAt(0)
-                  .SVVL
-                  .toString();
+              BMDTXController.text = SYS_VAR.elementAt(0).SVVL.toString();
             }
           });
         } else if (SVVL_TAX == '2' || SVVL_TAX == '3' || SVVL_TAX == '4') {
@@ -1901,9 +1884,7 @@ class Sale_Invoices_Controller extends GetxController {
     GET_SYS_VAR(654).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Date_of_Insert_Invoice = BMKID == 11 || BMKID == 12 ? '2' : SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        Date_of_Insert_Invoice = BMKID == 11 || BMKID == 12 ? '2' : SYS_VAR.elementAt(0).SVVL;
         //حسب الصلاحيات
         if (SYS_VAR
             .elementAt(0)
@@ -1915,9 +1896,7 @@ class Sale_Invoices_Controller extends GetxController {
                   BMKID == 10 ? 732 : 1022).then((data) {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
-              Allow_to_Inserted_Date_of_Sales_Invoices = USR_PRI
-                  .elementAt(0)
-                  .UPIN;
+              Allow_to_Inserted_Date_of_Sales_Invoices = USR_PRI.elementAt(0).UPIN;
             } else {
               Allow_to_Inserted_Date_of_Sales_Invoices = 2;
             }
@@ -1986,9 +1965,7 @@ class Sale_Invoices_Controller extends GetxController {
             .SVVL
             .toString() == '4') {
           //السماح بالبيع بسعر اقل من سعر التكلفه
-          PRIVLAGE(LoginController().SUID,
-              BMKID == 11 || BMKID == 12 ? 2206 : 606)
-              .then((data) {
+          PRIVLAGE(LoginController().SUID, BMKID == 11 || BMKID == 12 ? 2206 : 606).then((data) {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
               Allowto_Sell_Less_than_Cost_Price = USR_PRI
@@ -2100,14 +2077,9 @@ class Sale_Invoices_Controller extends GetxController {
         .then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Use_lowest_selling_price = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        Use_lowest_selling_price = SYS_VAR.elementAt(0).SVVL;
         //حسب الصلاحيات
-        if (SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString() == '3') {
+        if (SYS_VAR.elementAt(0).SVVL.toString() == '3') {
           //تجاوزأقل سعر بيع في الفاتوره
           PRIVLAGE(LoginController().SUID,
               BMKID == 11 || BMKID == 12 ? 2276 : BMKID == 5 ? 628 : 616).then((
@@ -2132,18 +2104,12 @@ class Sale_Invoices_Controller extends GetxController {
   Future GET_Use_advantage_of_not_exceeding_highest_selling_price() async {
     GET_SYS_VAR(
         BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 775 : BMKID == 5
-            ? 777
-            : 741).then((data) {
+            ? 777 : 741).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Use_highest_selling_price = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        Use_highest_selling_price = SYS_VAR.elementAt(0).SVVL;
         //حسب الصلاحيات
-        if (SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString() == '3') {
+        if (SYS_VAR.elementAt(0).SVVL.toString() == '3') {
           //تجاوزأعلى سعر بيع في الفاتوره
           PRIVLAGE(LoginController().SUID,
               BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 617 :
@@ -2209,12 +2175,10 @@ class Sale_Invoices_Controller extends GetxController {
 
   //تعدد المخازن في فاتورة المبيعات
   Future GET_Use_Multi_Stores() async {
-    GET_SYS_VAR(BMKID == 1 ? 509 : 508).then((data) {
+    GET_SYS_VAR((BMKID == 1 || BMKID == 2) ? 509 : 508).then((data) {
       if (data.isNotEmpty) {
         Use_Multi_Stores =
-        BMKID == 1 || BMKID == 2 || BMKID == 3 || BMKID == 4 ? data
-            .elementAt(0)
-            .SVVL : '2';
+        BMKID == 1 || BMKID == 2 || BMKID == 3 || BMKID == 4 ? data.elementAt(0).SVVL : '2';
       } else {
         Use_Multi_Stores = '2';
       }
@@ -2269,15 +2233,12 @@ class Sale_Invoices_Controller extends GetxController {
 
   //استخدام تاريخ/موعد التسليم في فاتورة المبيعات
   Future GET_Use_delivery_date() async {
-    GET_SYS_VAR(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 436 : BMKID == 1
-            ? 435
+    GET_SYS_VAR(BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 436 :
+    (BMKID == 1 || BMKID == 2) ? 435
             : BMKID == 5 ? 437 : 438).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Use_delivery_date = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        Use_delivery_date = SYS_VAR.elementAt(0).SVVL;
       } else {
         Use_delivery_date = '2';
       }
@@ -2289,9 +2250,7 @@ class Sale_Invoices_Controller extends GetxController {
     GET_SYS_VAR(BMKID == 11 || BMKID == 12 ? 601 : 502).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        SVVL_NO = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        SVVL_NO = SYS_VAR.elementAt(0).SVVL;
       }
     });
   }
@@ -2302,14 +2261,14 @@ class Sale_Invoices_Controller extends GetxController {
         .then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Allow_give_Free_Quantities = BMKID == 1 ? '1' : SYS_VAR.elementAt(0).SVVL;
+        Allow_give_Free_Quantities = (BMKID == 1 || BMKID == 2)? '1' : SYS_VAR.elementAt(0).SVVL;
         if (SYS_VAR.elementAt(0).SVVL == '1') {
           //اعطاء كميات مجانيه في المبيعات
           PRIVLAGE(LoginController().SUID, BMKID == 11 || BMKID == 12 ? 2201 : BMKID == 5 ? 622 : 602).
           then((data) {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
-              UPIN_BMDNF = BMKID == 1 ? 1 : USR_PRI.elementAt(0).UPIN;
+              UPIN_BMDNF = (BMKID == 1 || BMKID == 2 )? 1 : USR_PRI.elementAt(0).UPIN;
               if (USR_PRI.elementAt(0).UPIN == 1) {
                 //في الفاتورة السماح باعطاء كميات مجانية اذا كان الدفع نقدا
                 GET_SYS_VAR(
@@ -2317,12 +2276,9 @@ class Sale_Invoices_Controller extends GetxController {
                         ? 568
                         : BMKID == 7 ? 569 : 592).then((data) {
                   if (data.isNotEmpty) {
-                    Allow_give_Free_Pay_Cash = BMKID == 1 ? '1' : data
-                        .elementAt(0)
-                        .SVVL;
-                    if (data
-                        .elementAt(0)
-                        .SVVL == '3') {
+                    Allow_give_Free_Pay_Cash = (BMKID == 1 || BMKID == 2) ? '1' :
+                    data.elementAt(0).SVVL;
+                    if (data.elementAt(0).SVVL == '3') {
                       //السماح باعطاء كميات مجانية اذا كان الدفع نقدا
                       PRIVLAGE(LoginController().SUID,
                           BMKID == 3 || BMKID == 4 || BMKID == 10
@@ -2330,9 +2286,8 @@ class Sale_Invoices_Controller extends GetxController {
                               : BMKID == 5 ? 1855
                               : BMKID == 7 ? 1856 : 2342).then((data) {
                         if (data.isNotEmpty) {
-                          UPIN_Allow_give_Free_Pay_Cash = BMKID == 1 ? 1 : data
-                              .elementAt(0)
-                              .UPIN;
+                          UPIN_Allow_give_Free_Pay_Cash = (BMKID == 1 || BMKID == 2) ? 1
+                              : data.elementAt(0).UPIN;
                         } else {
                           UPIN_Allow_give_Free_Pay_Cash = 2;
                         }
@@ -2350,12 +2305,9 @@ class Sale_Invoices_Controller extends GetxController {
                         ? 571
                         : BMKID == 7 ? 572 : 593).then((data) {
                   if (data.isNotEmpty) {
-                    Allow_give_Free_Pay_due = BMKID == 1 ? '1' : data
-                        .elementAt(0)
-                        .SVVL;
-                    if (data
-                        .elementAt(0)
-                        .SVVL == '3') {
+                    Allow_give_Free_Pay_due = (BMKID == 1 || BMKID == 2) ? '1'
+                        : data.elementAt(0).SVVL;
+                    if (data.elementAt(0).SVVL == '3') {
                       //السماح باعطاء كميات مجانية اذا كان الدفع اجل
                       PRIVLAGE(LoginController().SUID,
                           BMKID == 3 || BMKID == 4 || BMKID == 10
@@ -2363,9 +2315,8 @@ class Sale_Invoices_Controller extends GetxController {
                               : BMKID == 5 ? 1858
                               : BMKID == 7 ? 1859 : 2343).then((data) {
                         if (data.isNotEmpty) {
-                          UPIN_Allow_give_Free_Pay_due = BMKID == 1 ? 1 : data
-                              .elementAt(0)
-                              .UPIN;
+                          UPIN_Allow_give_Free_Pay_due = (BMKID == 1 || BMKID == 2) ? 1
+                              : data.elementAt(0).UPIN;
                         } else {
                           UPIN_Allow_give_Free_Pay_due = 2;
                         }
@@ -2383,23 +2334,16 @@ class Sale_Invoices_Controller extends GetxController {
                         ? 574
                         : BMKID == 7 ? 575 : 594).then((data) {
                   if (data.isNotEmpty) {
-                    Allow_give_Free_Pay_Not_Cash_Due = BMKID == 1 ? '1' : data
-                        .elementAt(0)
-                        .SVVL;
-                    if (data
-                        .elementAt(0)
-                        .SVVL == '3') {
+                    Allow_give_Free_Pay_Not_Cash_Due = (BMKID == 1 || BMKID==2) ? '1'
+                        : data.elementAt(0).SVVL;
+                    if (data.elementAt(0).SVVL == '3') {
                       //السماح باعطاء كميات مجانية اذا كان الدفع ليس نقدا او اجل
                       PRIVLAGE(LoginController().SUID,
                           BMKID == 3 || BMKID == 4 || BMKID == 10
-                              ? 1860
-                              : BMKID == 5 ? 1861
-                              : BMKID == 7 ? 1862 : 2344).then((data) {
+                              ? 1860 : BMKID == 5 ? 1861 : BMKID == 7 ? 1862 : 2344).then((data) {
                         if (data.isNotEmpty) {
                           UPIN_Allow_give_Free_Pay_Not_Cash_Due =
-                          BMKID == 1 ? 1 : data
-                              .elementAt(0)
-                              .UPIN;
+                          (BMKID == 1 || BMKID == 2) ? 1 : data.elementAt(0).UPIN;
                         } else {
                           UPIN_Allow_give_Free_Pay_Not_Cash_Due = 2;
                         }
@@ -2433,26 +2377,19 @@ class Sale_Invoices_Controller extends GetxController {
 
   //السماح باعطاء تخفيض في الفواتير
   Future GET_Allow_give_Discount() async {
-    await GET_SYS_VAR(BMKID == 11 || BMKID == 12 ? 603 : BMKID == 7 ? 532 : 515)
-        .then((data) async {
+    await GET_SYS_VAR(BMKID == 11 || BMKID == 12 ? 603 : BMKID == 7 ? 532 : 515).then((data) async {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Allow_give_Discount = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        Allow_give_Discount = SYS_VAR.elementAt(0).SVVL;
         update();
-        if (SYS_VAR
-            .elementAt(0)
-            .SVVL == '1') {
+        if (SYS_VAR.elementAt(0).SVVL == '1') {
           await PRIVLAGE(LoginController().SUID,
               BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10
                   ? 603
                   : BMKID == 5 ? 623 : 2202).then((data) async {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
-              UPIN_BMMDI = BMKID == 1 ? 1 : USR_PRI
-                  .elementAt(0)
-                  .UPIN;
+              UPIN_BMMDI = BMKID == 1 ? 1 : USR_PRI.elementAt(0).UPIN;
             } else {
               UPIN_BMMDI = 2;
             }
@@ -2465,23 +2402,17 @@ class Sale_Invoices_Controller extends GetxController {
                     BMKID == 6 ? 577 : BMKID == 7 ? 578 : 595).then((
                 data) async {
               if (data.isNotEmpty) {
-                Allow_give_discount_Pay_Cash = BMKID == 1 ? '1' : data
-                    .elementAt(0)
-                    .SVVL
-                    .toString();
-                if (data
-                    .elementAt(0)
-                    .SVVL == '3') {
+                Allow_give_discount_Pay_Cash = (BMKID == 1 || BMKID==2) ? '1'
+                    : data.elementAt(0).SVVL.toString();
+                if (data.elementAt(0).SVVL == '3') {
                   //السماح باعطاء تخفيض اذا كان الدفع نقدا
                   await PRIVLAGE(LoginController().SUID,
                       BMKID == 3 || BMKID == 4 || BMKID == 10 ? 1863 :
-                      BMKID == 5 || BMKID == 5 ? 1864 : BMKID == 7
-                          ? 1865
-                          : 2345).then((data) {
+                      BMKID == 5 || BMKID == 6 ? 1864 : BMKID == 7
+                          ? 1865 : 2345).then((data) {
                     if (data.isNotEmpty) {
-                      UPIN_Allow_give_discount_Pay_Cash = BMKID == 1 ? 1 : data
-                          .elementAt(0)
-                          .UPIN;
+                      UPIN_Allow_give_discount_Pay_Cash = (BMKID == 1 || BMKID == 2) ? 1
+                          : data.elementAt(0).UPIN;
                     } else {
                       UPIN_Allow_give_discount_Pay_Cash = 2;
                     }
@@ -2499,34 +2430,22 @@ class Sale_Invoices_Controller extends GetxController {
                     BMKID == 6 ? 580 : BMKID == 7 ? 581 : 596).then((
                 data) async {
               if (data.isNotEmpty) {
-                Allow_give_discount_Pay_due = BMKID == 1 ? '1' : data
-                    .elementAt(0)
-                    .SVVL;
-                if (data
-                    .elementAt(0)
-                    .SVVL == '3') {
+                Allow_give_discount_Pay_due =( BMKID == 1 || BMKID == 2) ? '1'
+                    : data.elementAt(0).SVVL;
+                if (data.elementAt(0).SVVL == '3') {
                   //السماح باعطاء تخفيض اذا كان الدفع اجل
                   await PRIVLAGE(LoginController().SUID,
                       BMKID == 3 || BMKID == 4 || BMKID == 10 ? 1866 :
                       BMKID == 5 || BMKID == 6 ? 1867 : BMKID == 7
-                          ? 1868
-                          : 2346).then((data) {
+                          ? 1868 : 2346).then((data) {
                     if (data.isNotEmpty) {
-                      UPIN_Allow_give_discount_Pay_due = BMKID == 1 ? 1 : data
-                          .elementAt(0)
-                          .UPIN;
+                      UPIN_Allow_give_discount_Pay_due = (BMKID == 1 || BMKID == 2) ? 1 : data.elementAt(0).UPIN;
                     } else {
                       UPIN_Allow_give_discount_Pay_due = 2;
                     }
                   });
                 }
-                print('Allow_give_discount_Pay_due');
-                print(Allow_give_discount_Pay_due);
-                print(UPIN_Allow_give_discount_Pay_due);
-                print(BMKID != 11 || BMKID != 12);
-                print((PKID == 3 && Allow_give_discount_Pay_due == '1' ||
-                    (Allow_give_discount_Pay_due == '3'
-                        && UPIN_Allow_give_discount_Pay_due == 1)));
+
               } else {
                 Allow_give_discount_Pay_due = '2';
               }
@@ -2539,12 +2458,9 @@ class Sale_Invoices_Controller extends GetxController {
                     BMKID == 6 ? 583 : BMKID == 7 ? 584 : 597).then((
                 data) async {
               if (data.isNotEmpty) {
-                Allow_give_discount_Pay_Not_Cash_Due = BMKID == 1 ? '1' : data
-                    .elementAt(0)
-                    .SVVL;
-                if (data
-                    .elementAt(0)
-                    .SVVL == '3') {
+                Allow_give_discount_Pay_Not_Cash_Due = (BMKID == 1 || BMKID == 2)? '1'
+                    : data.elementAt(0).SVVL;
+                if (data.elementAt(0).SVVL == '3') {
                   //السماح باعطاء تخفيض اذا كان الدفع ليس نقدا او اجل
                   await PRIVLAGE(LoginController().SUID,
                       BMKID == 3 || BMKID == 4 || BMKID == 10 ? 1869 :
@@ -2552,23 +2468,13 @@ class Sale_Invoices_Controller extends GetxController {
                           ? 1871
                           : 2347).then((data) {
                     if (data.isNotEmpty) {
-                      UPIN_Allow_give_discount_Pay_Not_Cash_Due = BMKID == 1
-                          ? 1
-                          : data
-                          .elementAt(0)
-                          .UPIN;
+                      UPIN_Allow_give_discount_Pay_Not_Cash_Due = (BMKID == 1 || BMKID == 2)
+                          ? 1 : data.elementAt(0).UPIN;
                     } else {
                       UPIN_Allow_give_discount_Pay_Not_Cash_Due = 2;
                     }
                   });
                 }
-                print('Allow_give_discount_Pay_Not_Cash_Due');
-                print(Allow_give_discount_Pay_Not_Cash_Due);
-                print(UPIN_Allow_give_discount_Pay_Not_Cash_Due);
-                print((PKID != 1 && PKID != 3 &&
-                    Allow_give_discount_Pay_Not_Cash_Due == '1' ||
-                    (Allow_give_discount_Pay_Not_Cash_Due == '3'
-                        && UPIN_Allow_give_discount_Pay_Not_Cash_Due == 1)));
               } else {
                 Allow_give_discount_Pay_Not_Cash_Due = '2';
               }
@@ -2606,19 +2512,10 @@ class Sale_Invoices_Controller extends GetxController {
   Future GET_Allow_Edit_Sale_Prices() async {
     var SYS_VAR = await GET_SYS_VAR(
         BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10
-            ? 516
-            : 604);
+            ? 516 : 604);
     if (SYS_VAR.isNotEmpty) {
-      Allow_Edit_Sale_Prices = BMKID == 1 ? '1' : SYS_VAR
-          .elementAt(0)
-          .SVVL;
-      if (SYS_VAR
-          .elementAt(0)
-          .SVVL == '1') {
-        print('Allow_Edit_Sale_Prices2');
-        print(SYS_VAR
-            .elementAt(0)
-            .SVVL);
+      Allow_Edit_Sale_Prices = (BMKID == 1 || BMKID == 2) ? '1' : SYS_VAR.elementAt(0).SVVL;
+      if (SYS_VAR.elementAt(0).SVVL == '1') {
         var USR_PRI = await PRIVLAGE(LoginController().SUID,
             BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10
                 ? 605
@@ -2626,16 +2523,8 @@ class Sale_Invoices_Controller extends GetxController {
         print('Allow_Edit_Sale_Prices3');
         print(USR_PRI);
         if (USR_PRI.isNotEmpty) {
-          UPIN_EDIT_MPS1 = BMKID == 1 ? 1 : USR_PRI
-              .elementAt(0)
-              .UPIN!;
-          Allow_Cho_Price = USR_PRI
-              .elementAt(0)
-              .UPIN
-              .toString();
-          print('Allow_Edit_Sale_Prices3');
-          print(Allow_Cho_Price);
-          print(UPIN_EDIT_MPS1);
+          UPIN_EDIT_MPS1 = (BMKID == 1 || BMKID == 2) ? 1 : USR_PRI.elementAt(0).UPIN!;
+          Allow_Cho_Price = USR_PRI.elementAt(0).UPIN.toString();
           update();
         }
         else {
@@ -2649,22 +2538,15 @@ class Sale_Invoices_Controller extends GetxController {
                 BMKID == 6 ? 565 :
             BMKID == 7 ? 566 : 591).then((data) {
           if (data.isNotEmpty) {
-            Allow_Cho_Price = BMKID == 1 ? '1' : data
-                .elementAt(0)
-                .SVVL
-                .toString();
-            if (data
-                .elementAt(0)
-                .SVVL == '3') {
+            Allow_Cho_Price = (BMKID == 1 || BMKID==2) ? '1' : data.elementAt(0).SVVL.toString();
+            if (data.elementAt(0).SVVL == '3') {
               PRIVLAGE(LoginController().SUID,
                   BMKID == 3 || BMKID == 4 || BMKID == 10 ? 1851 : BMKID == 5 ||
                       BMKID == 6 ? 1852
                       : BMKID == 7 ? 1853 : 2341).then((data) {
                 USR_PRI = data;
                 if (USR_PRI.isNotEmpty) {
-                  UPIN_Allow_Cho_Price = BMKID == 1 ? 1 : USR_PRI
-                      .elementAt(0)
-                      .UPIN!;
+                  UPIN_Allow_Cho_Price = (BMKID == 1 || BMKID==2) ? 1 : USR_PRI.elementAt(0).UPIN!;
                   update();
                 } else {
                   UPIN_Allow_Cho_Price = 2;
@@ -2729,14 +2611,11 @@ class Sale_Invoices_Controller extends GetxController {
   //ضرورة تحديد المندوب/الموزع عند ادخال فاتورة مبيعات
   Future GET_SHOW_BDID() async {
     GET_SYS_VAR(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 692 : BMKID == 1
-            ? 691
-            : BMKID == 5 ? 693 : 737).then((data) {
+        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 692 : (BMKID == 1 || BMKID == 2)
+            ? 691 : BMKID == 5 ? 693 : 737).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        SHOW_BDID = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        SHOW_BDID = SYS_VAR.elementAt(0).SVVL;
       }
     });
   }
@@ -2817,9 +2696,8 @@ class Sale_Invoices_Controller extends GetxController {
   //في فاتورة المبيعات يكون التأثير المحاسبي للحساب على الفروع بـ
   Future GET_Accounting_Effect_of_Branches() async {
     GET_SYS_VAR(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 403 : BMKID == 1
-            ? 402
-            : BMKID == 5 ? 404 : 405).then((data) {
+        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 403 : (BMKID == 1 || BMKID==2)
+            ? 402 : BMKID == 5 ? 404 : 405).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
         Accounting_Effect_of_Branches = SYS_VAR
@@ -2836,7 +2714,7 @@ class Sale_Invoices_Controller extends GetxController {
           PRIVLAGE(LoginController().SUID,
               BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10
                   ? 640
-                  : BMKID == 1 ? 908
+                  : (BMKID == 1  || BMKID == 2) ? 908
                   : BMKID == 5 ? 635 : 2352).then((data) {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
@@ -2939,24 +2817,15 @@ class Sale_Invoices_Controller extends GetxController {
         data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        print('GET_USE_ACNO');
-        print(SYS_VAR
-            .elementAt(0)
-            .SVVL);
-        P_COSS =
-        BMKID == 7 || BMKID == 10 || BMKID == 11 || BMKID == 12 ? '2' : SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        P_COSS = BMKID == 7 || BMKID == 10 || BMKID == 11 || BMKID == 12 ? '2'
+            : SYS_VAR.elementAt(0).SVVL;
         if (P_COSS == '4') {
           //حسب الصلاحيات
           PRIVLAGE(LoginController().SUID,
-              BMKID == 1 ? 954 : BMKID == 5 || BMKID == 6 ? 637 : 664).then((
-              data) {
+              (BMKID == 1 || BMKID == 2 )? 954 : BMKID == 5 || BMKID == 6 ? 637 : 664).then((data) {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
-              UPIN_USE_ACNO = USR_PRI
-                  .elementAt(0)
-                  .UPIN;
+              UPIN_USE_ACNO = USR_PRI.elementAt(0).UPIN;
             } else {
               UPIN_USE_ACNO = 2;
             }
@@ -2972,24 +2841,15 @@ class Sale_Invoices_Controller extends GetxController {
 
   //تسلسل الحركة حسب مراكز التكلفة في الشاشة
   Future GET_COS_SEQ() async {
-    GET_SYS_VAR(BMKID == 670 ? 507 : BMKID == 5 || BMKID == 6 ? 671 : 669)
-        .then((data) {
+    GET_SYS_VAR((BMKID == 1 || BMKID == 2) ? 607 : (BMKID == 5 || BMKID == 6) ? 671 : 669).then((data) {
       SYS_VAR = data;
       if (data.isNotEmpty) {
-        P_COS_SEQ = data
-            .elementAt(0)
-            .SVVL!;
-        print('GET_COS_SEQ');
-        print(data
-            .elementAt(0)
-            .SVVL!);
+        P_COS_SEQ = data.elementAt(0).SVVL!;
         P_COS_SEQ == '4' ? P_COS_SEQ = '1' : P_COS_SEQ = '2';
       } else {
         P_COS_SEQ = '2';
       }
-      print('P_COS_SEQ : ${P_COS_SEQ}');
-      print(P_COSM != '1' || (P_COS_SEQ == '2' && P_COSS == '5'));
-      SET_COS();
+       SET_COS();
     });
   }
 
@@ -3033,14 +2893,11 @@ class Sale_Invoices_Controller extends GetxController {
   //في فاتورة المبيعات الكميه المجانيه للمنتج/الخدمه تكون
   Future GET_USE_BMDFN() async {
     GET_SYS_VAR(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 431 : BMKID == 1
-            ? 430
-            : BMKID == 5 ? 432 : 433).then((data) {
+        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 431 :
+        (BMKID == 1 || BMKID == 2) ? 430 : BMKID == 5 ? 432 : 433).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        USE_BMDFN = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        USE_BMDFN = SYS_VAR.elementAt(0).SVVL;
       } else {
         USE_BMDFN = '1';
       }
@@ -3064,14 +2921,11 @@ class Sale_Invoices_Controller extends GetxController {
   //البيع بطريقة الاجل في المبيعات
   Future GET_PKID_V() async {
     PRIVLAGE(LoginController().SUID,
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 604 : BMKID == 1
-            ? 904
-            : BMKID == 5 ? 624 : 2203).then((data) {
+        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 604 : (BMKID == 1 || BMKID==2)
+            ? 904 : BMKID == 5 ? 624 : 2203).then((data) {
       USR_PRI = data;
       if (USR_PRI.isNotEmpty) {
-        UPIN_PKID = USR_PRI
-            .elementAt(0)
-            .UPIN!;
+        UPIN_PKID = USR_PRI.elementAt(0).UPIN!;
         update();
       } else {
         UPIN_PKID = 2;
@@ -3760,15 +3614,10 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   Future GET_STO_INF_ONE_P() async {
-    GET_STO_INF_ONE(
-        BMKID!, SelectDataBIID.toString(), SelectDataBPID.toString()).then((
-        data) {
+    GET_STO_INF_ONE(BMKID!, SelectDataBIID.toString(), SelectDataBPID.toString()).then((data) {
       STO_INF = data;
       if (STO_INF.isNotEmpty) {
-        SelectDataSIID = STO_INF
-            .elementAt(0)
-            .SIID
-            .toString();
+        SelectDataSIID = STO_INF.elementAt(0).SIID.toString();
         update();
       }
       update();
@@ -3779,22 +3628,13 @@ class Sale_Invoices_Controller extends GetxController {
   Future GET_PAY_KIN_ONE_P_POS() async {
     PAY_KIN = await GET_PAY_KIN_ONE(BMKID!,
         BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10
-            ? 'BO'
-            : BMKID == 1 ? 'BI' : 'BF',
+            ? 'BO' : (BMKID == 1 || BMKID== 2) ? 'BI' : 'BF',
         UPIN_PKID, SelectDataBPID.toString());
 
     if (PAY_KIN.isNotEmpty) {
-      PKID = PAY_KIN
-          .elementAt(0)
-          .PKID;
-      SelectDataPKID = PAY_KIN
-          .elementAt(0)
-          .PKID
-          .toString();
-      PKNA = PAY_KIN
-          .elementAt(0)
-          .PKNA_D
-          .toString();
+      PKID = PAY_KIN.elementAt(0).PKID;
+      SelectDataPKID = PAY_KIN.elementAt(0).PKID.toString();
+      PKNA = PAY_KIN.elementAt(0).PKNA_D.toString();
     }
     update();
   }
@@ -3814,11 +3654,8 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب الدفع
   Future GET_PAY_KIN_P() async {
-    print('BMKID');
-    print(BMKID);
-    PAY_KIN_LIST = await GET_PAY_KIN(
-        BMKID!, [3, 4, 5, 6].contains(BMKID) ? 'BO' : BMKID == 1 ? 'BI' : 'BF'
-        , UPIN_PKID, SelectDataBPID.toString());
+    PAY_KIN_LIST = await GET_PAY_KIN(BMKID!, [3, 4, 5, 6].contains(BMKID) ? 'BO'
+        : (BMKID == 1 || BMKID==2) ? 'BI' : 'BF', UPIN_PKID, SelectDataBPID.toString());
     update();
   }
 
@@ -4023,7 +3860,7 @@ class Sale_Invoices_Controller extends GetxController {
   Future GET_ACC_CAS_P() async {
     ACC_CAS = await GET_ACC_CAS_ONE(
         SelectDataBIID.toString(), SelectDataSCID.toString(),
-        BMKID == 1 ? 'BI' : BMKID == 3 ? 'BO' : BMKID == 4 ? 'BO' : BMKID == 5
+       ( BMKID == 1 || BMKID == 2) ? 'BI' : BMKID == 3 ? 'BO' : BMKID == 4 ? 'BO' : BMKID == 5
             ? 'BS'
             : 'BF',
         BMKID!, LoginController().ACID_SALE);
@@ -4239,10 +4076,10 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_PAY_ONE_P(PKID.toString());
     await GET_ECO_ACC_P(AANOController.text);
     P_COSS == '1' || (P_COSS == '4' && UPIN_USE_ACNO == 1)
-        ? LoginController().SCID_SALE != 0?
+        ? LoginController().ACNO_SALE != 0?
          SelectDataACNO= LoginController().ACNO_SALE.toString():
     GET_ACC_COS_ONE_P()
-        : null;
+          : null;
     await GET_MAT_GRO_P();
     await GET_COU_INF_M_P();
     await GET_PAY_KIN_P();
@@ -4288,7 +4125,7 @@ class Sale_Invoices_Controller extends GetxController {
         SHOW_GRO = false;
         SHOW_ITEM = true;
         ADD_T = 1;
-        if ((BMKID == 4 || BMKID == 12) && LoginController().Return_Type == '2') {
+        if ((BMKID == 1 || BMKID == 4 || BMKID == 12) && LoginController().Return_Type == '2') {
           edit = false;
           LoginController().SET_N_P('TIMER_POST', 1);
           await GET_BMMID_P();
@@ -4739,7 +4576,7 @@ class Sale_Invoices_Controller extends GetxController {
     MAT_INF = await Get_MUIDS_D(
         MGNOController.text.toString(), SelectDataMINO.toString());
     if (MAT_INF.isNotEmpty) {
-      BMKID == 1 ? SelectDataMUID = MAT_INF.elementAt(0).MUIDP.toString() :
+      (BMKID == 1 || BMKID == 2 )? SelectDataMUID = MAT_INF.elementAt(0).MUIDP.toString() :
       SelectDataMUID = MAT_INF.elementAt(0).MUIDS.toString();
       SIID_V2 = SelectDataSIID.toString();
       await GETSNDE_ONE();
@@ -4963,7 +4800,7 @@ class Sale_Invoices_Controller extends GetxController {
         MPS1 = 0;
         BMDAMController.text = '0';
       } else {
-        if (BMKID != 1) {
+        if (BMKID != 1 && BMKID != 2) {
           //جلب سعر البيع حسب العميل عن طريق حقل السعر من جدول العميل
           if (((BMKID == 11 || BMKID == 12) && BPPR == 1) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
@@ -5052,7 +4889,7 @@ class Sale_Invoices_Controller extends GetxController {
       }
       update();
       //احتساب اقل سعر
-      BMKID == 1 ? MPLP = 0 : MAT_PRI
+     ( BMKID == 1 || BMKID==2) ? MPLP = 0 : MAT_PRI
           .elementAt(0)
           .MPLT == 1 && MAT_PRI
           .elementAt(0)
@@ -5064,7 +4901,7 @@ class Sale_Invoices_Controller extends GetxController {
           .elementAt(0)
           .MPLP;
       //احتساب اعلى سعر
-      BMKID == 1 ? MPHP = 0 : MAT_PRI
+      (BMKID == 1 || BMKID==2) ? MPHP = 0 : MAT_PRI
           .elementAt(0)
           .MPHT == 1 && MAT_PRI
           .elementAt(0)
@@ -5111,7 +4948,7 @@ class Sale_Invoices_Controller extends GetxController {
         MPS1 = 0;
         BMDAMController.text = '0';
       } else {
-        if (BMKID != 1) {
+        if (BMKID != 1 && BMKID != 2) {
           //جلب سعر البيع حسب العميل عن طريق حقل السعر من جدول العميل
           if (((BMKID == 11 || BMKID == 12) && BPPR == 1) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
@@ -5210,7 +5047,7 @@ class Sale_Invoices_Controller extends GetxController {
 
       update();
       //احتساب اقل سعر
-      BMKID == 1
+      (BMKID == 1 || BMKID == 2)
           ? MPLP = 0
           : MAT_PRI
           .elementAt(0)
@@ -5225,7 +5062,7 @@ class Sale_Invoices_Controller extends GetxController {
           .elementAt(0)
           .MPLP;
       //احتساب اعلى سعر
-      BMKID == 1
+     ( BMKID == 1 || BMKID == 2)
           ? MPHP = 0
           : MAT_PRI
           .elementAt(0)
@@ -5423,7 +5260,7 @@ class Sale_Invoices_Controller extends GetxController {
   //اظهار البيانات +البحث
   get_RETURN_SALE(String type) async {
     RETURN_SALE_INV = await GET_BIL_MOV_M(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-        BMKID == 4 ? 3 : BMKID == 12 ? 11 : BMKID!, type,
+        BMKID == 4 ? 3 : BMKID == 12 ? 11 : BMKID == 2 ? 1 : BMKID!, type,
         type == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
         type == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
         selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
@@ -5503,27 +5340,14 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب بيانات العميل-المورد مثل العنوان و الاسم والرقم الضريبي
   Future GET_BIL_CUS_IMP_INF_P(String GETBCID) async {
-    if (BMKID == 1) {
+    if (BMKID == 1 || BMKID == 2) {
       BIL_IMP = await GET_BIL_IMP_INF(GETBCID);
       if (BIL_IMP.isNotEmpty) {
-        print('BITX');
-        print(BIL_IMP
-            .elementAt(0)
-            .BITX);
         //الاسم
-        BCNA = BIL_IMP
-            .elementAt(0)
-            .BINA
-            .toString();
+        BCNA = BIL_IMP.elementAt(0).BINA.toString();
         //رقم البنايه
-        BCBN = BIL_IMP
-            .elementAt(0)
-            .BIBN == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BIBN
-            .toString();
+        BCBN = BIL_IMP.elementAt(0).BIBN == null
+            ? '' : BIL_IMP.elementAt(0).BIBN.toString();
         //رقم الشارع
         BCSN = BIL_IMP
             .elementAt(0)
@@ -5920,13 +5744,9 @@ class Sale_Invoices_Controller extends GetxController {
     BIL_MOV_M =
     await GET_BMMID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M');
     if (BIL_MOV_M.isNotEmpty) {
-      BMMID = BIL_MOV_M
-          .elementAt(0)
-          .BMMID;
+      BMMID = BIL_MOV_M.elementAt(0).BMMID;
       update();
-      LoginController().SET_N_P('BMMID', BIL_MOV_M
-          .elementAt(0)
-          .BMMID!);
+      LoginController().SET_N_P('BMMID', BIL_MOV_M.elementAt(0).BMMID!);
     }
     update();
   }
@@ -5940,14 +5760,11 @@ class Sale_Invoices_Controller extends GetxController {
 
   // جلب  اجمالي الضريبه
   GET_SUMBMDTXA() async {
-    SUM_TOT = await COUNT_BMDTXA(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    SUM_TOT = await COUNT_BMDTXA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
     if (SUM_TOT.isEmpty) {
       SUMBMDTXA = 0.0;
     } else {
-      SUMBMDTXA = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDTXA!, SCSFL);
+      SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
     }
   }
 
@@ -6557,7 +6374,7 @@ class Sale_Invoices_Controller extends GetxController {
               backgroundColor: Colors.redAccent);
           STB_N = 'S11';
           return false;
-        } else if (MGKI == 1 && BMKID != 1 && BMKID != 12 && BMKID != 4 &&
+        } else if (MGKI == 1 && BMKID != 1 && BMKID != 2 && BMKID != 12 && BMKID != 4 &&
             (Show_Items == '2' || Show_Items == '3' && Allow_Show_Items == 2) &&
             (double.parse(BMDNOController.text) > BDNO_F)) {
           Get.defaultDialog(
@@ -6668,7 +6485,7 @@ class Sale_Invoices_Controller extends GetxController {
               SIID: int.parse(SIID_V2.toString()),
               BIID: int.parse(SelectDataBIID.toString()),
               MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
-              BMDED: BMKID == 1 ? BMDEDController.text : SelectDataSNED.toString(),
+              BMDED: BMKID == 1 || BMKID == 2 ? BMDEDController.text : SelectDataSNED.toString(),
               BMDTY: 1,
               BMDAMR: roundDouble(double.parse(MPCOController.text) / SCEXS!, 6),
               BMDAMO: MPS1,
@@ -6737,7 +6554,7 @@ class Sale_Invoices_Controller extends GetxController {
             update();
           }
 
-          if (BMKID != 1) {
+          if (BMKID != 1 && BMKID != 2) {
             //اضافة الاصناف التابعة والمرتبطة
             await ADD_MAT_FOL_TO_MOV_D(
                 SelectDataBIID.toString(), MGNOController.text,
@@ -6924,8 +6741,7 @@ class Sale_Invoices_Controller extends GetxController {
             SIID: int.parse(SelectDataSIID.toString()),
             BIID: int.parse(SelectDataBIID.toString()),
             MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
-            BMDED: BMKID == 1 ? BMDEDController.text : SelectDataSNED
-                .toString(),
+            BMDED: BMKID == 1 || BMKID == 2? BMDEDController.text : SelectDataSNED.toString(),
             BMDTY: 1,
             BMDDIF: BMDNFController.text.isEmpty ||
                 double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1,
@@ -6960,8 +6776,7 @@ class Sale_Invoices_Controller extends GetxController {
             SYID_L: LoginController().SYID,
             CIID_L: LoginController().CIID,
           );
-          Save_BIF_MOV_D(
-              BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
+          Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
           MES_ADD_EDIT = 'StringAD'.tr;
         }
         STB_N = 'S15';
@@ -7104,15 +6919,12 @@ class Sale_Invoices_Controller extends GetxController {
             await GET_BROCODE_P(
                 userList[i].MGNOF.toString(), userList[i].MINOF.toString(),
                 userList[i].MUIDF.toString());
-            var data = await GET_BMDID(
-                BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+            var data = await GET_BMDID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
             if (data.isNotEmpty) {
               Bil_Mov_D_Local e = Bil_Mov_D_Local(
                 BMMID: BMMID,
                 BMDIDR: GETBMDID,
-                BMDID: data
-                    .elementAt(0)
-                    .BMDID,
+                BMDID: data.elementAt(0).BMDID,
                 BMKID: BMKID,
                 MGNO: userList[i].MGNOF,
                 MINO: userList[i].MINOF,
@@ -7154,8 +6966,7 @@ class Sale_Invoices_Controller extends GetxController {
                 SYID_L: userList[i].SYID_L,
                 CIID_L: userList[i].CIID_L,
               );
-              Save_BIF_MOV_D(
-                  BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
+              Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
               print(e);
             }
           } catch (e) {
@@ -7172,8 +6983,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   Future GET_BMDID_COUNT_P() async {
-    await GET_BMDID_COUNT(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+    await GET_BMDID_COUNT(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
         BMMID.toString()).then((userList) async {
       if (userList.isNotEmpty) {
         print('GET_BMDID_COUNT_P');
@@ -7200,8 +7010,7 @@ class Sale_Invoices_Controller extends GetxController {
     final dbClient = await conn.database;
     List<Bil_Mov_D_Local> contactList = [];
     try {
-      final maps = await dbClient!.query(
-          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+      final maps = await dbClient!.query(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
           where: "MGKI=1 AND BMMID='$GETBMMID' ");
       for (var item in maps) {
         contactList.add(Bil_Mov_D_Local.fromMap(item));
@@ -7465,7 +7274,7 @@ class Sale_Invoices_Controller extends GetxController {
           SelectDataSCID == null || ((BMKID == 3 ||
           BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10)
           && SelectDataBCID == null ||
-          (BMKID == 1 && SelectDataBIID2 == null))) {
+          ((BMKID == 1 || BMKID == 2) && SelectDataBIID2 == null))) {
         Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
             backgroundColor: Colors.red,
             icon: const Icon(Icons.error, color: Colors.white),
@@ -7482,7 +7291,7 @@ class Sale_Invoices_Controller extends GetxController {
             textColor: Colors.white,
             backgroundColor: Colors.redAccent);
         return false;
-      } else if (BMKID == 1 && SelectDataBIID2 == null) {
+      } else if ((BMKID == 1 || BMKID == 2) && SelectDataBIID2 == null) {
         Fluttertoast.showToast(
             msg: 'StringChi_BIID'.tr,
             textColor: Colors.white,
@@ -7502,7 +7311,7 @@ class Sale_Invoices_Controller extends GetxController {
             textColor: Colors.white,
             backgroundColor: Colors.redAccent);
         return false;
-      } else if (BMKID != 1 && SelectDataPKID.toString() == '3' &&
+      } else if ((BMKID != 1 || BMKID != 2 )&& SelectDataPKID.toString() == '3' &&
           SelectDataBCID == null) {
         Fluttertoast.showToast(
             msg: 'StrinError_BCID'.tr,
@@ -7651,7 +7460,7 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         return false;
       } else if (STMID == 'MOB' && StteingController().Show_Inv_Pay == true &&
-          Show_Inv_Pay == true && BMKID != 4 && BMKID != 12 &&
+          Show_Inv_Pay == true && BMKID != 4 && BMKID != 12 && BMKID != 2 &&
           ((BMKID == 1 || BMKID == 3 || BMKID == 5) && PKID == 3 ||
               BMKID == 11)) {
         await GET_AMMID_P();
@@ -7673,7 +7482,7 @@ class Sale_Invoices_Controller extends GetxController {
             BMMID: BMMID,
             BMMNO: BMMNO == null ? 1 : int.parse(BMMNO.toString()),
             BIID2: int.parse(SelectDataBIID.toString()),
-            BIID: BMKID == 1 ? int.parse(SelectDataBIID2.toString()) : BMKID ==
+            BIID: BMKID == 1 || BMKID == 2 ? int.parse(SelectDataBIID2.toString()) : BMKID ==
                 11 || BMKID == 12 ? int.parse(SelectDataBIID.toString()) : null,
             SIID: int.parse(SelectDataSIID.toString()),
             BPID: BMKID == 11 || BMKID == 12 ? int.parse(SelectDataBPID.toString()) : null,
@@ -7952,7 +7761,7 @@ class Sale_Invoices_Controller extends GetxController {
         await GET_BIL_MOV_M_PRINT_P(BMMID!);
         await GET_BIF_MOV_D_P(BMMID.toString(), RINT_RELATED_ITEMS_DETAIL.toString());
         await GET_Sys_Own_P(SelectDataBIID.toString());
-        await GET_BIL_CUS_IMP_INF_P(BMKID == 1 ? SelectDataBIID2.toString() : SelectDataBCID.toString());
+        await GET_BIL_CUS_IMP_INF_P(BMKID == 1 || BMKID == 2? SelectDataBIID2.toString() : SelectDataBCID.toString());
 
         if (LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1 && BMMST != 4 && STMID != 'EORD') {
          print('BMMST');
@@ -8961,12 +8770,9 @@ class Sale_Invoices_Controller extends GetxController {
                                                         SizedBox(
                                                           width: 0.02 * height,),
                                                         controller.BMKID == 3 ||
-                                                            controller.BMKID ==
-                                                                4 ||
-                                                            controller.BMKID ==
-                                                                5 ||
-                                                            controller.BMKID == 7
-                                                            ||
+                                                            controller.BMKID == 4 ||
+                                                            controller.BMKID == 5 ||
+                                                            controller.BMKID == 7 ||
                                                             controller.BMKID == 10
                                                             ? Expanded(
                                                           child: DropdownMat_Date_endBuilder(),
@@ -9073,11 +8879,8 @@ class Sale_Invoices_Controller extends GetxController {
                                                   mainAxisAlignment: MainAxisAlignment
                                                       .spaceBetween,
                                                   children: [
-                                                    controller.BMKID == 1 ||
-                                                        controller
-                                                            .Allow_give_Free_Quantities ==
-                                                            '1' && controller
-                                                            .UPIN_BMDNF == 1
+                                                    (controller.BMKID == 1 ||  controller.BMKID == 2 )||
+                                                        controller.Allow_give_Free_Quantities == '1' && controller.UPIN_BMDNF == 1
                                                         ? Column(
                                                       mainAxisAlignment: MainAxisAlignment
                                                           .spaceBetween,
@@ -9274,26 +9077,15 @@ class Sale_Invoices_Controller extends GetxController {
                                                                 Colors.red, 'M')),
                                                       ],
                                                     ),
-                                                    controller.BMKID == 1 ||
-                                                        controller
-                                                            .Allow_give_Free_Quantities ==
-                                                            '1' && controller
-                                                            .UPIN_BMDNF == 1
+                                                    (controller.BMKID == 1 || controller.BMKID == 2) ||
+                                                        controller.Allow_give_Free_Quantities == '1' && controller.UPIN_BMDNF == 1
                                                         ? Column(
-                                                      mainAxisAlignment: MainAxisAlignment
-                                                          .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
-                                                        SizedBox(height: 0.01 *
-                                                            height),
+                                                        SizedBox(height: 0.01 * height),
                                                         controller.UPIN_PRI == 1
-                                                            ? Text(controller
-                                                            .MPCO_VController
-                                                            .text,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.grey[600]!,
-                                                                'M'))
+                                                            ? Text(controller.MPCO_VController.text,
+                                                            style: ThemeHelper().buildTextStyle(context, Colors.grey[600]!, 'M'))
                                                             : Container(),
                                                         controller.UPIN_PRI == 1
                                                             ? SizedBox(
@@ -9582,55 +9374,25 @@ class Sale_Invoices_Controller extends GetxController {
                                                                     UPIN_Allow_Cho_Price);
                                                                 print(
                                                                     'UPIN_Allow_Cho_Price');
-                                                                if (controller
-                                                                    .BMKID != 1 &&
-                                                                    (controller
-                                                                        .Allow_Cho_Price ==
-                                                                        '1' ||
-                                                                        (controller
-                                                                            .Allow_Cho_Price ==
-                                                                            '3' &&
-                                                                            controller
-                                                                                .UPIN_Allow_Cho_Price ==
-                                                                                1))) {
-                                                                  buildShowMPS1(
-                                                                      context);
+                                                                if (controller.BMKID != 1 && controller.BMKID != 2 &&
+                                                                    (controller.Allow_Cho_Price == '1' ||
+                                                                        (controller.Allow_Cho_Price == '3' &&
+                                                                            controller.UPIN_Allow_Cho_Price == 1))) {
+                                                                  buildShowMPS1(context);
                                                                 }
                                                               },
                                                               child: TextFormField(
-                                                                style: ThemeHelper()
-                                                                    .buildTextStyle(
-                                                                    context,
-                                                                    Colors.black,
-                                                                    'M'),
-                                                                controller: controller
-                                                                    .BMDAMController,
-                                                                keyboardType: TextInputType
-                                                                    .number,
-                                                                textAlign: TextAlign
-                                                                    .center,
-                                                                focusNode: controller
-                                                                    .myFocusBMMAM,
-                                                                enabled: controller
-                                                                    .BMKID == 1 ||
-                                                                    controller
-                                                                        .Allow_Edit_Sale_Prices ==
-                                                                        '1' &&
-                                                                        controller
-                                                                            .UPIN_EDIT_MPS1 ==
-                                                                            1 &&
-                                                                        controller
-                                                                            .MIFR ==
-                                                                            2
-                                                                    ? true
-                                                                    : false,
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                                                controller: controller.BMDAMController,
+                                                                keyboardType: TextInputType.number,
+                                                                textAlign: TextAlign.center,
+                                                                focusNode: controller.myFocusBMMAM,
+                                                                enabled: (controller.BMKID == 1 ||
+                                                                controller.BMKID == 1) || controller.Allow_Edit_Sale_Prices == '1' &&
+                                                                    controller.UPIN_EDIT_MPS1 == 1 && controller.MIFR == 2
+                                                                    ? true : false,
                                                                 validator: (v) {
-                                                                  return controller
-                                                                      .validateBMDAM(
-                                                                      controller
-                                                                          .BMDAMController
-                                                                          .text
-                                                                          .toString());
+                                                                  return controller.validateBMDAM(controller.BMDAMController.text.toString());
                                                                 },
                                                                 onChanged:
                                                                     (v) async {
@@ -9872,56 +9634,28 @@ class Sale_Invoices_Controller extends GetxController {
                                                                     UPIN_Allow_Cho_Price);
                                                                 print(
                                                                     'UPIN_Allow_Cho_Price');
-                                                                if (controller
-                                                                    .BMKID != 1 &&
-                                                                    (controller
-                                                                        .Allow_Cho_Price ==
-                                                                        '1' ||
-                                                                        (controller
-                                                                            .Allow_Cho_Price ==
-                                                                            '3' &&
-                                                                            controller
-                                                                                .UPIN_Allow_Cho_Price ==
-                                                                                1))) {
+                                                                if (controller.BMKID != 1 && controller.BMKID != 2 &&
+                                                                    (controller.Allow_Cho_Price == '1' ||
+                                                                        (controller.Allow_Cho_Price == '3' &&
+                                                                            controller.UPIN_Allow_Cho_Price == 1))) {
                                                                   buildShowMPS1(
                                                                       context);
                                                                 }
                                                               },
                                                               child: TextFormField(
-                                                                style: ThemeHelper()
-                                                                    .buildTextStyle(
-                                                                    context,
-                                                                    Colors.black,
-                                                                    'M'),
-                                                                controller: controller
-                                                                    .BMDAMController,
-                                                                keyboardType: TextInputType
-                                                                    .number,
-                                                                textAlign: TextAlign
-                                                                    .center,
-                                                                focusNode: controller
-                                                                    .myFocusBMMAM,
-                                                                enabled: controller
-                                                                    .BMKID == 1 ||
-                                                                    controller
-                                                                        .Allow_Edit_Sale_Prices ==
-                                                                        '1'
-                                                                        &&
-                                                                        controller
-                                                                            .UPIN_EDIT_MPS1 ==
-                                                                            1 &&
-                                                                        controller
-                                                                            .MIFR ==
-                                                                            2
-                                                                    ? true
-                                                                    : false,
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                                                controller: controller.BMDAMController,
+                                                                keyboardType: TextInputType.number,
+                                                                textAlign: TextAlign.center,
+                                                                focusNode: controller.myFocusBMMAM,
+                                                                enabled: (controller.BMKID == 1 || controller.BMKID == 2) ||
+                                                                    controller.Allow_Edit_Sale_Prices == '1' &&
+                                                                        controller.UPIN_EDIT_MPS1 == 1 &&
+                                                                        controller.MIFR == 2
+                                                                    ? true : false,
                                                                 validator: (v) {
-                                                                  return controller
-                                                                      .validateBMDAM(
-                                                                      controller
-                                                                          .BMDAMController
-                                                                          .text
-                                                                          .toString());
+                                                                  return controller.validateBMDAM(
+                                                                      controller.BMDAMController.text.toString());
                                                                 },
                                                                 onChanged:
                                                                     (v) async {
@@ -10799,16 +10533,10 @@ class Sale_Invoices_Controller extends GetxController {
                                                 textConfirm: 'StringYes'.tr,
                                                 confirmTextColor: Colors.white,
                                                 onConfirm: () async {
-                                                  if (BMKID != 1 &&
-                                                      controller
-                                                          .When_Selling_Items_Lower_Price_than_Cost_Price ==
-                                                          '1' &&
-                                                      double.parse(controller
-                                                          .MPCOController.text) >
-                                                          0 &&
-                                                      double.parse(controller
-                                                          .MPCOController.text) >
-                                                          controller.BMDAM1!) {
+                                                  if (BMKID != 1 && BMKID != 2 &&
+                                                      controller.When_Selling_Items_Lower_Price_than_Cost_Price == '1' &&
+                                                      double.parse(controller.MPCOController.text) > 0 &&
+                                                      double.parse(controller.MPCOController.text) > controller.BMDAM1!) {
                                                     Navigator.of(context).pop(
                                                         false);
                                                     Get.defaultDialog(
@@ -10825,13 +10553,9 @@ class Sale_Invoices_Controller extends GetxController {
                                                       confirmTextColor: Colors
                                                           .white,
                                                       onConfirm: () async {
-                                                        if (BMKID != 1 &&
-                                                            Use_lowest_selling_price ==
-                                                                '1' &&
-                                                            MPLP! > 0 &&
-                                                            BMDAM1! < MPLP!) {
-                                                          Navigator.of(context)
-                                                              .pop(false);
+                                                        if (BMKID != 1 && BMKID != 2 && Use_lowest_selling_price == '1' && MPLP! > 0
+                                                            && BMDAM1! < MPLP!) {
+                                                          Navigator.of(context).pop(false);
                                                           Get.defaultDialog(
                                                             title:
                                                             'StringMestitle'.tr,
@@ -10841,13 +10565,12 @@ class Sale_Invoices_Controller extends GetxController {
                                                             backgroundColor:
                                                             Colors.white,
                                                             radius: 40,
-                                                            textCancel: 'StringOK'
-                                                                .tr,
+                                                            textCancel: 'StringOK'.tr,
                                                             cancelTextColor:
                                                             Colors.blueAccent,
                                                             barrierDismissible: false,
                                                           );
-                                                        } else if (BMKID != 1 &&
+                                                        } else if (BMKID != 1 && BMKID != 2 &&
                                                             Use_lowest_selling_price ==
                                                                 '3' &&
                                                             Allow_lowest_selling_price !=
@@ -10872,9 +10595,8 @@ class Sale_Invoices_Controller extends GetxController {
                                                             barrierDismissible: false,
                                                           );
                                                         } else {
-                                                          if (BMKID != 1 &&
-                                                              Use_highest_selling_price ==
-                                                                  '1' &&
+                                                          if (BMKID != 1 && BMKID != 2 &&
+                                                              Use_highest_selling_price == '1' &&
                                                               MPHP! > 0 &&
                                                               BMDAM1! > MPHP!) {
                                                             Navigator.of(context)
@@ -10895,13 +10617,10 @@ class Sale_Invoices_Controller extends GetxController {
                                                               barrierDismissible:
                                                               false,
                                                             );
-                                                          } else if (BMKID != 1 &&
-                                                              Use_highest_selling_price ==
-                                                                  '3' &&
-                                                              Allow_highest_selling_price !=
-                                                                  1 &&
-                                                              MPHP! > 0 &&
-                                                              BMDAM1! > MPHP!) {
+                                                          } else if (BMKID != 1 && BMKID != 2 &&
+                                                              Use_highest_selling_price == '3' &&
+                                                              Allow_highest_selling_price != 1 &&
+                                                              MPHP! > 0 && BMDAM1! > MPHP!) {
                                                             Navigator.of(context)
                                                                 .pop(false);
                                                             Get.defaultDialog(
@@ -10938,33 +10657,22 @@ class Sale_Invoices_Controller extends GetxController {
                                                       barrierDismissible: false,
                                                     );
                                                   } else if (BMKID != 1 &&
-                                                      controller
-                                                          .When_Selling_Items_Lower_Price_than_Cost_Price ==
-                                                          '2' &&
-                                                      double.parse(controller
-                                                          .MPCOController.text) >
-                                                          0 &&
-                                                      double.parse(controller
-                                                          .MPCOController.text) >
-                                                          BMDAM1!) {
-                                                    Navigator.of(context).pop(
-                                                        false);
+                                                      controller.When_Selling_Items_Lower_Price_than_Cost_Price == '2' &&
+                                                      double.parse(controller.MPCOController.text) > 0 &&
+                                                      double.parse(controller.MPCOController.text) > BMDAM1!) {
+                                                    Navigator.of(context).pop(false);
                                                     Get.defaultDialog(
                                                       title: 'StringMestitle'.tr,
                                                       middleText:
-                                                      'StringErr_Items_Lower_Price'
-                                                          .tr,
-                                                      backgroundColor: Colors
-                                                          .white,
+                                                      'StringErr_Items_Lower_Price'.tr,
+                                                      backgroundColor: Colors.white,
                                                       radius: 40,
                                                       textCancel: 'StringOK'.tr,
-                                                      cancelTextColor:
-                                                      Colors.blueAccent,
+                                                      cancelTextColor: Colors.blueAccent,
                                                       barrierDismissible: false,
                                                     );
-                                                  } else if (BMKID != 1 &&
-                                                      controller
-                                                          .When_Selling_Items_Lower_Price_than_Cost_Price ==
+                                                  } else if (BMKID != 1 && BMKID != 2 &&
+                                                      controller.When_Selling_Items_Lower_Price_than_Cost_Price ==
                                                           '4' &&
                                                       controller
                                                           .Allowto_Sell_Less_than_Cost_Price !=
@@ -10993,7 +10701,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                   } else {
                                                     Navigator.of(context).pop(
                                                         false);
-                                                    if (BMKID != 1 &&
+                                                    if (BMKID != 1 && BMKID != 2 &&
                                                         Use_lowest_selling_price ==
                                                             '1' &&
                                                         MPLP! > 0 &&
@@ -11014,7 +10722,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                         Colors.blueAccent,
                                                         barrierDismissible: false,
                                                       );
-                                                    } else if (BMKID != 1 &&
+                                                    } else if (BMKID != 1 && BMKID != 2 &&
                                                         Use_lowest_selling_price ==
                                                             '3' &&
                                                         Allow_lowest_selling_price !=
@@ -11038,7 +10746,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                         barrierDismissible: false,
                                                       );
                                                     } else {
-                                                      if (BMKID != 1 &&
+                                                      if (BMKID != 1 && BMKID != 2 &&
                                                           Use_highest_selling_price ==
                                                               '1' &&
                                                           MPHP! > 0 &&
@@ -11060,7 +10768,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                           Colors.blueAccent,
                                                           barrierDismissible: false,
                                                         );
-                                                      } else if (BMKID != 1 &&
+                                                      } else if (BMKID != 1 && BMKID != 2 &&
                                                           Use_highest_selling_price ==
                                                               '3' &&
                                                           Allow_highest_selling_price !=
@@ -11116,7 +10824,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                 barrierDismissible: false,
                                               );
                                             } else {
-                                              if (BMKID != 1 && controller
+                                              if (BMKID != 1 && BMKID != 2  && controller
                                                   .When_Selling_Items_Lower_Price_than_Cost_Price ==
                                                   '1' &&
                                                   double.parse(
@@ -11136,7 +10844,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                   textConfirm: 'StringYes'.tr,
                                                   confirmTextColor: Colors.white,
                                                   onConfirm: () async {
-                                                    if (BMKID != 1 &&
+                                                    if (BMKID != 1 && BMKID != 2 &&
                                                         Use_lowest_selling_price ==
                                                             '1' &&
                                                         MPLP! > 0 &&
@@ -11157,7 +10865,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                         Colors.blueAccent,
                                                         barrierDismissible: false,
                                                       );
-                                                    } else if (BMKID != 1 &&
+                                                    } else if (BMKID != 1 && BMKID != 2 &&
                                                         Use_lowest_selling_price ==
                                                             '3' &&
                                                         Allow_lowest_selling_price !=
@@ -11181,7 +10889,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                         barrierDismissible: false,
                                                       );
                                                     } else {
-                                                      if (BMKID != 1 &&
+                                                      if (BMKID != 1 && BMKID != 2 &&
                                                           Use_highest_selling_price ==
                                                               '1' &&
                                                           MPHP! > 0 &&
@@ -11203,7 +10911,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                           Colors.blueAccent,
                                                           barrierDismissible: false,
                                                         );
-                                                      } else if (BMKID != 1 &&
+                                                      } else if (BMKID != 1 && BMKID != 2 &&
                                                           Use_highest_selling_price ==
                                                               '3' &&
                                                           Allow_highest_selling_price !=
@@ -11242,7 +10950,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                   },
                                                   barrierDismissible: false,
                                                 );
-                                              } else if (BMKID != 1 &&
+                                              } else if (BMKID != 1 && BMKID != 2 &&
                                                   controller
                                                       .When_Selling_Items_Lower_Price_than_Cost_Price ==
                                                       '2' &&
@@ -11264,7 +10972,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                       .blueAccent,
                                                   barrierDismissible: false,
                                                 );
-                                              } else if (BMKID != 1 &&
+                                              } else if (BMKID != 1 && BMKID != 2 &&
                                                   controller
                                                       .When_Selling_Items_Lower_Price_than_Cost_Price ==
                                                       '4' &&
@@ -11289,7 +10997,7 @@ class Sale_Invoices_Controller extends GetxController {
                                                   barrierDismissible: false,
                                                 );
                                               } else {
-                                                if (BMKID != 1 &&
+                                                if (BMKID != 1 && BMKID != 2 &&
                                                     Use_lowest_selling_price ==
                                                         '1' && MPLP! > 0 &&
                                                     BMDAM1! < MPLP!) {
@@ -11305,13 +11013,10 @@ class Sale_Invoices_Controller extends GetxController {
                                                     Colors.blueAccent,
                                                     barrierDismissible: false,
                                                   );
-                                                } else if (BMKID != 1 &&
-                                                    Use_lowest_selling_price ==
-                                                        '3' &&
-                                                    Allow_lowest_selling_price !=
-                                                        1 &&
-                                                    MPLP! > 0 &&
-                                                    BMDAM1! < MPLP!) {
+                                                } else if (BMKID != 1 && BMKID != 2 &&
+                                                    Use_lowest_selling_price == '3' &&
+                                                    Allow_lowest_selling_price != 1 &&
+                                                    MPLP! > 0 && BMDAM1! < MPLP!) {
                                                   Get.defaultDialog(
                                                     title: 'StringMestitle'.tr,
                                                     middleText:
@@ -11325,31 +11030,22 @@ class Sale_Invoices_Controller extends GetxController {
                                                     barrierDismissible: false,
                                                   );
                                                 } else {
-                                                  if (BMKID != 1 &&
-                                                      Use_highest_selling_price ==
-                                                          '1' &&
-                                                      MPHP! > 0 &&
-                                                      BMDAM1! > MPHP!) {
+                                                  if (BMKID != 1 && BMKID != 2 &&
+                                                      Use_highest_selling_price == '1' &&
+                                                      MPHP! > 0 && BMDAM1! > MPHP!) {
                                                     Get.defaultDialog(
                                                       title: 'StringMestitle'.tr,
-                                                      middleText:
-                                                      'StringUse_highest_selling_price'
-                                                          .tr,
-                                                      backgroundColor: Colors
-                                                          .white,
+                                                      middleText: 'StringUse_highest_selling_price'.tr,
+                                                      backgroundColor: Colors.white,
                                                       radius: 40,
                                                       textCancel: 'StringOK'.tr,
-                                                      cancelTextColor:
-                                                      Colors.blueAccent,
+                                                      cancelTextColor: Colors.blueAccent,
                                                       barrierDismissible: false,
                                                     );
-                                                  } else if (BMKID != 1 &&
-                                                      Use_highest_selling_price ==
-                                                          '3' &&
-                                                      Allow_highest_selling_price !=
-                                                          1 &&
-                                                      MPHP! > 0 &&
-                                                      BMDAM1! > MPHP!) {
+                                                  } else if (BMKID != 1 && BMKID != 2 &&
+                                                      Use_highest_selling_price == '3' &&
+                                                      Allow_highest_selling_price != 1 &&
+                                                      MPHP! > 0 && BMDAM1! > MPHP!) {
                                                     Get.defaultDialog(
                                                       title: 'StringMestitle'.tr,
                                                       middleText:
@@ -13312,7 +13008,7 @@ class Sale_Invoices_Controller extends GetxController {
                     controller.BMKID == 3 || controller.BMKID == 5 ||
                         controller.BMKID == 4 || controller.BMKID == 7 ||
                         controller.BMKID == 10 ? 'BO'
-                        : controller.BMKID == 1
+                        : (controller.BMKID == 1 ||  controller.BMKID == 2)
                         ? 'BI'
                         : 'BF',
                     controller.UPIN_PKID, controller.SelectDataBPID.toString()),
@@ -13385,7 +13081,7 @@ class Sale_Invoices_Controller extends GetxController {
             FutureBuilder<List<Acc_Cas_Local>>(
                 future: GET_ACC_CAS(controller.SelectDataBIID.toString(),
                     controller.SelectDataSCID.toString(),
-                    controller.BMKID == 1 ? 'BI' : controller.BMKID == 3
+                    (controller.BMKID == 1 || controller.BMKID == 2) ? 'BI' : controller.BMKID == 3
                         ? 'BO'
                         : controller.BMKID == 4 ? 'BO' : controller.BMKID == 5
                         ? 'BS'
@@ -13985,7 +13681,7 @@ class Sale_Invoices_Controller extends GetxController {
   Future<dynamic> buildShowBIL_ACC_C(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Get.defaultDialog(
-      title: BMKID == 1 ? 'StringDAT_IMP'.tr : 'StringDAT_CUS'.tr,
+      title: BMKID == 1 || BMKID == 2 ? 'StringDAT_IMP'.tr : 'StringDAT_CUS'.tr,
       backgroundColor: Colors.white,
       radius: 30,
       content: Column(children: [

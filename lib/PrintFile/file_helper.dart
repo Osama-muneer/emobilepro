@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
@@ -98,6 +99,94 @@ class FileHelper {
   }
 
 
+  /// يحول الصفحة الأولى من ملف PDF إلى صورة PNG ويعيد بايتاتها
+  static Future<Uint8List?> _pdfPageToPngBytes(String pdfPath) async {
+    final pdf = PdfImageRenderer(path: pdfPath);
+    await pdf.open();
+    await pdf.openPage(pageIndex: 0);
+    final size = await pdf.getPageSize(pageIndex: 0);
+
+    final rendered = await pdf.renderPage(
+      pageIndex: 0,
+      x: 0,
+      y: 0,
+      width: size.width.toInt(),
+      height: size.height.toInt(),
+      scale: 2.5,
+    );
+    await pdf.close();
+
+    if (rendered == null) return null;
+    final decoded = im.decodeImage(rendered);
+    if (decoded == null) return null;
+
+    return Uint8List.fromList(im.encodePng(decoded));
+  }
+
+  /// يولّد List<int> من أوامر ESC/POS لطباعة الصورة + قص الورق
+  static Future<List<int>> _generateEscPosBytesFromPng(Uint8List pngBytes) async {
+    // نحمّل ملف التعريف المناسب (PaperSize 58mm مثال)
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm58, profile);
+
+    // فك ترميز الـ PNG
+    final img = im.decodeImage(pngBytes)!;
+
+    // تجميع الأوامر
+    var bytes = <int>[];
+    bytes += generator.imageRaster(img);
+    bytes += generator.cut();
+    return bytes;
+  }
+
+  /// دالة للطباعة عبر USB
+  static Future<void> _printUsbPage(AppPrinterDevice device,String pdfPath, int copies) async {
+    // — تحويل PDF → PNG
+    final pdfImg = await _pdfPageToPngBytes(pdfPath);
+    if (pdfImg == null) throw Exception('فشل في تحويل PDF إلى صورة');
+
+    // — توليد أوامر ESC/POS
+    final escBytes = await _generateEscPosBytesFromPng(pdfImg);
+
+    // — إنشاء الموصل باستخدام المُنشئ المسماة Android
+    final connector = UsbPrinterConnector.Android(
+      vendorId: device.vendorId.toString(),
+      productId: device.productId.toString(),
+    );
+
+    // — اتصال
+    await connector.connect(
+        UsbPrinterInput(
+      name:device.deviceName,
+      vendorId:  device.vendorId,
+      productId: device.productId.toString(),
+    ));
+
+    // — إرسال الأوامر
+    for (var i = 0; i < copies; i++) {
+      await connector.send(escBytes);            // ← هنا نستخدم send() وليس printRaw :contentReference[oaicite:3]{index=3}
+    }
+
+    // — فصل الاتصال
+    await connector.disconnect();
+  }
+
+  /// دالة للطباعة عبر الشبكة (TCP/IP)
+  static Future<void> _printNetwork(AppPrinterDevice device,String pdfPath, int copies) async {
+    // 1) تحويل PDF → PNG → ESC/POS bytes
+    final png = await _pdfPageToPngBytes(pdfPath);
+    if (png == null) throw Exception('فشل في تحويل PDF إلى صورة');
+    final escBytes = await _generateEscPosBytesFromPng(png);
+
+    // 2) لكل نسخة: افتح Socket وأرسل البيانات
+    for (var i = 0; i < copies; i++) {
+      final socket = await Socket.connect(device.address, int.parse(device.port.toString()));
+      socket.add(escBytes);
+      await socket.flush();
+      await socket.close();
+    }
+  }
+
   // 3) إعادة استخدام دوال تحويل PDF إلى صور
   static Future<void> _renderAndPrintPdfViaBluetooth(String path) async {
     final pdf = PdfImageRenderer(path: path);
@@ -139,39 +228,6 @@ class FileHelper {
     await pdf.close();
   }
 
-  static Future<void> _renderAndPrintPdfViaNetwork(String path) async {
-    final pdf = PdfImageRenderer(path: path);
-    await pdf.open();
-
-    int pageIndex = 0;
-    await pdf.openPage(pageIndex: pageIndex);
-    final size = await pdf.getPageSize(pageIndex: pageIndex);
-
-    // Render الصفحة كاملة كصورة واحدة (بدون تقطيع)
-    Uint8List? img = await pdf.renderPage(
-      pageIndex: pageIndex,
-      width: size.width,
-      height: size.height,
-      scale: 1.0, // اضبط حسب دقة الطابعة
-    );
-
-    if (img != null) {
-      final decodedImg = im.decodeImage(img);
-      if (decodedImg != null) {
-        final tempDir = await getTemporaryDirectory();
-        final tempImagePath = '${tempDir.path}/temp_network_image.png';
-        await File(tempImagePath).writeAsBytes(im.encodePng(decodedImg));
-
-        // أرسل الصورة إلى الطابعة عبر الشبكة
-        // await PrinterManager.instance.printImage(
-        //   type: PrinterType.network,
-        //   bytes: await File(tempImagePath).readAsBytes(),
-        // );
-      }
-    }
-
-    await pdf.close();
-  }
 
   static Future<void> printToAll(String pdfPath, int copies) async {
     final printers = await loadPrinters();
@@ -187,7 +243,7 @@ class FileHelper {
           await _bluetoothPrint(device, pdfPath, copies);
           break;
         case 'usb':
-          await _printUsb(device, pdfPath, copies);
+          await _printUsbPage(device, pdfPath, copies);
           break;
         case 'network':
           await _printNetwork(device, pdfPath, copies);
@@ -262,45 +318,6 @@ class FileHelper {
     }
   }
 
-  static Future<void> _printUsb(AppPrinterDevice device, String path, int copies) async {
-    try {
-      // مثال استخدام plugin USB (flutter_pos_printer_platform)
-      final usbManager = PrinterManager.instance;
-      // الاتصال:
-      await usbManager.connect(
-        type: PrinterType.usb,
-        model: UsbPrinterInput(
-          name: device.deviceName,
-          vendorId: device.vendorId ?? '0',
-          productId: device.productId ?? '0',
-        ),
-      );
-      for (int i = 0; i < copies; i++) {
-       // await _renderAndPrintPdfViaUsb(path);
-      }
-      await usbManager.disconnect(type: PrinterType.usb);
-      _showToast('تمت الطباعة على ${device.deviceName}', success: true);
-    } catch (e) {
-      _showErrorToast(e, StackTrace.current);
-    }
-  }
-
-  static Future<void> _printNetwork(AppPrinterDevice device, String path, int copies) async {
-    try {
-      final netManager = PrinterManager.instance;
-      await netManager.connect(
-        type: PrinterType.network,
-        model: TcpPrinterInput(ipAddress: device.address!),
-      );
-      for (int i = 0; i < copies; i++) {
-       // await _renderAndPrintPdfViaNetwork(path);
-      }
-      await netManager.disconnect(type: PrinterType.network);
-      _showToast('تمت الطباعة على ${device.deviceName}', success: true);
-    } catch (e) {
-      _showErrorToast(e, StackTrace.current);
-    }
-  }
 
   static void _showErrorToast(Object e, StackTrace stack) {
     print("Error: $e\n$stack");

@@ -878,6 +878,16 @@ class Pay_Out_Controller extends GetxController {
     });
   }
 
+  //جلب مراكز التكلفه
+  Future GET_ACC_COS_ONE_P() async {
+    await GET_ACC_COS_ONE().then((data) {
+      if (data.isNotEmpty) {
+        SelectDataACNO = data.elementAt(0).ACNO.toString();
+      }
+      update();
+    });
+  }
+
   //اضافة سند
   AddPayOut() {
     if(UPIN==1) {
@@ -901,6 +911,13 @@ class Pay_Out_Controller extends GetxController {
           : GET_SYS_CUR_ONE_PAY_P();
       AMKID == 15 ? PKID=1 : LoginController().PKID_Voucher !=0? PKID=LoginController().PKID_Voucher:PKID=1;
       GET_ACC_CAS_P();
+
+      // P_COSS == '1' || (P_COSS == '4' && UPIN_USE_ACNO == 1)
+      //     ? LoginController().ACNO_VOU != 0?
+      // SelectDataACNO= LoginController().ACNO_VOU.toString():
+      // GET_ACC_COS_ONE_P()
+      //     : null;
+
       // LoginController().SCEX_Voucher != 0.0 ?  SCEXController.text = LoginController().SCEX_Voucher.toString() : SCEXController.text='0';
       // LoginController().SCSY_Voucher!='0' ? SCSY=LoginController().SCSY_Voucher.toString():'';
       // SCSFL=LoginController().SCSFL_SALE ;
@@ -1216,6 +1233,7 @@ class Pay_Out_Controller extends GetxController {
         LoginController().SET_N_P('SCSFL_Voucher',SCSFL);
         LoginController().SET_D_P('SCEX_Voucher',double.parse(SCEXController.text));
         LoginController().SET_P('SCSY_Voucher',SCSY);
+        LoginController().SET_P('ACNO_VOU',SelectDataACNO.toString());
         LoginController().SET_N_P('TIMER_POST',0);
         //value ? UpdateACC_MOV_D_SCID(AMKID!,AMMID!,SelectDataSCID.toString(),SCEXController.text): null;
         ClearACC_Mov_M_Data();
@@ -1539,7 +1557,6 @@ class Pay_Out_Controller extends GetxController {
     }
     return true;
   }
-
 
   void configloading(String MES_ERR) {
     EasyLoading.instance
@@ -1920,6 +1937,7 @@ class Pay_Out_Controller extends GetxController {
                                         AACT=int.parse(selection.AACT.toString());
                                         SCID_C=selection.SCID;
                                         BIID_D=selection.BIID.toString();
+                                        SelectDataACNO_D=SelectDataACNO;
                                         GETAANOCOUNT_P();
                                         GET_AKID_P();
                                         GET_BAL_P(AMMID.toString(),

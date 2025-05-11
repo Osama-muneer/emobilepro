@@ -924,6 +924,7 @@ class LoginController extends GetxController {
   int get BPPR => userDataBox.get('BPPR', defaultValue: 1);
   String get RSID => userDataBox.get('RSID',defaultValue:'');
   String get ACNO_SALE => userDataBox.get('ACNO_SALE',defaultValue:'0');
+  String get ACNO_VOU => userDataBox.get('ACNO_VOU',defaultValue:'0');
 
 
   //السنداااااااااات

@@ -193,7 +193,7 @@ Future<List<Mat_Inf_Local>> Get_MAT_INF(int BMKID,String SHOW_ITEM,String Allow_
   }
 
 
-  if((BMKID!=1 && BMKID!=4) && (SHOW_ITEM=='2' || (SHOW_ITEM=='3' && Allow_Show_Items!='1'))){
+  if((BMKID!=1 && BMKID!=2 && BMKID!=4) && (SHOW_ITEM=='2' || (SHOW_ITEM=='3' && Allow_Show_Items!='1'))){
     sql3=" AND (B.MGKI=2 OR (B.MGKI=1 AND EXISTS(SELECT 1 FROM STO_NUM C WHERE  C.SIID=$GetSIID "
         " AND (C.MGNO=A.MGNO AND C.MINO=A.MINO) "
         " AND C.JTID_L=${LoginController().JTID} AND C.SYID_L=${LoginController().SYID} "

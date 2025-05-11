@@ -80,6 +80,7 @@ class Account_Statement_Controller extends GetxController {
 
   void onInit() async {
     super.onInit();
+    loading(false);
     AANOController=TextEditingController();
     AANAController=TextEditingController();
     TextEditingSercheController=TextEditingController();
@@ -164,7 +165,10 @@ class Account_Statement_Controller extends GetxController {
       await GET_PRIVLAGE();
       update();
     }
+    loading(true);
     update();
+
+
   }
 
   void dispose() {
