@@ -126,6 +126,8 @@ class Bil_Mov_D_Local {
   int? CTMID;
   int? CIMID;
   int? SCIDC;
+  String? BMKNA;
+  String? BMMDO;
 
 
   Bil_Mov_D_Local({this.BMKID,this.MGNO,this.MINO,this.MUID,this.SIID,this.GUID,this.BMMID,this.BMDAM,this.BIID,
@@ -333,6 +335,8 @@ class Bil_Mov_D_Local {
     CTMID = map['CTMID'];
     CIMID = map['CIMID'];
     SCIDC = map['SCIDC'];
+    BMKNA = map['BMKNA'];
+    BMMDO = map['BMMDO'];
 
   }
 

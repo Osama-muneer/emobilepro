@@ -946,7 +946,7 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                                       controller.isloading.value=false;
                                     }
                                   }):
-                                  Timer(const Duration(seconds: 5), () async {
+                                  Timer(const Duration(seconds: 3), () async {
                                   if(controller.SelectDataBMKID==null ){
                                     Get.snackbar('StringMestitle'.tr, 'StringChooseTheType'.tr,
                                         backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
@@ -956,32 +956,8 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                                         forwardAnimationCurve: Curves.easeOutBack);
                                     controller.isloading.value=false;
                                   }
-                                  else if(Bil_Mov_D.isEmpty ){
-                                    Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
-                                        backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
-                                        colorText:Colors.white,
-                                        isDismissible: true,
-                                        dismissDirection: DismissDirection.horizontal,
-                                        forwardAnimationCurve: Curves.easeOutBack);
-                                    controller.isloading.value=false;
-                                  }
                                   else {
-                                    final pdfFile =  await Pdf.TotalDetailedItemReport_Pdf(
-                                        controller.BMKID.toString(),
-                                        controller.SelectDataBMKID.toString(),
-                                        controller.SelectDataFromBINA.toString(),
-                                        controller.SelectDataToBINA.toString(),
-                                        controller.SDDSA, controller.SONA,
-                                        controller.SONE,
-                                        controller.SORN,
-                                        controller.SOLN,
-                                        LoginController().SUNA,
-                                        controller.SelectFromDays.toString().substring(0,10),
-                                        controller.SelectToDays.toString().substring(0,10),
-                                        controller.SUMBMDNO,
-                                        controller.SUMBMDMT);
-                                    PdfPakage.openFile(pdfFile);
-                                    controller.isloading.value=false;
+                                   await controller.GET_TotalDetailedItem_REP_P();
                                   }
                                 });
                               },
