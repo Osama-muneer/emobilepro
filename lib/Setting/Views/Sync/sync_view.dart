@@ -89,11 +89,12 @@ class _SyncViewState extends State<SyncView> {
                   Icons.update,color: Colors.white
                 ),
                 onPressed: () {
-                  setState(() {
+
                     if(controller.SyncOneTable==true){
                       ThemeHelper().ShowToastW( "'${'StringOutfromScreen'.tr} ");
                     }
                     else{
+                      setState(() async {
                       if( controller.checkclick==false || controller.CheckSync==false){
                         controller.TypeSync=1;
                         controller.TypeSyncAll=0;
@@ -106,24 +107,31 @@ class _SyncViewState extends State<SyncView> {
                         LoginController().SET_N_P('Timer_Strat',1);
                         print(controller.round);
                         print('round');
-                        service.invoke("stopService");
+                        final isRunning = await service.isRunning();
+                        if (isRunning) {
+                          try {
+                            service.invoke("stopService");
+                          } catch (e) {
+                            debugPrint('Error stopping service: $e');
+                          }
+                        }
                         print('round');
                         controller.Socket_IP();
                       }
+                      });
                     }
-
-                  });
                 },
               ):Container(),
                IconButton(
                 icon: Icon(Icons.settings_input_antenna,color: Colors.white),
-                onPressed: () {
-                  setState(() {
+                onPressed: () async{
+
                     if(controller.SyncOneTable==true){
                       ThemeHelper().ShowToastW( "'${'StringOutfromScreen'.tr} ");
                     }
                     else{
                       if( controller.checkclick==false || controller.CheckSync==false){
+                        setState(()  async {
                           controller.TypeSync=1;
                           controller.TypeSyncAll=1;
                           controller.CheckClickAll=true;
@@ -131,12 +139,22 @@ class _SyncViewState extends State<SyncView> {
                           controller.ClickAllOrLastTime=true;
                           controller.loadingone.value=true;
                           controller.CheckSync(true);
-                          service.invoke("stopService");
+                          final isRunning = await service.isRunning();
+                          if (isRunning) {
+                            try {
+                               service.invoke("stopService");
+                            } catch (e) {
+                              debugPrint('Error stopping service: $e');
+                            }
+                          }
+
+                          //service.invoke("stopService");
                           LoginController().SET_N_P('Timer_Strat',1);
                           controller.Socket_IP();
+                        });
                       }
                     }
-                  });
+
                 },
               ),
             ],

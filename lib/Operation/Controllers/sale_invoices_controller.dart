@@ -8351,14 +8351,14 @@ class Sale_Invoices_Controller extends GetxController {
         print((double.parse(food.BMDNO.toString()) + 1));
         BMDNOController.text =
             (double.parse(food.BMDNO.toString()) + 1).toString();
-        Timer(const Duration(milliseconds: 200), () async {
+        // Timer(const Duration(milliseconds: 200), () async {
           await Calculate_BMD_NO_AM();
           update();
           bool isValid = await Save_BIL_MOV_D_ORD_P();
           if (isValid) {
             ClearBil_Mov_D_Data();
           }
-        });
+        // });
       } else {
         if ((food.BMDNO! - 1) < 1) {
           deleteBIL_MOV_D_ONE(
@@ -8368,7 +8368,7 @@ class Sale_Invoices_Controller extends GetxController {
         }
         else {
           BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();
-          Timer(const Duration(milliseconds: 200), () async {
+          // Timer(const Duration(milliseconds: 200), () async {
             await Calculate_BMD_NO_AM();
             update();
             bool isValid = await Save_BIL_MOV_D_ORD_P();
@@ -8376,7 +8376,7 @@ class Sale_Invoices_Controller extends GetxController {
               ClearBil_Mov_D_Data();
             }
             update();
-          });
+          // });
         }
       }
       await GET_SUMBMMAM();
