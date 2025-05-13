@@ -5659,6 +5659,7 @@ class Sale_Invoices_Controller extends GetxController {
     SUM_STRING_NUMBER = '';
     titleAddScreen = 'StringAdd'.tr;
     TextButton_title = 'StringAdd'.tr;
+    print('STP-7');
   }
 
   //جلب رقم الحركة
@@ -5845,9 +5846,9 @@ class Sale_Invoices_Controller extends GetxController {
       update();
     }
     update();
-    GET_BMMAM_TX();
-    GET_BMMDI_TX();
-    GET_TCAM();
+    await GET_BMMAM_TX();
+    await GET_BMMDI_TX();
+    await GET_TCAM();
   }
 
   // جلب  صافي المبلغ
@@ -6119,7 +6120,6 @@ class Sale_Invoices_Controller extends GetxController {
     //الاجمالي المبلغ الكلي للتخفيض
     SUM_Totle_BMDDI =
         roundDouble(double.parse(BMDDITController.text) * BMDNO_V!, 6);
-    update();
     GET_USING_TAX_P();
     update();
   }
@@ -6217,7 +6217,7 @@ class Sale_Invoices_Controller extends GetxController {
         0,
         USE_BMDFN!);
     update();
-    await Future.delayed(const Duration(milliseconds: 800));
+    // await Future.delayed(const Duration(milliseconds: 800));
     await GET_SUMBMDTXA();
     await GET_SUMBMMDI();
     await GET_SUMBMMAM2();
@@ -6665,11 +6665,9 @@ class Sale_Invoices_Controller extends GetxController {
         } else {
           TCAMT = 0;
         }
-
         if (COUNT_NO > 0) {
           MES_ADD_EDIT = 'StringED'.tr;
           STB_N = 'S13';
-
           UpdateBil_Mov_D(
               BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
               BMKID!,
@@ -6713,6 +6711,7 @@ class Sale_Invoices_Controller extends GetxController {
         }
         else {
           STB_N = 'S14';
+          print('STP-4');
           Bil_Mov_D_Local e = Bil_Mov_D_Local(
             BMMID: BMMID,
             BMDID: BMDID,
@@ -6788,17 +6787,21 @@ class Sale_Invoices_Controller extends GetxController {
         Fluttertoast.showToast(msg: MES_ADD_EDIT,
             toastLength: Toast.LENGTH_LONG,
             textColor: Colors.white,
-            backgroundColor: Colors.green);
-        await GET_SUMBMMAM();
-        await GET_SUMBMMAM2();
-        await GET_SUMBMDTXA();
-        await GET_SUMBMMDIF();
-        await GET_SUMBMMDI();
-        await GET_CountRecode(BMMID!);
-        await GET_COUNT_BMDNO_P(BMMID!);
-        await GET_SUMBMDTXT();
-        await GET_SUM_AM_TXT_DI();
-        await GET_BIF_MOV_D_P(BMMID.toString(), '2');
+             backgroundColor: Colors.green);
+         print('STP-5');
+         GET_SUMBMMAM();
+         GET_SUMBMMAM2();
+         GET_SUMBMDTXA();
+         GET_SUMBMMDIF();
+         GET_SUMBMMDI();
+         GET_CountRecode(BMMID!);
+         GET_COUNT_BMDNO_P(BMMID!);
+         GET_SUMBMDTXT();
+         GET_SUM_AM_TXT_DI();
+         GET_BIF_MOV_D_P(BMMID.toString(), '2');
+         print('STP-6');
+         ClearBil_Mov_D_Data();
+         print('STP-8');
         STB_N = 'S6';
         update();
         return true;
@@ -8313,11 +8316,10 @@ class Sale_Invoices_Controller extends GetxController {
   //تعديل الصنف(الكمية) مطاعم
   Future<void> UPDATE_BIF_MOV_D_ORD(Bil_Mov_D_Local food, int TYPE) async {
     if (food.SYST != 1) {
+      print('MGNOController2');
       print(food.BMDID.toString());
-      print(food.BMDNO.toString());
-      print(food.BMDAM.toString());
-      print(food.BMDAMO.toString());
-      print('UPDATE_STO_MOV_D_ORD');
+      print(food.MGNO.toString());
+      print('MGNOController2');
       BMDIDController.text = food.BMDID.toString();
       MGNOController.text = food.MGNO.toString();
       SelectDataMINO = food.MINO.toString();
@@ -8350,14 +8352,14 @@ class Sale_Invoices_Controller extends GetxController {
         print((double.parse(food.BMDNO.toString()) + 1));
         BMDNOController.text =
             (double.parse(food.BMDNO.toString()) + 1).toString();
-        Timer(const Duration(milliseconds: 200), () async {
+        // Timer(const Duration(milliseconds: 200), () async {
           await Calculate_BMD_NO_AM();
           update();
           bool isValid = await Save_BIL_MOV_D_ORD_P();
           if (isValid) {
-            ClearBil_Mov_D_Data();
+            // ClearBil_Mov_D_Data();
           }
-        });
+        // });
       } else {
         if ((food.BMDNO! - 1) < 1) {
           deleteBIL_MOV_D_ONE(
@@ -8367,26 +8369,26 @@ class Sale_Invoices_Controller extends GetxController {
         }
         else {
           BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();
-          Timer(const Duration(milliseconds: 200), () async {
+          // Timer(const Duration(milliseconds: 200), () async {
             await Calculate_BMD_NO_AM();
             update();
             bool isValid = await Save_BIL_MOV_D_ORD_P();
             if (isValid) {
-              ClearBil_Mov_D_Data();
+              // ClearBil_Mov_D_Data();
             }
             update();
-          });
+          // });
         }
       }
-      await GET_SUMBMMAM();
-      await GET_SUMBMMAM2();
-      await GET_SUMBMDTXA();
-      await GET_SUMBMMDIF();
-      await GET_SUMBMMDI();
-      await GET_CountRecode(BMMID!);
-      await GET_COUNT_BMDNO_P(BMMID!);
-      await GET_SUMBMDTXT();
-      await GET_SUM_AM_TXT_DI();
+      // await GET_SUMBMMAM();
+      // await GET_SUMBMMAM2();
+      // await GET_SUMBMDTXA();
+      // await GET_SUMBMMDIF();
+      // await GET_SUMBMMDI();
+      // await GET_CountRecode(BMMID!);
+      // await GET_COUNT_BMDNO_P(BMMID!);
+      // await GET_SUMBMDTXT();
+      // await GET_SUM_AM_TXT_DI();
       update();
     }
   }

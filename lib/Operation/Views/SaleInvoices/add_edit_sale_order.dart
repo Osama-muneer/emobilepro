@@ -365,6 +365,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                   child: GestureDetector(
                                     onTap: () async {
                                       controller.SelectDataMINO = controller.MAT_INF_DATE[index].MINO.toString();
+                                      print('STP-1');
                                       controller.MGNOController.text = controller.MAT_INF_DATE[index].MGNO.toString();
                                       controller.SelectDataMUID = controller.MAT_INF_DATE[index].MUID.toString();
                                       controller.MGKI = controller.MAT_INF_DATE[index].MGKI;
@@ -393,13 +394,15 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                         await controller.GET_TAX_LIN_P('MAT',controller.MAT_INF_DATE[index].MGNO.toString(),
                                             controller.MAT_INF_DATE[index].MINO.toString());
                                       }
-                                      Timer(const Duration(milliseconds: 200), () async {
+                                      // Timer(const Duration(milliseconds: 200), () async {
+                                        print('STP-2');
                                         if(controller.COUNT_NO<=0){
-                                          controller.Calculate_BMD_NO_AM();
-                                          controller.update();
+                                         await controller.Calculate_BMD_NO_AM();
+                                          print('MGNOController3.text ${controller.MGNOController.text} : ${controller.SelectDataMINO }');
+                                         print('STP-3');
                                           bool isValid =await controller.Save_BIL_MOV_D_ORD_P();
                                           if (isValid) {
-                                            controller.ClearBil_Mov_D_Data();
+                                            // controller.ClearBil_Mov_D_Data();
                                             await controller.ADD_MAT_FOL_TO_MOV_D(controller.SelectDataBIID.toString(),
                                                 controller.MAT_INF_DATE[index].MGNO.toString(),
                                                 controller.MAT_INF_DATE[index].MINO.toString(),
@@ -407,7 +410,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                             );
                                           }
                                         }
-                                      });
+                                      // });
                                       controller.update();
                                     },
                                     child:  Container(

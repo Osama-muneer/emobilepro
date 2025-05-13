@@ -4491,8 +4491,7 @@ class SyncController extends GetxController {
       TypeCheckSync = TypeSync;
       TypeGet = 'BAL_ACC_D';
       await Future.delayed(const Duration(milliseconds: 500));
-      if (TotalBAL_ACC_D != 0 &&
-          (CHIKE_ALL == 1 || TotalBAL_ACC_D != CheckBAL_ACC_D)) {
+      if (TotalBAL_ACC_D != 0 && (CHIKE_ALL == 1 || TotalBAL_ACC_D != CheckBAL_ACC_D)) {
         FROM_DATE = LastBAL_ACC_D;
         apiProvider.GetAllBAL_ACC_D(VarGUIDMap.toString().toUpperCase());
         awaitFunc();
@@ -4549,11 +4548,9 @@ class SyncController extends GetxController {
     }
   }
 
-  GetCheckDataBase() {
-    Get_Count_Check('BAL_ACC_D').then((data) {
-      CheckDataBase = data;
+  GetCheckDataBase() async {
+    CheckDataBase=await Get_Count_Check('BAL_ACC_D');
       update();
-    });
   }
 
   AwaitCheckDataBase() async {
@@ -6035,8 +6032,9 @@ class SyncController extends GetxController {
         'typeSyncAll': 107,
         'typeSyncOneTable': 107,
         'saveTmp': () => GetCheckSaveTmp('BAL_ACC_M',TotalBAL_ACC_M),
-        'updateOrder': () =>
-          Update_SYN_ORD('BAL_ACC_M'),
+        'updateOrder':  () async =>{
+        if(TotalBAL_ACC_M!=0){
+        Update_SYN_ORD('BAL_ACC_M'),},}
       },//ارصده الحسابات -رئيسي
       'BAL_ACC_C': {
         'total': TotalBAL_ACC_C,
@@ -6049,7 +6047,11 @@ class SyncController extends GetxController {
         'typeSyncAll': 108,
         'typeSyncOneTable': 108,
         'saveTmp': () => GetCheckSaveTmp('BAL_ACC_C',TotalBAL_ACC_C),
-        'updateOrder': () => Update_SYN_ORD('BAL_ACC_C'),
+        'updateOrder': () async =>{
+          if(TotalBAL_ACC_C!=0){
+           Update_SYN_ORD('BAL_ACC_C'),
+        },}
+
       },//ارصده الحسابات-اجمالي
       'BAL_ACC_D': {
         'total': TotalBAL_ACC_D,
@@ -6063,8 +6065,10 @@ class SyncController extends GetxController {
         'typeSyncOneTable': 0,
         'saveTmp': () => GetCheckSaveTmp('BAL_ACC_D',TotalBAL_ACC_D),
         'updateOrder': () async => {
+          if(TotalBAL_ACC_D!=0){
+            await Update_SYN_ORD('BAL_ACC_D'),
+          },
           await GET_SYN_ORDDelete(),
-          await Update_SYN_ORD('BAL_ACC_D'),
           await  DeleteROWIDAll(),
           await DeleteROWIDFAS_ACC_USR(),
           await  UpdateCONFIG('LastSyncDate',DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now())),
