@@ -27,7 +27,7 @@ class _SyncViewState extends State<SyncView> {
     DeleteROWIDFAS_ACC_USR();
     DeleteROWIDAll();
     if ((controller.PercentValue == 100 || controller.PercentValue == 0) && controller.TypeSync==0) {
-       // await initializeService();
+       await initializeService();
       STMID=='EORD'?Get.offNamed('/Home',arguments:controller.CHIKE_BACK_MAIN==0?0:3):Get.offAllNamed('/Home');
       return true;
    }
@@ -57,7 +57,7 @@ class _SyncViewState extends State<SyncView> {
          SystemNavigator.pop();
       }
       else{
-         // STMID=='EORD'?false:await initializeService();
+         STMID=='MOB'?await initializeService():false;
          STMID=='EORD'?Get.offNamed('/Home',arguments:controller.CHIKE_BACK_MAIN==0?0:3):Get.offAllNamed('/Home');
       }
       },

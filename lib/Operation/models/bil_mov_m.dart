@@ -191,6 +191,8 @@ class Bil_Mov_M_Local {
   String?  BMMCRT;
   double? BMDAM1;
   double? BMDNO;
+  double? BMDNO2;
+  double? BMDNF2;
   double? BMDTXA;
   int? SCIDC;
   String?  BMMPD;
@@ -217,6 +219,11 @@ class Bil_Mov_M_Local {
   String? MUNA_D;
   String? BMDED;
   double? NET;
+  String? BMKID_D;
+  double? BMDNO_IN;
+  double? BMDNO_OUT;
+  double? BMDNF_IN;
+  double? BMDNF_OUT;
 
   Bil_Mov_M_Local({this.BMKID,this.BMMDO,this.SCEX,this.BMMNO,this.BMMID,this.BMMCN,this.BCID,this.BCCID,this.SCID,this.PKID
     ,this.BDID,this.GUID,this.BIID,this.DATEI,this.DEVI,this.DATEU,this.DEVU,this.SUCH,this.BPID
@@ -560,6 +567,11 @@ class Bil_Mov_M_Local {
     MUNA_D = map['MUNA_D'];
     BMDED = map['BMDED'];
     NET = map['NET'];
+    BMKID_D = map['BMKID_D'];
+    BMDNO_IN = map['BMDNO_IN'];
+    BMDNF_IN = map['BMDNF_IN'];
+    BMDNO_OUT = map['BMDNO_OUT'];
+    BMDNF_OUT = map['BMDNF_OUT'];
   }
 
 }

@@ -4,6 +4,8 @@ import '../../Operation/models/bil_mov_m.dart';
 import '../../Setting/controllers/login_controller.dart';
 import '../../Setting/models/bil_cre_c.dart';
 import '../../Widgets/config.dart';
+import '../../Widgets/pdf.dart';
+import '../../Widgets/pdfpakage.dart';
 import '../../database/report_db.dart';
 import '../../database/setting_db.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +40,7 @@ class Inv_Rep_Controller extends GetxController {
           SelectDataSCID,PKID,SelectDataFromMINO,SelectDataToMINO,SelectDataBMKID,SelectDataST='1';
   int BMKID=11;
   double SUMBMDNO=0,SUMBMDMT=0;
-
+  List<Bil_Mov_M_Local> Bil_Mov_M = [];
 
 
   static const MaterialColor buttonTextColor = MaterialColor(
@@ -171,22 +173,48 @@ class Inv_Rep_Controller extends GetxController {
 
   Future GET_TotalDetailedItem_REP_P() async {
     isloading.value=true;
-    Bil_Mov_D=await GET_TotalDetailedItem_REP(BMKID,
+
+    Bil_Mov_M=await GET_TotalDetailedItem_REP2(BMKID,
         SelectDataBMKID=='11'?'BIF_MOV_M':'BIL_MOV_M',
         SelectDataBMKID=='11'?'BIF_MOV_D':'BIL_MOV_D',SelectDataFromBIID.toString(),SelectDataToBIID.toString(),
         SelectFromDays.toString(),SelectToDays.toString(),SelectDataFromMGNO.toString(),SelectDataToMGNO.toString(),
         SelectDataFromMINO.toString(),SelectDataToMINO.toString(),PKID.toString(),
         SelectDataSCID.toString(),SelectDataBMKID.toString(),SelectDataST.toString());
 
-    var GET_SUM_DetailedItem=await GET_SUM_DetailedItem_REP(SelectDataBMKID=='11'?'BIF_MOV_M':'BIL_MOV_M',
-        SelectDataBMKID=='11'?'BIF_MOV_D':'BIL_MOV_D',SelectDataFromBIID.toString(),SelectDataToBIID.toString(),
-        SelectFromDays.toString(),SelectToDays.toString(),SelectDataFromMGNO.toString(),SelectDataToMGNO.toString(),
-        SelectDataFromMINO.toString(),SelectDataToMINO.toString(),PKID.toString(),SelectDataSCID.toString(),
-        SelectDataBMKID.toString(),SelectDataST.toString());
-       if( GET_SUM_DetailedItem.isNotEmpty){
-         SUMBMDNO= GET_SUM_DetailedItem.elementAt(0).BMDNO!;
-         SUMBMDMT=GET_SUM_DetailedItem.elementAt(0).BMDAMT!;
-       };
+    if(Bil_Mov_M.isEmpty ){
+      Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
+          backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
+          colorText:Colors.white,
+          isDismissible: true,
+          dismissDirection: DismissDirection.horizontal,
+          forwardAnimationCurve: Curves.easeOutBack);
+      isloading.value=false;
+    }
+    else {
+      //  var Bil_Mov_M= await fetchDetailedMovements();
+      // generatePdfReport(controller.Bil_Mov_M);
+
+      final pdfFile =  await Pdf.TotalDetailedItemReport_Pdf(
+          BMKID.toString(),
+          SelectDataBMKID.toString(),
+          SelectDataFromBINA.toString(),
+          SelectDataToBINA.toString(),
+          SDDSA, SONA,
+          SONE,
+          SORN,
+          SOLN,
+          LoginController().SUNA,
+          SelectFromDays.toString().substring(0,10),
+          SelectToDays.toString().substring(0,10),
+          SUMBMDNO,
+          SUMBMDMT,
+          Bil_Mov_M
+      );
+      PdfPakage.openFile(pdfFile);
+      isloading.value=false;
+      update();
+    }
+
   }
 
   Future Fetch_GET_BIF_REP_PdfData() async {
