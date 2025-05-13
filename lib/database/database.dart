@@ -2681,6 +2681,7 @@ CREATE TABLE CON_ACC_M (
   CCMFD     DATE,
   CCMTD     DATE,
   ACNO      TEXT,
+  ACNO2      TEXT,
   BMMCT     INTEGER                          DEFAULT 1,
   ATTID     INTEGER,
   BMMNR INTEGER,
@@ -14548,6 +14549,7 @@ CREATE TABLE SYS_REP(
   Future OnUpgradeV449_17 (Database db) async{
     await db.execute(CreateBIF_TRA_TBL);
     await db.execute(CreateAppPrinterDevice);
+    await db.execute('''ALTER TABLE BIF_MOV_M ADD COLUMN ACNO2 TEXT''');
     await db.execute('''ALTER TABLE BIL_CUS ADD COLUMN BCCR2 REAL DEFAULT 0''');
     await db.execute('''ALTER TABLE BIL_CUS_TMP ADD COLUMN BCCR2 REAL DEFAULT 0''');
   }

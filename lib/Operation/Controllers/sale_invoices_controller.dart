@@ -6230,6 +6230,7 @@ class Sale_Invoices_Controller extends GetxController {
 
   //حالة الحفظ
   editMode() async{
+    print('editMode');
     contentFocusNode.unfocus();
     bool isValidate = true;
     if (isValidate == false) {

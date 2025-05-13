@@ -2683,8 +2683,7 @@ class Pdf {
     // حساب الإجماليات
     final totalIn = data.fold<double>(0.0, (sum, m) => sum + (m.BMDNO_IN ?? 0.0) + (m.BMDNF_IN ?? 0.0));
     final totalOut = data.fold<double>(0.0, (sum, m) => sum + (m.BMDNO_OUT ?? 0.0) + (m.BMDNF_OUT ?? 0.0));
-
-
+    final formatter = intl.NumberFormat.decimalPattern();
     final image = await SimplePdf.loadImage();
     var arabicFont = Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"));
     var ttf = Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"));
@@ -2800,23 +2799,23 @@ class Pdf {
                 children: [
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNF_OUT.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNF_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNO_OUT.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNO_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNF_IN.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNF_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNO_IN.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNO_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDAM.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDAM).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
@@ -2832,23 +2831,23 @@ class Pdf {
                 children: [
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNF_OUT.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNF_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNO_OUT.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNO_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNF_IN.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNF_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDNO_IN.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDNO_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
-                    child:SimplePdf.text(m.BMDAM.toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                    child:SimplePdf.text(formatter.format(m.BMDAM).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(2),
@@ -2911,11 +2910,11 @@ class Pdf {
               children: [
                 pw.Padding(
                   padding: pw.EdgeInsets.all(6),
-                  child:SimplePdf.text(totalOut.toString(), ttf, fontSize: 11, color: PdfColors.black),
+                  child:SimplePdf.text(formatter.format(totalOut).toString(), ttf, fontSize: 11, color: PdfColors.black),
                 ),
                 pw.Padding(
                   padding: pw.EdgeInsets.all(6),
-                  child:SimplePdf.text(totalIn.toString(), ttf, fontSize: 11, color: PdfColors.black),
+                  child:SimplePdf.text(formatter.format(totalIn).toString(), ttf, fontSize: 11, color: PdfColors.black),
                 ),
               ],
             ),
