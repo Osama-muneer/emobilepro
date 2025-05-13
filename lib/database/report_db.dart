@@ -2467,6 +2467,7 @@ Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BCCAM1(String GETBIID_F,String GETBII
   }).toList();
   return list;
 }
+
 Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BCCAM2(String GETBIID_F,String GETBIID_T,String GETBMMDO_F,String GETBMMDO_T
     ,String GETCTMID_F,String GETCTMID_T, String GETBPID_F,String GETBPID_T,String GETCIMID_F,String GETCIMID_T,
     String GETBCCID) async {
@@ -2582,7 +2583,7 @@ async {
       CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNO ELSE 0.0 END AS BMDNO_OUT,
       CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END AS BMDNF_OUT
       FROM $TAB_M AS M
-      JOIN BIL_MOV_D AS D 
+      JOIN $TAB_D AS D 
       ON M.BMMID = D.BMMID
       AND M.CIID_L = D.CIID_L
       AND M.JTID_L = D.JTID_L
@@ -2630,7 +2631,7 @@ async {
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END) AS BMDNF_OUT,
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDAM ELSE 0.0 END) AS BMDAM_OUT
       FROM $TAB_M AS M
-      JOIN BIL_MOV_D AS D 
+      JOIN $TAB_D AS D 
       ON M.BMMID = D.BMMID
       AND M.CIID_L = D.CIID_L
       AND M.JTID_L = D.JTID_L
@@ -2661,5 +2662,3 @@ async {
   final rows = await dbClient!.rawQuery(TYPE==101?sql2:sql);
   return rows.map((m) => Bil_Mov_M_Local.fromMap(m)).toList();
 }
-
-

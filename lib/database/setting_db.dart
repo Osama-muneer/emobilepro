@@ -2381,40 +2381,6 @@ Future<List<Bil_Mov_D_Local>> getTopItem(TYPE,SCID,String GETDATE_F, String GETD
   return result.map((item) => Bil_Mov_D_Local.fromMap(item)).toList();
 }
 
-Future<List<Bil_Mov_M_Local>> getTypeBil(BMKID,SCID,String GETDATE_F, String GETDATE_T) async {
-  var dbClient = await conn.database; // الحصول على اتصال قاعدة البيانات
-  String SQLBIID_L = LoginController().BIID_ALL_V == '1'
-      ? " AND  A.BIID_L=${LoginController().BIID}" :  '';
-  String sql = ''' 
-  SELECT ifnull(SUM(A.BMMMT),0.0) AS BMMMT FROM BIL_MOV_M A WHERE A.BMKID=$BMKID 
-  AND A.SCID=$SCID AND A.BMMDOR BETWEEN '$GETDATE_F' AND '$GETDATE_T'
-  AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} 
-  AND A.CIID_L=${LoginController().CIID} $SQLBIID_L 
-  UNION ALL
-  SELECT ifnull(SUM(A.BMMMT),0.0) AS BMMMT FROM BIF_MOV_M A WHERE A.BMKID=$BMKID 
-  AND A.SCID=$SCID AND A.BMMDOR BETWEEN '$GETDATE_F' 
-  AND '$GETDATE_T'
-  AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} 
-  AND A.CIID_L=${LoginController().CIID} $SQLBIID_L 
-  ORDER BY A.BMMID ''';
-  var result = await dbClient!.rawQuery(sql);
-  // print(sql);
-  // print(result);
-  // print('getTypeBil');
-  return result.map((item) => Bil_Mov_M_Local.fromMap(item)).toList();
-}
-
-Future<List<Acc_Mov_M_Local>> getTypeVou(BMKID) async {
-  var dbClient = await conn.database; // الحصول على اتصال قاعدة البيانات
-  String SQLBIID_L = LoginController().BIID_ALL_V == '1'
-      ? " AND  A.BIID_L=${LoginController().BIID}" :  '';
-  String sql = ''' SELECT ifnull(SUM(A.AMMAM),0.0) AS AMMAM FROM ACC_MOV_M A WHERE A.AMKID=$BMKID 
-  AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} 
-  AND A.CIID_L=${LoginController().CIID} $SQLBIID_L ORDER BY A.AMMID ''';
-  var result = await dbClient!.rawQuery(sql);
-  return result.map((item) => Acc_Mov_M_Local.fromMap(item)).toList();
-}
-
 Future<List<Bil_Mov_M_Local>> getMonthlySales(SCID,String GETDATE_F, String GETDATE_T) async {
   var dbClient = await conn.database; // الحصول على اتصال قاعدة البيانات
   String SQLBIID_L = LoginController().BIID_ALL_V == '1'
@@ -2716,9 +2682,7 @@ Future<List<Bil_Mov_M_Local>> GET_COUNT_ST(type,String GETDATE_F, String GETDATE
         AND A.SYID_L = ${LoginController().SYID}
         AND A.CIID_L = ${LoginController().CIID}
         $SQLBIID_L
-          
         UNION ALL
-        
         SELECT COUNT(CASE WHEN B.BMMST = 1 THEN 1 END) AS BMMST,
         COUNT(CASE WHEN B.BMMST != 1 THEN 1 END) AS BMMST2
         FROM BIF_MOV_M B

@@ -149,12 +149,10 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
                                 barrierDismissible: false,
                               );
                             } else {
-                              if (((controller.BMKID == 11 ||
-                                              controller.BMKID == 12) &&
+                              if (((controller.BMKID == 11 || controller.BMKID == 12) &&
                                           controller.SHOW_BDID == '3') &&
                                       controller.SelectDataBDID == null ||
-                                  ((controller.BMKID != 11 &&
-                                              controller.BMKID != 12) &&
+                                  ((controller.BMKID != 11 && controller.BMKID != 12) &&
                                           controller.SHOW_BDID == '2') &&
                                       controller.SelectDataBDID == null) {
                                 Get.defaultDialog(
@@ -168,11 +166,9 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
                                   confirmTextColor: Colors.white,
                                   onConfirm: () {
                                     Navigator.of(context).pop(false);
-                                    if (StteingController().isSwitchSend_SMS ==
-                                            true &&
-                                        controller.BMKID != 1 &&
-                                        controller
-                                            .BCMOController.text.isNotEmpty) {
+                                    if (StteingController().isSwitchSend_SMS == true &&
+                                        controller.BMKID != 1 && controller.BMKID != 2 &&
+                                        controller.BCMOController.text.isNotEmpty) {
                                       Get.defaultDialog(
                                           title: 'StringMestitle'.tr,
                                           middleText: 'StringSend_SMS'.tr,
@@ -202,7 +198,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
                               } else {
                                 if (StteingController().isSwitchSend_SMS ==
                                         true &&
-                                    controller.BMKID != 1 &&
+                                    controller.BMKID != 1 && controller.BMKID != 2 &&
                                     controller.BCMOController.text.isNotEmpty) {
                                   Get.defaultDialog(
                                       title: 'StringMestitle'.tr,
@@ -297,7 +293,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
                                 Navigator.of(context).pop(false);
                                 if (StteingController().isSwitchSend_SMS ==
                                         true &&
-                                    controller.BMKID != 1 &&
+                                    controller.BMKID != 1 &&  controller.BMKID != 2 &&
                                     controller.BCMOController.text.isNotEmpty) {
                                   Get.defaultDialog(
                                       title: 'StringMestitle'.tr,
@@ -327,7 +323,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
                             );
                           } else {
                             if (StteingController().isSwitchSend_SMS == true &&
-                                controller.BMKID != 1 &&
+                                controller.BMKID != 1 &&  controller.BMKID != 2 &&
                                 controller.BCMOController.text.isNotEmpty) {
                               Get.defaultDialog(
                                   title: 'StringMestitle'.tr,
@@ -599,8 +595,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
       if (controller.edit == true) {
         UpdateBIL_MOV_M_SUM(
             controller.BMKID == 11 || controller.BMKID == 12
-                ? 'BIF_MOV_M'
-                : 'BIL_MOV_M',
+                ? 'BIF_MOV_M' : 'BIL_MOV_M',
             controller.BMKID!,
             controller.BMMID!,
             controller.roundDouble(
@@ -1044,7 +1039,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: controller.BMKID == 1
+            child: (controller.BMKID == 1 || controller.BMKID == 2)
                 ? controller.DropdownBIL_IMPBuilder()
                 : controller.DropdownBIL_CUSBuilder(),
           ),
@@ -1502,14 +1497,14 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
           msg: 'StringvalidateBCNA'.tr,
           textColor: Colors.white,
           backgroundColor: Colors.red);
-    } else if (controller.BMKID != 1 &&
+    } else if (controller.BMKID != 1 && controller.BMKID != 2 &&
         controller.PKID == 3 &&
         controller.SelectDataBCID == null) {
       Fluttertoast.showToast(
           msg: 'StringvalidateBCNA'.tr,
           textColor: Colors.white,
           backgroundColor: Colors.red);
-    } else if (controller.BMKID == 1 && controller.SelectDataBIID2 == null) {
+    } else if ((controller.BMKID == 1 || controller.BMKID == 2) && controller.SelectDataBIID2 == null) {
       Fluttertoast.showToast(
           msg: 'StringChi_BIID'.tr,
           textColor: Colors.white,

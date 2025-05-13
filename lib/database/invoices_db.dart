@@ -566,8 +566,9 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
       " $SqlORD ORDER BY A.BMMID DESC";
 
   var result = await dbClient!.rawQuery(sql);
-   // printLongText(sql);
-   // print(result);
+   printLongText(sql);
+   print(result);
+  print(GETBMKID.toString());
   List<Bil_Mov_M_Local> list = result.map((item) {return Bil_Mov_M_Local.fromMap(item);
   }).toList();
   return list;

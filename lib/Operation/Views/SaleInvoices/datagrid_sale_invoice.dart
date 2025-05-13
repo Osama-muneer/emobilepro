@@ -245,8 +245,10 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
                 'StringMINO'.tr,
                 style: const TextStyle(fontFamily: 'Hacen'),
               ))),
-      controller.Use_Multi_Stores=='1' && ((controller.BMKID==3 || controller.BMKID==4) && StteingController().MULTI_STORES_BO==true)
-          || ((controller.BMKID==1 || controller.BMKID==2) && StteingController().MULTI_STORES_BI==true)?GridColumn(
+      controller.Use_Multi_Stores=='1' && ((controller.BMKID==3 || controller.BMKID==4)
+          && StteingController().MULTI_STORES_BO==true)
+          || ((controller.BMKID==1 || controller.BMKID==2)
+          && StteingController().MULTI_STORES_BI==true)?GridColumn(
           columnName: 'SIID',
           width: double.nan,
           columnWidthMode: ColumnWidthMode.auto,
@@ -267,7 +269,7 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
                 'StringSNNO'.tr,
                 style: const TextStyle(fontFamily: 'Hacen'),
               ))),
-          controller.BMKID==1 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?GridColumn(
+          controller.BMKID==1 || controller.BMKID==2 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?GridColumn(
           columnName: 'BMDNF',
           width: double.nan,
           columnWidthMode: ColumnWidthMode.auto,
@@ -404,7 +406,7 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
                 'StringSNNO'.tr,
                 style: const TextStyle(fontFamily: 'Hacen'),
               ))),
-          controller.BMKID==1 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?GridColumn(
+          controller.BMKID==1 || controller.BMKID==2 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?GridColumn(
           columnName: 'BMDNF',
           width: double.nan,
           columnWidthMode: ColumnWidthMode.auto,
@@ -544,7 +546,7 @@ class InventoryDataGridSource extends DataGridSource {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontFamily: 'Hacen')),
       ),
-        controller.BMKID==1 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?Container(
+        controller.BMKID==1 || controller.BMKID==2 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?Container(
         alignment: Alignment.center,
         child: Text(controller.formatter.format(row.getCells()[5].value).toString(),
             overflow: TextOverflow.ellipsis,
@@ -623,7 +625,7 @@ class InventoryDataGridSource extends DataGridSource {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontFamily: 'Hacen')),
       ),
-      controller.BMKID==1 || controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?Container(
+      controller.BMKID==1 || controller.BMKID==2 ||  controller.Allow_give_Free_Quantities=='1' && controller.UPIN_BMDNF==1?Container(
         alignment: Alignment.center,
         child: Text(controller.formatter.format(row.getCells()[5].value).toString(),
             overflow: TextOverflow.ellipsis,

@@ -10,6 +10,7 @@ import 'package:flutter_search_bar/flutter_search_bar.dart' as search;
 import 'package:intl/intl.dart';
 
 import '../../../Widgets/theme_helper.dart';
+import 'Filter_Sale.dart';
 
 
 class Return_Sale_Invoices_view extends StatefulWidget {
@@ -20,7 +21,6 @@ class Return_Sale_Invoices_view extends StatefulWidget {
 }
 
 class _Sale_Invoices_viewState extends State<Return_Sale_Invoices_view> {
-  @override
   final Sale_Invoices_Controller controller = Get.find();
   late search.SearchBar searchBar;
   String query = '';
@@ -76,7 +76,8 @@ class _Sale_Invoices_viewState extends State<Return_Sale_Invoices_view> {
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-        title: Text('StringReturn_Sale'.tr,
+        title: Text(controller.BMKID==2?'StringReturn_Purchase'.tr:
+        'StringReturn_Sale'.tr,
           style:  ThemeHelper().buildTextStyle(context, AppColors.textColor, 'L')
         ),
         iconTheme: IconThemeData(color: Colors.white),
@@ -85,61 +86,9 @@ class _Sale_Invoices_viewState extends State<Return_Sale_Invoices_view> {
           Row(
             children: [
               searchBar.getSearchAction(context),
-              PopupMenuButton(
-                enableFeedback: true,
-                initialValue: 0,
-                elevation: 0.0,
-                itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                  PopupMenuItem(
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          controller.get_RETURN_SALE("ALL");
-                          Navigator.of(context).pop(false);
-                          // Get.offAndToNamed(Routes.Inventory);
-                        });
-                      },
-                      child: ListTile(
-                        title: Text(
-                          'StringShowAll'.tr,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          controller.get_RETURN_SALE("DateNow");
-                          Navigator.of(context).pop(false);
-                        });
-                      },
-                      child: ListTile(
-                        title: Text(
-                          'StringDateNow'.tr,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _selectDataFromDate(context);
-                        });
-                      },
-                      child: ListTile(
-                        title: Text(
-                          'StringSerDate'.tr,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                onPressed: () => Fliter_Sales().showFilterSheet(context),
               ),
             ],
           )

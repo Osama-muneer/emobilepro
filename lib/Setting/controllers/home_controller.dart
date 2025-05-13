@@ -73,8 +73,8 @@ class HomeController extends GetxController {
       SUM_STATE_BO1=0,SUM_STATE_BF1=0,SUM_STATE_BI1=0,SUM_STATE_BS1=0,SUM_STATE_BO2=0,SUM_STATE_BF2=0,SUM_STATE_BI2=0
   ,SUM_STATE_BS2=0,SUM_STATE_BO4=0,SUM_STATE_BF4=0,SUM_STATE_BI4=0,SUM_STATE_BS4=0,SUM_B1=0,SUM_B3=0,SUM_B4=0
   ,SUM_B5=0,SUM_B7=0,SUM_B10=0,SUM_B11=0,SUM_B12=0,SUM_A1=0,SUM_A2=0;
-  int? UPIN_BI=0,UPIN_BO=0,UPIN_BO_R=0,UPIN_BF=0,UPIN_ACI=0,UPIN_ACO=0,UPIN_ACS=0,UPIN_ACJ=0,UPIN_CUS=0,
-      BMKST_BI=1,BMKST_BO=1,BMKST_BO_R=1,BMKST_BF=1,AMKST_ACI=1,AMKST_ACO=1,AMKST_ACJ,BMKST_BF_R=1,UPIN_BF_R=1,BMKST_BO_S=1,
+  int? UPIN_BI=0,UPIN_BIO=1,UPIN_BO=1,UPIN_BO_R=1,UPIN_BF=1,UPIN_ACI=0,UPIN_ACO=0,UPIN_ACS=0,UPIN_ACJ=0,UPIN_CUS=0,
+      BMKST_BI=1,BMKST_BIO=1,BMKST_BO=1,BMKST_BO_R=1,BMKST_BF=1,AMKST_ACI=1,AMKST_ACO=1,AMKST_ACJ,BMKST_BF_R=1,UPIN_BF_R=1,BMKST_BO_S=1,
       UPIN_BO_S=1,UPIN_QU=1,UPIN_CUS_ORD=1,FAUST=2,SSID=0,BMKST_QU=1,BMKST_CUS_ORD=1,COU_STATE_BO1=0,COU_STATE_BF1=0,
       COU_STATE_BI1=0,COU_STATE_BS1=0,COU_STATE_BO2=0,COU_STATE_BF2=0,
       COU_STATE_BI2=0,COU_STATE_BS2=0,COU_STATE_BO4=0,COU_STATE_BF4=0,
@@ -215,7 +215,6 @@ class HomeController extends GetxController {
   @override
   void onInit() async {
     loading(false);
-    //querTO_NUM();
     Get.arguments==3?currentIndex=3:Get.arguments==1?currentIndex=1:currentIndex=0;
     BINAController = TextEditingController();
     JTNAController = TextEditingController();
@@ -223,11 +222,8 @@ class HomeController extends GetxController {
     searchController = TextEditingController();
    // await ES_WS_PKG.GET_P();
     await GET_GEN_VAR_P();
-    //await GET_BIL_SUM();
-    await GET_ACC_SUM();
     GET_SUNA();
     Get_JTNA_DATA();
-   // GET_SUM_PAY_BIL_MOV_P();
     GET_BIL_MOV_M_GET_BIF_MOV_M_STATE_P('0');
     GET_BIL_MOV_M_GET_BIF_MOV_M_STATE_P('1');
     GET_BIL_MOV_M_GET_BIF_MOV_M_STATE_P('2');
@@ -243,6 +239,7 @@ class HomeController extends GetxController {
       StteingController().SET_B_P('Save_Sync_Invo',true);
     }
     await GET_USR_PRI(901);
+    await GET_USR_PRI(912);
     await GET_USR_PRI(601);
     await GET_USR_PRI(621);
     await GET_USR_PRI(2207);
@@ -262,6 +259,7 @@ class HomeController extends GetxController {
     await GET_ACC_MOV_K_P(2);
     await GET_ACC_MOV_K_P(15);
     await GET_BIL_MOV_K_P(1);
+    await GET_BIL_MOV_K_P(2);
     await GET_BIL_MOV_K_P(3);
     await GET_BIL_MOV_K_P(4);
     await GET_BIL_MOV_K_P(5);
@@ -337,6 +335,11 @@ class HomeController extends GetxController {
         //فاتورة مشتربات
         if(GETPRID==901){
         UPIN_BI = 1;
+        }
+
+        //مردود مشتريات
+        if(GETPRID==912){
+          UPIN_BIO = 1;
         }
         //فاتورة مبيعات
         else if(GETPRID==601){
@@ -415,6 +418,7 @@ class HomeController extends GetxController {
       else {
         if(LoginController().SUID=='1'){
           UPIN_BI=1;
+          UPIN_BIO=1;
           UPIN_BO=1;
           UPIN_BO_R=1;
           UPIN_BO_R=1;
@@ -437,6 +441,8 @@ class HomeController extends GetxController {
         }else{
           //فاتورة مشتربات
           if(GETPRID==901) {UPIN_BI = 2;}
+          //مردود مشتريات
+          if(GETPRID==912){UPIN_BIO = 2;}
           //فاتورة مبيعات
           else if(GETPRID==601) {UPIN_BO = 1;}
           //مردود فواتير المبيعات
@@ -503,6 +509,8 @@ class HomeController extends GetxController {
       if (Bil_Mov_K.isNotEmpty) {
         // فواتير المشتريات
         if(GETBMKID==1 ){BMKST_BI = Bil_Mov_K.elementAt(0).BMKST;}
+        //مردود مشتريات
+        if(GETBMKID==2 ){BMKST_BIO = Bil_Mov_K.elementAt(0).BMKST;}
         // فواتير المبيعات
         else if(GETBMKID==3){BMKST_BO = Bil_Mov_K.elementAt(0).BMKST;}
         // مردود فواتير المبيعات
@@ -790,6 +798,8 @@ class HomeController extends GetxController {
 
     GEN_VAR=await GET_GEN_VAR('PKID1');
       if (GEN_VAR.isNotEmpty) {
+        print('PKID1');
+        print(GEN_VAR.elementAt(0).VAL.toString());
         LoginController().SET_P('PKID1', GEN_VAR.elementAt(0).VAL.toString());
       }
 
@@ -1069,414 +1079,6 @@ class HomeController extends GetxController {
       update();
     } );
     // returns hostname as string
-  }
-
-  // Future GET_SUM_PAY_BIL_MOV_P() async {
-  //   //مبيعات عادية
-  //
-  //   //على حسب الدفع
-  //   GET_SUM_PAY_BIL_MOV(SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY1_BO=data.elementAt(0).BMMMT!;
-  //       update();
-  //     }else{
-  //       SUM_PAY1_BO=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','3','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY3_BO=data.elementAt(0).BMMMT!;
-  //       update();
-  //     }else{
-  //       SUM_PAY3_BO=0;
-  //     }
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','3','8',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY8_BO=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY8_BO=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','3','9',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY9_BO=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY9_BO=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //على حسب الحالة
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','1','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BO1=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BO1=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BO1=0;
-  //       COU_STATE_BO1=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','2','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BO2=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BO2=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BO2=0;
-  //       COU_STATE_BO2=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','4','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BO4=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BO4=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BO4=0;
-  //       COU_STATE_BO4=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //الالصنف الأكثر  بيعًا
-  //   GET_MAX_MIN_ITEM_NO_BIL_MOV('1','BIL_MOV_M','BIL_MOV_D','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       //SUM_PAY9_BO=data.elementAt(0).BMDNO!;
-  //     }else{
-  //       //   SUM_PAY9_BO=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //مبيعات فورية
-  //   GET_SUM_PAY_BIL_MOV('BIF_MOV_M','11','1',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY1_BF=data.elementAt(0).BMMMT!;
-  //       update();
-  //     }else{
-  //       SUM_PAY1_BF=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIF_MOV_M','11','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY3_BF=data.elementAt(0).BMMMT!;
-  //       update();
-  //     }else{
-  //       SUM_PAY3_BF=0;
-  //     }
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIF_MOV_M','11','8',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY8_BF=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY8_BF=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIF_MOV_M','11','9',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY9_BF=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY9_BF=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //على حسب الحالة
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','1','11',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BF1=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BF1=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BF1=0;
-  //       COU_STATE_BF1=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','2','11',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BF2=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BF2=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BF2=0;
-  //       COU_STATE_BF2=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','4','11',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BF4=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BF4=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BF4=0;
-  //       COU_STATE_BF4=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //مشتريات
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','1','1',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY1_BI=data.elementAt(0).BMMMT!;
-  //       update();
-  //     }else{
-  //       SUM_PAY1_BI=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','1','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY3_BI=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY3_BI=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','1','8',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY8_BI=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY8_BI=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','1','9',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY9_BI=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY9_BI=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //على حسب الحالة
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','1','1',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BI1=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BI1=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BI1=0;
-  //       COU_STATE_BI1=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','2','1',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BI2=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BI2=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BI2=0;
-  //       COU_STATE_BI2=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','4','1',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BI4=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BI4=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BI4=0;
-  //       COU_STATE_BI4=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //
-  //   //خدمات
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','5','1',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY1_BS=data.elementAt(0).BMMMT!;
-  //       update();
-  //     }else{
-  //       SUM_PAY1_BS=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','5','3',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY3_BS=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY3_BS=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','5','8',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY8_BS=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY8_BS=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_SUM_PAY_BIL_MOV('BIL_MOV_M','5','9',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_PAY9_BS=data.elementAt(0).BMMMT!;
-  //     }else{
-  //       SUM_PAY9_BS=0;
-  //     }
-  //     update();
-  //   });
-  //
-  //   //على حسب الحالة
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','1','5',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BS1=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BS1=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BS1=0;
-  //       COU_STATE_BS1=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','2','5',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BS2=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BS2=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BS2=0;
-  //       COU_STATE_BS2=0;
-  //     }
-  //     update();
-  //   });
-  //   GET_STATE_BIL_MOV('BIL_MOV_M','4','5',SelectDays_F ?? (SelectDays_F = selectedDatesercher.toString().split(" ")[0]),
-  //       SelectDays_T ?? (SelectDays_T = selectedDatesercher.toString().split(" ")[0])).then((data) {
-  //     if(data.isNotEmpty) {
-  //       SUM_STATE_BS4=data.elementAt(0).BMMMT!;
-  //       COU_STATE_BS4=data.elementAt(0).BMMNO!;
-  //       update();
-  //     }else{
-  //       SUM_STATE_BS4=0;
-  //       COU_STATE_BS4=0;
-  //     }
-  //     update();
-  //   });
-  //
-  // }
-
-  // Future GET_BIL_SUM() async {
-  //  BIL_MOV_M=await  getTypeBil(1);
-  //     if(BIL_MOV_M.isNotEmpty) {
-  //       SUM_B1=BIL_MOV_M.elementAt(0).BMMMT!;
-  //       update();
-  //     } else{
-  //       SUM_B1=0;
-  //     }
-  //
-  //  BIL_MOV_M=await  getTypeBil(3);
-  //  if(BIL_MOV_M.isNotEmpty) {
-  //    SUM_B3=BIL_MOV_M.elementAt(0).BMMMT!;
-  //    update();
-  //  } else{
-  //    SUM_B3=0;
-  //  }
-  //
-  //  BIL_MOV_M=await  getTypeBil(4);
-  //  if(BIL_MOV_M.isNotEmpty) {
-  //    SUM_B4=BIL_MOV_M.elementAt(0).BMMMT!;
-  //    update();
-  //  } else{
-  //    SUM_B4=0;
-  //  }
-  //
-  //  BIL_MOV_M=await  getTypeBil(5);
-  //  if(BIL_MOV_M.isNotEmpty) {
-  //    SUM_B5=BIL_MOV_M.elementAt(0).BMMMT!;
-  //    update();
-  //  } else{
-  //    SUM_B5=0;
-  //  }
-  //
-  //  BIL_MOV_M=await  getTypeBil(7);
-  //  if(BIL_MOV_M.isNotEmpty) {
-  //    SUM_B7=BIL_MOV_M.elementAt(0).BMMMT!;
-  //    update();
-  //  } else{
-  //    SUM_B7=0;
-  //  }
-  //
-  //  BIL_MOV_M=await  getTypeBil(10);
-  //  if(BIL_MOV_M.isNotEmpty) {
-  //    SUM_B10=BIL_MOV_M.elementAt(0).BMMMT!;
-  //    update();
-  //  } else{
-  //    SUM_B10=0;
-  //  }
-  //
-  //  BIL_MOV_M=await  getTypeBil(11);
-  //  if(BIL_MOV_M.isNotEmpty) {
-  //    SUM_B11=BIL_MOV_M.elementAt(0).BMMMT!;
-  //    update();
-  //  } else{
-  //    SUM_B11=0;
-  //  }
-  //
-  //     update();
-  //
-  // }
-
-  Future GET_ACC_SUM() async {
-    ACC_MOV_M = await  getTypeVou(1);
-      if(ACC_MOV_M.isNotEmpty) {
-        SUM_A1=ACC_MOV_M.elementAt(0).AMMAM!;
-        update();
-      } else{
-        SUM_A1=0;
-      }
-
-    ACC_MOV_M=await  getTypeVou(2);
-   if(ACC_MOV_M.isNotEmpty) {
-     SUM_A2=ACC_MOV_M.elementAt(0).AMMAM!;
-     update();
-   } else{
-     SUM_A2=0;
-   }
-
-
-      update();
-
   }
 
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:emobilepro/Widgets/config.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -272,8 +273,12 @@ class FileHelper {
 
   static Future<void> _bluetoothPrint(AppPrinterDevice device,String path, int copies) async {
     try {
+      // 1) إيقاف Discovery لتجنب التضارب
+      //await FlutterBluetoothSerial.instance.cancelDiscovery();
       bool isConn = await bluetooth.isConnected ?? false;
       if (!(await bluetooth.isConnected ?? false)) {
+        await bluetooth.disconnect();
+
         final bonded = await bluetooth.getBondedDevices();
         // حاول إيجاد الجهاز حسب address المحفوظ في جدولك
         final found = bonded.firstWhereOrNull((d) => d.address == device.address);
@@ -308,6 +313,8 @@ class FileHelper {
 
       _showToast("تمت الطباعة بنجاح!", success: true);
     } catch (e, st) {
+      printLongText('Error bluetoothPrint ' + e.toString());
+     // printLongText(st);
       _showErrorToast(e, st);
     } finally {
       // 3) فصل الاتصال بعد الانتهاء لضمان عمل الجلسة التالية

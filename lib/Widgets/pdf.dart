@@ -2709,12 +2709,16 @@ class Pdf {
                    decoration: pw.BoxDecoration(color: PdfColors.MyColors,),
                    children: [
                      pw.Container(
-                       padding: const pw.EdgeInsets.only(left: 7,right: 7,top: 2,bottom: 2),
+                       padding:GetBMKID=='101'?
+                       const pw.EdgeInsets.only(left: 49,right: 48,top: 2,bottom: 2)
+                           : const pw.EdgeInsets.only(left: 7,right: 7,top: 2,bottom: 2),
                        alignment: pw.Alignment.center,
                        child: SimplePdf.text('العدد المنصرف', ttf, fontSize: 11, color: PdfColors.black),
                      ),
                      pw.Container(
-                       padding: const pw.EdgeInsets.only(left: 11,right: 10,top: 2,bottom: 2),
+                       padding:GetBMKID=='101'?
+                       const pw.EdgeInsets.only(left: 53,right: 53,top: 2,bottom: 2)
+                           : const pw.EdgeInsets.only(left: 11,right: 10,top: 2,bottom: 2),
                        alignment: pw.Alignment.center,
                        child: SimplePdf.text('العدد المورد', ttf, fontSize: 11, color: PdfColors.black),
                      ),

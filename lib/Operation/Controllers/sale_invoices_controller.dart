@@ -5259,6 +5259,9 @@ class Sale_Invoices_Controller extends GetxController {
 
   //اظهار البيانات +البحث
   get_RETURN_SALE(String type) async {
+    print('BMKID == 2 ? 1:BMKID!');
+    print(BMKID);
+    print(BMKID == 2 ? 1:BMKID!);
     RETURN_SALE_INV = await GET_BIL_MOV_M(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
         BMKID == 4 ? 3 : BMKID == 12 ? 11 : BMKID == 2 ? 1 : BMKID!, type,
         type == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
@@ -5669,6 +5672,7 @@ class Sale_Invoices_Controller extends GetxController {
       BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID1 :
       BMMNO = BIL_MOV_M.elementAt(0).BMMNO.toString();
       print(BIL_MOV_M.elementAt(0).BMMNO.toString());
+      print(LoginController().PKID1);
       print(BMMNO);
       print('GET_BMMNO_P');
     }
@@ -7240,6 +7244,8 @@ class Sale_Invoices_Controller extends GetxController {
   //حفظ فاتوره
   Future<bool> Save_BIL_MOV_M(bool typesave) async {
     try {
+
+      print('Save_BIL_MOV_M');
       // print(Must_Specify_Location_Invoice);
       // print(distanceInMeters);
       // print(Allow_Must_Specify_Location_Invoice);
@@ -7602,6 +7608,8 @@ class Sale_Invoices_Controller extends GetxController {
             CIID_L: LoginController().CIID,
           );
           STB_N = 'S2';
+          print('Save_BIF_MOV_M');
+          print(e);
           await Save_BIF_MOV_M(
               BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', e);
         }
@@ -11861,6 +11869,18 @@ class Sale_Invoices_Controller extends GetxController {
     return false;
   }
 
+
+  bool _isIgnoringDropdown_IMP() {
+    if (edit == true && BMKID == 2) {
+      return true;
+    }
+    if (BMKID == 2 && LoginController().Return_Type == '2') {
+      return true;
+    }
+
+    return false;
+  }
+
 // دالة لإنشاء InputDecoration
   InputDecoration _buildInputDecoration(BuildContext context, double height) {
     return InputDecoration(
@@ -13277,120 +13297,123 @@ class Sale_Invoices_Controller extends GetxController {
                 GETSTRING: 'StringSupplier'.tr,
               );
             }
-            return DropdownButtonFormField2(
-              decoration: ThemeHelper().InputDecorationDropDown(
-                  suffixIconColor: Colors.black45,
-                  suffixIcon: _buildSuffixIcon_IMP(),
-                  "${'StringSupplier'.tr}  ${'StringCUS_BAL'.tr} ${controller.formatter.format(controller.BACBA).toString()}"),
-              isDense: true,
-              isExpanded: true,
-              hint: ThemeHelper().buildText(context, 'StringSupplier', Colors.grey, 'S'),
-              iconStyleData: IconStyleData(
-                icon: controller.SelectDataBIID2 == null
-                    ?snapshot.connectionState == ConnectionState.waiting
-                    ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.black45,
-                  ),
-                )
-                    : const Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.black45,
-                )
-                    : InkWell(
-                  onTap: () {
-                    controller.buildShowBIL_ACC_C(context);
-                  },
-                  child: const Icon(
-                    Icons.error_outline,
-                    color: Colors.black45,
-                    size: 20,
-                  ),
-                ),
-              ),
-              items: snapshot.data!.map((item) => DropdownMenuItem<String>(
-                onTap: () async {
-                  controller.BCNAController.text = item.BINA.toString();
-                  controller.AANOController.text = item.AANO.toString();
-                  controller.GUIDC = item.GUID.toString();
-                  controller.BCMOController.text = item.BIMO.toString();
-                  controller.BIIDB = item.BIID;
-                  controller.PKID_C = item.PKID;
-                  controller.BCCT = item.BICT;
-                  controller.SCID_C = item.SCID;
-                  controller.BCAD_D = item.BIAD.toString();
-                  controller.GET_BIL_ACC_C_P(
-                      controller.AANOController.text,
-                      controller.GUIDC,
-                      controller.SelectDataBIID.toString(),
-                      controller.SelectDataSCID.toString(),
-                      PKID.toString(),GETBMMID: BMMID.toString());
-                  await controller.GET_TAX_LIN_CUS_IMP_P(
-                      'IMP', item.AANO.toString(), item.BIID.toString());
-                },
-                value: "${item.BIID.toString() + " +++ " + item.BINA_D.toString()}",
-                child: Text(
-                  "${item.BIID.toString()} - ${item.BINA_D.toString()}",
-                  style: ThemeHelper()
-                      .buildTextStyle(context, Colors.black, 'M'),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              )).toList().obs,
-              value: controller.SelectDataBIID3,
-              onChanged: (value) {
-                controller.SelectDataBIID3 = value as String;
-                controller.SelectDataBIID2 = value.toString().split(" +++ ")[0];
-                controller.update();
-              },
-              dropdownStyleData: const DropdownStyleData(
-                maxHeight: 300,
-              ),
-              dropdownSearchData: DropdownSearchData(
-                  searchController: controller.TextEditingSercheController,
-                  searchInnerWidget: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 8,
+            return IgnorePointer(
+              ignoring:  _isIgnoringDropdown_IMP(),
+              child: DropdownButtonFormField2(
+                decoration: ThemeHelper().InputDecorationDropDown(
+                    suffixIconColor: Colors.black45,
+                    suffixIcon:_isIgnoringDropdown_IMP()?null: _buildSuffixIcon_IMP(),
+                    "${'StringSupplier'.tr}  ${'StringCUS_BAL'.tr} ${controller.formatter.format(controller.BACBA).toString()}"),
+                isDense: true,
+                isExpanded: true,
+                hint: ThemeHelper().buildText(context, 'StringSupplier', Colors.grey, 'S'),
+                iconStyleData: IconStyleData(
+                  icon: controller.SelectDataBIID2 == null
+                      ?snapshot.connectionState == ConnectionState.waiting
+                      ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.black45,
                     ),
-                    child: TextFormField(
-                      controller: controller.TextEditingSercheController,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear, size: 20),
-                          onPressed: () {
-                            controller.TextEditingSercheController.clear();
-                            controller.update();
-                          },
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        hintText: 'StringSearch_for_BIID'.tr,
-                        hintStyle: ThemeHelper()
-                            .buildTextStyle(context, Colors.grey, 'S'),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  )
+                      : const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.black45,
+                  )
+                      : InkWell(
+                    onTap: () {
+                      controller.buildShowBIL_ACC_C(context);
+                    },
+                    child: const Icon(
+                      Icons.error_outline,
+                      color: Colors.black45,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                items: snapshot.data!.map((item) => DropdownMenuItem<String>(
+                  onTap: () async {
+                    controller.BCNAController.text = item.BINA.toString();
+                    controller.AANOController.text = item.AANO.toString();
+                    controller.GUIDC = item.GUID.toString();
+                    controller.BCMOController.text = item.BIMO.toString();
+                    controller.BIIDB = item.BIID;
+                    controller.PKID_C = item.PKID;
+                    controller.BCCT = item.BICT;
+                    controller.SCID_C = item.SCID;
+                    controller.BCAD_D = item.BIAD.toString();
+                    controller.GET_BIL_ACC_C_P(
+                        controller.AANOController.text,
+                        controller.GUIDC,
+                        controller.SelectDataBIID.toString(),
+                        controller.SelectDataSCID.toString(),
+                        PKID.toString(),GETBMMID: BMMID.toString());
+                    await controller.GET_TAX_LIN_CUS_IMP_P(
+                        'IMP', item.AANO.toString(), item.BIID.toString());
+                  },
+                  value: "${item.BIID.toString() + " +++ " + item.BINA_D.toString()}",
+                  child: Text(
+                    "${item.BIID.toString()} - ${item.BINA_D.toString()}",
+                    style: ThemeHelper()
+                        .buildTextStyle(context, Colors.black, 'M'),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )).toList().obs,
+                value: controller.SelectDataBIID3,
+                onChanged: (value) {
+                  controller.SelectDataBIID3 = value as String;
+                  controller.SelectDataBIID2 = value.toString().split(" +++ ")[0];
+                  controller.update();
+                },
+                dropdownStyleData: const DropdownStyleData(
+                  maxHeight: 300,
+                ),
+                dropdownSearchData: DropdownSearchData(
+                    searchController: controller.TextEditingSercheController,
+                    searchInnerWidget: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
+                      ),
+                      child: TextFormField(
+                        controller: controller.TextEditingSercheController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear, size: 20),
+                            onPressed: () {
+                              controller.TextEditingSercheController.clear();
+                              controller.update();
+                            },
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
+                          hintText: 'StringSearch_for_BIID'.tr,
+                          hintStyle: ThemeHelper()
+                              .buildTextStyle(context, Colors.grey, 'S'),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  searchMatchFn: (item, searchValue) {
-                    return (item.value
-                        .toString()
-                        .toLowerCase()
-                        .contains(searchValue.toLowerCase()));
-                  },
-                  searchInnerWidgetHeight: 50),
-              onMenuStateChange: (isOpen) {
-                if (!isOpen) {
-                  controller.TextEditingSercheController.clear();
-                }
-              },
+                    searchMatchFn: (item, searchValue) {
+                      return (item.value
+                          .toString()
+                          .toLowerCase()
+                          .contains(searchValue.toLowerCase()));
+                    },
+                    searchInnerWidgetHeight: 50),
+                onMenuStateChange: (isOpen) {
+                  if (!isOpen) {
+                    controller.TextEditingSercheController.clear();
+                  }
+                },
+              ),
             );
           },
         ));
