@@ -2739,9 +2739,7 @@ class Sale_Invoices_Controller extends GetxController {
   Future GET_USE_Cost_Centers() async {
     var data = await GET_SYS_VAR(351);
     if (data.isNotEmpty) {
-      P_COSM = data
-          .elementAt(0)
-          .SVVL!;
+      P_COSM = data.elementAt(0).SVVL!;
     } else {
       P_COSM = '2';
     }
@@ -2813,8 +2811,7 @@ class Sale_Invoices_Controller extends GetxController {
 
   //استخدام مراكز تكلفه في فاتورة المبيعات
   Future GET_USE_ACNO() async {
-    GET_SYS_VAR(BMKID == 1 ? 507 : BMKID == 5 || BMKID == 6 ? 530 : 506).then((
-        data) {
+    GET_SYS_VAR((BMKID == 1 || BMKID == 2) ? 507 : BMKID == 5 || BMKID == 6 ? 530 : 506).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
         P_COSS = BMKID == 7 || BMKID == 10 || BMKID == 11 || BMKID == 12 ? '2'
@@ -4125,7 +4122,7 @@ class Sale_Invoices_Controller extends GetxController {
         SHOW_GRO = false;
         SHOW_ITEM = true;
         ADD_T = 1;
-        if ((BMKID == 1 || BMKID == 4 || BMKID == 12) && LoginController().Return_Type == '2') {
+        if ((BMKID == 2 || BMKID == 4 || BMKID == 12) && LoginController().Return_Type == '2') {
           edit = false;
           LoginController().SET_N_P('TIMER_POST', 1);
           await GET_BMMID_P();
@@ -6230,13 +6227,14 @@ class Sale_Invoices_Controller extends GetxController {
 
   //حالة الحفظ
   editMode() async{
-    print('editMode');
+
     contentFocusNode.unfocus();
     bool isValidate = true;
     if (isValidate == false) {
       isloadingvalidator(false);
     } else {
       STMID == 'MOB' ? await calculateDistanceBetweenLocations() : null;
+      print(Get.arguments);
       if (Get.arguments == null && edit == false) {
         if (CheckBack == 0 || CountRecodeController.text == '0') {
           Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
@@ -7385,7 +7383,7 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         return false;
       }
-      else if (STMID == 'MOB'  && (BMKID!=11 || BMKID!=12)  &&(P_COS_SEQ == '1' || P_COSS == '1')
+      else if (STMID == 'MOB'  && (BMKID!=11 || BMKID!=12)  && (P_COS_SEQ == '1' || P_COSS == '1')
           && SelectDataACNO == null) {
         Fluttertoast.showToast(
             msg: 'StringACNO_ERR'.tr,
