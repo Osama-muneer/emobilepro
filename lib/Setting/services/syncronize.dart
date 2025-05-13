@@ -255,7 +255,7 @@ class SyncronizationData {
         List_D[i].BMKID==11?"BIF_MOV_DO":List_D[i].BMKID==12?
         "BIF_MOV_DOR":List_D[i].BMKID==3?"BIL_MOV_DO":List_D[i].BMKID==4?"BIL_MOV_DOR":
         List_D[i].BMKID==5?"BIL_MOV_DOS":List_D[i].BMKID==7?"BIL_MOV_DQ":
-        List_D[i].BMKID==10?"BIL_MOV_DCR": "BIL_MOV_DI",
+        List_D[i].BMKID==10?"BIL_MOV_DCR": List_D[i].BMKID==2?"BIL_MOV_DIR": "BIL_MOV_DI",
         "STID_V":"",
         "TBNA_V":GETTAB_N,
         "LAN_V": LoginController().LAN,
@@ -869,7 +869,7 @@ class SyncronizationData {
         contactList[i].BMKID==11 ? "BIF_MOV_MO" : contactList[i].BMKID==12 ? "BIF_MOV_MOR":
         contactList[i].BMKID==3?"BIL_MOV_MO":contactList[i].BMKID==4?
         "BIL_MOV_MOR":contactList[i].BMKID==5?"BIL_MOV_MOS":contactList[i].BMKID==7?"BIL_MOV_MQ":
-        contactList[i].BMKID==10?"BIL_MOV_MCR": "BIL_MOV_MI",
+        contactList[i].BMKID==10?"BIL_MOV_MCR": contactList[i].BMKID==2?"BIL_MOV_MIR": "BIL_MOV_MI",
         "STID_V":"",
         "TBNA_V": contactList[i].BMKID==11 ||  contactList[i].BMKID==12? 'BIF_MOV_M':'BIL_MOV_M',
         "LAN_V": LoginController().LAN,
@@ -886,7 +886,8 @@ class SyncronizationData {
         "F_GUID_V":"",
         "WH_V1":'',
         "PAR_V":"",
-        "JSON_V": contactList[i].BMKID==11 || contactList[i].BMKID==12 ? data.toString():data2.toString(),
+        "JSON_V": contactList[i].BMKID==11 || contactList[i].BMKID==12 ?
+        data.toString():data2.toString(),
         "JSON_V2":"",
         "JSON_V3":""
       };
