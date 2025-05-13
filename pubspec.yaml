@@ -73,7 +73,7 @@ dependencies:
 #  flutter_barcode_scanner:
   number_to_word_arabic:
   flutter_background_service: ^5.0.10
-#  flutter_local_notifications:
+  flutter_local_notifications:
   shared_preferences:
   simple_animations:
 #  charts_flutter:
