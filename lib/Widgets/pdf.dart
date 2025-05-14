@@ -2699,10 +2699,6 @@ class Pdf {
       theme: ThemeData.withFont(base: Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"))),
       pageFormat: PdfPageFormat.a4,
       build: (context) => [
-        PdfPakage.buildHeader(GetBMKID, '', GETSONA, GETSONE, GETSORN, GETSOLN, image),
-      buildTitleTotalDetailedItemReport(GetBMKID, GetBMMDO_F, GetBMMDO_T,
-            GetBINA_F, GetBINA_T, arabicFont, context),
-
            pw.Row(children: [
              pw.Table(
                border: pw.TableBorder.all(color: PdfColors.black, width: 0.6),
@@ -2958,6 +2954,15 @@ class Pdf {
       pageFormat: PdfPageFormat.a4,
       build: (context) {
         final content = <pw.Widget>[];
+
+        content.add(
+          PdfPakage.buildHeader(GetBMKID, '', GETSONA, GETSONE, GETSORN, GETSOLN, image),
+        );
+
+        content.add(
+          buildTitleTotalDetailedItemReport(GetBMKID, GetBMMDO_F, GetBMMDO_T,
+              GetBINA_F, GetBINA_T, arabicFont, context),
+        );
         grouped.forEach((bmkid, scMapDynamic) {
           final scMap = scMapDynamic as Map;
           scMap.forEach((scid, txListDynamic) {
@@ -2967,63 +2972,47 @@ class Pdf {
             // دمج نوع الحركة والعمله في سطر واحد
             content.add(
               pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
-                  pw.Text('$typeName'),
-                  pw.Text('$currencyName'),
+                  SimplePdf.text('$currencyName', ttf, fontSize: 15, color: PdfColors.red),
+                  SizedBox(width: 30),
+                  SimplePdf.text('$typeName', ttf, fontSize: 15, color: PdfColors.red),
                 ],
               ),
             );
-
             content.add(
               pw.Table(
                 border: pw.TableBorder.all(width: 0.7),
                 columnWidths: {
-                  0: pw.FlexColumnWidth(0.5),
-                  1: pw.FlexColumnWidth(0.5),
-                  2: pw.FlexColumnWidth(0.5),
-                  3: pw.FlexColumnWidth(0.5),
-                  4: pw.FlexColumnWidth(0.5),
+                  0: pw.FlexColumnWidth(0.6),
+                  1: pw.FlexColumnWidth(0.6),
+                  2: pw.FlexColumnWidth(0.6),
+                  3: pw.FlexColumnWidth(0.6),
+                  4: pw.FlexColumnWidth(0.6),
                   5: pw.FlexColumnWidth(0.5),
-                  6: pw.FlexColumnWidth(0.8),
+                  6: pw.FlexColumnWidth(0.5),
                   7: pw.FlexColumnWidth(0.5),
-                  8: pw.FlexColumnWidth(1.5),
-                  9: pw.FlexColumnWidth(0.7),
-                  10: pw.FlexColumnWidth(1),
+                  8: pw.FlexColumnWidth(0.9),
+                  9: pw.FlexColumnWidth(1.3),
+                  10: pw.FlexColumnWidth(0.6),
                   11: pw.FlexColumnWidth(0.8),
                 },
                 children: [
-                  // الصف الرئيسي للعناوين
-                  GetBMKID=='101'? pw.TableRow(
+                 pw.TableRow(
                     decoration: pw.BoxDecoration(color: PdfColors.MyColors,),
                     children: [
-                      'مجاني',
-                      'كمية',
-                      'مجاني',
-                      'كمية',
-                      'سعر الوحدة',
-                      'الوحدة',
-                      'الصنف',
-                    ].map((title) =>
-                        pw.Padding(
-                            padding: pw.EdgeInsets.all(4),
-                            child:SimplePdf.text(title, ttf, fontSize: 10, color: PdfColors.black)
-                        )).toList(),
-                  ): pw.TableRow(
-                    decoration: pw.BoxDecoration(color: PdfColors.MyColors,),
-                    children: [
-                      'مجاني',
-                      'كمية',
-                      'مجاني',
-                      'كمية',
-                      'سعر الوحدة',
-                      'الوحدة',
-                      'الصنف',
-                      'العملة',
-                      'العميل',
-                      'رقم الحركة',
-                      'التاريخ',
-                      'النوع',
+                      'StringNet_Amount2'.tr,
+                      'String_Discount'.tr,
+                      'String_Tax_Amount'.tr,
+                      'StringSUM_BMMAM'.tr,
+                      'StringMPCO'.tr,
+                      'StringSMDNF'.tr,
+                      'StringSNNO'.tr,
+                      'StringMUID'.tr,
+                      'StringMINO'.tr,
+                      'StringBCID'.tr,
+                      'StringSMMNO'.tr,
+                      'StringSMDED2'.tr,
                     ].map((title) => pw.Padding(
                         padding: pw.EdgeInsets.all(4),
                         child:SimplePdf.text(title, ttf, fontSize: 10, color: PdfColors.black)
@@ -3031,59 +3020,37 @@ class Pdf {
                   ),
                   // الصفوف الديناميكية
                   ...txList.map((m) =>
-                  GetBMKID=='101'? pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNF_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNO_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNF_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNO_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDAM).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(m.MUNA_D.toString() ?? '', ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(m.MINA_D.toString() ?? '', ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                    ],
-                  ):
                   pw.TableRow(
                     children: [
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNF_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                        child:SimplePdf.text(formatter.format(((m.BMDAM!-m.BMDDI!)*m.BMDNO!)+(
+                            m.BMDTXT1!+m.BMDTXT2!)).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNO_OUT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                        child:SimplePdf.text(formatter.format((m.BMDDI!+((m.BMDDIA!/100)*m.BMDAM!))
+                            *m.BMDNO!+(m.BMDDIF!*m.BMDNF!)).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNF_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                        child:SimplePdf.text(formatter.format(m.BMDTXT1).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(formatter.format(m.BMDNO_IN).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                        child:SimplePdf.text(formatter.format(m.BMDAMT).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
                         child:SimplePdf.text(formatter.format(m.BMDAM).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child:SimplePdf.text(formatter.format(m.BMDNF).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child:SimplePdf.text(formatter.format(m.BMDNO).toString(), ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
@@ -3092,10 +3059,6 @@ class Pdf {
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
                         child:SimplePdf.text(m.MINA_D.toString() ?? '', ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(m.SCNA_D.toString() ?? '', ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(2),
@@ -3109,12 +3072,65 @@ class Pdf {
                         padding: pw.EdgeInsets.all(2),
                         child:SimplePdf.text(m.BMMDO ?? '', ttf, fontSize: 8.5, color: PdfColors.black),
                       ),
-                      pw.Padding(
-                        padding: pw.EdgeInsets.all(2),
-                        child:SimplePdf.text(m.BMKID_D.toString() ?? '', ttf, fontSize: 8.5, color: PdfColors.black),
-                      ),
                     ],
                   )
+                  ),
+                  pw.TableRow(
+                    decoration: pw.BoxDecoration(color: PdfColors.grey300),
+                    children: [
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(
+                            txList.fold<double>(0.0, (sum, m) => sum + (( (m.BMDAM ?? 0.0) - (m.BMDDI ?? 0.0)) * (m.BMDNO ?? 0.0) + (m.BMDTXT1 ?? 0.0) + (m.BMDTXT2 ?? 0.0) )),).toString(),
+                          ttf, fontSize: 9,
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(
+                              txList.fold<double>(0.0, (sum, m) => sum +
+                                  ((m.BMDDI ?? 0.0) + ((m.BMDDIA ?? 0.0) / 100 * (m.BMDAM ?? 0.0)))
+                                      * (m.BMDNO ?? 0.0) + ((m.BMDDIF ?? 0.0) * (m.BMDNF ?? 0.0))
+                              )).toString(), ttf, fontSize: 9),
+                        ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(txList.fold<double>(0.0, (sum, m) => sum + (m.BMDTXT1 ?? 0.0)),).toString(),
+                          ttf, fontSize: 9,
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(txList.fold<double>(0.0, (sum, m) => sum + (m.BMDAMT ?? 0.0)),).toString(),
+                          ttf, fontSize: 9,
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(txList.fold<double>(0.0, (sum, m) => sum + (m.BMDAM ?? 0.0)),).toString(),
+                          ttf, fontSize: 9,
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(txList.fold<double>(0.0, (sum, m) => sum + (m.BMDNF ?? 0.0)),).toString(),
+                          ttf, fontSize: 9,
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(2),
+                        child: SimplePdf.text(
+                          formatter.format(txList.fold<double>(0.0, (sum, m) => sum + (m.BMDNO ?? 0.0)),).toString(),
+                          ttf, fontSize: 9,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -3125,7 +3141,6 @@ class Pdf {
         return content;
       },
     ));
-
     return PdfPakage.saveDocument(
         name: "${'StringTotalDetailedItem'.tr}.pdf", pdf: pdf);
   }
@@ -3141,27 +3156,8 @@ class Pdf {
       Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          pw.Divider(height: 1),
           SizedBox(height: 0.3 * PdfPageFormat.cm),
           pw.Column(children: [
-            // Row(
-            //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            //   children: <pw.Widget>[
-            //     pw.Column(children: [
-            //       pw.Text(GetBMKID=='1'?'${'StringPurchases'.tr}':GetBMKID=='3'?'${'StringSale_Invoices'.tr}'
-            //           :GetBMKID=='5'?'${'StringService_Bills'.tr}':'${'StringSale_Points'.tr}',
-            //           style: TextStyle(fontSize: 14.sp,)),
-            //     ]),
-            //     pw.Column(children: [
-            //       pw.Text('${'StringPKIDlableText'.tr}  $GetBMMDO_F :',
-            //           style: TextStyle(fontSize: 14.sp,)),
-            //     ]),
-            //     pw.Column(children: [
-            //       pw.Text('${'StringSCIDlableText'.tr}  $GetBMMDO_F :',
-            //           style: TextStyle(fontSize: 14.sp,)),
-            //     ])
-            //   ],
-            // ),
             GetBINA_F != 'null' && GetBINA_T != 'null'
                 ? Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -3200,6 +3196,7 @@ class Pdf {
             ),
           ]),
           SizedBox(height: 0.3 * PdfPageFormat.cm),
+          pw.Divider(height: 1),
           // Text(dataInfo.billnote.toString()),
           // SizedBox(height: 0.8 * PdfPageFormat.cm),
         ],

@@ -681,6 +681,43 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
         });
   }
 
+  FutureBuilder<List<Pay_Kin_Local>> DropdownPAY_KIN_T() {
+    return FutureBuilder<List<Pay_Kin_Local>>(
+        future: GET_PAY_KIN('1'),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Pay_Kin_Local>> snapshot) {
+          if (!snapshot.hasData) {
+            return Dropdown(josnStatus: josnStatus, GETSTRING: 'StringPKID_T'.tr,);
+          }
+          return DropdownButtonFormField2(
+            decoration: ThemeHelper().InputDecorationDropDown(" ${'StringPKID_T'.tr}"),
+            isExpanded: true,
+            hint: ThemeHelper().buildText(context,'StringChi_PAY', Colors.grey,'S'),
+            value: controller.PKID_T,
+            style: const TextStyle(
+                fontFamily: 'Hacen',
+                color: Colors.black),
+            items: snapshot.data!
+                .map((item) => DropdownMenuItem<String>(
+              value: item.PKID.toString(),
+              child: Text(
+                "${item.PKNA_D.toString()}",
+                style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+              ),
+            )).toList().obs,
+            validator: (v) {
+              if (v == null) {
+                return 'StringChi_PAY'.tr;
+              };
+          return null;
+            },
+            onChanged: (value) {
+              controller.PKID_T = value.toString();
+            },
+          );
+        });
+  }
+
   DropdownST_Builder() {
     return  DropdownButtonFormField2(
       decoration: ThemeHelper().InputDecorationDropDown( controller.BMKID==101 ||
@@ -951,6 +988,29 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular( 0.02 * height)),
                               child: DropdownSYS_CUR_T()
+                          ),
+                          SizedBox(height:0.012 * height),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                    margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(  0.02 * height)),
+                                    child: DropdownPAY_KIN()
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                    margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular( 0.02 * height)),
+                                    child: DropdownPAY_KIN_T()
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height:0.012 * height),
                           Container(

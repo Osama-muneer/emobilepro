@@ -213,7 +213,10 @@ class Bil_Mov_M_Local {
   double? BMDAM;
   double? BMDNF;
   double? BMDTXT1;
+  double? BMDTXT2;
   double? BMDDI;
+  double? BMDDIA;
+  double? BMDDIF;
   double? BMDAMT;
   String? MINA_D;
   String? MUNA_D;
@@ -572,6 +575,9 @@ class Bil_Mov_M_Local {
     BMDNF_IN = map['BMDNF_IN'];
     BMDNO_OUT = map['BMDNO_OUT'];
     BMDNF_OUT = map['BMDNF_OUT'];
+    BMDTXT2 = map['BMDTXT2'];
+    BMDDIA = map['BMDDIA'];
+    BMDDIF = map['BMDDIF'];
   }
 
 }

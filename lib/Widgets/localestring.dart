@@ -1065,6 +1065,8 @@ class LocalString extends Translations{
       'StringHere_printers.':'هنا يمكنك إضافة الطابعات الخاصة بك.',
       'StringThis_printer_already':'هذه الطابعة موجودة مسبقًا!',
       'StringReturn_Purchase':'مردود مشتريات',
+      'StringPKID_F':'من الدفع',
+      'StringPKID_T':'الى الدفع',
 
     },
     'en':{
@@ -2117,6 +2119,8 @@ class LocalString extends Translations{
       'StringHere_printers.':'Here you can add your own printers.',
       'StringThis_printer_already':'This printer is already there!',
       'StringReturn_Purchase':'Return Purchase',
+      'StringPKID_F':'From Payment',
+      'StringPKID_T':'To Payment',
     }
   };
 }

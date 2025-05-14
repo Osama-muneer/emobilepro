@@ -38,7 +38,7 @@ class Inv_Rep_Controller extends GetxController {
   String? SelectDataFromBIID='',SelectDataToBIID='',SelectDataFromBPID,SelectDataToBPID,
           SelectDataFromBINA, SelectDataToBINA,SelectDataFromMGNO,SelectDataToMGNO,
           SelectDataSCID,PKID,SelectDataFromMINO,SelectDataToMINO,SelectDataBMKID,SelectDataST='1',
-      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T;
+      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T,PKID_T;
   int BMKID=11;
   double SUMBMDNO=0,SUMBMDMT=0;
   List<Bil_Mov_M_Local> Bil_Mov_M = [];
