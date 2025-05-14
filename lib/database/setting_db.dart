@@ -2,6 +2,7 @@ import 'dart:io';
 
 import '../Operation/models/acc_mov_m.dart';
 import '../Setting/models/AppPrinterDevice.dart';
+import '../Setting/models/Mob_Log.dart';
 import '../Setting/models/bk_inf.dart';
 import '../Setting/models/eco_acc.dart';
 import '../Setting/models/eco_var.dart';
@@ -2920,4 +2921,43 @@ Future<void> deletePrinter(int id) async {
   );
 }
 
+Future<void> insertMob_Log(String MLTY,String MLIN) async {
+  try {
+    final db = await DatabaseHelper().database; // تأكد من وجود DatabaseHelper
+    final dateTimes = DateFormat('dd-MM-yyyy hh:mm').format(DateTime.now());
+    await db!.insert('MOB_LOG', {
+      'MLTY': MLTY,
+      'MLDO': dateTimes.toString(),
+      'SUID': LoginController().SUID,
+      'SUNA': LoginController().SUNA,
+      'MLIN': MLIN.toString(),
+      'JTID_L': LoginController().JTID,
+      'BIID_L': LoginController().BIID,
+      'SYID_L': LoginController().SYID,
+      'CIID_L': LoginController().CIID,
+    });
+    print('✅ Mob_Log info inserted successfully.');
+  } catch (e) {
+    print('❌ Error inserting Mob Log: $e');
+  }
+}
 
+/// Fetch all MobLog records.
+Future<List<MobLog>> fetchAllMobLogs() async {
+  final db = await DatabaseHelper().database;
+  final result = await db!.query(
+    MobLog.tableName,
+    orderBy: 'MLDO DESC',
+  );
+  return result.map((map) => MobLog.fromMap(map)).toList();
+}
+
+/// Delete a MobLog by its MLID.
+Future<int> deleteMobLog(int mlid) async {
+  final db = await DatabaseHelper().database;
+  return await db!.delete(
+    MobLog.tableName,
+    where: 'MLID = ?',
+    whereArgs: [mlid],
+  );
+}

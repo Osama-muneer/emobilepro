@@ -1773,7 +1773,7 @@ Future<List<Mat_Gro_Local>> GET_MAT_GRO_ORD(String GETTYPE,int TYPE) async {
 
 }
 
-Future<List<Mat_Inf_Local>> GET_MAT_INF_LIST(String GETMGNO,String GETSCID,String GETBIID,int GETBPPR) async {
+Future<List<Mat_Inf_Local>> GET_MAT_INF_LIST(String GETMGNO,String GETSCID,String GETBIID,int GETBPPR,GETDisplayItemsOnScreen) async {
   var dbClient = await conn.database;
   String sql='';
   String Wheresql='';
@@ -1785,6 +1785,13 @@ Future<List<Mat_Inf_Local>> GET_MAT_INF_LIST(String GETMGNO,String GETSCID,Strin
   String Wheresql7='';
   String sqlMGNO='';
   String sqLBPPR='';
+  String SQLDisplayItemsOnScreen='';
+
+  if(GETDisplayItemsOnScreen=='2'){
+    SQLDisplayItemsOnScreen="  AND A.MUIDS=E.MUID";
+  }else{
+    SQLDisplayItemsOnScreen='';
+  }
 
   if(GETMGNO!='0'){
     sqlMGNO=" AND A.MGNO='$GETMGNO'";
@@ -1822,7 +1829,7 @@ Future<List<Mat_Inf_Local>> GET_MAT_INF_LIST(String GETMGNO,String GETSCID,Strin
       " AND (D.MGNO=C.MGNO  AND D.JTID_L=C.JTID_L AND D.CIID_L=C.CIID_L AND D.SYID_L=C.SYID_L $Wheresql3) "
       " AND (D.MUID=E.MUID  AND D.JTID_L=E.JTID_L AND D.CIID_L=E.CIID_L AND D.SYID_L=E.SYID_L $Wheresql4) "
       " AND (D.MGNO=B.MGNO AND D.MINO=B.MINO AND D.MUID=B.MUID AND D.JTID_L=B.JTID_L AND D.CIID_L=B.CIID_L "
-      " AND D.SYID_L=B.SYID_L $Wheresql5) "
+      " AND D.SYID_L=B.SYID_L $Wheresql5) $SQLDisplayItemsOnScreen"
       " AND $sqLBPPR (D.MGNO=H.MGNO  AND D.JTID_L=H.JTID_L AND D.CIID_L=H.CIID_L AND D.SYID_L=H.SYID_L $Wheresql6) "
       " AND B.BIID=$GETBIID AND B.SCID=$GETSCID  AND C.MGST IN(1,4) AND C.MGTY=2  $sqlMGNO "
       " AND EXISTS(SELECT 1 FROM GRO_USR GU WHERE GU.MGNO=C.MGNO AND  GU.GUOU=1 AND GU.SUID='${LoginController().SUID}'"

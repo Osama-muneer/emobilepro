@@ -435,7 +435,8 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                               style: ThemeHelper().buildTextStyle(context, Colors.red,'M')),
                                           controller.MAT_INF_DATE[index].MINA_D.toString().length >= 30 ?
                                           AnimatedTextWidget(text: controller.MAT_INF_DATE[index].MINA_D.toString(),):
-                                          Text(controller.MAT_INF_DATE[index].MINA_D.toString(),
+                                          Text(controller.DisplayItemsOnScreen=='3' ?controller.MAT_INF_DATE[index].MINA_D.toString():
+                                            '${controller.MAT_INF_DATE[index].MINA_D.toString()} - ${controller.MAT_INF_DATE[index].MUNA_D.toString()}',
                                             style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                                           ),
                                           if(controller.isTablet==false)
