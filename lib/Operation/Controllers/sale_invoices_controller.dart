@@ -308,6 +308,7 @@ class Sale_Invoices_Controller extends GetxController {
       SelectDataRTNA = '',
       SelectDataCTMID,
       SelectDataCTMID2,
+      DisplayItemsOnScreen = '1',
       errorText,SelectDays_F,SelectDays_T,selectedBranchFrom,selectedBranchTo;
   String Type = '1',
       SCSY = '',
@@ -944,6 +945,7 @@ class Sale_Invoices_Controller extends GetxController {
     GET_USE_TAX_P();
     GET_USR_PRI_VOU();
     GET_SYN_ORD_P();
+    GET_How_Display_Items_Screen_P();
     LoginController().SET_P('Return_Type', '1');
     if (Get.arguments is Map<String, dynamic>) {
     final arguments = Get.arguments as Map<String, dynamic>?;
@@ -1215,17 +1217,12 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب صلاحية استخدام تاريخ الانتهاء
   Future USE_SMDED_P() async {
-    USE_SMDED().then((data) {
-      SYS_VAR = data;
-      if (SYS_VAR.isNotEmpty) {
-        SMDED = SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString();
+   var data =await USE_SMDED();
+      if (data.isNotEmpty) {
+        SMDED = data.elementAt(0).SVVL.toString();
       } else {
         SMDED = '2';
       }
-    });
   }
 
   //جلب تذلبل المستندات
@@ -1408,6 +1405,16 @@ class Sale_Invoices_Controller extends GetxController {
         PRINT_INV = '1';
       }
     });
+  }
+
+  //طريقه عرض الاصناف في شاشه اللمس
+  Future GET_How_Display_Items_Screen_P() async {
+    var data =await GET_SYS_VAR(637);
+      if (data.isNotEmpty) {
+        DisplayItemsOnScreen = data.elementAt(0).SVVL.toString();
+      } else {
+        DisplayItemsOnScreen = '1';
+      }
   }
 
   //لنموذج المعتمد لتقرير فاتورة
@@ -4527,18 +4534,11 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   //جلب الاصناف مطاعم
-  Future GET_MAT_INF_DATE(String GETMGNO, String GETSCID, String GETBIID,
-      int GETBCPR) async {
-    MAT_INF_DATE = await GET_MAT_INF_LIST(GETMGNO, GETSCID, GETBIID, GETBCPR);
+  Future GET_MAT_INF_DATE(String GETMGNO, String GETSCID, String GETBIID, int GETBCPR) async {
+    MAT_INF_DATE = await GET_MAT_INF_LIST(GETMGNO, GETSCID, GETBIID, GETBCPR,DisplayItemsOnScreen);
     update();
   }
 
-  validarTitulo(String? value) {
-    if (value == null || value.isEmpty) {
-      return '';
-    }
-    return null;
-  }
 
   String? validateSMDFN(String value) {
     if (value
@@ -4603,7 +4603,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
     await GET_COUNT_MINO_P();
   }
-
 
   //جلب الكمية
   GET_STO_NUM_P(String StringMUID) async {
@@ -6784,10 +6783,10 @@ class Sale_Invoices_Controller extends GetxController {
         STB_N = 'S15';
         CheckBack = 1;
         update();
-        Fluttertoast.showToast(msg: MES_ADD_EDIT,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-             backgroundColor: Colors.green);
+        // Fluttertoast.showToast(msg: MES_ADD_EDIT,
+        //     toastLength: Toast.LENGTH_LONG,
+        //     textColor: Colors.white,
+        //      backgroundColor: Colors.green);
          print('STP-5');
          GET_SUMBMMAM();
          GET_SUMBMMAM2();

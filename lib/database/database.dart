@@ -645,6 +645,21 @@ CREATE TABLE CON_ACC_M (
          )  ;
 ''';
 
+  String CreateMOB_LOG = '''
+  CREATE TABLE MOB_LOG(
+  MLID INTEGER PRIMARY KEY AUTOINCREMENT,
+  MLTY TEXT,
+  MLDO  DATE,
+  SUID  TEXT,
+  SUNA  TEXT,
+  MLIN  TEXT,
+  JTID_L INTEGER,
+  BIID_L INTEGER,
+  SYID_L INTEGER,
+  CIID_L TEXT
+  ) 
+''';
+
   // دالة مساعدة لتحويل القيمة إلى صيغة مناسبة لـ SQL
   String toSqlValue(dynamic value) {
     if (value == null) return 'null';
@@ -6445,6 +6460,7 @@ CREATE TABLE SYS_REP(
     await db.execute(CreateBK_INF);
     await db.execute(CreateBIF_TRA_TBL);
     await db.execute(CreateAppPrinterDevice);
+    await db.execute(CreateMOB_LOG);
 
     InsertMobVar(db);
     InsertMobVar2(db);
@@ -14549,6 +14565,7 @@ CREATE TABLE SYS_REP(
   Future OnUpgradeV449_17 (Database db) async{
     await db.execute(CreateBIF_TRA_TBL);
     await db.execute(CreateAppPrinterDevice);
+    await db.execute(CreateMOB_LOG);
     await db.execute('''ALTER TABLE BIF_MOV_M ADD COLUMN ACNO2 TEXT''');
     await db.execute('''ALTER TABLE BIL_CUS ADD COLUMN BCCR2 REAL DEFAULT 0''');
     await db.execute('''ALTER TABLE BIL_CUS_TMP ADD COLUMN BCCR2 REAL DEFAULT 0''');
