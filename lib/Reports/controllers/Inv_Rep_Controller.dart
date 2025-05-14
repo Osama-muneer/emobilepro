@@ -37,7 +37,8 @@ class Inv_Rep_Controller extends GetxController {
   String? SelectFromDays,SelectToDays;
   String? SelectDataFromBIID='',SelectDataToBIID='',SelectDataFromBPID,SelectDataToBPID,
           SelectDataFromBINA, SelectDataToBINA,SelectDataFromMGNO,SelectDataToMGNO,
-          SelectDataSCID,PKID,SelectDataFromMINO,SelectDataToMINO,SelectDataBMKID,SelectDataST='1';
+          SelectDataSCID,PKID,SelectDataFromMINO,SelectDataToMINO,SelectDataBMKID,SelectDataST='1',
+      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T;
   int BMKID=11;
   double SUMBMDNO=0,SUMBMDMT=0;
   List<Bil_Mov_M_Local> Bil_Mov_M = [];
@@ -124,17 +125,20 @@ class Inv_Rep_Controller extends GetxController {
 
   void clearData() {
     // TODO: implement dispose
+    SelectDataBMKID=null;
+    SelectDataBMKID_T=null;
     SelectDataFromMINO=null;
     SelectDataToMINO=null;
     SelectDataToMGNO=null;
     SelectDataFromMGNO=null;
     SelectDataFromBIID =LoginController().BIID.toString();
     SelectDataToBIID = LoginController().BIID.toString();
-    SelectDataBMKID = '3';
+  //  SelectDataBMKID = '3';
     SelectDataFromBPID=null;
     SelectDataToBPID=null;
     PKID=null;
     SelectDataSCID=null;
+    SelectDataSCID_T=null;
     value = false;
     value1 = false;
     SelectFromDays = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -161,7 +165,6 @@ class Inv_Rep_Controller extends GetxController {
     super.dispose();
   }
 
-
   //جلب بطائق الائتمان
   Future GET_BIL_CRE_C_P() async {
     GET_BIL_CRE_C_APPROVE().then((data) {
@@ -175,11 +178,15 @@ class Inv_Rep_Controller extends GetxController {
     isloading.value=true;
 
     Bil_Mov_M=await GET_TotalDetailedItem_REP2(BMKID,
-        SelectDataBMKID=='11'?'BIF_MOV_M':'BIL_MOV_M',
-        SelectDataBMKID=='11'?'BIF_MOV_D':'BIL_MOV_D',SelectDataFromBIID.toString(),SelectDataToBIID.toString(),
-        SelectFromDays.toString(),SelectToDays.toString(),SelectDataFromMGNO.toString(),SelectDataToMGNO.toString(),
+        SelectDataBMKID=='11' || SelectDataBMKID=='12'?'BIF_MOV_M':'BIL_MOV_M',
+        SelectDataBMKID=='11'?'BIF_MOV_D':'BIL_MOV_D',SelectDataBMKID.toString(),
+        SelectDataBMKID_T.toString(),
+        SelectDataFromBIID.toString(),SelectDataToBIID.toString(),
+        SelectFromDays.toString(),SelectToDays.toString(),SelectDataFromMGNO.toString(),
+        SelectDataToMGNO.toString(),
         SelectDataFromMINO.toString(),SelectDataToMINO.toString(),PKID.toString(),
-        SelectDataSCID.toString(),SelectDataBMKID.toString(),SelectDataST.toString());
+        SelectDataSCID.toString(),SelectDataSCID_T.toString(),
+        SelectDataST.toString(),SelectDataST_T.toString());
 
     if(Bil_Mov_M.isEmpty ){
       Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
@@ -194,7 +201,7 @@ class Inv_Rep_Controller extends GetxController {
       //  var Bil_Mov_M= await fetchDetailedMovements();
       // generatePdfReport(controller.Bil_Mov_M);
 
-      final pdfFile =  await Pdf.TotalDetailedItemReport_Pdf(
+      final pdfFile =  await Pdf.TotalDetailedItemReport_Pdf2(
           BMKID.toString(),
           SelectDataBMKID.toString(),
           SelectDataFromBINA.toString(),

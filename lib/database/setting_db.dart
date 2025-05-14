@@ -557,7 +557,7 @@ Future<List<Bil_Mov_K_Local>> GET_BIL_MOV_K() async {
 
   sql =
   "SELECT BMKID,CASE WHEN ${LoginController().LAN}=2 AND BMKNA IS NOT NULL THEN BMKNE ELSE BMKNA END  BMKNA_D"
-      " FROM BIL_MOV_K WHERE BMKID IN(1,3,4,5,11,12) "
+      " FROM BIL_MOV_K WHERE BMKID IN(1,2,3,4,5,11,12) "
       " AND JTID_L=${LoginController().JTID} "
       " AND SYID_L=${LoginController().SYID} AND CIID_L='${LoginController().CIID}' $Wheresql";
   var result = await dbClient!.rawQuery(sql);

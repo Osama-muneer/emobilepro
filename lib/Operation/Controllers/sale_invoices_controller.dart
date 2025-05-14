@@ -7247,20 +7247,7 @@ class Sale_Invoices_Controller extends GetxController {
   Future<bool> Save_BIL_MOV_M(bool typesave) async {
     try {
 
-      print('Save_BIL_MOV_M');
-      // print(Must_Specify_Location_Invoice);
-      // print(distanceInMeters);
-      // print(Allow_Must_Specify_Location_Invoice);
-      // print(distanceInMeters);
-      print(BCBL!);
-      print(SUMBAL!);
-      print(BACBA!);
-      print(((BACBA! + SUMBAL!)));
-      print((BCBL! - (BACBA! + SUMBAL!)));
-      print(double.parse(BMMAMTOTController.text));
-      print((BCBL! - (BACBA! + SUMBAL!)) < double.parse(BMMAMTOTController.text));
-      print('GUID_LNK');
-     // print(GUID_LNK.toString().toUpperCase());
+      // print(GUID_LNK.toString().toUpperCase());
       STB_N = 'S1';
       String BMMMS = PKID == 1 ? "عليكم ف.مبيعات نقداً" : PKID == 3
           ? "عليكم ف.مبيعات آجل"
