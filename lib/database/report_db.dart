@@ -2525,10 +2525,9 @@ Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BCCAM3(String GETBIID_F,String GETBII
 
 
 Future<List<Bil_Mov_M_Local>> GET_TotalDetailedItem_REP2(int TYPE,String TAB_M,String TAB_D,
-    String GETBIID_F,String GETBIID_T,String GETBMMDO_F,
+    String GETBMKID_F,String GETBMKID_T,String GETBIID_F,String GETBIID_T,String GETBMMDO_F,
     String GETBMMDO_T,String GETMGNO_F,String GETMGNO_T,String GETMINO_F,String GETMINO_T,
-    String GETPKID,String GETSCID,String GETBMKID,
-    String GETBMMST)
+    String GETPKID,String GETSCID_F,String GETSCID_T,String GETBMMST_F,String GETBMMST_T)
 async {
   final dbClient = await conn.database;
   String S='';
@@ -2536,12 +2535,24 @@ async {
   String N='';
   String PKIDsql='';
   String SCIDsql='';
+  String BMKIDsql='';
+  String BMKSTsql='';
+  (GETBMKID_F.isEmpty || GETBMKID_F=='null') && (GETBMKID_T.isEmpty || GETBMKID_T=='null')?
+  BMKIDsql =" " : BMKIDsql="  AND M.BMKID BETWEEN '$GETBMKID_F' AND '$GETBMKID_T'";
+
   (GETMGNO_F.isEmpty || GETMGNO_F=='null') && (GETMGNO_T.isEmpty || GETMGNO_T=='null')?
-  M =" " : M="  AND A.MGNO BETWEEN '$GETMGNO_F' AND '$GETMGNO_F'";
+  M =" " : M="  AND B.MGNO BETWEEN '$GETMGNO_F' AND '$GETMGNO_F'";
+
   (GETMINO_F.isEmpty || GETMINO_F=='null') && (GETMINO_T.isEmpty || GETMINO_T=='null')?
-  N =" " : N="  AND A.MINO BETWEEN '$GETMINO_F' AND '$GETMINO_T'";
+  N =" " : N="  AND B.MINO BETWEEN '$GETMINO_F' AND '$GETMINO_T'";
+
+  (GETSCID_F.isEmpty || GETSCID_F=='null') && (GETSCID_T.isEmpty || GETSCID_T=='null')?
+  SCIDsql =" " : SCIDsql="  AND M.SCID BETWEEN '$GETSCID_F' AND '$GETSCID_T'";
+
+  (GETBMMST_F.isEmpty || GETBMMST_F=='null') && (GETBMMST_T.isEmpty || GETBMMST_T=='null')?
+  BMKSTsql =" " : BMKSTsql="  AND M.BMMST BETWEEN '$GETBMMST_F' AND '$GETBMMST_T'";
+
   (GETPKID.isEmpty || GETPKID=='null') ? PKIDsql= "":PKIDsql= " AND M.PKID=$GETPKID ";
-  (GETSCID.isEmpty || GETSCID=='null') ? SCIDsql= "":SCIDsql= " AND M.SCID=$GETSCID ";
 
   // بناء فلترة BIID ديناميكياً
   String extraJoin = '';
@@ -2582,8 +2593,8 @@ async {
       -- منصرف
       CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNO ELSE 0.0 END AS BMDNO_OUT,
       CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END AS BMDNF_OUT
-      FROM $TAB_M AS M
-      JOIN $TAB_D AS D 
+      FROM BIL_MOV_M AS M
+      JOIN BIL_MOV_D AS D 
       ON M.BMMID = D.BMMID
       AND M.CIID_L = D.CIID_L
       AND M.JTID_L = D.JTID_L
@@ -2613,7 +2624,65 @@ async {
       AND M.SYID_L = ${LoginController().SYID}
       AND M.CIID_L = '${LoginController().CIID}'
       $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
-      AND M.BMKID=$GETBMKID  $PKIDsql $SCIDsql $S  $M  $N
+      $BMKIDsql $BMKSTsql
+      $PKIDsql $SCIDsql $S  $M  $N
+      UNION ALL
+      
+      SELECT 
+      M.BMKID,
+      K.BMKNA AS BMKID_D,
+      M.BMMDO,
+      M.BMMNO,
+      M.BMMNA,
+      M.SCID,
+      CASE WHEN ${LoginController().LAN} = 3 THEN COALESCE(C.SCN3, C.SCNE, C.SCNA)
+      WHEN ${LoginController().LAN} = 2 THEN COALESCE(C.SCNE, C.SCNA)
+      ELSE C.SCNA
+      END AS SCNA_D,
+      D.MGNO,
+      D.MINO,
+      CASE WHEN ${LoginController().LAN}=2 AND B.MINE IS NOT NULL THEN B.MINE ELSE B.MINA END  MINA_D,
+      D.MUID,
+      CASE WHEN ${LoginController().LAN}=2 AND E.MUNE IS NOT NULL THEN E.MUNE ELSE E.MUNA END  MUNA_D,
+      D.BMDAM,
+      -- مورد
+      CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDNO ELSE 0.0 END AS BMDNO_IN,
+      CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDNF ELSE 0.0 END AS BMDNF_IN,
+      -- منصرف
+      CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNO ELSE 0.0 END AS BMDNO_OUT,
+      CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END AS BMDNF_OUT
+      FROM BIF_MOV_M AS M
+      JOIN BIF_MOV_D AS D 
+      ON M.BMMID = D.BMMID
+      AND M.CIID_L = D.CIID_L
+      AND M.JTID_L = D.JTID_L
+      AND M.SYID_L = D.SYID_L
+      $extraJoin
+      LEFT JOIN BIL_MOV_K AS K 
+      ON M.BMKID = K.BMKID
+      LEFT JOIN SYS_CUR AS C 
+      ON M.SCID = C.SCID
+      AND M.CIID_L = C.CIID_L
+      AND M.JTID_L = C.JTID_L
+      AND M.SYID_L = C.SYID_L
+      $extraWhere2
+      LEFT JOIN MAT_INF AS B 
+      ON (D.MGNO=B.MGNO AND D.MINO=B.MINO)
+      AND B.CIID_L = D.CIID_L
+      AND B.JTID_L = D.JTID_L
+      AND B.SYID_L = D.SYID_L
+      $extraWhere3
+      LEFT JOIN MAT_UNI AS E
+      ON  D.MUID=E.MUID
+      AND E.CIID_L = D.CIID_L
+      AND E.JTID_L = D.JTID_L
+      AND E.SYID_L = D.SYID_L
+      $extraWhere4
+      WHERE  M.JTID_L = ${LoginController().JTID}
+      AND M.SYID_L = ${LoginController().SYID}
+      AND M.CIID_L = '${LoginController().CIID}'
+      $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
+      $BMKIDsql $BMKSTsql $PKIDsql $SCIDsql $S  $M  $N
       ORDER BY M.BMMDO ASC
   """;
 
@@ -2630,8 +2699,8 @@ async {
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNO ELSE 0.0 END) AS BMDNO_OUT,
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END) AS BMDNF_OUT,
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDAM ELSE 0.0 END) AS BMDAM_OUT
-      FROM $TAB_M AS M
-      JOIN $TAB_D AS D 
+      FROM BIL_MOV_M AS M
+      JOIN BIL_MOV_D AS D 
       ON M.BMMID = D.BMMID
       AND M.CIID_L = D.CIID_L
       AND M.JTID_L = D.JTID_L
@@ -2649,16 +2718,56 @@ async {
       AND E.JTID_L = D.JTID_L
       AND E.SYID_L = D.SYID_L
       $extraWhere4
-      WHERE  M.JTID_L = ${LoginController().JTID}
+       WHERE  M.JTID_L = ${LoginController().JTID}
       AND M.SYID_L = ${LoginController().SYID}
       AND M.CIID_L = '${LoginController().CIID}'
       $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
-      AND M.BMKID=$GETBMKID  $PKIDsql $SCIDsql $S  $M  $N
+      $BMKIDsql $BMKSTsql
+      $PKIDsql $SCIDsql $S  $M  $N
       GROUP BY  M.SCID,D.MGNO,D.MINO,D.MUID,D.BMDAM
-      ORDER BY M.BMMDO ASC    
+      UNION ALL
+        SELECT  M.SCID,D.MGNO,D.MINO,
+      CASE WHEN ${LoginController().LAN}=2 AND B.MINE IS NOT NULL THEN B.MINE ELSE B.MINA END  MINA_D,
+      D.MUID,SUM(D.BMDAM) AS BMDAM,
+      CASE WHEN ${LoginController().LAN}=2 AND E.MUNE IS NOT NULL THEN E.MUNE ELSE E.MUNA END  MUNA_D,
+      -- مورد
+      SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDNO ELSE 0.0 END) AS BMDNO_IN,
+      SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDNF ELSE 0.0 END) AS BMDNF_IN,
+      SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDAM ELSE 0.0 END) AS BMDAM_IN,
+      -- منصرف
+      SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNO ELSE 0.0 END) AS BMDNO_OUT,
+      SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END) AS BMDNF_OUT,
+      SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDAM ELSE 0.0 END) AS BMDAM_OUT
+      FROM BIF_MOV_M AS M
+      JOIN BIF_MOV_D AS D 
+      ON M.BMMID = D.BMMID
+      AND M.CIID_L = D.CIID_L
+      AND M.JTID_L = D.JTID_L
+      AND M.SYID_L = D.SYID_L
+      $extraJoin
+      LEFT JOIN MAT_INF AS B 
+      ON (D.MGNO=B.MGNO AND D.MINO=B.MINO)
+      AND B.CIID_L = D.CIID_L
+      AND B.JTID_L = D.JTID_L
+      AND B.SYID_L = D.SYID_L
+      $extraWhere3
+      LEFT JOIN MAT_UNI AS E
+      ON  D.MUID=E.MUID
+      AND E.CIID_L = D.CIID_L
+      AND E.JTID_L = D.JTID_L
+      AND E.SYID_L = D.SYID_L
+      $extraWhere4
+       WHERE  M.JTID_L = ${LoginController().JTID}
+      AND M.SYID_L = ${LoginController().SYID}
+      AND M.CIID_L = '${LoginController().CIID}'
+      $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
+      $BMKIDsql $BMKSTsql
+      $PKIDsql $SCIDsql $S  $M  $N
+      GROUP BY  M.SCID,D.MGNO,D.MINO,D.MUID,D.BMDAM
   """;
 
   printLongText(TYPE==101?sql2:sql);
   final rows = await dbClient!.rawQuery(TYPE==101?sql2:sql);
+  printLongText(rows.toString());
   return rows.map((m) => Bil_Mov_M_Local.fromMap(m)).toList();
 }

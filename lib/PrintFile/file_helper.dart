@@ -287,6 +287,14 @@ class FileHelper {
           return;
         }
         await bluetooth.connect(found);
+        bluetooth.connect(found).catchError((error) {
+          print(error.toString());
+          Fluttertoast.showToast(
+              msg: error.toString(),
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+        });
         await Future.delayed(const Duration(seconds: 1));
       }
 

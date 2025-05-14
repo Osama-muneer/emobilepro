@@ -115,12 +115,12 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
         builder: (BuildContext context,
             AsyncSnapshot<List<Bil_Mov_K_Local>> snapshot) {
           if (!snapshot.hasData) {
-            return Dropdown(josnStatus: josnStatus, GETSTRING: 'StringType'.tr,);
+            return Dropdown(josnStatus: josnStatus, GETSTRING: 'StringType_F'.tr,);
           }
           return DropdownButtonFormField2(
-            decoration: ThemeHelper().InputDecorationDropDown(" ${'StringType'.tr}"),
+            decoration: ThemeHelper().InputDecorationDropDown(" ${'StringType_F'.tr}"),
             isExpanded: true,
-            hint: ThemeHelper().buildText(context,'StringType', Colors.grey,'S'),
+            hint: ThemeHelper().buildText(context,'StringType_F', Colors.grey,'S'),
             value: snapshot.data!.any((item) =>
             item.BMKID.toString() == controller.SelectDataBMKID)
                 ? controller.SelectDataBMKID : null,
@@ -147,6 +147,44 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
         });
   }
 
+  FutureBuilder<List<Bil_Mov_K_Local>> DropdownBIL_MOV_K_T() {
+    return FutureBuilder<List<Bil_Mov_K_Local>>(
+        future:  GET_BIL_MOV_K(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Bil_Mov_K_Local>> snapshot) {
+          if (!snapshot.hasData) {
+            return Dropdown(josnStatus: josnStatus, GETSTRING: 'StringType_T'.tr,);
+          }
+          return DropdownButtonFormField2(
+            decoration: ThemeHelper().InputDecorationDropDown(" ${'StringType_T'.tr}"),
+            isExpanded: true,
+            hint: ThemeHelper().buildText(context,'StringType_T', Colors.grey,'S'),
+            value: snapshot.data!.any((item) =>
+            item.BMKID.toString() == controller.SelectDataBMKID_T)
+                ? controller.SelectDataBMKID_T : null,
+            style: const TextStyle(fontFamily: 'Hacen', color: Colors.black),
+            items: snapshot.data!
+                .map((item) => DropdownMenuItem<String>(
+              value: item.BMKID.toString(),
+              child: Text(
+                item.BMKNA_D.toString(),
+                style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+              ),
+            )).toList().obs,
+            validator: (value) {
+              if (value == null) {
+                return 'Please select gender.';
+              }
+              return null;
+            },
+            onChanged: (value) {
+              controller.SelectDataBMKID_T = value.toString();
+              controller.value=false;
+            },
+          );
+        });
+  }
+
   FutureBuilder<List<Mat_Gro_Local>> DropdownMat_Gro_From() {
     return FutureBuilder<List<Mat_Gro_Local>>(
         future:  GET_MAT_GRO(),
@@ -161,7 +199,6 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
             hint: ThemeHelper().buildText(context,'StringChiceMGNO', Colors.grey,'S'),
             dropdownStyleData: const DropdownStyleData(
               maxHeight: 300,
-              width: 200
             ),
             items: snapshot.data!
                 .map((item) => DropdownMenuItem<String>(
@@ -242,7 +279,7 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
             hint: ThemeHelper().buildText(context,'StringChiceMGNO', Colors.grey,'S'),
             dropdownStyleData: const DropdownStyleData(
                 maxHeight: 300,
-                width: 200
+             //   width: 200
             ),
             items: snapshot.data!
                 .map((item) => DropdownMenuItem<String>(
@@ -321,7 +358,6 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
             hint: ThemeHelper().buildText(context,'StringMINO', Colors.grey,'S'),
             dropdownStyleData: const DropdownStyleData(
               maxHeight: 300,
-              width: 200
             ),
             items: snapshot.data!
                 .map((item) => DropdownMenuItem<String>(
@@ -397,7 +433,6 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
             hint:  ThemeHelper().buildText(context,'StringMINO', Colors.grey,'S'),
             dropdownStyleData: const DropdownStyleData(
               maxHeight: 300,
-              width: 200
             ),
             items: snapshot.data!
                 .map((item) => DropdownMenuItem<String>(
@@ -541,13 +576,50 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
         builder: (BuildContext context,
             AsyncSnapshot<List<Sys_Cur_Local>> snapshot) {
           if (!snapshot.hasData) {
-            return Dropdown(josnStatus: josnStatus, GETSTRING: 'StringSCIDlableText'.tr,);
+            return Dropdown(josnStatus: josnStatus, GETSTRING:
+            controller.BMKID==101 || controller.BMKID==102?'StringSCID_F'.tr:
+            'StringSCIDlableText'.tr,);
           }
           return DropdownButtonFormField2(
-            decoration: ThemeHelper().InputDecorationDropDown(" ${'StringSCIDlableText'.tr}"),
+            decoration: ThemeHelper().InputDecorationDropDown(controller.BMKID==101 ||
+                controller.BMKID==102?'StringSCID_F'.tr: 'StringSCIDlableText'.tr),
             isExpanded: true,
             hint: ThemeHelper().buildText(context,'StringChi_currency', Colors.grey,'S'),
             value: controller.SelectDataSCID,
+            style: const TextStyle(fontFamily: 'Hacen', color: Colors.black),
+            items: snapshot.data!.map((item) => DropdownMenuItem<String>(
+              value: item.SCID.toString(),
+              child: Text(
+                "${item.SCNA_D.toString()} ",
+                style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+              ),
+            )).toList().obs,
+            validator: (v) {
+              if (v == null) {
+                return 'StringChi_currency'.tr;
+              };
+          return null;
+            },
+            onChanged: (value) {
+              controller.SelectDataSCID = value.toString();
+            },
+          );
+        });
+  }
+
+  FutureBuilder<List<Sys_Cur_Local>> DropdownSYS_CUR_T() {
+    return FutureBuilder<List<Sys_Cur_Local>>(
+        future: GET_SYS_CUR(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Sys_Cur_Local>> snapshot) {
+          if (!snapshot.hasData) {
+            return Dropdown(josnStatus: josnStatus, GETSTRING: 'StringSCID_T'.tr,);
+          }
+          return DropdownButtonFormField2(
+            decoration: ThemeHelper().InputDecorationDropDown(" ${'StringSCID_T'.tr}"),
+            isExpanded: true,
+            hint: ThemeHelper().buildText(context,'StringChi_currency', Colors.grey,'S'),
+            value: controller.SelectDataSCID_T,
             style: const TextStyle(
                 fontFamily: 'Hacen',
                 color: Colors.black),
@@ -561,12 +633,12 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
             )).toList().obs,
             validator: (v) {
               if (v == null) {
-                return 'StringBrach'.tr;
+                return 'StringSCID_T'.tr;
               };
           return null;
             },
             onChanged: (value) {
-              controller.SelectDataSCID = value.toString();
+              controller.SelectDataSCID_T = value.toString();
             },
           );
         });
@@ -611,7 +683,8 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
 
   DropdownST_Builder() {
     return  DropdownButtonFormField2(
-      decoration: ThemeHelper().InputDecorationDropDown(" ${'StringState'.tr}"),
+      decoration: ThemeHelper().InputDecorationDropDown( controller.BMKID==101 ||
+          controller.BMKID==102?'StringST_F'.tr: 'StringState'.tr),
       isExpanded: true,
       hint: ThemeHelper().buildText(context,'StringState', Colors.grey,'S'),
       value: controller.SelectDataST,
@@ -630,6 +703,32 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
       )).toList().obs,
       onChanged: (value) {
         controller.SelectDataST = value.toString();
+        controller.update();
+      },
+    );
+  }
+
+  DropdownST_TBuilder() {
+    return  DropdownButtonFormField2(
+      decoration: ThemeHelper().InputDecorationDropDown(" ${'StringST_T'.tr}"),
+      isExpanded: true,
+      hint: ThemeHelper().buildText(context,'StringState', Colors.grey,'S'),
+      value: controller.SelectDataST_T,
+      style: const TextStyle(
+          fontFamily: 'Hacen',
+          color: Colors.black,
+          fontWeight: FontWeight.bold),
+      items: josnStatus.map((item) => DropdownMenuItem<String>(
+        onTap: (){
+        },
+        value: item['id'],
+        child: Text(
+          item['name'],
+          style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+        ),
+      )).toList().obs,
+      onChanged: (value) {
+        controller.SelectDataST_T = value.toString();
         controller.update();
       },
     );
@@ -674,12 +773,24 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                     children: <Widget>[
                       //من فرع الى فرع
                       if(controller.BMKID==101 || controller.BMKID==102)
-                      if(STMID!='COU') Container(
-                          margin: EdgeInsets.only(left: 0.01 * height,right: 0.01 * height),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular( 0.02 * height)),
-                          child:  DropdownBIL_MOV_K(),
+                      if(STMID!='COU') Column(
+                        children: [
+                          Container(
+                              margin: EdgeInsets.only(left: 0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular( 0.02 * height)),
+                              child:  DropdownBIL_MOV_K(),
+                          ),
+                          SizedBox(height: 0.012 * height,),
+                          Container(
+                              margin: EdgeInsets.only(left: 0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular( 0.02 * height)),
+                              child:  DropdownBIL_MOV_K_T(),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 0.01 * height,),
                       Row(
@@ -820,6 +931,61 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                           ),
                         ],
                       ):
+                      controller.BMKID==101 || controller.BMKID==102?
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height:0.011 * height),
+                          Container(
+                              margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(  0.02 * height)),
+                              child: DropdownSYS_CUR()
+                          ),
+                          SizedBox(height:0.012 * height),
+                          Container(
+                              margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular( 0.02 * height)),
+                              child: DropdownSYS_CUR_T()
+                          ),
+                          SizedBox(height:0.012 * height),
+                          Container(
+                              margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(  0.02 * height)),
+                              child: DropdownMat_Gro_From()
+                          ),
+                          SizedBox(height:0.012 * height),
+                          Container(
+                              margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular( 0.02 * height)),
+                              child: DropdownMat_Gro_To()
+                          ),
+                          SizedBox(height:0.012 * height),
+                          Container(
+                              margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(  0.02 * height)),
+                              child: DropdownMAT_INF_From()
+                          ),
+                          SizedBox(height:0.012 * height),
+                          Container(
+                              margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular( 0.02 * height)),
+                              child: DropdownMAT_INF_To()
+                          )
+                        ],
+                      ):
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -849,62 +1015,27 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                           ),
                         ],
                       ),
-                      SizedBox(height:0.02 * height),
+                      SizedBox(height: 0.01 * height,),
                       controller.BMKID==101 || controller.BMKID==102?
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height:0.01 * height),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(  0.02 * height)),
-                                    child: DropdownMat_Gro_From()
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular( 0.02 * height)),
-                                    child: DropdownMat_Gro_To()
-                                ),
-                              ),
-                            ],
+                          Container(
+                            margin: EdgeInsets.only(left: 0.01 * height,right: 0.01 * height),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular( 0.02 * height)),
+                            child:  DropdownST_Builder(),
                           ),
-                          SizedBox(height: 0.01 * height,),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(  0.02 * height)),
-                                    child: DropdownMAT_INF_From()
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left:  0.01 * height,right: 0.01 * height),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular( 0.02 * height)),
-                                    child: DropdownMAT_INF_To()
-                                ),
-                              ),
-                            ],
+                          SizedBox(height:0.012 * height),
+                          Container(
+                            margin: EdgeInsets.only(left: 0.01 * height,right: 0.01 * height),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular( 0.02 * height)),
+                            child:  DropdownST_TBuilder(),
                           ),
                         ],
                       ):
-                      Container(),
-                      SizedBox(height: 0.01 * height,),
                       Container(
                           margin: EdgeInsets.only(left: 0.01 * height,right: 0.01 * height),
                           decoration: BoxDecoration(
