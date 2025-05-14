@@ -1215,17 +1215,12 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب صلاحية استخدام تاريخ الانتهاء
   Future USE_SMDED_P() async {
-    USE_SMDED().then((data) {
-      SYS_VAR = data;
-      if (SYS_VAR.isNotEmpty) {
-        SMDED = SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString();
+   var data =await USE_SMDED();
+      if (data.isNotEmpty) {
+        SMDED = data.elementAt(0).SVVL.toString();
       } else {
         SMDED = '2';
       }
-    });
   }
 
   //جلب تذلبل المستندات
@@ -6786,10 +6781,10 @@ class Sale_Invoices_Controller extends GetxController {
         STB_N = 'S15';
         CheckBack = 1;
         update();
-        Fluttertoast.showToast(msg: MES_ADD_EDIT,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-             backgroundColor: Colors.green);
+        // Fluttertoast.showToast(msg: MES_ADD_EDIT,
+        //     toastLength: Toast.LENGTH_LONG,
+        //     textColor: Colors.white,
+        //      backgroundColor: Colors.green);
          print('STP-5');
          GET_SUMBMMAM();
          GET_SUMBMMAM2();
