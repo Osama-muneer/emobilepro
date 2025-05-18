@@ -8484,7 +8484,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
-
   Future GET_ECO_ACC_P(String AANO) async {
     ECO_ACC=await GET_ECO_ACC(AANO);
     if(ECO_ACC.isNotEmpty){
@@ -9643,8 +9642,7 @@ class Sale_Invoices_Controller extends GetxController {
         builder: ((controller) =>
             FutureBuilder<List<Acc_Cos_Local>>(
                 future: GET_ACC_COS(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Acc_Cos_Local>> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<List<Acc_Cos_Local>> snapshot) {
                   if (!snapshot.hasData) {
                     return Dropdown(
                       josnStatus: josnStatus,
@@ -9652,26 +9650,18 @@ class Sale_Invoices_Controller extends GetxController {
                     );
                   }
                   return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown(
-                        'StringACNOlableText'.tr),
+                    decoration: ThemeHelper().InputDecorationDropDown('StringACNOlableText'.tr),
                     isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringChi_ACNO', Colors.grey, 'S'),
+                    hint: ThemeHelper().buildText(context, 'StringChi_ACNO', Colors.grey, 'S'),
                     value: controller.SelectDataACNO,
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
+                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                     items: snapshot.data!.map((item) =>
                         DropdownMenuItem<String>(
                           value: item.ACNO.toString(),
-                          child: Text(
-                            "${item.ACNO.toString()} - ${item.ACNA_D
-                                .toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
+                          child: Text("${item.ACNO.toString()} - ${item.ACNA_D.toString()}",
+                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                           ),
-                        ))
-                        .toList()
-                        .obs,
+                        )).toList().obs,
                     onChanged: (value) {
                       controller.SelectDataACNO = value.toString();
                       controller.update();

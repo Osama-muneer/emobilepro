@@ -51,7 +51,7 @@ class _Account_Statement_ViewState extends State<Account_Statement_View> {
           return Scaffold(
             appBar: AppBar(
               backgroundColor: AppColors.MainColor,
-              iconTheme: IconThemeData(color: Colors.white),
+              iconTheme:const  IconThemeData(color: Colors.white),
               actions: [
                 Row(
                   children: [
@@ -80,74 +80,6 @@ class _Account_Statement_ViewState extends State<Account_Statement_View> {
                   Column(
                     children: [
                       SizedBox(height: 0.01 * height),
-                      // FutureBuilder<List<Sys_Scr_Local>>(
-                      //     future: GET_SYS_SCR('A.SSID =203'), // جلب البيانات
-                      //     builder: (context, snapshot) {
-                      //       if (snapshot.connectionState == ConnectionState.waiting) {
-                      //         return const Center(child: CircularProgressIndicator());
-                      //       } else if (snapshot.hasError) {
-                      //         return Center(child: Text(''));
-                      //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      //         return const Center(child: Text(''));
-                      //       }
-                      //       return GridView.builder(
-                      //         shrinkWrap: true,
-                      //         itemCount: snapshot.data!.length,
-                      //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      //           crossAxisCount: 1,
-                      //           childAspectRatio: MediaQuery.of(context).size.height / 100,
-                      //         ),
-                      //         itemBuilder: (BuildContext context, int index) {
-                      //           final client = snapshot.data![index];
-                      //           return TextButton(
-                      //             onPressed: () async {
-                      //               if( controller.SelectDataSSID!='203'){
-                      //                 controller.SelectDataSSID = client.SSID.toString();
-                      //                 controller.SSNA = client.SSNA_D.toString();
-                      //                 controller.SelectDataAANO=null;
-                      //                 controller.SelectDataAANO2=null;
-                      //                 query_Acc_Acc(LoginController().BIID.toString(),controller.SelectDataSSID.toString());
-                      //                 await controller.GET_PRIVLAGE();
-                      //                 controller.update();
-                      //               }else{
-                      //                 print('SelectDataSSID');
-                      //                 controller.SelectDataSSID = null;
-                      //                 controller.SSNA = '';
-                      //                 controller.SelectDataAANO=null;
-                      //                 controller.SelectDataAANO2=null;
-                      //                 controller.update();
-                      //               }
-                      //             },
-                      //             style: client.SSID.toString() == controller.SelectDataSSID
-                      //                 ? TextButton.styleFrom(
-                      //               side: const BorderSide(color: Colors.red),
-                      //               //foregroundColor: Colors.black,
-                      //               // backgroundColor: Colors.grey[400],
-                      //               shape: RoundedRectangleBorder(
-                      //                 borderRadius: BorderRadius.circular(0.02 * height), // <-- Radius
-                      //               ),
-                      //             )
-                      //                 : TextButton.styleFrom(side: const BorderSide(color: Colors.black45),
-                      //               // foregroundColor: Colors.black,
-                      //               shape: RoundedRectangleBorder(
-                      //                 borderRadius: BorderRadius.circular(
-                      //                     0.02 * height), // <-- Radius
-                      //               ),
-                      //             ),
-                      //             child: Text(
-                      //               client.SSNA_D.toString(),
-                      //               style: TextStyle(
-                      //                   color: client.SSID.toString() == controller.SelectDataSSID
-                      //                       ?Colors.red:Colors.black,
-                      //                   fontSize: 0.018 * height,
-                      //                   fontWeight: FontWeight.bold),
-                      //             ),
-                      //           );
-                      //         },
-                      //       );
-                      //     }
-                      // ),
-                      // SizedBox(height: 0.02 * height),
                       DropdownACC_ACCBuilder(),
                       SizedBox(height: 0.02 * height),
                       DropdownSYS_CURBuilder(context),

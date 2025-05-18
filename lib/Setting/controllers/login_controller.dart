@@ -727,21 +727,21 @@ class LoginController extends GetxController {
     GET_CONFIG_P();
     CHIKE_SYN_USR_TYP_P();
     (ERR_TYP,MSG_V)=await GET_CON_ACC_M_P();
-    if ((usernameController.text == '123456' &&
-        passwordController.text == '123456') ||
-        (usernameController.text == '654321' &&
-            passwordController.text == '654321')) {
-      LoginController().SET_N_P('experimentalcopy',1);
-      usernameController.text == '123456' && passwordController.text == '123456'
-          ? LoginController().SET_N_P('experimentalcopyType',1)
-          : LoginController().SET_N_P('experimentalcopyType',2);
-      update();
-      Get.offAllNamed('/Home');
-      SET_B_P('RemmberMy',isloadingRemmberMy);
-      SET_P('JTNA',SelectDataJTNA.toString());
-      SET_P('BINA',SelectDataBINA.toString());
-    }
-    else {
+    // if ((usernameController.text == '123456' &&
+    //     passwordController.text == '123456') ||
+    //     (usernameController.text == '654321' &&
+    //         passwordController.text == '654321')) {
+    //   LoginController().SET_N_P('experimentalcopy',1);
+    //   usernameController.text == '123456' && passwordController.text == '123456'
+    //       ? LoginController().SET_N_P('experimentalcopyType',1)
+    //       : LoginController().SET_N_P('experimentalcopyType',2);
+    //   update();
+    //   Get.offAllNamed('/Home');
+    //   SET_B_P('RemmberMy',isloadingRemmberMy);
+    //   SET_P('JTNA',SelectDataJTNA.toString());
+    //   SET_P('BINA',SelectDataBINA.toString());
+    // }
+   // else {
       bool isValidate = loginformKey.currentState!.validate();
       if (isValidate == false) {
         isloading(false);
@@ -888,7 +888,7 @@ class LoginController extends GetxController {
           isloading(false);
         }
       }
-    }
+   // }
   }
 
 

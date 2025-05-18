@@ -593,9 +593,11 @@ class _LoginViewState extends State<LoginView> {
                                         StteingController().SET_P('SalesScreenTemplate',MediaQuery.of(context).size.width >450?
                                         'StringR_TYP1'.tr :'StringR_TYP2'.tr);
                                         setState(() {
+                                          LoginController().SET_N_P('experimentalcopy',2);
                                           controller.CONV_P(controller.passwordController.text);
                                           controller.CHIKE_USER_PAS();
                                           controller.Login();
+
                                         });
                                       },
                                       child: Container(
@@ -650,21 +652,25 @@ class _LoginViewState extends State<LoginView> {
                                       ..userInteractions = false
                                       ..dismissOnTap = false;
                                     EasyLoading.show(status: 'StringShow_Connent'.tr);
-                                    controller.getIP();
-                                    StringIP = controller.IPSERERController.text;
-                                    StringPort = controller.PORTController.text;
+                                     controller.getIP();
+                                   //controller.IPSERERController.text=5389;
+                                   //controller.PORTController.text='5389';
+                                    StringIP = '144.76.153.210';
+                                    StringPort = '5389';
                                     print(StringIP);
                                     print(StringPort);
                                     controller.update();
                                     LoginController().SET_P('baseApi','http://$StringIP:$StringPort');
                                     LoginController().SET_P('API','http://$StringIP:$StringPort');
-                                    LoginController().SET_P('IP',controller.IPSERERController.text);
-                                    LoginController().SET_P('PORT',controller.PORTController.text);
-                                    UpdateMOB_VAR(8,controller.IPSERERController.text);
-                                    UpdateMOB_VAR(9,controller.PORTController.text);
+                                    LoginController().SET_P('IP','144.76.153.210');
+                                    LoginController().SET_P('PORT','5389');
+                                    UpdateMOB_VAR(8,'144.76.153.210');
+                                    UpdateMOB_VAR(9,'5389');
                                     UpdateMOB_VAR(10,'http://$StringIP:$StringPort');
                                     controller.update();
-                                    ApiProviderLogin().Socket_IP(controller.IPSERERController.text,int.parse(controller.PORTController.text));
+                                    LoginController().SET_N_P('experimentalcopy',1);
+                                    LoginController().SET_P('DeviceName', '123456');
+                                    ApiProviderLogin().Socket_IP('144.76.153.210',5389);
                                     // ApiProviderLogin().TEST_API();
                                   },
                                 ),

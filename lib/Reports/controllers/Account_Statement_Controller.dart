@@ -195,13 +195,6 @@ class Account_Statement_Controller extends GetxController {
       UPDL=PRIVLAGE_L.elementAt(0).UPDL;
       UPPR=PRIVLAGE_L.elementAt(0).UPPR;
       UPQR=PRIVLAGE_L.elementAt(0).UPQR;
-      update();
-      print(UPIN);
-      print(UPPR);
-      print(UPCH);
-      print(UPQR);
-      print('UPQR');
-
     }else {
       UPIN=2;UPCH=2;UPDL=2;UPPR=2;UPQR=2;
     }
@@ -215,7 +208,6 @@ class Account_Statement_Controller extends GetxController {
       SCNA=SYS_CUR.elementAt(0).SCNA_D.toString();
       SCSY=SYS_CUR.elementAt(0).SCSY!;
     }
-    update();
   }
 
   //PDF
