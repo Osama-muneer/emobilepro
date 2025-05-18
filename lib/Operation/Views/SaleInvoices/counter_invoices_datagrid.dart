@@ -151,15 +151,8 @@ class InventoryDataGridSource extends DataGridSource {
           controller.TCAMT);
 
 
-      await  controller.GET_SUMBMDTXA();
-      await  controller.GET_SUMBMMDIF();
-      await  controller.GET_SUMBMMDI();
-      await  controller.GET_SUMBMMAM();
-      await  controller.GET_SUMBMMAM2();
+      await  controller.GET_SUMBIL_P();
       await  controller.GET_CountRecode( controller.BMMID!);
-      await  controller.GET_COUNT_BMDNO_P( controller.BMMID!);
-      await  controller.GET_SUMBMDTXT();
-      await  controller.GET_SUM_AM_TXT_DI();
       // UpdateBIF_MOV_D(newCellValue,controller.BMDAMT!,controller.BMMID,dataGridRow.getCells()[3].value,controller.BMDTXA,
       //     controller.BMDTXAT,controller.roundDouble(controller.BMDAM!*controller.SCEX!,6));
       controller.BMDAM_VAL=controller.BMDAMT;
@@ -194,15 +187,8 @@ class InventoryDataGridSource extends DataGridSource {
           controller.BMDAMT3,
           controller.TCAMT);
 
-      await  controller.GET_SUMBMDTXA();
-      await  controller.GET_SUMBMMDIF();
-      await  controller.GET_SUMBMMDI();
-      await  controller.GET_SUMBMMAM();
-      await  controller.GET_SUMBMMAM2();
+      await  controller.GET_SUMBIL_P();
       await  controller.GET_CountRecode( controller.BMMID!);
-      await  controller.GET_COUNT_BMDNO_P( controller.BMMID!);
-      await  controller.GET_SUMBMDTXT();
-      await  controller.GET_SUM_AM_TXT_DI();
       // UpdateBIF_MOV_D(controller.roundDouble(controller.BMDNO!,controller.SCSFL),controller.BMDAMT!,controller.BMMID,
       //     dataGridRow.getCells()[3].value,controller.BMDTXA,controller.BMDTXAT,
       //     controller.roundDouble(controller.BMDAM!*controller.SCEX!,6));
@@ -301,15 +287,8 @@ class InventoryDataGridSource extends DataGridSource {
                   controller.TCAMT);
 
 
-              await  controller.GET_SUMBMDTXA();
-              await  controller.GET_SUMBMMDIF();
-              await  controller.GET_SUMBMMDI();
-              await  controller.GET_SUMBMMAM();
-              await  controller.GET_SUMBMMAM2();
+              await  controller.GET_SUMBIL_P();
               await  controller.GET_CountRecode(controller.BMMID!);
-              await  controller.GET_COUNT_BMDNO_P(controller.BMMID!);
-              await  controller.GET_SUMBMDTXT();
-              await  controller.GET_SUM_AM_TXT_DI();
               // controller.BMDAM_VAL=controller.BMDAMT;
               controller.loading(true);
               DataGrid();
@@ -406,15 +385,8 @@ class InventoryDataGridSource extends DataGridSource {
                   controller.BMDAMT3,
                   controller.TCAMT);
 
-              await  controller.GET_SUMBMDTXA();
-              await  controller.GET_SUMBMMDIF();
-              await  controller.GET_SUMBMMDI();
-              await  controller.GET_SUMBMMAM();
-              await  controller.GET_SUMBMMAM2();
+              await  controller.GET_SUMBIL_P();
               await  controller.GET_CountRecode( controller.BMMID!);
-              await  controller.GET_COUNT_BMDNO_P( controller.BMMID!);
-              await  controller.GET_SUMBMDTXT();
-              await  controller.GET_SUM_AM_TXT_DI();
 
               // UpdateBIF_MOV_M(double.parse(controller.BMMAMController.text),
               //     double.parse(controller.BMMTXController.text),controller.BMMID);
@@ -458,15 +430,8 @@ class InventoryDataGridSource extends DataGridSource {
                 controller.BMDAMT3,
                 controller.TCAMT);
 
-            await  controller.GET_SUMBMDTXA();
-            await  controller.GET_SUMBMMDIF();
-            await  controller.GET_SUMBMMDI();
-            await  controller.GET_SUMBMMAM();
-            await  controller.GET_SUMBMMAM2();
+            await  controller.GET_SUMBIL_P();
             await  controller.GET_CountRecode( controller.BMMID!);
-            await  controller.GET_COUNT_BMDNO_P( controller.BMMID!);
-            await  controller.GET_SUMBMDTXT();
-            await  controller.GET_SUM_AM_TXT_DI();
 
             // UpdateBIF_MOV_D(newCellValue,controller.BMDAMT!,controller.BMMID,dataGridRow.getCells()[3].value,
             //     controller.BMDTXA,controller.BMDTXAT,controller.roundDouble(controller.BMDAM! * controller.SCEX!,6));

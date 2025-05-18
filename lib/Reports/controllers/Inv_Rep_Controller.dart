@@ -137,6 +137,7 @@ class Inv_Rep_Controller extends GetxController {
     SelectDataFromBPID=null;
     SelectDataToBPID=null;
     PKID=null;
+    PKID_T=null;
     SelectDataSCID=null;
     SelectDataSCID_T=null;
     value = false;
@@ -184,8 +185,9 @@ class Inv_Rep_Controller extends GetxController {
         SelectDataFromBIID.toString(),SelectDataToBIID.toString(),
         SelectFromDays.toString(),SelectToDays.toString(),SelectDataFromMGNO.toString(),
         SelectDataToMGNO.toString(),
-        SelectDataFromMINO.toString(),SelectDataToMINO.toString(),PKID.toString(),
+        SelectDataFromMINO.toString(),SelectDataToMINO.toString(),
         SelectDataSCID.toString(),SelectDataSCID_T.toString(),
+        PKID.toString(),PKID_T.toString(),
         SelectDataST.toString(),SelectDataST_T.toString());
 
     if(Bil_Mov_M.isEmpty ){

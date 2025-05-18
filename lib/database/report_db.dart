@@ -2527,7 +2527,8 @@ Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BCCAM3(String GETBIID_F,String GETBII
 Future<List<Bil_Mov_M_Local>> GET_TotalDetailedItem_REP2(int TYPE,String TAB_M,String TAB_D,
     String GETBMKID_F,String GETBMKID_T,String GETBIID_F,String GETBIID_T,String GETBMMDO_F,
     String GETBMMDO_T,String GETMGNO_F,String GETMGNO_T,String GETMINO_F,String GETMINO_T,
-    String GETPKID,String GETSCID_F,String GETSCID_T,String GETBMMST_F,String GETBMMST_T)
+    String GETSCID_F,String GETSCID_T,
+    String GETPKID_F,String GETPKID_T,String GETBMMST_F,String GETBMMST_T)
 async {
   final dbClient = await conn.database;
   String S='';
@@ -2549,10 +2550,12 @@ async {
   (GETSCID_F.isEmpty || GETSCID_F=='null') && (GETSCID_T.isEmpty || GETSCID_T=='null')?
   SCIDsql =" " : SCIDsql="  AND M.SCID BETWEEN '$GETSCID_F' AND '$GETSCID_T'";
 
+  (GETPKID_F.isEmpty || GETPKID_F=='null') && (GETPKID_T.isEmpty || GETPKID_T=='null')?
+  PKIDsql =" " : PKIDsql="  AND M.PKID BETWEEN '$GETSCID_F' AND '$GETSCID_T'";
+
   (GETBMMST_F.isEmpty || GETBMMST_F=='null') && (GETBMMST_T.isEmpty || GETBMMST_T=='null')?
   BMKSTsql =" " : BMKSTsql="  AND M.BMMST BETWEEN '$GETBMMST_F' AND '$GETBMMST_T'";
 
-  (GETPKID.isEmpty || GETPKID=='null') ? PKIDsql= "":PKIDsql= " AND M.PKID=$GETPKID ";
 
   // بناء فلترة BIID ديناميكياً
   String extraJoin = '';

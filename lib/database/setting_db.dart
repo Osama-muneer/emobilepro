@@ -1445,8 +1445,7 @@ Future<List<Sto_Inf_Local>> Get_STO_INF(int GETBMKID, String StringBIID, String 
   LoginController().BIID_ALL_V == '1'
       ? Wheresql3 = " AND D.BIID_L=${LoginController().BIID}"
       : Wheresql3 = '';
-  sql =
-  "SELECT A.*,CASE WHEN ${LoginController().LAN}=2 AND A.SINE IS NOT NULL THEN A.SINE ELSE A.SINA END  SINA_D"
+  sql = " SELECT A.*,CASE WHEN ${LoginController().LAN}=2 AND A.SINE IS NOT NULL THEN A.SINE ELSE A.SINA END  SINA_D"
       " FROM STO_INF A where A.SIST NOT IN(2,3) AND  (A.BIID IS NULL OR  A.BIID=$StringBIID)   "
       " AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} "
       " AND A.CIID_L=${LoginController().CIID} $Wheresql AND"
@@ -2792,9 +2791,11 @@ Future<List<Bk_inf>> GET_BK_INF() async {
 }
 
 
-Future<List<Bil_Mov_M_Local>> SUM_BAL(TYPE,GETID,AANO,SCID,Last_Asyn) async {
+Future<List<Bil_Mov_M_Local>> SUM_BAL(TYPE,TYPE2,GETID,AANO,SCID,Last_Asyn) async {
   var dbClient = await conn.database;
   String sql='';
+  String sqlBMMST='';
+  String sqlAMMST='';
   String sqlBMMID='';
   String sqlAMMID='';
   final inputFormat = DateFormat('dd-MM-yyyy HH:mm:ss');
@@ -2802,6 +2803,25 @@ Future<List<Bil_Mov_M_Local>> SUM_BAL(TYPE,GETID,AANO,SCID,Last_Asyn) async {
   final outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   final lastSyncIso = outputFormat.format(dt);
   print(lastSyncIso);
+
+  if(TYPE2==1){
+    sqlBMMST='  A.BMMST=2  ';
+    sqlAMMST='  A.AMMST=2  ';
+  }else{
+
+ sqlBMMST='''   (A.BMMST=2 OR (A.BMMST=1 AND datetime(
+ substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
+ substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
+ substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
+ substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso'))) ''';
+
+ sqlAMMST=''' (A.AMMST=2 OR (A.AMMST=1 AND datetime(
+ substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
+ substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
+ substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
+ substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso')))  ''';
+  }
+
 
   if(TYPE==1){
     sqlBMMID=' A.BMMID!=$GETID AND ';
@@ -2827,11 +2847,7 @@ LEFT JOIN BIL_MOV_K AS B ON(A.BMKID=B.BMKID AND A.CIID_L=B.CIID_L  AND A.JTID_L=
 AND A.BIID_L=B.BIID_L AND A.SYID_L=B.SYID_L ) WHERE $sqlBMMID
  B.BMKTY IN(1,2) AND B.BMKAN IS NOT NULL AND (Ifnull(A.BCID,A.BIID) IS NOT NULL) 
 AND A.BPID IS NULL AND A.PKID IN(3)
- AND (A.BMMST=2 OR (A.BMMST=1 AND datetime(
- substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
- substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso')))
+
 UNION ALL 
   SELECT C.AANO,A.SCID,(CASE WHEN B.BMKTY = 2 THEN(  Ifnull (A.BMMAM, 0)- Ifnull (A.BMMDI, 0)
   - Ifnull (A.BMMDIA, 0)- Ifnull (A.BMMDIF, 0)) ELSE  0 END) AS MD,
@@ -2846,11 +2862,7 @@ UNION ALL
           WHERE  $sqlBMMID
            B.BMKTY IN(1,2) AND B.BMKAN IS NOT NULL 
           AND (A.BCID IS NOT NULL) AND A.BPID IS NULL 
-          AND A.PKID IN(3)  AND (A.BMMST=2 OR (A.BMMST=1 AND datetime(
- substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
- substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso')))  
+          AND A.PKID IN(3)  AND $sqlBMMST
 		  UNION ALL 
 SELECT C.AANO,Ifnull (CAST (C.SCID AS INTEGER), A.SCID) AS SCID,
      Ifnull (C.AMDMD, 0) AS MD,Ifnull (C.AMDDA, 0) AS DA,
@@ -2862,17 +2874,13 @@ SELECT C.AANO,Ifnull (CAST (C.SCID AS INTEGER), A.SCID) AS SCID,
   AND A.BIID_L=C.BIID_L AND A.JTID_L=C.JTID_L AND A.SYID_L=C.SYID_L ) 
   left join ACC_ACC AS E ON(C.AANO=E.AANO  AND C.CIID_L=E.CIID_L  AND C.JTID_L=E.JTID_L 
   AND A.BIID_L=E.BIID_L AND  C.SYID_L=E.SYID_L ) 
-  WHERE  $sqlAMMID    (A.AMMST=2 OR (A.AMMST=1 AND datetime(
- substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
- substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso'))) AND B.AMKAC IN (1) ) AS A 
+  WHERE  $sqlAMMID    $sqlAMMST AND B.AMKAC IN (1) ) AS A 
 WHERE (A.CIID_L='${LoginController().CIID}' AND A.JTID_L= ${LoginController().JTID}
 AND A.SYID_L=${LoginController().SYID} ) AND A.AANO='$AANO' AND A.SCID=$SCID  ) AS A1 ''';
 
   var result = await dbClient!.rawQuery(sql,);
   print('SUM_BAL');
-//  printLongText('SQL: $sql');
+  printLongText('SQL: $sql');
   print('Args: [$lastSyncIso]');
   print('Result: $result');
   List<Bil_Mov_M_Local> list = result.map((item) {

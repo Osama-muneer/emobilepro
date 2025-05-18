@@ -39,6 +39,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart' as intl;
 import '../models/acc_mov_d.dart';
+import '../models/bil_mov_m.dart';
 
 List<Acc_Mov_D_Local> get_ACC_MOV_D = [];
 
@@ -69,7 +70,9 @@ class Pay_Out_Controller extends GetxController {
   var GUID,GUIDD,SUM_M;
   late FocusNode _autocompleteFocusNode;
   double SCEX2=0,SCHR=0,SCLR=0,SCEX=0, BACBMD=0,
-      BACBDA=0, BACBA=0,AMDMO=0,SUMAMDEQ_DA=0,SUMAMDEQ_MD=0,Difference_AMDEQ_MD_DA=0,SUMBAL_V=0,
+      BACBDA=0, BACBA=0,AMDMO=0,SUMAMDEQ_DA=0,SUMAMDEQ_MD=0,Difference_AMDEQ_MD_DA=0,
+      SUMBAL_V=0,
+      SumBal=0,
       BACBNF = 0;
   String? SelectDataBIID,titleScreen,SelectDataSCID,SelectDataSCID2,SelectDataPKID,SelectDataAANO,SelectDays,SelectDataACNO,
       SelectDataACID,SelectDataBCCID,SelectDataABID,Date_of_Insert_Voucher,RepeatingSameAccount,ShowRePrintingVoucher,SUMO,
@@ -697,15 +700,57 @@ class Pay_Out_Controller extends GetxController {
   }
 
 
-  Future GET_ACC_MOV_D_P(String GetAMKID,String GetAMMID) async {
-    get_ACC_MOV_D= await GET_ACC_MOV_D(GetAMKID,GetAMMID);
-    SUM_ACC_MOV_D=await GET_ACC_MOV_D_SUM(GetAMKID,GetAMMID);
-    if(get_ACC_MOV_D.isNotEmpty){
-      GET_BAL_P(get_ACC_MOV_D.elementAt(0).AMMID.toString(),
-          get_ACC_MOV_D.elementAt(0).AANO.toString(),
-          get_ACC_MOV_D.elementAt(0).SCID.toString());
+  Future<void> GET_ACC_MOV_D_P(String GetAMKID, String GetAMMID) async {
+    // 1. جلب الحركات الفرعية
+    get_ACC_MOV_D = await GET_ACC_MOV_D(GetAMKID, GetAMMID);
+
+    // 2. جلب مجموعاتها (إن احتجت)
+    SUM_ACC_MOV_D = await GET_ACC_MOV_D_SUM(GetAMKID, GetAMMID);
+
+    // 3. إذا كانت القائمة غير فارغة، عَبِّئ الرصيد لكل حركة
+    if (get_ACC_MOV_D.isNotEmpty) {
+      // أسلوب متسلسل
+      for (var mov in get_ACC_MOV_D) {
+        // استدعاء SUM_BAL للحصول على الـ List<Bil_Mov_M_Local>
+        List<Bil_Mov_M_Local> bils = await SUM_BAL(
+          2,                // معاملات المثال
+          2,
+          mov.AMMID,
+          mov.AANO,
+          mov.SCID,
+          LastBAL_ACC_C.toString(),
+        );
+
+        // استخراج رصيد الحركة (مثلاً مجموع الحقل amount لكل العناصر)
+        mov.balance = bils.map((b) => b.SUM_BAL)              // ابدل amount باسم الحقل الصحيح
+            .fold(0.0, (prev, curr) => prev! + curr!);
+        print('mov.balance');
+        print(mov.balance);
+      }
+
+      // — أو — طريقة متوازية للأداء الأفضل:
+      /*
+    final futures = get_ACC_MOV_D.map((mov) async {
+      final bils = await SUM_BAL(
+        2, 2, mov.AMMID, mov.AANO, mov.SCID, LastBAL_ACC_C.toString()
+      );
+      return bils.map((b) => b.amount).fold(0.0, (a, b) => a + b);
+    }).toList();
+
+    final balances = await Future.wait(futures);
+    for (int i = 0; i < get_ACC_MOV_D.length; i++) {
+      get_ACC_MOV_D[i].balance = balances[i];
+    }
+    */
     }
   }
+
+
+  // Future GET_ACC_MOV_D_P(String GetAMKID,String GetAMMID) async {
+  //   get_ACC_MOV_D= await GET_ACC_MOV_D(GetAMKID,GetAMMID);
+  //   SUM_ACC_MOV_D=await GET_ACC_MOV_D_SUM(GetAMKID,GetAMMID);
+  //   GET_BAL_APP_P();
+  // }
 
   Future GET_ACC_MOV_D_View_P(String GetAMKID,String GetAMMID) async {
     ListACC_MOV_D=await GET_ACC_MOV_D(GetAMKID,GetAMMID);
@@ -1073,7 +1118,7 @@ class Pay_Out_Controller extends GetxController {
   //جلب رصيد غير مرحل
   GET_BAL_P(AMMID,AANO,SCID) async {
     SUMBAL_V = 0.0;
-    SUM_M = await SUM_BAL(2,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+    SUM_M = await SUM_BAL(2,1,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
     if (SUM_M.isEmpty) {
       SUMBAL_V = 0.0;
     } else {
@@ -1081,9 +1126,33 @@ class Pay_Out_Controller extends GetxController {
       update();
     }
     update();
-    print('SUMBAL_V');
-    print(SUMBAL_V);
-    update();
+  }
+
+  //جلب رصيد التطبيق على حسب اخر تزامن
+  GET_BAL_APP_P() async {
+    if(get_ACC_MOV_D.isNotEmpty){
+
+      for (var mov in get_ACC_MOV_D) {
+
+        //    SUM_BAL(2,1,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+        // استدعاء جلب الرصيد
+     //   SUM_M = await SUM_BAL(2,2,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+        SUM_M = await SUM_BAL(
+          2,2,
+          mov.AMMID,
+          mov.AANO,
+          mov.SCID,
+          LastBAL_ACC_C.toString()
+        );
+
+        // تعبئة الحقل داخل الموديل
+       // mov.balance = bal;
+      }
+
+      // GET_BAL_P(get_ACC_MOV_D.elementAt(0).AMMID.toString(),
+      //     get_ACC_MOV_D.elementAt(0).AANO.toString(),
+      //     get_ACC_MOV_D.elementAt(0).SCID.toString());
+    }
   }
 
 

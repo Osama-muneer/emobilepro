@@ -6,6 +6,7 @@ import 'LogMobService.dart';
 class ToastService {
   ToastService._(); // Private constructor
 
+
   /// Show a toast and record the event in the database.
   static Future<void> show(
       String message, {
@@ -13,7 +14,6 @@ class ToastService {
         Toast toastLength = Toast.LENGTH_SHORT,
         Color? backgroundColor,
         Color? textColor,
-        double fontSize = 14.0,
         int timeInSecForIosWeb = 2,
         LogType type = LogType.INF,
       }) async {
@@ -25,7 +25,6 @@ class ToastService {
       timeInSecForIosWeb: timeInSecForIosWeb,
       backgroundColor: backgroundColor ?? Colors.black.withOpacity(0.8),
       textColor: textColor ?? Colors.white,
-      fontSize: fontSize,
     );
 
     // Log to database

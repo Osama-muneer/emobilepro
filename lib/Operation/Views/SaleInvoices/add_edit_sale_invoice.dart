@@ -11,6 +11,7 @@ import 'package:flutter_search_bar/flutter_search_bar.dart' as search;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import '../TreasuryVouchers/add_ed_pay_out.dart';
+import 'AddItem.dart';
 import 'datagrid_sale_invoice.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
@@ -1467,7 +1468,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_Invoice> {
   void displayAddItems() {
     controller.ClearBil_Mov_D_Data();
     controller.update();
-    controller.displayAddItemsWindo();
+    Additem().displayAddItemsWindo();
     controller.update();
   }
 

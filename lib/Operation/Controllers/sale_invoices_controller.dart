@@ -61,9 +61,11 @@ import '../../Setting/models/sys_var.dart';
 import '../../Setting/models/usr_pri.dart';
 import '../../Setting/services/fat_mod.dart';
 import '../../Setting/services/syncronize.dart';
+import '../../Widgets/DatePickerHelper.dart';
 import '../../Widgets/ES_FAT_PKG.dart';
 import '../../Widgets/ES_MAT_PKG.dart';
 import '../../Widgets/ES_WS_PKG.dart';
+import '../../Widgets/SignatureHelper.dart';
 import '../../Widgets/SignatureScreen.dart';
 import '../../Widgets/config.dart';
 import '../../Widgets/dropdown.dart';
@@ -83,6 +85,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:uuid/uuid.dart';
 import '../../database/sync_db.dart';
+import '../Views/SaleInvoices/AddItem.dart';
 import '../Views/SaleInvoices/add_edit_counter_invoice.dart';
 import '../Views/SaleInvoices/get_bil_cus.dart';
 import '../Views/SaleInvoices/datagrid_sale_invoice.dart';
@@ -99,7 +102,7 @@ class Sale_Invoices_Controller extends GetxController {
   final FocusNode minaFocusNode = FocusNode();
   late FocusNode focusNode;
   Uint8List? signature;
-  late FocusNode _autocompleteFocusNode;
+  late FocusNode autocompleteFocusNode;
   RxBool loading = false.obs,BMATY_SHOW = false.obs,RSID_SHOW = false.obs,
       REID_SHOW = false.obs,RTID_SHOW = false.obs,SHOW_MAT_DES = false.obs;
   bool value = false, edit = false,isTablet= false,
@@ -576,7 +579,8 @@ class Sale_Invoices_Controller extends GetxController {
       BMDAMT3 = 0,
       BMDNF = 0,
       TCAMT = 0,
-      SUMBAL = 0;
+      SUMBAL = 0,
+      SumBal=0;
   RxDouble? longitude = 0.0.obs;
   RxDouble? latitude = 0.0.obs;
   double distanceInMeters = 0;
@@ -863,7 +867,7 @@ class Sale_Invoices_Controller extends GetxController {
     myFocusNode = FocusNode();
     myFocusBMMAM = FocusNode();
     focusNode = FocusNode();
-    _autocompleteFocusNode = FocusNode();
+    autocompleteFocusNode = FocusNode();
     FromDaysController.text = SER_DA;
     ToDaysController.text = SER_DA;
     GET_USR_PRI();
@@ -1059,7 +1063,7 @@ class Sale_Invoices_Controller extends GetxController {
     ToDaysController.dispose();
     BCLATController.dispose();
     BCLONController.dispose();
-    _autocompleteFocusNode.dispose();
+    autocompleteFocusNode.dispose();
     if(isTablet && STMID=='EORD') {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
@@ -1070,20 +1074,8 @@ class Sale_Invoices_Controller extends GetxController {
 
 
   Future<void> selectDateFromDays_F(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await DatePickerHelper.pickDate(
       context: context,
-      initialDate:  dateFromDays1,
-      firstDate: DateTime(2000,5),
-      lastDate: DateTime(2040),
-      builder: (context, child) {
-        return   Theme(
-          data: ThemeData.light().copyWith(
-              primaryColor: const Color(0xFF4A5BF6),
-              colorScheme: ColorScheme.fromSwatch(primarySwatch: buttonTextColor).copyWith(secondary: const Color(0xFF4A5BF6))//selection color
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       FromDaysController.text =  DateFormat("yyyy-MM-dd").format(picked);
@@ -1095,26 +1087,25 @@ class Sale_Invoices_Controller extends GetxController {
     var SYN_ORD=await GET_SYN_ORD('BAL_ACC_C');
     if (SYN_ORD.isNotEmpty) {
       LastBAL_ACC_C = SYN_ORD.elementAt(0).SOLD.toString();
-      print('LastBAL_ACC_C');
-      print(LastBAL_ACC_C);
     }
   }
 
-  Future<void> selectDateToDays(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> onSelectFromDays(BuildContext context) async {
+    final formatted = await DatePickerHelper.pickDate(
       context: context,
-      initialDate: dateTimeToDays2,
-      firstDate: DateTime(2000, 5),
-      lastDate: DateTime(2040),
-      builder: (context, child) {
-        return   Theme(
-          data: ThemeData.light().copyWith(
-              primaryColor: const Color(0xFF4A5BF6),
-              colorScheme: ColorScheme.fromSwatch(primarySwatch: buttonTextColor).copyWith(secondary: const Color(0xFF4A5BF6))//selection color
-          ),
-          child: child!,
-        );
-      },
+    );
+
+    if (formatted != null) {
+
+      FromDaysController.text =   DateFormat("yyyy-MM-dd").format(formatted);
+      update();
+    }
+  }
+
+
+  Future<void> selectDateToDays(BuildContext context) async {
+    final picked = await DatePickerHelper.pickDate(
+      context: context,
     );
     if (picked != null) {
       ToDaysController.text = DateFormat("yyyy-MM-dd").format(picked);
@@ -1150,12 +1141,8 @@ class Sale_Invoices_Controller extends GetxController {
     await PRIVLAGE(LoginController().SUID, 102).then((data) {
       USR_PRI = data;
       if (USR_PRI.isNotEmpty) {
-        UPIN_VOU = USR_PRI
-            .elementAt(0)
-            .UPIN;
-        UPCH = USR_PRI
-            .elementAt(0)
-            .UPCH;
+        UPIN_VOU = USR_PRI.elementAt(0).UPIN;
+        UPCH = USR_PRI.elementAt(0).UPCH;
       }
       else {
         UPIN_VOU = 2;
@@ -1722,10 +1709,7 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_TAX_LIN(BMKID!, TTID1.toString(), GETTLTY, GETTLNO, GETTLNO2)
         .then((userList) async {
       if (userList.isNotEmpty) {
-        BCTX = userList
-            .elementAt(0)
-            .TLTN
-            .toString();
+        BCTX = userList.elementAt(0).TLTN.toString();
         TCID_M = userList[0].TCID;
         TCSY_M = userList[0].TCSY.toString();
         var TAX_TCSDID_M = await GET_TAX_TCSDID(
@@ -1741,30 +1725,16 @@ class Sale_Invoices_Controller extends GetxController {
         }
         var GET_TCRA = await GET_USE_FAT_P(TTID1.toString(), 2);
         if (GET_TCRA.isNotEmpty) {
-          TCRA_M = double.parse(GET_TCRA
-              .elementAt(0)
-              .TVDVL
-              .toString());
+          TCRA_M = double.parse(GET_TCRA.elementAt(0).TVDVL.toString());
         } else {
           TCRA_M = 0;
         }
-        if (userList
-            .elementAt(0)
-            .TCSDIDI != null) {
-          await GET_TAX_LIN_CUS(TTID1.toString(), userList
-              .elementAt(0)
-              .TCSDIDI
-              .toString()).then((TAX_LIN_CUS) async {
+        if (userList.elementAt(0).TCSDIDI != null) {
+          await GET_TAX_LIN_CUS(TTID1.toString(), userList.elementAt(0).TCSDIDI.toString()).then((TAX_LIN_CUS) async {
             if (userList.isNotEmpty) {
-              print(TAX_LIN_CUS
-                  .elementAt(0)
-                  .TCSVL);
+              print(TAX_LIN_CUS.elementAt(0).TCSVL);
               print('TCSVL');
-              TCVL_C = TAX_LIN_CUS
-                  .elementAt(0)
-                  .TCSVL! * userList
-                  .elementAt(0)
-                  .TCVL!;
+              TCVL_C = TAX_LIN_CUS.elementAt(0).TCSVL! * userList.elementAt(0).TCVL!;
             }
             print(TAX_LIN_CUS
                 .elementAt(0)
@@ -4204,17 +4174,8 @@ class Sale_Invoices_Controller extends GetxController {
           await UPDATE_BIL_MOV_D(note.BMMID.toString(), BMMID!, GUID);
           await Future.delayed(const Duration(milliseconds: 400));
           await GET_BMMNO_P();
-          await GET_SUMBMDTXA();
-          await GET_SUMBMMDIF();
-          await GET_SUMBMMDI();
-          await GET_SUMBMMAM();
-          await GET_SUMBMMAM2();
+          await GET_SUMBIL_P();
           await GET_CountRecode(note.BMMID!);
-          await GET_COUNT_BMDNO_P(note.BMMID!);
-          await GET_SUMBMDTXT();
-          await GET_SUM_AM_TXT_DI();
-          print('SelectDataSIID');
-          print(SelectDataSIID);
           update();
         }
         else {
@@ -4297,15 +4258,8 @@ class Sale_Invoices_Controller extends GetxController {
           titleScreen = 'StringEdit'.tr;
           SER_MINA = '';
           GET_COU_INF_M_P();
-          await GET_SUMBMDTXA();
-          await GET_SUMBMMDIF();
-          await GET_SUMBMMDI();
-          await GET_SUMBMMAM();
-          await GET_SUMBMMAM2();
+          await GET_SUMBIL_P();
           await GET_CountRecode(BMMID!);
-          await GET_COUNT_BMDNO_P(BMMID!);
-          await GET_SUMBMDTXT();
-          await GET_SUM_AM_TXT_DI();
         }
         await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
         await GET_BIL_ACC_C_P(AANOController.text, GUIDC,
@@ -5759,126 +5713,128 @@ class Sale_Invoices_Controller extends GetxController {
     loading(false);
   }
 
-  // جلب  اجمالي الضريبه
-  GET_SUMBMDTXA() async {
-    SUM_TOT = await COUNT_BMDTXA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  GET_SUMBIL_P() async {
+    SUM_TOT = await SUM_BIL(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
     if (SUM_TOT.isEmpty) {
       SUMBMDTXA = 0.0;
-    } else {
-      SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
-    }
-  }
-
-  //BMDTXA*BMDNO جلب  اجمالي الضريبه
-  GET_SUMBMDTXT() async {
-    SUM_TOT = await SUM_BMDTXT(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (SUM_TOT.isEmpty) {
       SUMBMDTXT = 0.0;
       SUMBMDTXT1 = 0.0;
       SUMBMDTXT2 = 0.0;
       SUMBMDTXT3 = 0.0;
       SUMBMDTXTController.text = '0';
-    } else {
-      SUMBMDTXT = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDTXT!, SCSFL);
-      SUMBMDTXT1 = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDTXT1!, SCSFL);
-      SUMBMDTXT2 = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDTXT2!, SCSFL);
-      SUMBMDTXT3 = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDTXT3!, SCSFL);
-      SUMBMDTXTController.text = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDTXT!, SCSFL).toString();
-      update();
-    }
-  }
-
-  // جلب اجمالي المجاني
-  GET_SUMBMMDIF() async {
-    SUM_TOT = await SUM_BMMDIF(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (SUM_TOT.isEmpty) {
       SUMBMMDIF = 0.0;
       SUMBMMDIFController.text = '0';
+      SUMBMMDI = 0.0;
+      BMMAMController.text = '0.0';
+      BMMAMTOTController.text = '0.0';
+      COUNTBMDNO = 0;
+      COUNTBMDNOController.text = '0';
+      SUM_AM_TXT_DI_V = 0;
+      BMMAM_TX = 0;
+      BMMDI_TX = 0;
+      TCAM = 0;
+      update();
     } else {
-      SUMBMMDIF = roundDouble(SUM_TOT
-          .elementAt(0)
-          .BMMDIF!, SCSFL);
-      SUMBMMDIFController.text = roundDouble(SUM_TOT
-          .elementAt(0)
-          .BMMDIF!, SCSFL).toString();
+      SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
+      SUMBMDTXT = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL);
+      SUMBMDTXT1 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT1!, SCSFL);
+      SUMBMDTXT2 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT2!, SCSFL);
+      SUMBMDTXT3 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT3!, SCSFL);
+      SUMBMDTXTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL).toString();
+      SUMBMMDIF = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL);
+      SUMBMMDIFController.text = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL).toString();
+      SUMBMMDI = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL);
+      SelectDataBMMDN == '1' ?
+      BMMDIController.text = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL).toString() : '';
+      BMMAMController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDAM!, SCSFL).toString();
+      BMMAMTOTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_TOTBMDAM!, SCSFL).toString();
+      COUNTBMDNOController.text = SUM_TOT.elementAt(0).COUNT_BMDNO.toString();
+      SUM_AM_TXT_DI_V = SUM_TOT.elementAt(0).SUM_AM_TXT_DI;
+      BMMAM_TX = SUM_TOT.elementAt(0).BMDAM_TX;
+      BMMDI_TX = SUM_TOT.elementAt(0).BMDDI_TX;
+      TCAM = SUM_TOT.elementAt(0).TCAMT;
+      update();
     }
   }
+
+  // جلب  اجمالي الضريبه
+  // GET_SUMBMDTXA() async {
+  //   SUM_TOT = await COUNT_BMDTXA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (SUM_TOT.isEmpty) {
+  //     SUMBMDTXA = 0.0;
+  //   } else {
+  //     SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
+  //   }
+  // }
+
+  //BMDTXA*BMDNO جلب  اجمالي الضريبه
+  // GET_SUMBMDTXT() async {
+  //   SUM_TOT = await SUM_BMDTXT(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (SUM_TOT.isEmpty) {
+  //     SUMBMDTXT = 0.0;
+  //     SUMBMDTXT1 = 0.0;
+  //     SUMBMDTXT2 = 0.0;
+  //     SUMBMDTXT3 = 0.0;
+  //     SUMBMDTXTController.text = '0';
+  //   } else {
+  //     SUMBMDTXT = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL);
+  //     SUMBMDTXT1 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT1!, SCSFL);
+  //     SUMBMDTXT2 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT2!, SCSFL);
+  //     SUMBMDTXT3 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT3!, SCSFL);
+  //     SUMBMDTXTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL).toString();
+  //     update();
+  //   }
+  // }
+
+  // جلب اجمالي المجاني
+  // GET_SUMBMMDIF() async {
+  //   SUM_TOT = await SUM_BMMDIF(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (SUM_TOT.isEmpty) {
+  //     SUMBMMDIF = 0.0;
+  //     SUMBMMDIFController.text = '0';
+  //   } else {
+  //     SUMBMMDIF = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL);
+  //     SUMBMMDIFController.text = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL).toString();
+  //   }
+  // }
 
   // جلب اجمالي التخفيض
-  GET_SUMBMMDI() async {
-    SUM_TOT = await SUM_BMMDI(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (SUM_TOT.isEmpty) {
-      SUMBMMDI = 0.0;
-    } else {
-      SUMBMMDI = roundDouble(SUM_TOT
-          .elementAt(0)
-          .BMMDI!, SCSFL);
-      SelectDataBMMDN == '1' ? BMMDIController.text = roundDouble(SUM_TOT
-          .elementAt(0)
-          .BMMDI!, SCSFL).toString() : '';
-    }
-  }
+  // GET_SUMBMMDI() async {
+  //   SUM_TOT = await SUM_BMMDI(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (SUM_TOT.isEmpty) {
+  //     SUMBMMDI = 0.0;
+  //   } else {
+  //     SUMBMMDI = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL);
+  //     SelectDataBMMDN == '1' ?
+  //     BMMDIController.text = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL).toString() : '';
+  //   }
+  // }
 
   // جلب  اجمالي المبلغ
-  GET_SUMBMMAM() async {
-    SUM_TOT = await SUM_BMMAM(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (SUM_TOT.isEmpty) {
-      BMMAMController.text = '0.0';
-    } else {
-      BMMAMController.text = roundDouble(SUM_TOT
-          .elementAt(0)
-          .SUM_BMDAM!, SCSFL).toString();
-      update();
-    }
-    update();
-    await GET_BMMAM_TX();
-    await GET_BMMDI_TX();
-    await GET_TCAM();
-  }
+ // GET_SUMBMMAM() async {
+    // SUM_TOT = await SUM_BMMAM(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    // if (SUM_TOT.isEmpty) {
+    //   BMMAMController.text = '0.0';
+    // } else {
+    //   BMMAMController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDAM!, SCSFL).toString();
+    //   update();
+    // }
+  //   update();
+  //   await GET_BMMAM_TX();
+  //   await GET_BMMDI_TX();
+  //   await GET_TCAM();
+  // }
 
   // جلب  صافي المبلغ
-  GET_SUMBMMAM2() async {
-    SUM_TOT = await SUM_BMMAM2(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (SUM_TOT.isEmpty) {
-      BMMAMTOTController.text = '0.0';
-    }
-    BMMAMTOTController.text = roundDouble(SUM_TOT
-        .elementAt(0)
-        .SUM_TOTBMDAM!, SCSFL).toString();
-    update();
-  }
-
-
-  //جلب رصيد غير مرحل
-  GET_BAL_P(BMMID,AANO,SCID) async {
-    SUMBAL = 0.0;
-    SUM_M = await SUM_BAL(1,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
-    if (SUM_M.isEmpty) {
-      SUMBAL = 0.0;
-    } else {
-      SUMBAL = SUM_M.elementAt(0).SUM_BAL;
-      update();
-    }
-    update();
-    print('SUMBAL');
-    print(SUMBAL);
-    update();
-  }
+  // GET_SUMBMMAM2() async {
+  //   SUM_TOT = await SUM_BMMAM2(
+  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (SUM_TOT.isEmpty) {
+  //     BMMAMTOTController.text = '0.0';
+  //   }
+  //   BMMAMTOTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_TOTBMDAM!, SCSFL).toString();
+  //   update();
+  // }
 
   //جلب عدد  السجلات
   GET_CountRecode(int GETBMMID) async {
@@ -5892,9 +5848,7 @@ class Sale_Invoices_Controller extends GetxController {
           COUNT_RECODE.elementAt(0).COU.toString(), GETBMMID);
       update();
     }
-    await CountRecode(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID, 2)
-        .then((data) {
+    await CountRecode(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID, 2).then((data) {
       if (data.isEmpty) {
         COUNTRecode_ORD = 0;
       } else {
@@ -5907,76 +5861,100 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب اجمالي القطع
   GET_COUNT_BMDNO_P(int GETBMMID) async {
-    COUNT_RECODE = await GET_COUNT_BMDNO(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID);
+    COUNT_RECODE = await GET_COUNT_BMDNO(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID);
     if (COUNT_RECODE.isEmpty) {
       COUNTBMDNO = 0;
       COUNTBMDNOController.text = '0';
     } else {
-      COUNTBMDNOController.text = COUNT_RECODE
-          .elementAt(0)
-          .COUNT_BMDNO
-          .toString();
+      COUNTBMDNOController.text = COUNT_RECODE.elementAt(0).COUNT_BMDNO.toString();
       update();
     }
     update();
   }
 
   //اجمالي المبلغ-خصومات+ضريبه
-  GET_SUM_AM_TXT_DI() async {
-    COUNT_RECODE = await SUM_AM_TXT_DI(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (COUNT_RECODE.isEmpty) {
-      SUM_AM_TXT_DI_V = 0;
-    } else {
-      SUM_AM_TXT_DI_V = COUNT_RECODE
-          .elementAt(0)
-          .SUM_AM_TXT_DI;
-      update();
-    }
-  }
+  // GET_SUM_AM_TXT_DI() async {
+  //   COUNT_RECODE = await SUM_AM_TXT_DI(
+  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (COUNT_RECODE.isEmpty) {
+  //     SUM_AM_TXT_DI_V = 0;
+  //   } else {
+  //     SUM_AM_TXT_DI_V = COUNT_RECODE.elementAt(0).SUM_AM_TXT_DI;
+  //     update();
+  //   }
+  // }
 
   // اجمالي BMDAM_TX
-  GET_BMMAM_TX() async {
-    COUNT_RECODE = await SUM_BMDAM_TX(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (COUNT_RECODE.isEmpty) {
-      BMMAM_TX = 0;
-    } else {
-      BMMAM_TX = COUNT_RECODE
-          .elementAt(0)
-          .BMDAM_TX;
-      update();
-    }
-  }
+  // GET_BMMAM_TX() async {
+  //   COUNT_RECODE = await SUM_BMDAM_TX(
+  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (COUNT_RECODE.isEmpty) {
+  //     BMMAM_TX = 0;
+  //   } else {
+  //     BMMAM_TX = COUNT_RECODE.elementAt(0).BMDAM_TX;
+  //     update();
+  //   }
+  // }
 
   // اجمالي BMDDI_TX
-  GET_BMMDI_TX() async {
-    COUNT_RECODE = await SUM_BMDDI_TX(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (COUNT_RECODE.isEmpty) {
-      BMMDI_TX = 0;
-    } else {
-      BMMDI_TX = COUNT_RECODE
-          .elementAt(0)
-          .BMDDI_TX;
-      update();
-    }
-  }
+  // GET_BMMDI_TX() async {
+  //   COUNT_RECODE = await SUM_BMDDI_TX(
+  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (COUNT_RECODE.isEmpty) {
+  //     BMMDI_TX = 0;
+  //   } else {
+  //     BMMDI_TX = COUNT_RECODE.elementAt(0).BMDDI_TX;
+  //     update();
+  //   }
+  // }
 
   // اجمالي TCAM
-  GET_TCAM() async {
-    COUNT_RECODE = await SUM_TCAMT(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (COUNT_RECODE.isEmpty) {
-      TCAM = 0;
+  // GET_TCAM() async {
+  //   COUNT_RECODE = await SUM_TCAMT(
+  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+  //   if (COUNT_RECODE.isEmpty) {
+  //     TCAM = 0;
+  //   } else {
+  //     TCAM = COUNT_RECODE.elementAt(0).TCAMT;
+  //     update();
+  //   }
+  // }
+
+
+
+  //جلب رصيد غير مرحل
+  GET_BAL_P(BMMID,AANO,SCID) async {
+    SUMBAL = 0.0;
+    SUM_M = await SUM_BAL(1,1,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+    if (SUM_M.isEmpty) {
+      SUMBAL = 0.0;
     } else {
-      TCAM = COUNT_RECODE
-          .elementAt(0)
-          .TCAMT;
+      SUMBAL = SUM_M.elementAt(0).SUM_BAL;
       update();
     }
+    update();
+    print('SUMBAL');
+    print(SUMBAL);
+    GET_BAL_APP_P(BMMID,AANO,SCID);
+    update();
   }
+
+  //جلب رصيد التطبيق على حسب اخر تزامن
+  GET_BAL_APP_P(BMMID,AANO,SCID) async {
+    SumBal = 0.0;
+    SUM_M = await SUM_BAL(1,2,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+    if (SUM_M.isEmpty) {
+      SumBal = 0.0;
+    } else {
+      SumBal = SUM_M.elementAt(0).SUM_BAL;
+      update();
+    }
+    update();
+    print('SumBal');
+    print(SumBal);
+    update();
+  }
+
 
   Future GET_BIL_MOV_M_PRINT_P(int GETBMMID) async {
     BIF_MOV_M_PRINT = await GET_BIL_MOV_M_PRINT(
@@ -6117,8 +6095,7 @@ class Sale_Invoices_Controller extends GetxController {
         (((double.parse(BMDDIRController.text) / 100) * BMDAM1!)), 6)
         .toString();
     //الاجمالي المبلغ الكلي للتخفيض
-    SUM_Totle_BMDDI =
-        roundDouble(double.parse(BMDDITController.text) * BMDNO_V!, 6);
+    SUM_Totle_BMDDI = roundDouble(double.parse(BMDDITController.text) * BMDNO_V!, 6);
     GET_USING_TAX_P();
     update();
   }
@@ -6217,10 +6194,7 @@ class Sale_Invoices_Controller extends GetxController {
         USE_BMDFN!);
     update();
     // await Future.delayed(const Duration(milliseconds: 800));
-    await GET_SUMBMDTXA();
-    await GET_SUMBMMDI();
-    await GET_SUMBMMAM2();
-    await GET_SUMBMDTXT();
+    await GET_SUMBIL_P();
     update();
   }
 
@@ -6537,15 +6511,8 @@ class Sale_Invoices_Controller extends GetxController {
               toastLength: Toast.LENGTH_LONG,
               textColor: Colors.white,
               backgroundColor: Colors.green);
-          GET_SUMBMMAM();
-          GET_SUMBMMAM2();
-          GET_SUMBMDTXA();
-          GET_SUMBMMDIF();
-          GET_SUMBMMDI();
+          GET_SUMBIL_P();
           GET_CountRecode(BMMID!);
-          GET_COUNT_BMDNO_P(BMMID!);
-          GET_SUMBMDTXT();
-          GET_SUM_AM_TXT_DI();
           update();
           STB_N = 'S6';
           //الخصم علي مستوى الفاتورة
@@ -6564,8 +6531,8 @@ class Sale_Invoices_Controller extends GetxController {
             update();
           }
 
-          if (_autocompleteFocusNode != 'null') {
-            _autocompleteFocusNode.requestFocus();
+          if (autocompleteFocusNode != 'null') {
+            autocompleteFocusNode.requestFocus();
           }
           update();
           return true;
@@ -6788,15 +6755,8 @@ class Sale_Invoices_Controller extends GetxController {
         //     textColor: Colors.white,
         //      backgroundColor: Colors.green);
          print('STP-5');
-         GET_SUMBMMAM();
-         GET_SUMBMMAM2();
-         GET_SUMBMDTXA();
-         GET_SUMBMMDIF();
-         GET_SUMBMMDI();
+         GET_SUMBIL_P();
          GET_CountRecode(BMMID!);
-         GET_COUNT_BMDNO_P(BMMID!);
-         GET_SUMBMDTXT();
-         GET_SUM_AM_TXT_DI();
          GET_BIF_MOV_D_P(BMMID.toString(), '2');
          print('STP-6');
          ClearBil_Mov_D_Data();
@@ -7321,7 +7281,7 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         return false;
       } else if ((BMKID == 3 || BMKID == 5 || BMKID == 11) && PKID == 3 && SelectDataBCID != null && BCBL != 0 &&
-          (BACBA! + SUMBAL! + double.parse(BMMAMTOTController.text)) > BCBL!) {
+          (BACBA! + SumBal! + double.parse(BMMAMTOTController.text)) > BCBL!) {
         Fluttertoast.showToast(
             msg: 'StringBCBL'.tr,
             toastLength: Toast.LENGTH_LONG,
@@ -8276,7 +8236,7 @@ class Sale_Invoices_Controller extends GetxController {
     FetchBarcodData(_scanBarcode);
 
     Timer(const Duration(milliseconds: 400), () {
-      displayAddItemsWindo();
+      Additem().displayAddItemsWindo();
       myFocusNode.requestFocus();
     });
   }
@@ -8363,18 +8323,8 @@ class Sale_Invoices_Controller extends GetxController {
               // ClearBil_Mov_D_Data();
             }
             update();
-          // });
         }
       }
-      // await GET_SUMBMMAM();
-      // await GET_SUMBMMAM2();
-      // await GET_SUMBMDTXA();
-      // await GET_SUMBMMDIF();
-      // await GET_SUMBMMDI();
-      // await GET_CountRecode(BMMID!);
-      // await GET_COUNT_BMDNO_P(BMMID!);
-      // await GET_SUMBMDTXT();
-      // await GET_SUM_AM_TXT_DI();
       update();
     }
   }
@@ -8613,3200 +8563,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
-  displayAddItemsWindo() {
-    Get.bottomSheet(
-      StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-        double width = MediaQuery.of(context).size.width;
-        double height = MediaQuery.of(context).size.height;
-        return GetBuilder<Sale_Invoices_Controller>(
-            init: Sale_Invoices_Controller(),
-            builder: ((controller) =>
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Form(
-                    key: controller.ADD_EDformKey,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(0.02 * height),
-                          topLeft: Radius.circular(0.02 * height),
-                        ),
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                              controller.titleAddScreen,
-                              style: ThemeHelper().buildTextStyle(
-                                  context, Colors.black, 'L')
-                          ),
-                          Expanded(
-                              child: SingleChildScrollView(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      right: 0.02 * width, left: 0.02 * width),
-                                  child: Column(
-                                    children: [
-                                      Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 0.01 * height),
-                                                child: Center(
-                                                  child: Text(
-                                                      "Stringdata_Item".tr,
-                                                      style: ThemeHelper()
-                                                          .buildTextStyle(
-                                                          context, Colors.white,
-                                                          'L')),
-                                                ),
-                                              ),
-                                              Container(
-                                                width: double.infinity,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 0.01 * height),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment
-                                                      .end,
-                                                  children: <Widget>[
-                                                    StteingController()
-                                                        .isSwitchUse_Gro == true
-                                                        ? SizedBox(
-                                                      height: 0.01 * height,
-                                                    )
-                                                        : const SizedBox(
-                                                      height: 0,
-                                                    ),
-                                                    StteingController()
-                                                        .isSwitchUse_Gro == true
-                                                        ? Row(
-                                                      children: [
-                                                        Expanded(
-                                                            child:
-                                                            DropdownMAT_GROBuilder()),
-                                                      ],
-                                                    )
-                                                        : const SizedBox(
-                                                      height: 0,
-                                                    ),
-                                                    Center(child: Text(
-                                                        'عدد السجلات: ${autoCompleteData.length}')),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        Expanded(child: Autocomplete<Mat_Inf_Local>(
-                                                          optionsBuilder: (TextEditingValue textEditingValue) {
-                                                            return _filterOptions(textEditingValue.text);
-                                                          },
-                                                          displayStringForOption: (Mat_Inf_Local option) =>
-                                                          controller.MINAController.text.isEmpty ? '' : option.MINA_D,
-                                                          fieldViewBuilder: (
-                                                              BuildContext context, textEditingController,
-                                                              focusNode, onFieldSubmitted) {
-                                                            _autocompleteFocusNode = focusNode;
-                                                            return _buildTextField(context, textEditingController, focusNode);
-                                                          },
-                                                          onSelected: (
-                                                              Mat_Inf_Local selection) async {
-                                                            await _handleSelection(selection);
-                                                          },
-                                                          optionsViewBuilder: (
-                                                              BuildContext context,
-                                                              AutocompleteOnSelected<Mat_Inf_Local> onSelected,
-                                                              Iterable<Mat_Inf_Local> options) {
-                                                            return _buildOptionsList(
-                                                                context,
-                                                                options,
-                                                                onSelected);
-                                                          },
-                                                        ),
-                                                        ),
-                                                        StteingController().isSwitchBrcode
-                                                            ? IconButton(
-                                                            icon: Icon(
-                                                              Icons.camera_alt,
-                                                              size: 0.03 * height,
-                                                            ),
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                Navigator.of(
-                                                                    context)
-                                                                    .pop(false);
-                                                                scanBarcodeNormal();
-                                                                controller
-                                                                    .myFocusNode
-                                                                    .requestFocus();
-                                                              });
-                                                            })
-                                                            : Container()
-                                                      ],
-                                                    ),
-                                                    controller.SMDED != '2' &&
-                                                        controller.BMKID != 11 &&
-                                                        controller.BMKID != 12
-                                                        ? Row(
-                                                      mainAxisAlignment: MainAxisAlignment
-                                                          .spaceAround,
-                                                      children: [
-                                                        Expanded(
-                                                            child: DropdownMat_Uni_CBuilder()),
-                                                        SizedBox(
-                                                          width: 0.02 * height,),
-                                                        controller.BMKID == 3 ||
-                                                            controller.BMKID == 4 ||
-                                                            controller.BMKID == 5 ||
-                                                            controller.BMKID == 7 ||
-                                                            controller.BMKID == 10
-                                                            ? Expanded(
-                                                          child: DropdownMat_Date_endBuilder(),
-                                                        )
-                                                            : Container(
-                                                          width: MediaQuery
-                                                              .of(context)
-                                                              .size
-                                                              .width / 3,
-                                                          margin: EdgeInsets.only(
-                                                              bottom: 0.01 *
-                                                                  height),
-                                                          child: TextFormField(
-                                                            controller: controller
-                                                                .BMDEDController,
-                                                            textAlign:
-                                                            TextAlign
-                                                                .center,
-                                                            decoration:
-                                                            InputDecoration(
-                                                              labelText:
-                                                              'StringSMDED'
-                                                                  .tr,
-                                                              contentPadding: const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical:
-                                                                  13,
-                                                                  horizontal:
-                                                                  8),
-                                                            ),
-                                                            onTap: () {
-                                                              setState(() {
-                                                                selectDateFromDays2(
-                                                                    context);
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                        : Row(
-                                                      mainAxisAlignment: MainAxisAlignment
-                                                          .spaceAround,
-                                                      children: [
-                                                        Expanded(
-                                                            child: DropdownMat_Uni_CBuilder()),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: 0.01 * height,
-                                                    ),
-                                                    controller.Use_Multi_Stores == '1' &&
-                                                        (([3, 4, 7, 10].contains(BMKID)) &&
-                                                            StteingController().MULTI_STORES_BO == true) || (([1, 2].contains(BMKID)) &&
-                                                        StteingController().MULTI_STORES_BI == true) ?
-                                                    Row(
-                                                      children: [
-                                                        Expanded(
-                                                            child: DropdownSTO_INF_DBuilder()),
-                                                      ],
-                                                    ) : Container(),
-                                                    SizedBox(
-                                                      height: 0.01 * height,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 0.01 * height),
-                                                child: Center(
-                                                  child: Text(
-                                                    "StringUnite_price_Quantity"
-                                                        .tr,
-                                                    style: ThemeHelper()
-                                                        .buildTextStyle(
-                                                        context, Colors.white,
-                                                        'L'),),
-                                                ),
-                                              ),
-                                              Container(
-                                                width: double.infinity,
-                                                padding: EdgeInsets.only(
-                                                    left: 0.01 * height,
-                                                    right: 0.01 * height),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment
-                                                      .spaceBetween,
-                                                  children: [
-                                                    (controller.BMKID == 1 ||  controller.BMKID == 2 )||
-                                                        controller.Allow_give_Free_Quantities == '1' && controller.UPIN_BMDNF == 1
-                                                        ? Column(
-                                                      mainAxisAlignment: MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        SizedBox(height: 0.01 *
-                                                            height),
-                                                        controller.UPIN_PRI == 1
-                                                            ? Text(
-                                                          "StringCost_Price".tr,
-                                                          style: ThemeHelper()
-                                                              .buildTextStyle(
-                                                              context,
-                                                              Colors.black, 'M'),)
-                                                            : Container(),
-                                                        controller.UPIN_PRI == 1
-                                                            ? SizedBox(
-                                                            height: 0.01 * height)
-                                                            : const SizedBox(
-                                                            height: 1),
-                                                        Text(
-                                                            "StrinlChice_item_QUANTITY"
-                                                                .tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M')),
-                                                        SizedBox(
-                                                          height: 0.01 * height,
-                                                        ),
-                                                        (PKID == 1 && controller
-                                                            .Allow_give_Free_Pay_Cash ==
-                                                            '1' ||
-                                                            (controller
-                                                                .Allow_give_Free_Pay_Cash ==
-                                                                '3' && controller
-                                                                .UPIN_Allow_give_Free_Pay_Cash ==
-                                                                1)) ?
-                                                        Text("StringBMDNF".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M')) : (PKID ==
-                                                            3 && controller
-                                                            .Allow_give_Free_Pay_due ==
-                                                            '1' || (controller
-                                                            .Allow_give_Free_Pay_due ==
-                                                            '3'
-                                                            && controller
-                                                                .UPIN_Allow_give_Free_Pay_due ==
-                                                                1)) ? Text(
-                                                            "StringBMDNF".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M'))
-                                                            : (PKID != 1 &&
-                                                            PKID != 3 &&
-                                                            controller
-                                                                .Allow_give_Free_Pay_Not_Cash_Due ==
-                                                                '1' ||
-                                                            (controller
-                                                                .Allow_give_Free_Pay_Not_Cash_Due ==
-                                                                '3'
-                                                                && controller
-                                                                    .UPIN_Allow_give_Free_Pay_Not_Cash_Due ==
-                                                                    1)) ? Text(
-                                                            "StringBMDNF".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M'))
-                                                            : Container(),
-                                                        SizedBox(
-                                                          height: 0.01 * height,
-                                                        ),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? Text(
-                                                            "StringBMMAMTX".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M'))
-                                                            : Container(),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? SizedBox(
-                                                          height: 0.01 * height,)
-                                                            : Container(),
-                                                        Text("StringMPCO".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M')),
-                                                        SizedBox(height: 0.01 *
-                                                            height),
-                                                        Text("StringSUM_BMMAM".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.red, 'M')),
-                                                      ],
-                                                    )
-                                                        : Column(
-                                                      mainAxisAlignment: MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        SizedBox(height: 0.01 *
-                                                            height),
-                                                        controller.UPIN_PRI == 1
-                                                            ? Text(
-                                                            "StringCost_Price"
-                                                                .tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M'))
-                                                            : Container(),
-                                                        controller.UPIN_PRI == 1
-                                                            ? SizedBox(
-                                                            height: 0.01 * height)
-                                                            : const SizedBox(
-                                                            height: 1),
-                                                        Text(
-                                                            "StrinlChice_item_QUANTITY"
-                                                                .tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M')),
-                                                        SizedBox(
-                                                          height:
-                                                          0.01 * height,
-                                                        ),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? Text(
-                                                            "StringBMMAMTX"
-                                                                .tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M'))
-                                                            : Container(),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? SizedBox(
-                                                          height: 0.01 * height,
-                                                        )
-                                                            : Container(),
-                                                        Text("StringMPCO".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.black,
-                                                                'M')),
-                                                        SizedBox(
-                                                          height:
-                                                          0.01 * height,
-                                                        ),
-                                                        Text("StringSUM_BMMAM".tr,
-                                                            style: ThemeHelper()
-                                                                .buildTextStyle(
-                                                                context,
-                                                                Colors.red, 'M')),
-                                                      ],
-                                                    ),
-                                                    (controller.BMKID == 1 || controller.BMKID == 2) ||
-                                                        controller.Allow_give_Free_Quantities == '1' && controller.UPIN_BMDNF == 1
-                                                        ? Column(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        SizedBox(height: 0.01 * height),
-                                                        controller.UPIN_PRI == 1
-                                                            ? Text(controller.MPCO_VController.text,
-                                                            style: ThemeHelper().buildTextStyle(context, Colors.grey[600]!, 'M'))
-                                                            : Container(),
-                                                        controller.UPIN_PRI == 1
-                                                            ? SizedBox(
-                                                            height: 0.01 * height)
-                                                            : const SizedBox(
-                                                            height: 1),
-                                                        Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .width /
-                                                                2.4,
-                                                            height: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .height /
-                                                                35.8,
-                                                            child: TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context,
-                                                                  Colors.black,
-                                                                  'M'),
-                                                              controller: controller
-                                                                  .BMDNOController,
-                                                              keyboardType:
-                                                              TextInputType
-                                                                  .number,
-                                                              textAlign: TextAlign
-                                                                  .center,
-                                                              focusNode: controller
-                                                                  .myFocusNode,
-                                                              textInputAction: TextInputAction.go,
-                                                              validator: (v) {
-                                                                return controller.validateSMDFN(controller.BMDNOController.text.toString());
-                                                              },
-                                                              onChanged: (v) {
-                                                                if (v
-                                                                    .isNotEmpty &&
-                                                                    double.parse(
-                                                                        v) >=
-                                                                        0.0) {
-                                                                  controller
-                                                                      .Calculate_BMD_NO_AM();
-                                                                } else {
-                                                                  SUMBMDAMController
-                                                                      .text = '0';
-                                                                }
-                                                              },
-                                                              onFieldSubmitted: (String value) {
-                                                                controller.myFocusBMMAM.requestFocus();
-                                                                if (controller.BMDAMController.text.isEmpty) {
-                                                                  return;
-                                                                } else {
-                                                                  controller.BMDAMController.selection = TextSelection(
-                                                                      baseOffset: 0,
-                                                                      extentOffset: controller.BMDAMController.text.length);
-                                                                }
-                                                              },
-                                                            )),
-                                                        SizedBox(
-                                                          height: 0.01 * height,),
-                                                        (PKID == 1 && controller
-                                                            .Allow_give_Free_Pay_Cash ==
-                                                            '1' ||
-                                                            (controller
-                                                                .Allow_give_Free_Pay_Cash ==
-                                                                '3' && controller
-                                                                .UPIN_Allow_give_Free_Pay_Cash ==
-                                                                1)) ?
-                                                        Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .width / 2.4,
-                                                            height: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .height / 35.8,
-                                                            child: TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context, Colors
-                                                                  .black, 'M'),
-                                                              controller: controller
-                                                                  .BMDNFController,
-                                                              keyboardType: TextInputType
-                                                                  .number,
-                                                              textAlign: TextAlign
-                                                                  .center,
-                                                              onChanged: (v) {
-                                                                if (v
-                                                                    .isNotEmpty) {
-                                                                  if (double
-                                                                      .parse(v) >=
-                                                                      0.0) {
-                                                                    controller
-                                                                        .Calculate_BMD_NO_AM();
-                                                                  }
-                                                                }
-                                                              },
-                                                            )) : (PKID == 3 &&
-                                                            controller
-                                                                .Allow_give_Free_Pay_due ==
-                                                                '1' || (controller
-                                                            .Allow_give_Free_Pay_due ==
-                                                            '3'
-                                                            && controller
-                                                                .UPIN_Allow_give_Free_Pay_due ==
-                                                                1)) ? Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .width / 2.4,
-                                                            height: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .height / 35.8,
-                                                            child: TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context,
-                                                                  Colors.black,
-                                                                  'M'),
-                                                              controller: controller
-                                                                  .BMDNFController,
-                                                              keyboardType: TextInputType
-                                                                  .number,
-                                                              textAlign: TextAlign
-                                                                  .center,
-                                                              onChanged: (v) {
-                                                                if (v
-                                                                    .isNotEmpty) {
-                                                                  if (double
-                                                                      .parse(v) >=
-                                                                      0.0) {
-                                                                    controller
-                                                                        .Calculate_BMD_NO_AM();
-                                                                  }
-                                                                }
-                                                              },
-                                                            ))
-                                                            : (PKID != 1 &&
-                                                            PKID != 3 &&
-                                                            controller
-                                                                .Allow_give_Free_Pay_Not_Cash_Due ==
-                                                                '1' ||
-                                                            (controller
-                                                                .Allow_give_Free_Pay_Not_Cash_Due ==
-                                                                '3'
-                                                                && controller
-                                                                    .UPIN_Allow_give_Free_Pay_Not_Cash_Due ==
-                                                                    1))
-                                                            ? Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .width / 2.4,
-                                                            height: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .height / 35.8,
-                                                            child: TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context,
-                                                                  Colors.black,
-                                                                  'M'),
-                                                              controller: controller
-                                                                  .BMDNFController,
-                                                              keyboardType: TextInputType
-                                                                  .number,
-                                                              textAlign: TextAlign
-                                                                  .center,
-                                                              onChanged: (v) {
-                                                                if (v
-                                                                    .isNotEmpty) {
-                                                                  if (double
-                                                                      .parse(v) >=
-                                                                      0.0) {
-                                                                    controller
-                                                                        .Calculate_BMD_NO_AM();
-                                                                  }
-                                                                }
-                                                              },
-                                                            ))
-                                                            : Container(),
-                                                        SizedBox(
-                                                          height:
-                                                          0.01 * height,
-                                                        ),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .width /
-                                                                2.4,
-                                                            height: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .height /
-                                                                35.8,
-                                                            child:
-                                                            TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context, Colors
-                                                                  .black, 'M'),
-                                                              controller:
-                                                              controller
-                                                                  .BMDAMTXController,
-                                                              keyboardType:
-                                                              TextInputType
-                                                                  .number,
-                                                              textAlign:
-                                                              TextAlign
-                                                                  .center,
-                                                              enabled: false,
-                                                            ))
-                                                            : Container(),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? SizedBox(
-                                                          height: 0.01 * height,
-                                                        )
-                                                            : Container(),
-                                                        Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .width /
-                                                                2.4,
-                                                            height: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .height /
-                                                                35.8,
-                                                            child:
-                                                            GestureDetector(
-                                                              onDoubleTap: () {
-                                                                print(
-                                                                    Allow_Cho_Price);
-                                                                print(
-                                                                    UPIN_Allow_Cho_Price);
-                                                                print(
-                                                                    'UPIN_Allow_Cho_Price');
-                                                                if (controller.BMKID != 1 && controller.BMKID != 2 &&
-                                                                    (controller.Allow_Cho_Price == '1' ||
-                                                                        (controller.Allow_Cho_Price == '3' &&
-                                                                            controller.UPIN_Allow_Cho_Price == 1))) {
-                                                                  buildShowMPS1(context);
-                                                                }
-                                                              },
-                                                              child: TextFormField(
-                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                                                                controller: controller.BMDAMController,
-                                                                keyboardType: TextInputType.number,
-                                                                textAlign: TextAlign.center,
-                                                                focusNode: controller.myFocusBMMAM,
-                                                                enabled: (controller.BMKID == 1 ||
-                                                                controller.BMKID == 1) || controller.Allow_Edit_Sale_Prices == '1' &&
-                                                                    controller.UPIN_EDIT_MPS1 == 1 && controller.MIFR == 2
-                                                                    ? true : false,
-                                                                validator: (v) {
-                                                                  return controller.validateBMDAM(controller.BMDAMController.text.toString());
-                                                                },
-                                                                onChanged:
-                                                                    (v) async {
-                                                                  if (v
-                                                                      .isNotEmpty &&
-                                                                      double
-                                                                          .parse(
-                                                                          v) >=
-                                                                          0.0) {
-                                                                    controller
-                                                                        .MPS1 = 0;
-                                                                    controller
-                                                                        .MPS1 =
-                                                                        double
-                                                                            .parse(
-                                                                            BMDAMController
-                                                                                .text);
-                                                                    // await Future.delayed(const Duration(milliseconds: 1300));
-                                                                    controller
-                                                                        .Calculate_BMD_NO_AM();
-                                                                  } else {
-                                                                    BMDAMTXController
-                                                                        .text =
-                                                                    '0';
-                                                                    SUMBMDAMController
-                                                                        .text =
-                                                                    '0';
-                                                                  }
-                                                                },
-                                                                onTap: () {
-                                                                  if (controller
-                                                                      .BMDAMController
-                                                                      .text
-                                                                      .isEmpty) {
-                                                                    return;
-                                                                  } else {
-                                                                    controller
-                                                                        .BMDAMController
-                                                                        .selection =
-                                                                        TextSelection(
-                                                                            baseOffset: 0,
-                                                                            extentOffset: controller
-                                                                                .BMDAMController
-                                                                                .text
-                                                                                .length);
-                                                                  }
-                                                                },
-                                                              ),
-                                                            )),
-                                                        SizedBox(
-                                                          height:
-                                                          0.01 * height,
-                                                        ),
-                                                        Text(
-                                                          controller.formatter
-                                                              .format(
-                                                              double.parse(
-                                                                  controller
-                                                                      .SUMBMDAMController
-                                                                      .text)),
-                                                          style: ThemeHelper()
-                                                              .buildTextStyle(
-                                                              context, Colors.red,
-                                                              'M'),),
-                                                      ],
-                                                    )
-                                                        : Column(
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        SizedBox(
-                                                            height: 0.01 *
-                                                                height),
-                                                        controller.UPIN_PRI == 1
-                                                            ? Text(
-                                                          controller
-                                                              .MPCO_VController
-                                                              .text,
-                                                          style: ThemeHelper()
-                                                              .buildTextStyle(
-                                                              context,
-                                                              Colors.grey[600]!,
-                                                              'M'),)
-                                                            : Container(),
-                                                        controller.UPIN_PRI == 1
-                                                            ? SizedBox(
-                                                          height: 0.01 * height,
-                                                        )
-                                                            : const SizedBox(
-                                                            height: 1),
-                                                        Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .width /
-                                                                2.4,
-                                                            height: MediaQuery
-                                                                .of(
-                                                                context)
-                                                                .size
-                                                                .height /
-                                                                35.8,
-                                                            child: TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context,
-                                                                  Colors.black,
-                                                                  'M'),
-                                                              controller: controller
-                                                                  .BMDNOController,
-                                                              keyboardType:
-                                                              TextInputType
-                                                                  .number,
-                                                              textAlign: TextAlign
-                                                                  .center,
-                                                              focusNode: controller
-                                                                  .myFocusNode,
-                                                              textInputAction:
-                                                              TextInputAction
-                                                                  .go,
-                                                              validator: (v) {
-                                                                return controller
-                                                                    .validateSMDFN(
-                                                                    controller
-                                                                        .BMDNOController
-                                                                        .text
-                                                                        .toString());
-                                                              },
-                                                              onChanged: (v) {
-                                                                if (v
-                                                                    .isNotEmpty &&
-                                                                    double.parse(
-                                                                        v) >=
-                                                                        0.0) {
-                                                                  controller
-                                                                      .Calculate_BMD_NO_AM();
-                                                                } else {
-                                                                  SUMBMDAMController
-                                                                      .text = '0';
-                                                                }
-                                                              },
-                                                              onFieldSubmitted:
-                                                                  (String value) {
-                                                                controller
-                                                                    .myFocusBMMAM
-                                                                    .requestFocus();
-                                                                if (controller
-                                                                    .BMDAMController
-                                                                    .text
-                                                                    .isEmpty) {
-                                                                  return;
-                                                                } else {
-                                                                  controller
-                                                                      .BMDAMController
-                                                                      .selection =
-                                                                      TextSelection(
-                                                                          baseOffset:
-                                                                          0,
-                                                                          extentOffset: controller
-                                                                              .BMDAMController
-                                                                              .text
-                                                                              .length);
-                                                                }
-                                                              },
-                                                            )),
-                                                        SizedBox(
-                                                          height:
-                                                          0.01 * height,
-                                                        ),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .width / 2.4,
-                                                            height: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .height / 35.8,
-                                                            child: TextFormField(
-                                                              style: ThemeHelper()
-                                                                  .buildTextStyle(
-                                                                  context, Colors
-                                                                  .black, 'M'),
-                                                              controller: controller
-                                                                  .BMDAMTXController,
-                                                              keyboardType: TextInputType
-                                                                  .number,
-                                                              textAlign: TextAlign
-                                                                  .center,
-                                                              enabled: false,
-                                                            ))
-                                                            : Container(),
-                                                        (USING_TAX_SALES == '1' ||
-                                                            (USING_TAX_SALES ==
-                                                                '3' &&
-                                                                (UPIN_USING_TAX_SALES ==
-                                                                    1 &&
-                                                                    Price_include_Tax ==
-                                                                        true)))
-                                                            ? SizedBox(
-                                                          height: 0.01 * height,
-                                                        )
-                                                            : Container(),
-                                                        Container(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                bottom: 0.01 *
-                                                                    height),
-                                                            width: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .width / 2.4,
-                                                            height: MediaQuery
-                                                                .of(context)
-                                                                .size
-                                                                .height / 35.8,
-                                                            child: GestureDetector(
-                                                              onDoubleTap: () {
-                                                                print(
-                                                                    Allow_Cho_Price);
-                                                                print(
-                                                                    UPIN_Allow_Cho_Price);
-                                                                print(
-                                                                    'UPIN_Allow_Cho_Price');
-                                                                if (controller.BMKID != 1 && controller.BMKID != 2 &&
-                                                                    (controller.Allow_Cho_Price == '1' ||
-                                                                        (controller.Allow_Cho_Price == '3' &&
-                                                                            controller.UPIN_Allow_Cho_Price == 1))) {
-                                                                  buildShowMPS1(
-                                                                      context);
-                                                                }
-                                                              },
-                                                              child: TextFormField(
-                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                                                                controller: controller.BMDAMController,
-                                                                keyboardType: TextInputType.number,
-                                                                textAlign: TextAlign.center,
-                                                                focusNode: controller.myFocusBMMAM,
-                                                                enabled: (controller.BMKID == 1 || controller.BMKID == 2) ||
-                                                                    controller.Allow_Edit_Sale_Prices == '1' &&
-                                                                        controller.UPIN_EDIT_MPS1 == 1 &&
-                                                                        controller.MIFR == 2
-                                                                    ? true : false,
-                                                                validator: (v) {
-                                                                  return controller.validateBMDAM(
-                                                                      controller.BMDAMController.text.toString());
-                                                                },
-                                                                onChanged:
-                                                                    (v) async {
-                                                                  if (v
-                                                                      .isNotEmpty &&
-                                                                      double
-                                                                          .parse(
-                                                                          v) >=
-                                                                          0.0) {
-                                                                    controller
-                                                                        .MPS1 =
-                                                                        double
-                                                                            .parse(
-                                                                            BMDAMController
-                                                                                .text);
-                                                                    await Future
-                                                                        .delayed(
-                                                                        const Duration(
-                                                                            milliseconds: 1200));
-                                                                    controller
-                                                                        .Calculate_BMD_NO_AM();
-                                                                  } else {
-                                                                    BMDAMTXController
-                                                                        .text =
-                                                                    '0';
-                                                                    SUMBMDAMController
-                                                                        .text =
-                                                                    '0';
-                                                                  }
-                                                                },
-                                                                onTap: () {
-                                                                  if (controller
-                                                                      .BMDAMController
-                                                                      .text
-                                                                      .isEmpty) {
-                                                                    return;
-                                                                  } else {
-                                                                    controller
-                                                                        .BMDAMController
-                                                                        .selection =
-                                                                        TextSelection(
-                                                                            baseOffset: 0,
-                                                                            extentOffset: controller
-                                                                                .BMDAMController
-                                                                                .text
-                                                                                .length);
-                                                                  }
-                                                                },
-                                                              ),
-                                                            )),
-                                                        SizedBox(
-                                                          height:
-                                                          0.01 * height,
-                                                        ),
-                                                        Text(
-                                                          controller.formatter
-                                                              .format(
-                                                              double.parse(
-                                                                  controller
-                                                                      .SUMBMDAMController
-                                                                      .text)),
-                                                          style: ThemeHelper()
-                                                              .buildTextStyle(
-                                                              context, Colors.red,
-                                                              'M'),),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      controller.SelectDataBMMDN == '1' &&
-                                          controller.Allow_give_Discount == '1' &&
-                                          controller.UPIN_BMMDI == 1
-                                          ? (PKID == 1 && controller
-                                          .Allow_give_discount_Pay_Cash == '1' ||
-                                          (controller
-                                              .Allow_give_discount_Pay_Cash ==
-                                              '3' && controller
-                                              .UPIN_Allow_give_discount_Pay_Cash ==
-                                              1)) ?
-                                      Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior:
-                                        Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal:
-                                                    0.01 * height),
-                                                child: Column(
-                                                  children: [
-                                                    Center(
-                                                      child: Text(
-                                                        "StringManual_Discount"
-                                                            .tr,
-                                                        style: ThemeHelper()
-                                                            .buildTextStyle(
-                                                            context, Colors.white,
-                                                            'L'),),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        Expanded(child: Card(
-                                                            elevation: 2,
-                                                            clipBehavior: Clip
-                                                                .antiAliasWithSaveLayer,
-                                                            child: Container(
-                                                              color: Colors.white,
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                    'StringRate'
-                                                                        .tr,
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                  Container(
-                                                                    //width: double.infinity,
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                        left: 0.01 *
-                                                                            height,
-                                                                        right: 0.01 *
-                                                                            height,
-                                                                        bottom: 0.01 *
-                                                                            height),
-                                                                    child:
-                                                                    TextFormField(
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M'),
-                                                                      controller:
-                                                                      controller
-                                                                          .BMDDIRController,
-                                                                      keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                      textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                      onChanged:
-                                                                          (v) {
-                                                                        if (v
-                                                                            .isNotEmpty &&
-                                                                            double
-                                                                                .parse(
-                                                                                v) >=
-                                                                                0) {
-                                                                          controller
-                                                                              .Calculate_BMDDI_IR();
-                                                                        }
-                                                                        // else{
-                                                                        //   controller.BMDDIRController.text = '0';
-                                                                        //   controller.SUMBMDDIR = 0;
-                                                                        //   controller.Calculate_BMDDI_IR();
-                                                                        // }
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                      controller
-                                                                          .formatter
-                                                                          .format(
-                                                                          controller
-                                                                              .SUMBMDDIR)
-                                                                          .toString(),
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M')),
-                                                                ],
-                                                              ),
-                                                            ))),
-                                                        Expanded(child: Card(
-                                                            elevation: 2,
-                                                            clipBehavior: Clip
-                                                                .antiAliasWithSaveLayer,
-                                                            child: Container(
-                                                              color: Colors.white,
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                    'StringAmount'
-                                                                        .tr,
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                  Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                        left: 0.01 *
-                                                                            height,
-                                                                        right: 0.01 *
-                                                                            height,
-                                                                        bottom: 0.01 *
-                                                                            height),
-                                                                    child:
-                                                                    TextFormField(
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M'),
-                                                                      controller:
-                                                                      controller
-                                                                          .BMDDIController,
-                                                                      keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                      textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                      onChanged:
-                                                                          (v) {
-                                                                        if (v
-                                                                            .isNotEmpty &&
-                                                                            double
-                                                                                .parse(
-                                                                                v) >=
-                                                                                0) {
-                                                                          controller
-                                                                              .Calculate_BMDDI_IR();
-                                                                        }
-                                                                        // else {
-                                                                        //     controller.BMDDIController.text = '0';
-                                                                        //     controller.SUMBMDDI = 0;
-                                                                        //     controller.Calculate_BMDDI_IR();
-                                                                        //   }
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    controller
-                                                                        .formatter
-                                                                        .format(
-                                                                        controller
-                                                                            .SUMBMDDI)
-                                                                        .toString(),
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                ],
-                                                              ),
-                                                            )),),
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      "${"StrinCount_BMDAMC"
-                                                          .tr}                                                 ${controller
-                                                          .formatter.format(
-                                                          double.parse(controller
-                                                              .BMDDITController
-                                                              .text))}",
-                                                      style: ThemeHelper()
-                                                          .buildTextStyle(
-                                                          context, Colors.white,
-                                                          'L'),),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                          : (PKID == 3 && controller
-                                          .Allow_give_discount_Pay_due == '1' ||
-                                          (controller
-                                              .Allow_give_discount_Pay_due == '3'
-                                              && controller
-                                                  .UPIN_Allow_give_discount_Pay_due ==
-                                                  1)) ?
-                                      Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior:
-                                        Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal:
-                                                    0.01 * height),
-                                                child: Column(
-                                                  children: [
-                                                    Center(
-                                                      child: Text(
-                                                        "StringManual_Discount"
-                                                            .tr,
-                                                        style: ThemeHelper()
-                                                            .buildTextStyle(
-                                                            context, Colors.white,
-                                                            'L'),),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        Expanded(child: Card(
-                                                            elevation: 2,
-                                                            clipBehavior: Clip
-                                                                .antiAliasWithSaveLayer,
-                                                            child: Container(
-                                                              color: Colors.white,
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                    'StringRate'
-                                                                        .tr,
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                  Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                        left: 0.01 *
-                                                                            height,
-                                                                        right: 0.01 *
-                                                                            height,
-                                                                        bottom: 0.01 *
-                                                                            height),
-                                                                    child:
-                                                                    TextFormField(
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M'),
-                                                                      controller:
-                                                                      controller
-                                                                          .BMDDIRController,
-                                                                      keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                      textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                      onChanged:
-                                                                          (v) {
-                                                                        if (v
-                                                                            .isNotEmpty &&
-                                                                            double
-                                                                                .parse(
-                                                                                v) >=
-                                                                                0) {
-                                                                          controller
-                                                                              .Calculate_BMDDI_IR();
-                                                                        }
-                                                                        // else{
-                                                                        //   controller.BMDDIRController.text = '0';
-                                                                        //   controller.SUMBMDDIR = 0;
-                                                                        //   controller.Calculate_BMDDI_IR();
-                                                                        // }
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    controller
-                                                                        .formatter
-                                                                        .format(
-                                                                        controller
-                                                                            .SUMBMDDIR)
-                                                                        .toString(),
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                ],
-                                                              ),
-                                                            ))),
-                                                        Expanded(child: Card(
-                                                            elevation: 2,
-                                                            clipBehavior: Clip
-                                                                .antiAliasWithSaveLayer,
-                                                            child: Container(
-                                                              color: Colors.white,
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                    'StringAmount'
-                                                                        .tr,
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                  Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                        left: 0.01 *
-                                                                            height,
-                                                                        right: 0.01 *
-                                                                            height,
-                                                                        bottom: 0.01 *
-                                                                            height),
-                                                                    child:
-                                                                    TextFormField(
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M'),
-                                                                      controller:
-                                                                      controller
-                                                                          .BMDDIController,
-                                                                      keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                      textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                      onChanged:
-                                                                          (v) {
-                                                                        if (v
-                                                                            .isNotEmpty &&
-                                                                            double
-                                                                                .parse(
-                                                                                v) >=
-                                                                                0) {
-                                                                          controller
-                                                                              .Calculate_BMDDI_IR();
-                                                                        }
-                                                                        // else {
-                                                                        //     controller.BMDDIController.text = '0';
-                                                                        //     controller.SUMBMDDI = 0;
-                                                                        //     controller.Calculate_BMDDI_IR();
-                                                                        //   }
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    controller
-                                                                        .formatter
-                                                                        .format(
-                                                                        controller
-                                                                            .SUMBMDDI)
-                                                                        .toString(),
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                ],
-                                                              ),
-                                                            )),),
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      "${"StrinCount_BMDAMC"
-                                                          .tr}                                                 ${controller
-                                                          .formatter.format(
-                                                          double.parse(controller
-                                                              .BMDDITController
-                                                              .text))}",
-                                                      style: ThemeHelper()
-                                                          .buildTextStyle(
-                                                          context, Colors.white,
-                                                          'L'),),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                          : (PKID != 1 && PKID != 3 && controller
-                                          .Allow_give_discount_Pay_Not_Cash_Due ==
-                                          '1' ||
-                                          (controller
-                                              .Allow_give_discount_Pay_Not_Cash_Due ==
-                                              '3'
-                                              && controller
-                                                  .UPIN_Allow_give_discount_Pay_Not_Cash_Due ==
-                                                  1)) ?
-                                      Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior:
-                                        Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal:
-                                                    0.01 * height),
-                                                child: Column(
-                                                  children: [
-                                                    Center(
-                                                      child: Text(
-                                                        "StringManual_Discount"
-                                                            .tr,
-                                                        style: ThemeHelper()
-                                                            .buildTextStyle(
-                                                            context, Colors.white,
-                                                            'L'),),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        Expanded(child: Card(
-                                                            elevation: 2,
-                                                            clipBehavior: Clip
-                                                                .antiAliasWithSaveLayer,
-                                                            child: Container(
-                                                              color: Colors.white,
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                    'StringRate'
-                                                                        .tr,
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                  Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                        left: 0.01 *
-                                                                            height,
-                                                                        right: 0.01 *
-                                                                            height,
-                                                                        bottom: 0.01 *
-                                                                            height),
-                                                                    child:
-                                                                    TextFormField(
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M'),
-                                                                      controller:
-                                                                      controller
-                                                                          .BMDDIRController,
-                                                                      keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                      textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                      onChanged:
-                                                                          (v) {
-                                                                        if (v
-                                                                            .isNotEmpty &&
-                                                                            double
-                                                                                .parse(
-                                                                                v) >=
-                                                                                0) {
-                                                                          controller
-                                                                              .Calculate_BMDDI_IR();
-                                                                        }
-                                                                        // else{
-                                                                        //   controller.BMDDIRController.text = '0';
-                                                                        //   controller.SUMBMDDIR = 0;
-                                                                        //   controller.Calculate_BMDDI_IR();
-                                                                        // }
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    controller
-                                                                        .formatter
-                                                                        .format(
-                                                                        controller
-                                                                            .SUMBMDDIR)
-                                                                        .toString(),
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                ],
-                                                              ),
-                                                            )),),
-                                                        Expanded(child: Card(
-                                                            elevation: 2,
-                                                            clipBehavior: Clip
-                                                                .antiAliasWithSaveLayer,
-                                                            child: Container(
-                                                              color: Colors.white,
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                    'StringAmount'
-                                                                        .tr,
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                  Container(
-                                                                    margin: EdgeInsets
-                                                                        .only(
-                                                                        left: 0.01 *
-                                                                            height,
-                                                                        right: 0.01 *
-                                                                            height,
-                                                                        bottom: 0.01 *
-                                                                            height),
-                                                                    child:
-                                                                    TextFormField(
-                                                                      style: ThemeHelper()
-                                                                          .buildTextStyle(
-                                                                          context,
-                                                                          Colors
-                                                                              .black,
-                                                                          'M'),
-                                                                      controller:
-                                                                      controller
-                                                                          .BMDDIController,
-                                                                      keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                      textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                      onChanged:
-                                                                          (v) {
-                                                                        if (v
-                                                                            .isNotEmpty &&
-                                                                            double
-                                                                                .parse(
-                                                                                v) >=
-                                                                                0) {
-                                                                          controller
-                                                                              .Calculate_BMDDI_IR();
-                                                                        }
-                                                                        // else {
-                                                                        //     controller.BMDDIController.text = '0';
-                                                                        //     controller.SUMBMDDI = 0;
-                                                                        //     controller.Calculate_BMDDI_IR();
-                                                                        //   }
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    controller
-                                                                        .formatter
-                                                                        .format(
-                                                                        controller
-                                                                            .SUMBMDDI)
-                                                                        .toString(),
-                                                                    style: ThemeHelper()
-                                                                        .buildTextStyle(
-                                                                        context,
-                                                                        Colors
-                                                                            .black,
-                                                                        'M'),),
-                                                                ],
-                                                              ),
-                                                            )),),
-
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                        "${"StrinCount_BMDAMC"
-                                                            .tr}                                                 ${controller
-                                                            .formatter.format(
-                                                            double.parse(
-                                                                controller
-                                                                    .BMDDITController
-                                                                    .text))}",
-                                                        style: ThemeHelper()
-                                                            .buildTextStyle(
-                                                            context, Colors.white,
-                                                            'L')),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                          : Container()
-                                          : Container(),
-                                      controller.SVVL_TAX != '2'
-                                          ? Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior:
-                                        Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal:
-                                                    0.01 * height),
-                                                child: Center(
-                                                  child: Text(
-                                                    "${'StringSUM_BMMTX'
-                                                        .tr}                                                          %${formatter
-                                                        .format(BMDTX)
-                                                        .toString()}",
-                                                    style: ThemeHelper()
-                                                        .buildTextStyle(
-                                                        context, Colors.white,
-                                                        'L'),),
-                                                ),
-                                              ),
-                                              Container(
-                                                width: double.infinity,
-                                                margin: EdgeInsets.only(
-                                                    left: 0.01 * height,
-                                                    right: 0.01 * height,
-                                                    bottom: 0.01 * height),
-                                                child: TextFormField(
-                                                  style: ThemeHelper()
-                                                      .buildTextStyle(
-                                                      context, Colors.black, 'M'),
-                                                  controller:
-                                                  controller.BMDTXAController,
-                                                  keyboardType:
-                                                  TextInputType.number,
-                                                  textAlign: TextAlign.center,
-                                                  enabled: false,
-                                                  decoration:
-                                                  const InputDecoration(
-                                                      hintStyle: TextStyle(
-                                                          color:
-                                                          Colors.blue)),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                          : Container(),
-                                      Card(
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              0.02 * width),
-                                        ),
-                                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        child: Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: double.infinity,
-                                                color: Colors.red,
-                                                child: Center(
-                                                  child: Text(
-                                                    "StrinCount_BMDAMC".tr,
-                                                    style: ThemeHelper()
-                                                        .buildTextStyle(
-                                                        context, Colors.white,
-                                                        'L'),),
-                                                ),
-                                              ),
-                                              Container(
-                                                width: double.infinity,
-                                                margin: EdgeInsets.only(
-                                                    left: 0.01 * height,
-                                                    right: 0.01 * height,
-                                                    bottom: 0.01 * height),
-                                                child: TextFormField(
-                                                  style: ThemeHelper()
-                                                      .buildTextStyle(
-                                                      context, Colors.black, 'M'),
-                                                  enabled: false,
-                                                  textAlign: TextAlign.center,
-
-                                                  controller:
-                                                  controller.SUMBMDAMTController,
-                                                  decoration: const InputDecoration(
-                                                    enabledBorder: OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              // Text("${controller.SUM_STRING_NUMBER} $SCNA")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: MediaQuery.of(context).size.width / 0.5,
-                                        margin: EdgeInsets.only(left: 0.01 * height, right: 0.01 * height),
-                                        child: TextButton(
-                                          style: ButtonStyle(
-                                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(0.01 * height),
-                                                    side: const BorderSide(color: Colors.black45))),
-                                            padding: WidgetStateProperty.all<EdgeInsets>(
-                                                EdgeInsets.only(left: 0.01 * height, right: 0.01 * height)),
-                                          ),
-                                          child: Text(
-                                            controller.TextButton_title,
-                                            style: ThemeHelper().buildTextStyle(
-                                                context, Colors.black, 'M'),
-                                          ),
-                                          onPressed: () async {
-                                            // _focusNode.requestFocus();
-                                            // FocusScope.of(context).requestFocus(_focusNode);
-                                            if (controller.When_Repeating_Same_inserted_Items_in_Invoice == '1' &&
-                                                controller.COUNT_MINO > 0) {
-                                              Get.defaultDialog(
-                                                title: 'StringMestitle'.tr,
-                                                middleText: 'StringCOUNT_MINO'.tr,
-                                                backgroundColor: Colors.white,
-                                                radius: 40,
-                                                textCancel: 'StringNo'.tr,
-                                                cancelTextColor: Colors.red,
-                                                textConfirm: 'StringYes'.tr,
-                                                confirmTextColor: Colors.white,
-                                                onConfirm: () async {
-                                                  if (BMKID != 1 && BMKID != 2 &&
-                                                      controller.When_Selling_Items_Lower_Price_than_Cost_Price == '1' &&
-                                                      double.parse(controller.MPCOController.text) > 0 &&
-                                                      double.parse(controller.MPCOController.text) > controller.BMDAM1!) {
-                                                    Navigator.of(context).pop(
-                                                        false);
-                                                    Get.defaultDialog(
-                                                      title: 'StringMestitle'.tr,
-                                                      middleText:
-                                                      'StringItems_Lower_Price'
-                                                          .tr,
-                                                      backgroundColor: Colors
-                                                          .white,
-                                                      radius: 40,
-                                                      textCancel: 'StringNo'.tr,
-                                                      cancelTextColor: Colors.red,
-                                                      textConfirm: 'StringYes'.tr,
-                                                      confirmTextColor: Colors
-                                                          .white,
-                                                      onConfirm: () async {
-                                                        if (BMKID != 1 && BMKID != 2 && Use_lowest_selling_price == '1' && MPLP! > 0
-                                                            && BMDAM1! < MPLP!) {
-                                                          Navigator.of(context).pop(false);
-                                                          Get.defaultDialog(
-                                                            title:
-                                                            'StringMestitle'.tr,
-                                                            middleText:
-                                                            'StringUse_lowest_selling_price'
-                                                                .tr,
-                                                            backgroundColor:
-                                                            Colors.white,
-                                                            radius: 40,
-                                                            textCancel: 'StringOK'.tr,
-                                                            cancelTextColor:
-                                                            Colors.blueAccent,
-                                                            barrierDismissible: false,
-                                                          );
-                                                        } else if (BMKID != 1 && BMKID != 2 &&
-                                                            Use_lowest_selling_price ==
-                                                                '3' &&
-                                                            Allow_lowest_selling_price !=
-                                                                1 &&
-                                                            MPLP! > 0 &&
-                                                            BMDAM1! < MPLP!) {
-                                                          Navigator.of(context)
-                                                              .pop(false);
-                                                          Get.defaultDialog(
-                                                            title:
-                                                            'StringMestitle'.tr,
-                                                            middleText:
-                                                            'StringUse_lowest_selling_price'
-                                                                .tr,
-                                                            backgroundColor:
-                                                            Colors.white,
-                                                            radius: 40,
-                                                            textCancel: 'StringOK'
-                                                                .tr,
-                                                            cancelTextColor:
-                                                            Colors.blueAccent,
-                                                            barrierDismissible: false,
-                                                          );
-                                                        } else {
-                                                          if (BMKID != 1 && BMKID != 2 &&
-                                                              Use_highest_selling_price == '1' &&
-                                                              MPHP! > 0 &&
-                                                              BMDAM1! > MPHP!) {
-                                                            Navigator.of(context)
-                                                                .pop(false);
-                                                            Get.defaultDialog(
-                                                              title:
-                                                              'StringMestitle'.tr,
-                                                              middleText:
-                                                              'StringUse_highest_selling_price'
-                                                                  .tr,
-                                                              backgroundColor:
-                                                              Colors.white,
-                                                              radius: 40,
-                                                              textCancel:
-                                                              'StringOK'.tr,
-                                                              cancelTextColor:
-                                                              Colors.blueAccent,
-                                                              barrierDismissible:
-                                                              false,
-                                                            );
-                                                          } else if (BMKID != 1 && BMKID != 2 &&
-                                                              Use_highest_selling_price == '3' &&
-                                                              Allow_highest_selling_price != 1 &&
-                                                              MPHP! > 0 && BMDAM1! > MPHP!) {
-                                                            Navigator.of(context)
-                                                                .pop(false);
-                                                            Get.defaultDialog(
-                                                              title:
-                                                              'StringMestitle'.tr,
-                                                              middleText:
-                                                              'StringUse_highest_selling_price'
-                                                                  .tr,
-                                                              backgroundColor:
-                                                              Colors.white,
-                                                              radius: 40,
-                                                              textCancel:
-                                                              'StringOK'.tr,
-                                                              cancelTextColor:
-                                                              Colors.blueAccent,
-                                                              barrierDismissible:
-                                                              false,
-                                                            );
-                                                          } else {
-                                                            // Navigator.of(context).pop(false);
-                                                            bool isValid = await controller
-                                                                .Save_BIL_MOV_D_P();
-                                                            if (isValid) {
-                                                              DataGrid();
-                                                              controller
-                                                                  .ClearBil_Mov_D_Data();
-                                                              controller
-                                                                  .minaFocusNode
-                                                                  .requestFocus();
-                                                            }
-                                                          }
-                                                        }
-                                                      },
-                                                      barrierDismissible: false,
-                                                    );
-                                                  } else if (BMKID != 1 &&
-                                                      controller.When_Selling_Items_Lower_Price_than_Cost_Price == '2' &&
-                                                      double.parse(controller.MPCOController.text) > 0 &&
-                                                      double.parse(controller.MPCOController.text) > BMDAM1!) {
-                                                    Navigator.of(context).pop(false);
-                                                    Get.defaultDialog(
-                                                      title: 'StringMestitle'.tr,
-                                                      middleText:
-                                                      'StringErr_Items_Lower_Price'.tr,
-                                                      backgroundColor: Colors.white,
-                                                      radius: 40,
-                                                      textCancel: 'StringOK'.tr,
-                                                      cancelTextColor: Colors.blueAccent,
-                                                      barrierDismissible: false,
-                                                    );
-                                                  } else if (BMKID != 1 && BMKID != 2 &&
-                                                      controller.When_Selling_Items_Lower_Price_than_Cost_Price ==
-                                                          '4' &&
-                                                      controller
-                                                          .Allowto_Sell_Less_than_Cost_Price !=
-                                                          1 &&
-                                                      double.parse(controller
-                                                          .MPCOController.text) >
-                                                          0 &&
-                                                      double.parse(controller
-                                                          .MPCOController.text) >
-                                                          BMDAM1!) {
-                                                    Navigator.of(context).pop(
-                                                        false);
-                                                    Get.defaultDialog(
-                                                      title: 'StringMestitle'.tr,
-                                                      middleText:
-                                                      'StringErr_Items_Lower_Price'
-                                                          .tr,
-                                                      backgroundColor: Colors
-                                                          .white,
-                                                      radius: 40,
-                                                      textCancel: 'StringOK'.tr,
-                                                      cancelTextColor:
-                                                      Colors.blueAccent,
-                                                      barrierDismissible: false,
-                                                    );
-                                                  } else {
-                                                    Navigator.of(context).pop(
-                                                        false);
-                                                    if (BMKID != 1 && BMKID != 2 &&
-                                                        Use_lowest_selling_price ==
-                                                            '1' &&
-                                                        MPLP! > 0 &&
-                                                        BMDAM1! < MPLP!) {
-                                                      Navigator.of(context)
-                                                          .pop(false);
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'
-                                                            .tr,
-                                                        middleText:
-                                                        'StringUse_lowest_selling_price'
-                                                            .tr,
-                                                        backgroundColor: Colors
-                                                            .white,
-                                                        radius: 40,
-                                                        textCancel: 'StringOK'.tr,
-                                                        cancelTextColor:
-                                                        Colors.blueAccent,
-                                                        barrierDismissible: false,
-                                                      );
-                                                    } else if (BMKID != 1 && BMKID != 2 &&
-                                                        Use_lowest_selling_price ==
-                                                            '3' &&
-                                                        Allow_lowest_selling_price !=
-                                                            1 &&
-                                                        MPLP! > 0 &&
-                                                        BMDAM1! < MPLP!) {
-                                                      Navigator.of(context)
-                                                          .pop(false);
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'
-                                                            .tr,
-                                                        middleText:
-                                                        'StringUse_lowest_selling_price'
-                                                            .tr,
-                                                        backgroundColor: Colors
-                                                            .white,
-                                                        radius: 40,
-                                                        textCancel: 'StringOK'.tr,
-                                                        cancelTextColor:
-                                                        Colors.blueAccent,
-                                                        barrierDismissible: false,
-                                                      );
-                                                    } else {
-                                                      if (BMKID != 1 && BMKID != 2 &&
-                                                          Use_highest_selling_price ==
-                                                              '1' &&
-                                                          MPHP! > 0 &&
-                                                          BMDAM1! > MPHP!) {
-                                                        Navigator.of(context)
-                                                            .pop(false);
-                                                        Get.defaultDialog(
-                                                          title: 'StringMestitle'
-                                                              .tr,
-                                                          middleText:
-                                                          'StringUse_highest_selling_price'
-                                                              .tr,
-                                                          backgroundColor:
-                                                          Colors.white,
-                                                          radius: 40,
-                                                          textCancel: 'StringOK'
-                                                              .tr,
-                                                          cancelTextColor:
-                                                          Colors.blueAccent,
-                                                          barrierDismissible: false,
-                                                        );
-                                                      } else if (BMKID != 1 && BMKID != 2 &&
-                                                          Use_highest_selling_price ==
-                                                              '3' &&
-                                                          Allow_highest_selling_price !=
-                                                              1 &&
-                                                          MPHP! > 0 &&
-                                                          BMDAM1! > MPHP!) {
-                                                        Navigator.of(context)
-                                                            .pop(false);
-                                                        Get.defaultDialog(
-                                                          title: 'StringMestitle'
-                                                              .tr,
-                                                          middleText:
-                                                          'StringUse_highest_selling_price'
-                                                              .tr,
-                                                          backgroundColor:
-                                                          Colors.white,
-                                                          radius: 40,
-                                                          textCancel: 'StringOK'
-                                                              .tr,
-                                                          cancelTextColor:
-                                                          Colors.blueAccent,
-                                                          barrierDismissible: false,
-                                                        );
-                                                      } else {
-                                                        // Navigator.of(context).pop(false);
-
-                                                        bool isValid = await controller
-                                                            .Save_BIL_MOV_D_P();
-                                                        if (isValid) {
-                                                          DataGrid();
-                                                          controller
-                                                              .ClearBil_Mov_D_Data();
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                },
-                                                barrierDismissible: false,
-                                              );
-                                            } else if (controller
-                                                .When_Repeating_Same_inserted_Items_in_Invoice ==
-                                                '3' &&
-                                                controller.COUNT_MINO > 0) {
-                                              Get.defaultDialog(
-                                                title: 'StringMestitle'.tr,
-                                                middleText: 'StringErr_COUNT_MINO'
-                                                    .tr,
-                                                backgroundColor: Colors.white,
-                                                radius: 40,
-                                                textCancel: 'StringOK'.tr,
-                                                cancelTextColor: Colors
-                                                    .blueAccent,
-                                                barrierDismissible: false,
-                                              );
-                                            } else {
-                                              if (BMKID != 1 && BMKID != 2  && controller
-                                                  .When_Selling_Items_Lower_Price_than_Cost_Price ==
-                                                  '1' &&
-                                                  double.parse(
-                                                      controller.MPCOController
-                                                          .text) > 0 &&
-                                                  double.parse(
-                                                      controller.MPCOController
-                                                          .text) > BMDAM1!) {
-                                                Get.defaultDialog(
-                                                  title: 'StringMestitle'.tr,
-                                                  middleText: 'StringItems_Lower_Price'
-                                                      .tr,
-                                                  backgroundColor: Colors.white,
-                                                  radius: 40,
-                                                  textCancel: 'StringNo'.tr,
-                                                  cancelTextColor: Colors.red,
-                                                  textConfirm: 'StringYes'.tr,
-                                                  confirmTextColor: Colors.white,
-                                                  onConfirm: () async {
-                                                    if (BMKID != 1 && BMKID != 2 &&
-                                                        Use_lowest_selling_price ==
-                                                            '1' &&
-                                                        MPLP! > 0 &&
-                                                        BMDAM1! < MPLP!) {
-                                                      Navigator.of(context)
-                                                          .pop(false);
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'
-                                                            .tr,
-                                                        middleText:
-                                                        'StringUse_lowest_selling_price'
-                                                            .tr,
-                                                        backgroundColor: Colors
-                                                            .white,
-                                                        radius: 40,
-                                                        textCancel: 'StringOK'.tr,
-                                                        cancelTextColor:
-                                                        Colors.blueAccent,
-                                                        barrierDismissible: false,
-                                                      );
-                                                    } else if (BMKID != 1 && BMKID != 2 &&
-                                                        Use_lowest_selling_price ==
-                                                            '3' &&
-                                                        Allow_lowest_selling_price !=
-                                                            1 &&
-                                                        MPLP! > 0 &&
-                                                        BMDAM1! < MPLP!) {
-                                                      Navigator.of(context)
-                                                          .pop(false);
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'
-                                                            .tr,
-                                                        middleText:
-                                                        'StringUse_lowest_selling_price'
-                                                            .tr,
-                                                        backgroundColor: Colors
-                                                            .white,
-                                                        radius: 40,
-                                                        textCancel: 'StringOK'.tr,
-                                                        cancelTextColor:
-                                                        Colors.blueAccent,
-                                                        barrierDismissible: false,
-                                                      );
-                                                    } else {
-                                                      if (BMKID != 1 && BMKID != 2 &&
-                                                          Use_highest_selling_price ==
-                                                              '1' &&
-                                                          MPHP! > 0 &&
-                                                          BMDAM1! > MPHP!) {
-                                                        Navigator.of(context)
-                                                            .pop(false);
-                                                        Get.defaultDialog(
-                                                          title: 'StringMestitle'
-                                                              .tr,
-                                                          middleText:
-                                                          'StringUse_highest_selling_price'
-                                                              .tr,
-                                                          backgroundColor:
-                                                          Colors.white,
-                                                          radius: 40,
-                                                          textCancel: 'StringOK'
-                                                              .tr,
-                                                          cancelTextColor:
-                                                          Colors.blueAccent,
-                                                          barrierDismissible: false,
-                                                        );
-                                                      } else if (BMKID != 1 && BMKID != 2 &&
-                                                          Use_highest_selling_price ==
-                                                              '3' &&
-                                                          Allow_highest_selling_price !=
-                                                              1 &&
-                                                          MPHP! > 0 &&
-                                                          BMDAM1! > MPHP!) {
-                                                        Navigator.of(context)
-                                                            .pop(false);
-                                                        Get.defaultDialog(
-                                                          title: 'StringMestitle'
-                                                              .tr,
-                                                          middleText:
-                                                          'StringUse_highest_selling_price'
-                                                              .tr,
-                                                          backgroundColor:
-                                                          Colors.white,
-                                                          radius: 40,
-                                                          textCancel: 'StringOK'
-                                                              .tr,
-                                                          cancelTextColor:
-                                                          Colors.blueAccent,
-                                                          barrierDismissible: false,
-                                                        );
-                                                      } else {
-                                                        Navigator.of(context).pop(
-                                                            false);
-                                                        bool isValid = await controller
-                                                            .Save_BIL_MOV_D_P();
-                                                        if (isValid) {
-                                                          DataGrid();
-                                                          controller
-                                                              .ClearBil_Mov_D_Data();
-                                                        }
-                                                      }
-                                                    }
-                                                  },
-                                                  barrierDismissible: false,
-                                                );
-                                              } else if (BMKID != 1 && BMKID != 2 &&
-                                                  controller
-                                                      .When_Selling_Items_Lower_Price_than_Cost_Price ==
-                                                      '2' &&
-                                                  double.parse(controller
-                                                      .MPCOController.text) >
-                                                      0 &&
-                                                  double.parse(controller
-                                                      .MPCOController.text) >
-                                                      BMDAM1!) {
-                                                Get.defaultDialog(
-                                                  title: 'StringMestitle'.tr,
-                                                  middleText:
-                                                  'StringErr_Items_Lower_Price'
-                                                      .tr,
-                                                  backgroundColor: Colors.white,
-                                                  radius: 40,
-                                                  textCancel: 'StringOK'.tr,
-                                                  cancelTextColor: Colors
-                                                      .blueAccent,
-                                                  barrierDismissible: false,
-                                                );
-                                              } else if (BMKID != 1 && BMKID != 2 &&
-                                                  controller
-                                                      .When_Selling_Items_Lower_Price_than_Cost_Price ==
-                                                      '4' &&
-                                                  controller
-                                                      .Allowto_Sell_Less_than_Cost_Price !=
-                                                      1 &&
-                                                  double.parse(
-                                                      controller.MPCOController
-                                                          .text) > 0 &&
-                                                  double.parse(
-                                                      controller.MPCOController
-                                                          .text) > BMDAM1!) {
-                                                Get.defaultDialog(
-                                                  title: 'StringMestitle'.tr,
-                                                  middleText: 'StringErr_Items_Lower_Price'
-                                                      .tr,
-                                                  backgroundColor: Colors.white,
-                                                  radius: 40,
-                                                  textCancel: 'StringOK'.tr,
-                                                  cancelTextColor: Colors
-                                                      .blueAccent,
-                                                  barrierDismissible: false,
-                                                );
-                                              } else {
-                                                if (BMKID != 1 && BMKID != 2 &&
-                                                    Use_lowest_selling_price ==
-                                                        '1' && MPLP! > 0 &&
-                                                    BMDAM1! < MPLP!) {
-                                                  Get.defaultDialog(
-                                                    title: 'StringMestitle'.tr,
-                                                    middleText:
-                                                    'StringUse_lowest_selling_price'
-                                                        .tr,
-                                                    backgroundColor: Colors.white,
-                                                    radius: 40,
-                                                    textCancel: 'StringOK'.tr,
-                                                    cancelTextColor:
-                                                    Colors.blueAccent,
-                                                    barrierDismissible: false,
-                                                  );
-                                                } else if (BMKID != 1 && BMKID != 2 &&
-                                                    Use_lowest_selling_price == '3' &&
-                                                    Allow_lowest_selling_price != 1 &&
-                                                    MPLP! > 0 && BMDAM1! < MPLP!) {
-                                                  Get.defaultDialog(
-                                                    title: 'StringMestitle'.tr,
-                                                    middleText:
-                                                    'StringUse_lowest_selling_price'
-                                                        .tr,
-                                                    backgroundColor: Colors.white,
-                                                    radius: 40,
-                                                    textCancel: 'StringOK'.tr,
-                                                    cancelTextColor:
-                                                    Colors.blueAccent,
-                                                    barrierDismissible: false,
-                                                  );
-                                                } else {
-                                                  if (BMKID != 1 && BMKID != 2 &&
-                                                      Use_highest_selling_price == '1' &&
-                                                      MPHP! > 0 && BMDAM1! > MPHP!) {
-                                                    Get.defaultDialog(
-                                                      title: 'StringMestitle'.tr,
-                                                      middleText: 'StringUse_highest_selling_price'.tr,
-                                                      backgroundColor: Colors.white,
-                                                      radius: 40,
-                                                      textCancel: 'StringOK'.tr,
-                                                      cancelTextColor: Colors.blueAccent,
-                                                      barrierDismissible: false,
-                                                    );
-                                                  } else if (BMKID != 1 && BMKID != 2 &&
-                                                      Use_highest_selling_price == '3' &&
-                                                      Allow_highest_selling_price != 1 &&
-                                                      MPHP! > 0 && BMDAM1! > MPHP!) {
-                                                    Get.defaultDialog(
-                                                      title: 'StringMestitle'.tr,
-                                                      middleText:
-                                                      'StringUse_highest_selling_price'
-                                                          .tr,
-                                                      backgroundColor: Colors
-                                                          .white,
-                                                      radius: 40,
-                                                      textCancel: 'StringOK'.tr,
-                                                      cancelTextColor:
-                                                      Colors.blueAccent,
-                                                      barrierDismissible: false,
-                                                    );
-                                                  } else {
-                                                    //  Navigator.of(context).pop(false);
-                                                    bool isValid = await controller
-                                                        .Save_BIL_MOV_D_P();
-                                                    if (isValid) {
-                                                      DataGrid();
-                                                      controller
-                                                          .ClearBil_Mov_D_Data();
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ))
-                        ],
-                      ),
-                    ),
-                  ),
-                )));
-      }),
-    );
-  }
-
-  List<Mat_Inf_Local> _filterOptions(String query) {
-    return StteingController().SHOW_ITEM == true || StteingController().SHOW_ITEM_C == true
-        ? autoCompleteData.where((county) =>
-        "${county.MGNO ?? ''}${county.MINA_D ?? ''}${county.MINO ?? ''}${county.MUNA_D ?? ''}${county.MUCBC ?? ''}${county.MPS1 ?? ''}${county.MPS2 ?? ''}"
-            .toLowerCase()
-            .contains(query.toLowerCase()))
-        .toList().obs
-        : autoCompleteData.where((county) =>
-        "${county.MINA_D ?? ''}${county.MINO ?? ''}"
-            .toLowerCase()
-            .contains(query.toLowerCase())).toList().obs;
-  }
-
-
-  Widget _buildTextField(BuildContext context,
-      TextEditingController textEditingController, FocusNode focusNode) {
-    final isEmpty = MINAController.text.isEmpty;
-    return TextFormField(
-      controller: isEmpty ? textEditingController : MINAController,
-      focusNode: focusNode,
-      autofocus: isEmpty,
-      validator: (value) => validateMINO(value!),
-      textAlign: TextAlign.center,
-      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-      decoration: InputDecoration(
-        labelText: 'StringMINO'.tr,
-        hintText: StteingController().SHOW_ITEM == true ||
-            StteingController().SHOW_ITEM_C == true
-            ? 'StringSearch_for_MINO_MGNO'.tr
-            : 'StringMINO'.tr,
-        suffixIcon: isEmpty
-            ? null
-            : IconButton(
-          icon: const Icon(Icons.clear, color: Colors.black),
-          onPressed: () {
-            _clearField(textEditingController, focusNode);
-          },
-        ),
-        icon: isEmpty
-            ? null
-            : IconButton(
-          icon: const Icon(Icons.error, color: Colors.black),
-          onPressed: () {
-            _showDetailsDialog(context);
-          },
-        ),
-      ),
-    );
-  }
-
-  void _clearField(TextEditingController textEditingController, FocusNode focusNode) {
-    textEditingController.clear();
-    ClearBil_Mov_D_Data();
-    focusNode.requestFocus();
-    update();
-  }
-
-  void _showDetailsDialog(BuildContext context) {
-    if (SelectDataMUID?.isNotEmpty ?? false) {
-      Get.defaultDialog(
-        title: '${MINAController.text}. ${SelectDataMUCNA}',
-        backgroundColor: Colors.white,
-        radius: 30,
-        content: _buildDetailsDialogContent(context),
-        textCancel: 'StringHide'.tr,
-        cancelTextColor: Colors.blueAccent,
-      );
-    }
-  }
-
-  Widget _buildDetailsDialogContent(BuildContext context) {
-    final details = [
-      'StringMgno2',
-      'String_BDNO_F',
-      'String_BDNO_F2',
-      'String_SCEX',
-      'String_SCEXS',
-      if (UPIN_PRI == 1) 'StringCost_Price',
-      'String_MPHP',
-      'String_MPLP',
-    ];
-    final values = [
-      MGNA,
-      formatter.format(BDNO_F),
-      formatter.format(BDNO_F2),
-      formatter.format(double.parse(SCEXController.text)),
-      formatter.format(SCEXS),
-      if (UPIN_PRI == 1) formatter.format(MPCO),
-      formatter.format(MPHP),
-      formatter.format(MPLP),
-    ];
-    return Row(
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: details.map((detail) =>
-              Text(
-                '${detail.tr}:',
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M'),
-              ))
-              .toList(),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: values.map((value) =>
-              Text(
-                value,
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-              ))
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _handleSelection(Mat_Inf_Local selection) async {
-    print('controller.SelectDataMINO');
-    print(SelectDataMINO);
-    SelectDataMINO = selection.MINO.toString();
-    MGNOController.text = selection.MGNO.toString();
-    SelectDataMUID = null;
-    SelectDataSNED = null;
-    MITSK = selection.MITSK;
-    MGKI = selection.MGKI;
-    GUIDMT = selection.GUID;
-    update();
-    if (StteingController().SHOW_ITEM == true ||
-        StteingController().SHOW_ITEM_C == true) {
-      SelectDataMUID = selection.MUID.toString();
-      SIID_V2 = SelectDataSIID.toString();
-      await GETSNDE_ONE();
-      if(BMKID==1){
-        BMDAMController.text ='0';
-      }else{
-        BMDAMController.text = BCPR == 2 ? selection.MPS2.toString() : BCPR == 3 ?
-        selection.MPS3.toString() : BCPR == 4
-            ? selection.MPS4.toString()
-            : selection.MPS1.toString();
-      }
-      SelectDataMUCNA = selection.MUNA_D.toString();
-      MPS1 = double.parse(BMDAMController.text);
-    } else {
-      await GETMUIDS();
-    }
-    MINAController.text = selection.MINA_D.toString();
-    MIED = selection.MIED;
-    BMDNOController.text = '';
-    BMDNO_V = 0;
-    BMDNFController.text = '0';
-    SUMBMDAMController.text = '0';
-    BMDDIRController.text = '0';
-    BMDDIController.text = '0';
-    if (TTID1 != null) {
-      await GET_TAX_LIN_P('MAT', selection.MGNO.toString(),
-          selection.MINO.toString());
-    }
-    update();
-    myFocusNode.requestFocus();
-  }
-
-  Widget _buildOptionsList(BuildContext context, Iterable<Mat_Inf_Local> options,
-      AutocompleteOnSelected<Mat_Inf_Local> onSelected) {
-    return GetBuilder<Sale_Invoices_Controller>(
-        builder: ((controller) =>
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                width: double.infinity,
-                height: (options.length * 100.0).clamp(150.0, 0.4 * MediaQuery.of(context).size.height),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // رأس الجدول الثابت باستخدام Table
-                    if(StteingController().SHOW_ITEM == true )
-                    controller.BMKID==1?
-                    Table(
-                      // border: TableBorder.all(color: Colors.grey),
-                      columnWidths: {
-                        0: const FixedColumnWidth(260), // عرض ثابت للصنف
-                        1: const FractionColumnWidth(0.25), // عرض مرن للوحدة
-                      },
-                      children: [
-                        TableRow(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "StringMINO".tr,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "StringMUID".tr,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ):
-                    Table(
-                      // border: TableBorder.all(color: Colors.grey),
-                      columnWidths: {
-                        0: const FixedColumnWidth(197), // عرض ثابت للصنف
-                        1: const FractionColumnWidth(0.21), // عرض مرن للوحدة
-                        2: const FixedColumnWidth(110), // عرض ثابت للسعر
-                      },
-                      children: [
-                        TableRow(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "StringMINO".tr,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "StringMUID".tr,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "StringPrice".tr,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Expanded(child: ListView.builder(
-                      itemCount: options.length,
-                      itemBuilder: (context, index) {
-                        final option = options.elementAt(index);
-                        print('BCPR');
-                        print(BCPR);
-                        return StteingController().SHOW_ITEM_C == true ?
-                        GestureDetector(
-                          onTap: () => onSelected(option),
-                          child: Card(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 3, horizontal: 4),
-                            elevation: 2,
-                            child: Container(
-                              color: Colors.grey[30],
-                              padding: const EdgeInsets.all(8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "${option.MGNO} - (${option.MINO}-${option
-                                        .MINA_D})",
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceAround,
-                                    children: [
-                                      Text(
-                                        "${'StringMUID'.tr}: ${option
-                                            .MUNA_D}", // استبدل `unit` بالمفتاح الصحيح للوحدة
-
-                                      ),
-                                      Text(
-                                        "${'StringPrice'.tr}: ${formatter
-                                            .format(
-                                            BCPR == 2 ? option.MPS2 : BCPR == 3
-                                                ? option.MPS3
-                                                : BCPR == 4
-                                                ? option.MPS4
-                                                : option.MPS1).toString()}",
-                                        // استبدل `price` بالمفتاح الصحيح للسعر
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ) :
-                        StteingController().SHOW_ITEM == true ?
-                        controller.BMKID==1?
-                        GestureDetector(
-                          onTap: () => onSelected(option),
-                          child: Table(
-                            // border: TableBorder.all(color: Colors.grey),
-                            columnWidths: {
-                              0: FixedColumnWidth(120), // عرض ثابت للصنف
-                              1: FractionColumnWidth(0.02), // عرض مرن للوحدة
-                            },
-                            children: [
-                              TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Text(
-                                      "${option.MGNO} - (${option.MINO}-${option.MINA_D.toString()})",),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Text("${option.MUNA_D}",),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                            :GestureDetector(
-                          onTap: () => onSelected(option),
-                          child: Table(
-                            // border: TableBorder.all(color: Colors.grey),
-                            columnWidths: {
-                              0: FixedColumnWidth(120), // عرض ثابت للصنف
-                              1: FractionColumnWidth(0.02), // عرض مرن للوحدة
-                              2: FixedColumnWidth(50), // عرض ثابت للسعر
-                            },
-                            children: [
-                              TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Text(
-                                      "${option.MGNO} - (${option.MINO}-${option
-                                          .MINA_D})",),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Text("${option.MUNA_D}",),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Text("${formatter.format(
-                                        BCPR == 2 ? option.MPS2 : BCPR == 3 ? option.MPS3
-                                            : BCPR == 4 ? option.MPS4 : option.MPS1).toString()}",
-                                        style: TextStyle(color: Colors.red)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                            : GestureDetector(
-                          onTap: () => onSelected(option),
-                          child: Padding(
-                            padding: EdgeInsets.all(6.0),
-                            child: Text(
-                              option.MINA_D,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        );
-                      },
-                    ),),
-                  ],
-                ),
-              ),
-            )));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownMAT_GROBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Mat_Gro_Local>>(
-                future: GET_MAT_GRO(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Mat_Gro_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringBrach',
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    isDense: true,
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringMgno', Colors.grey, 'S'),
-                    dropdownStyleData: const DropdownStyleData(
-                      maxHeight: 250,
-                    ),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          value: "${item.MGNO.toString() + " +++ " +
-                              item.MGNA_D.toString()}",
-                          // value: item.MGNO.toString(),
-                          child: Text(
-                            item.MGNA_D.toString(),
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        ))
-                        .toList()
-                        .obs,
-                    value: controller.SelectDataMGNO2,
-                    onChanged: (value) async {
-                      ClearBil_Mov_D_Data();
-                      controller.update();
-                      controller.MGNOController.text =
-                      value.toString().split(" +++ ")[0];
-                      controller.SelectDataMGNO =
-                      value.toString().split(" +++ ")[0];
-                      controller.SelectDataMGNO2 = value.toString();
-                      await controller.fetchAutoCompleteData(
-                          StteingController().SHOW_ITEM == true ||
-                              StteingController().SHOW_ITEM_C == true ? 2 : 1,
-                          '2');
-                      controller.update();
-                    },
-                    dropdownSearchData: DropdownSearchData(
-                        searchController: controller
-                            .TextEditingSercheController,
-                        searchInnerWidget: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
-                          ),
-                          child: TextFormField(
-                            controller: controller.TextEditingSercheController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'StringSearch_for_MGNO'.tr,
-                              hintStyle: ThemeHelper().buildTextStyle(
-                                  context, Colors.grey, 'S'),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ),
-                        searchMatchFn: (item, searchValue) {
-                          return (item.value.toString().toLowerCase().contains(
-                              searchValue));
-                        },
-                        searchInnerWidgetHeight: 50),
-
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        controller.TextEditingSercheController.clear();
-                      }
-                    },
-                  );
-                })));
-  }
-
-  FutureBuilder<List<Mat_Uni_C_Local>> DropdownMat_Uni_CBuilder() {
-    return FutureBuilder<List<Mat_Uni_C_Local>>(
-        future: GetMat_Uni_C(
-            MGNOController.text.toString(), SelectDataMINO.toString()),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Mat_Uni_C_Local>> snapshot) {
-          if (!snapshot.hasData) {
-            return Dropdown2(josnStatus: josnStatus);
-          }
-          return DropdownButtonFormField2(
-            isExpanded: true,
-            hint: ThemeHelper().buildText(
-                context, 'StringMUID', Colors.grey, 'S'),
-            value: SelectDataMUID,
-            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-            items: snapshot.data!
-                .map((item) =>
-                DropdownMenuItem<String>(
-                  onTap: () {
-                    SelectDataMUCNA = item.MUNA_D.toString();
-                    update();
-                  },
-                  value: item.MUID.toString(),
-                  child: Text(
-                    '${item.MUNA_D.toString()}   ',
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
-                  ),
-                ))
-                .toList()
-                .obs,
-            validator: (value) {
-              if (value == null) {
-                return 'StringvalidateMUID'.tr;
-              }
-              return null;
-            },
-            onChanged: (value) async {
-              SelectDataMUID = value.toString();
-              SelectDataSNED = null;
-              SelectDataMUCNA = null;
-              SelectDataMUCNA = '';
-              BMDAMController.clear();
-              BMDINController.clear();
-              BMDEDController.clear();
-              SUMBMDAMController.clear();
-              MPCOController.clear();
-              MPCO_VController.clear();
-              BMDTXAController.clear();
-              BMDAMController.text = '0';
-              BMDAMTXController.text = '0';
-              SUMBMDAMController.text = '0';
-              BMDTXAController.text = '0';
-              MPCOController.text = '0';
-              MPCO_VController.text = '0';
-              SUMBMDAMTController.text = '0';
-              SUMBMDAM = 0;
-              SUM_BMDAM = 0;
-              BMDAM1 = 0;
-              SUM_BMDAM2 = 0;
-              BMDAM2 = 0;
-              MPS1 = 0;
-              BDNO_F = 0;
-              BDNO_F2 = 0;
-              BMDTXTController.text = '0';
-              SUMBMDAMTFController.text = '0';
-              MPS1Controller.text = '0';
-              MPS2Controller.text = '0';
-              MPS3Controller.text = '0';
-              MPS4Controller.text = '0';
-              CHIN_NO = 1;
-              MPCO_V = 0;
-              MPCO = 0;
-              BMDNO = 0;
-              V_FROM = 0;
-              V_TO = 0;
-              V_KIN = 0;
-              V_N1 = 0;
-              update();
-              await GETSNDE_ONE();
-              myFocusNode.requestFocus();
-              Timer(const Duration(seconds: 1), () async {
-                await Calculate_BMD_NO_AM();
-                update();
-              });
-            },
-          );
-        });
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownMat_Date_endBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Sto_Num_Local>>(
-                future: GET_SMDED(
-                    controller.MGNOController.text.toString(),
-                    controller.SelectDataMINO.toString(),
-                    controller.SIID_V2.toString(),
-                    controller.SelectDataMUID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Sto_Num_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown2(josnStatus: josnStatus);
-                  }
-                  return DropdownButtonFormField2(
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringSMDED', Colors.grey, 'S'),
-                    value: snapshot.data!.any((item) =>
-                    item.SNED.toString() == controller.SelectDataSNED)
-                        ? controller.SelectDataSNED : null,
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          value: item.SNED.toString(),
-                          child: Text(
-                            item.SNED.toString(),
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        )).toList().obs,
-                    onChanged: (value) {
-                      controller.SelectDataSNED = value.toString();
-                      Timer(const Duration(milliseconds: 90), () {
-                        controller.myFocusNode.requestFocus();
-                      });
-                      controller.update();
-                    },
-                  );
-                })));
-  }
-
-  Future<dynamic> buildShowMPS1(BuildContext context) {
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    return Get.defaultDialog(
-      title: "",
-      content: Padding(
-        padding: EdgeInsets.only(right: 0.02 * height, left: 0.02 * height),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringMPS1', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: MPS1Controller,
-                    onTap: () async {
-                      BMDAMController.text = MPS1Controller.text;
-                      MPS1 = double.parse(MPS1Controller.text);
-                      Navigator.of(context).pop(false);
-                      await Future.delayed(const Duration(milliseconds: 600));
-                      Calculate_BMD_NO_AM();
-                      update();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringMPS2', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: MPS2Controller,
-                    onTap: () async {
-                      BMDAMController.text = MPS2Controller.text;
-                      MPS1 = double.parse(MPS2Controller.text);
-                      Navigator.of(context).pop(false);
-                      await Future.delayed(const Duration(milliseconds: 600));
-                      Calculate_BMD_NO_AM();
-                      update();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringMPS3', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: MPS3Controller,
-                    onTap: () async {
-                      BMDAMController.text = MPS3Controller.text;
-                      MPS1 = double.parse(MPS3Controller.text);
-                      Navigator.of(context).pop(false);
-                      await Future.delayed(const Duration(milliseconds: 600));
-                      Calculate_BMD_NO_AM();
-                      update();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringMPS4', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: MPS4Controller,
-                    onTap: () async {
-                      BMDAMController.text = MPS4Controller.text;
-                      MPS1 = double.parse(MPS4Controller.text);
-                      Navigator.of(context).pop(false);
-                      await Future.delayed(const Duration(milliseconds: 600));
-                      Calculate_BMD_NO_AM();
-                      update();
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: Colors.white,
-      radius: 40,
-      // barrierDismissible: false,
-    );
-  }
 
   FutureBuilder<List<Bil_Cus_Local>> DropdownBIL_CUSBuilder() {
     return FutureBuilder<List<Bil_Cus_Local>>(
@@ -12806,9 +9562,7 @@ class Sale_Invoices_Controller extends GetxController {
                             style: ThemeHelper().buildTextStyle(
                                 context, Colors.black, 'M'),
                           ),
-                        ))
-                        .toList()
-                        .obs,
+                        )).toList().obs,
                     validator: (value) {
                       if (value == null) {
                         return 'StringStoch'.tr;
@@ -12850,14 +9604,11 @@ class Sale_Invoices_Controller extends GetxController {
                         ? true
                         : false,
                     child: DropdownButtonFormField2(
-                      decoration: ThemeHelper().InputDecorationDropDown(
-                          'StringBPIDlableText'.tr),
+                      decoration: ThemeHelper().InputDecorationDropDown('StringBPIDlableText'.tr),
                       isExpanded: true,
-                      hint: ThemeHelper().buildText(
-                          context, 'StringBrach', Colors.grey, 'S'),
+                      hint: ThemeHelper().buildText(context, 'StringBrach', Colors.grey, 'S'),
                       value: controller.SelectDataBPID,
-                      style: ThemeHelper().buildTextStyle(
-                          context, Colors.black, 'M'),
+                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                       items: snapshot.data!
                           .map((item) =>
                           DropdownMenuItem<String>(
@@ -12871,9 +9622,7 @@ class Sale_Invoices_Controller extends GetxController {
                               style: ThemeHelper().buildTextStyle(context,
                                   Colors.black, 'M'),
                             ),
-                          ))
-                          .toList()
-                          .obs,
+                          )).toList().obs,
                       validator: (v) {
                         if (v == null) {
                           return 'StringBrach'.tr;
@@ -13889,51 +10638,17 @@ class Sale_Invoices_Controller extends GetxController {
     );
   }
 
-  static const MaterialColor buttonTextColor = MaterialColor(
-    0xFFEF5350,
-    <int, Color>{
-      50: Color(0xFFFFEBEE),
-      100: Color(0xFFFFCDD2),
-      200: Color(0xFFEF9A9A),
-      300: Color(0xFFE57373),
-      400: Color(0xFFEF5350),
-      500: Color(0xFFF44336),
-      600: Color(0xFFE53935),
-      700: Color(0xFFD32F2F),
-      800: Color(0xFFC62828),
-      900: Color(0xFFB71C1C),
-    },
-  );
-
   Future<void> selectDateFromDays(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await DatePickerHelper.pickDate(
       context: context,
-      initialDate: dateTimeDays,
-      firstDate: DateTime(2022, 5),
-      lastDate: DateTime(2050),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-              primaryColor: const Color(0xFF4A5BF6),
-              colorScheme: ColorScheme.fromSwatch(
-                  primarySwatch: buttonTextColor).copyWith(
-                  secondary: const Color(0xFF4A5BF6)) //selection color
-          ),
-          child: child!,
-        );
-      },);
+    );
 
     if (picked != null) {
-      final difference = dateTimeDays
-          .difference(picked)
-          .inDays;
+      final difference = dateTimeDays.difference(picked).inDays;
       if (difference >= 0) {
         dateTimeDays = picked;
-        SelectDays =
-        DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(
-            " ")[0];
-        BMMRD =
-        DateFormat('yyyy-MM-dd').format(dateTimeDays).toString().split(" ")[0];
+        SelectDays = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
+        BMMRD = DateFormat('yyyy-MM-dd').format(dateTimeDays).toString().split(" ")[0];
       } else {
         Fluttertoast.showToast(
             msg: "StringCHK_SMMDO".tr,
@@ -13945,20 +10660,12 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   Future<void> selectDateBMMDD(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: dateTimeDays,
-        firstDate: DateTime(2022, 5),
-        lastDate: DateTime(2050));
+    final picked = await DatePickerHelper.pickDate(context: context);
     if (picked != null) {
-      final difference = dateTimeDays
-          .difference(picked)
-          .inDays;
+      final difference = dateTimeDays.difference(picked).inDays;
       if (difference <= 0) {
         dateTimeDays = picked;
-        BMMDDController.text =
-        DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(
-            " ")[0];
+        BMMDDController.text = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
         update();
       } else {
         Fluttertoast.showToast(
@@ -13971,21 +10678,13 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   Future<void> selectDateBMMCD(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: dateTimeDays,
-        firstDate: DateTime(2022, 5),
-        lastDate: DateTime(2050));
+    final picked = await DatePickerHelper.pickDate(context: context);
 
     if (picked != null) {
-      final difference = dateTimeDays
-          .difference(picked)
-          .inDays;
+      final difference = dateTimeDays.difference(picked).inDays;
       if (difference <= 0) {
         dateTimeDays = picked;
-        BMMCDController.text =
-        DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(
-            " ")[0];
+        BMMCDController.text = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
         update();
       } else {
         Fluttertoast.showToast(
@@ -13993,7 +10692,6 @@ class Sale_Invoices_Controller extends GetxController {
             textColor: Colors.white,
             backgroundColor: Colors.redAccent);
       }
-
       update();
     }
   }
@@ -14018,9 +10716,6 @@ class Sale_Invoices_Controller extends GetxController {
       );
     }
     else {
-      print(USE_TX);
-      print(BCTX);
-      print(GetBMKID);
       print(USE_TX != '1');
       if (USE_TX != '1') {
         Pdf_Invoices_Samplie(
@@ -14054,6 +10749,7 @@ class Sale_Invoices_Controller extends GetxController {
       }
     }
   }
+
 
 
   //دالة استخدام التوقيع
@@ -14131,6 +10827,7 @@ class Sale_Invoices_Controller extends GetxController {
 
   Future PRINT_BALANCE_P({
     BMMID,AANO,SCID,PKID,
+
     required String typeRep,
     String? GetBMKID,
     String? GetBMMDO,
@@ -14236,7 +10933,5 @@ class Sale_Invoices_Controller extends GetxController {
       }
     }
   }
-
-
 
 }

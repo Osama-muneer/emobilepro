@@ -1293,8 +1293,11 @@ Future<List<Bil_Mov_D_Local>> GET_COUNT_BMDNO(String TAB_N,int GetBMMID) async {
 Future<List<Bil_Mov_D_Local>> SUM_BMDTXT(String TAB_N,int GetBMMID) async {
   var dbClient = await conn.database;
   String sql;
-  sql = "select ifnull(sum(BMDTXT),0.0) AS SUM_BMDTXT,ifnull(sum(BMDTXT1),0.0) AS SUM_BMDTXT1"
-      " ,ifnull(sum(BMDTXT2),0.0) AS SUM_BMDTXT2,ifnull(sum(BMDTXT3),0.0) AS SUM_BMDTXT3 from $TAB_N where BMMID=$GetBMMID";
+  sql = "select ifnull(sum(BMDTXT),0.0) AS SUM_BMDTXT,"
+      " ifnull(sum(BMDTXT1),0.0) AS SUM_BMDTXT1"
+      " ,ifnull(sum(BMDTXT2),0.0) AS SUM_BMDTXT2,"
+      " ifnull(sum(BMDTXT3),0.0) AS SUM_BMDTXT3 "
+      " from $TAB_N where BMMID=$GetBMMID";
   var result = await dbClient!.rawQuery(sql);
   List<Bil_Mov_D_Local> list = result.map((item) {
     return Bil_Mov_D_Local.fromMap(item);
@@ -2516,6 +2519,9 @@ Future<List<Ide_Lin_Local>> GET_IDE_LIN(ILTY,ILNO) async {
       " AND A.CIID_L='${LoginController().CIID}' $Wheresql LIMIT 1 ";
 
   var result = await dbClient!.rawQuery(sql);
+  print(sql);
+  print(result);
+  print('GET_IDE_LIN');
   List<Ide_Lin_Local> list = result.map((item) {
     return Ide_Lin_Local.fromMap(item);
   }).toList();
@@ -3526,3 +3532,27 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_BMMFNOR(TAB_V,GUID) async {
   return list;
 }
 
+Future<List<Bil_Mov_D_Local>> SUM_BIL(String TAB_N,int GetBMMID) async {
+  var dbClient = await conn.database;
+  String sql='';
+   sql=" SELECT ifnull(sum(BMDTXA),0.0) AS SUM_BMDTXA,"
+      " ifnull(sum(BMDAMTF),0.0) AS BMMDIF,"
+      " ifnull(sum(BMDDIM),0.0) AS BMMDI ,"
+      " ifnull(sum(BMDAMT+BMDAMTF),0.0) AS SUM_BMDAM,"
+      " ifnull(sum((BMDAMT+BMDTXT)-BMDDIM),0.0) AS SUM_TOTBMDAM,"
+      " ifnull(sum(BMDTXT),0.0) AS SUM_BMDTXT,"
+      " ifnull(sum(BMDTXT1),0.0) AS SUM_BMDTXT1,"
+      " ifnull(sum(BMDTXT2),0.0) AS SUM_BMDTXT2,"
+      " ifnull(sum(BMDTXT3),0.0) AS SUM_BMDTXT3,"
+      " ifnull(sum((BMDAMT-BMDDIM)+BMDTXT),0.0) AS SUM_BMDTXA,"
+      " ifnull(sum(BMDNO+BMDNF),0.0) AS COUNT_BMDNO,"
+      " ifnull(SUM(ifnull(BMDAM_TX, 0.0) * (ifnull(BMDNO, 0.0) + ifnull(BMDNF, 0.0))),0.0) AS BMDAM_TX,"
+      " ifnull(SUM(ifnull(BMDDI_TX, 0.0) * (ifnull(BMDNO, 0.0) + ifnull(BMDNF, 0.0))),0.0) AS BMDDI_TX,"
+      " ifnull(SUM(ifnull(TCAMT, 0.0)),0.0) AS TCAMT "
+      " FROM $TAB_N WHERE BMMID=$GetBMMID ";
+  var result = await dbClient!.rawQuery(sql);
+  List<Bil_Mov_D_Local> list = result.map((item) {
+    return Bil_Mov_D_Local.fromMap(item);
+  }).toList();
+  return list;
+}

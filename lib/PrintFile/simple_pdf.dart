@@ -380,19 +380,14 @@ class SimplePdf {
   }
 
   static Widget buildBalanceSection(item,controller,pw.Font font,FontSize) {
-    bool showUnBalance = StteingController().PRINT_BALANCE
-        ? (StteingController().PRINT_BALANCE_ALERT ? controller.PRINT_BALANCE_ALR : true)
-        : false;
-    String totalAmount=showUnBalance? controller.formatter.format([4, 11, 12].contains(item.BMKID)
-        ? item.BMMMT! - controller.BACBA! - controller.SUMBAL :
-    (item.BMMMT! + controller.BACBA! + controller.SUMBAL) - item.BMMCP!).toString():
-    controller.formatter.format([4, 11, 12].contains(item.BMKID)
-        ? item.BMMMT! - controller.BACBA! :
-    (item.BMMMT! + controller.BACBA!)  - item.BMMCP!).toString();
-    print('StteingController().Print_Balance');
-    print(StteingController().Print_Balance);
-    print(StteingController().Print_Balance);
-    print(controller.Print_Balance);
+    // bool showUnBalance = StteingController().PRINT_BALANCE
+    //     ? (StteingController().PRINT_BALANCE_ALERT ? controller.PRINT_BALANCE_ALR : true)
+    //     : false;
+    String totalAmount= controller.formatter.format([4,6,12].contains(item.BMKID)
+        ? item.BMMMT! - (controller.BACBA! + controller.SumBal!) :
+    (item.BMMMT! + controller.BACBA! + controller.SumBal!)  - item.BMMCP!).toString();
+    print('Print_Balance');
+    print(totalAmount);
 
     bool isBalancePrintable() {
       return StteingController().Print_Balance == true &&
@@ -416,50 +411,25 @@ class SimplePdf {
               ((controller.BMKID == 3 || controller.BMKID == 5) && controller.PRINT_PAY == '1'));
     }
 
-    print('PRINT_BALANCE_ALR');
-    print(controller.PRINT_BALANCE_ALR);
-
-
 
     String getBalanceText() {
       if (shouldShowBMMCPWithReturn()) {
         return
-          showUnBalance?
-            " ${'StringUn_Balance'.tr}: ${controller.formatter.format(controller.SUMBAL).toString()}"
-            " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA).toString()}"
-            " ${'StringAmount_Print'.tr} ${controller.formatter.format(item.BMMMT).toString()}"
-            " ${'StringTotal_Am_Print'.tr} ${totalAmount.toString()}"
-            " ${'StringBMMCP'.tr} ${controller.formatter.format(item.BMMCP).toString()}"
-            " ${'StringReturn_Am'.tr} ${controller.formatter.format(item.BMMTC).toString()}":
-
-              " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA).toString()}"
+              " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA + controller.SumBal).toString()}"
               " ${'StringAmount_Print'.tr} ${controller.formatter.format(item.BMMMT).toString()}"
               " ${'StringTotal_Am_Print'.tr} ${totalAmount.toString()}"
               " ${'StringBMMCP'.tr} ${controller.formatter.format(item.BMMCP).toString()}"
               " ${'StringReturn_Am'.tr} ${controller.formatter.format(item.BMMTC).toString()}";
       } else if (shouldShowBMMCP()) {
         return
-          showUnBalance?
-          " ${'StringUn_Balance'.tr}: ${controller.formatter.format(controller.SUMBAL).toString()}"
-          " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA).toString()}"
-          " ${'StringAmount_Print'.tr} ${controller.formatter.format(item.BMMMT).toString()}"
-          " ${'StringBMMCP'.tr} ${controller.formatter.format(item.BMMCP).toString()}"
-          " ${'StringTotal_Am_Print'.tr} ${totalAmount.toString()}" :
-
-          " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA).toString()}"
+          " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA + controller.SumBal).toString()}"
           " ${'StringAmount_Print'.tr} ${controller.formatter.format(item.BMMMT).toString()}"
           " ${'StringBMMCP'.tr} ${controller.formatter.format(item.BMMCP).toString()}"
           " ${'StringTotal_Am_Print'.tr} ${totalAmount.toString()}";
 
       } else {
         return
-          showUnBalance?
-            " ${'StringUn_Balance'.tr}: ${controller.formatter.format(controller.SUMBAL).toString()}"
-            " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA).toString()}"
-            " ${'StringAmount_Print'.tr} ${controller.formatter.format(item.BMMMT).toString()}"
-            " ${'StringTotal_Am_Print'.tr} ${totalAmount.toString()}":
-
-              " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA).toString()}"
+              " ${'StringLast_Balance_Print'.tr} ${controller.formatter.format(controller.BACBA + controller.SumBal).toString()}"
               " ${'StringAmount_Print'.tr} ${controller.formatter.format(item.BMMMT).toString()}"
               " ${'StringTotal_Am_Print'.tr} ${totalAmount.toString()}"
         ;

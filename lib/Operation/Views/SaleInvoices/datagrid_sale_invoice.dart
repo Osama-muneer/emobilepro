@@ -11,6 +11,8 @@ import 'package:get/get.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 
+import 'AddItem.dart';
+
 class DataGridPageInvoice extends StatefulWidget {
   @override
   _DataGridPageInvoiceState createState() => _DataGridPageInvoiceState();
@@ -84,7 +86,7 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
    Timer(const Duration(seconds: 1), () {
      controller.fetchAutoCompleteData(2, '2');
      controller. Calculate_BMD_NO_AM();
-     controller.displayAddItemsWindo();
+     Additem().displayAddItemsWindo();
      controller.myFocusNode.requestFocus();
      controller.update();
    });
@@ -95,14 +97,8 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
        row.getCells()[25].value==11 || row.getCells()[25].value==12?'BIF_MOV_D':'BIL_MOV_D',
        row.getCells()[0].value.toString(),row.getCells()[1].value.toString());
    controller.update();
-   await controller.GET_SUMBMDTXA();
-   await controller.GET_SUMBMMDIF();
-   await controller.GET_SUMBMMDI();
-   await controller.GET_SUMBMMAM();
-   await controller.GET_SUMBMMAM2();
-   await controller.GET_SUMBMDTXT();
+   await controller.GET_SUMBIL_P();
    await controller.GET_CountRecode(row.getCells()[0].value);
-   await controller.GET_COUNT_BMDNO_P(row.getCells()[0].value);
    controller.update();
    //الخصم علي مستوى الفاتورة
    if(controller.SelectDataBMMDN=='0' && (double.parse(controller.BMMDIController.text)>0 ||

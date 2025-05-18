@@ -484,10 +484,11 @@ Pdf_Vouchers_Samplie({
                       child: SimplePdf.text(
                         ListACC_MOV_D.BACBA != null ?
                         GetAMKID != '2'?controller.formatter.format(double.parse(ListACC_MOV_D.BACBA.toString())+
-                            double.parse(ListACC_MOV_D.BACBNF.toString())-
+                            double.parse(ListACC_MOV_D.BACBNF.toString()) + double.parse(ListACC_MOV_D.balance.toString())-
                             double.parse(ListACC_MOV_D.AMDDA.toString())) :
                         controller.formatter.format(double.parse(ListACC_MOV_D.BACBA.toString())+
-                            double.parse(ListACC_MOV_D.BACBNF.toString())+
+                            double.parse(ListACC_MOV_D.BACBNF.toString()) +
+                           double.parse(ListACC_MOV_D.balance.toString()) +
                             double.parse(ListACC_MOV_D.AMDMD.toString())): '0',
                         font,
                         fontSize: 12,
@@ -500,7 +501,8 @@ Pdf_Vouchers_Samplie({
                       child: SimplePdf.text(
                         ListACC_MOV_D.BACBA != null ?
                         controller.formatter.format(double.parse(ListACC_MOV_D.BACBA.toString())+
-                            double.parse(ListACC_MOV_D.BACBNF.toString())) : '0',
+                            double.parse(ListACC_MOV_D.BACBNF.toString())
+                            + double.parse(ListACC_MOV_D.balance.toString())) : '0',
                         font,
                         fontSize: 12,
                         color: PdfColors.black,
@@ -534,7 +536,6 @@ Pdf_Vouchers_Samplie({
                         mainAxisAlignment: pw.MainAxisAlignment.center, // توسيط المحتوى
                         children: [
                           buildSud(),
-                          pw.SizedBox(width: 5), // مسافة صغيرة بين النص والصورة
                         ],
                       ): SimplePdf.text(
                         ListACC_MOV_D.SCSY.toString(),
