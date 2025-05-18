@@ -79,7 +79,6 @@ final String selectedDatereportnow= DateFormat('dd-MM-yyyy hh:mm').format(DateTi
 void printLongText(longText) {
   //String longText = 'هذا نص طويل جداً جداً. ' * 100; // تكرار النص لزيادة الطول
   // يمكنك تقسيم النص إلى أجزاء صغيرة إذا كان طويلاً جداً
-  print(longText.length);
   for (int i = 0; i < longText.length; i += 100) {
     print(longText.toString().substring(i, i + 100 > longText.length
         ? longText.length

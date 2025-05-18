@@ -38,7 +38,7 @@ class Inv_Rep_Controller extends GetxController {
   String? SelectDataFromBIID='',SelectDataToBIID='',SelectDataFromBPID,SelectDataToBPID,
           SelectDataFromBINA, SelectDataToBINA,SelectDataFromMGNO,SelectDataToMGNO,
           SelectDataSCID,PKID,SelectDataFromMINO,SelectDataToMINO,SelectDataBMKID,SelectDataST='1',
-      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T;
+      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T,PKID_T;
   int BMKID=11;
   double SUMBMDNO=0,SUMBMDMT=0;
   List<Bil_Mov_M_Local> Bil_Mov_M = [];
@@ -137,6 +137,7 @@ class Inv_Rep_Controller extends GetxController {
     SelectDataFromBPID=null;
     SelectDataToBPID=null;
     PKID=null;
+    PKID_T=null;
     SelectDataSCID=null;
     SelectDataSCID_T=null;
     value = false;
@@ -184,8 +185,9 @@ class Inv_Rep_Controller extends GetxController {
         SelectDataFromBIID.toString(),SelectDataToBIID.toString(),
         SelectFromDays.toString(),SelectToDays.toString(),SelectDataFromMGNO.toString(),
         SelectDataToMGNO.toString(),
-        SelectDataFromMINO.toString(),SelectDataToMINO.toString(),PKID.toString(),
+        SelectDataFromMINO.toString(),SelectDataToMINO.toString(),
         SelectDataSCID.toString(),SelectDataSCID_T.toString(),
+        PKID.toString(),PKID_T.toString(),
         SelectDataST.toString(),SelectDataST_T.toString());
 
     if(Bil_Mov_M.isEmpty ){

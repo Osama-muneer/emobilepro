@@ -281,16 +281,8 @@ class _Add_Edit_CounterSalesInvoiceViewState extends State<Add_Edit_CounterSales
                                             print('--1');
                                             deleteBIF_MOV_D(controller.BMMID!);
 
-                                            controller.GET_SUMBMDTXA();
-                                            controller.GET_SUMBMMDIF();
-                                            controller.GET_SUMBMMDI();
-                                            controller.GET_SUMBMMAM();
-                                            controller.GET_SUMBMMAM2();
+                                            controller.GET_SUMBIL_P();
                                             controller.GET_CountRecode( controller.BMMID!);
-                                            controller.GET_COUNT_BMDNO_P( controller.BMMID!);
-                                            controller.GET_SUMBMDTXT();
-                                            controller.GET_SUM_AM_TXT_DI();
-
                                             controller.update();
 
                                             controller.BMMAMController.clear();

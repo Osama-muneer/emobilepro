@@ -1689,7 +1689,6 @@ Pdf_Invoices({
                           controller.formatter.format(product.BMDTX1).toString() , font,
                           fontSize: 9),
                     ),
-
                     Container(
                       alignment: pw.Alignment.center,
                       padding:  const pw.EdgeInsets.only(top: 2,bottom: 2,right: 1,left: 1),
@@ -2125,7 +2124,6 @@ Pdf_Invoices({
                                TableRow(
                                  children: [
                                    Container(
-
                                      decoration: const BoxDecoration( color: PdfColors.grey200,),
                                      padding: const EdgeInsets.all(1),
                                      child: SimplePdf.text(

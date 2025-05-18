@@ -48,11 +48,12 @@ class Acc_Mov_D_Local {
   double? DA;
   double? BAL;
   String? BACBNF;
+  double? balance;
 
   Acc_Mov_D_Local({this.AMKID,this.AMMID,this.AMDID,this.AANO,this.ACNO,this.AMDRE,this.AMDIN,this.SCID,this.SCEX,this.SCSY
     ,this.AMDMD,this.AMDDA,this.AMDEQ,this.AMDTY,this.AMDST,this.BIID,this.AMDVW,this.AMDKI,this.GUID,this.GUIDF,this.GUIDC,
     this.JTID_L,this.SYID_L,this.BIID_L,this.CIID_L,this.AANA_D,this.SUMAMDDA,this.SUMAMDMD,this.SUMAMDEQ,this.AANOCOUNT,
-    this.DATEI,this.DEVI,this.SUCH,this.DATEU,this.DEVU,this.SUID,this.SYST_L});
+    this.DATEI,this.DEVI,this.SUCH,this.DATEU,this.DEVU,this.SUID,this.SYST_L,this.balance = 0.0});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -132,6 +133,7 @@ class Acc_Mov_D_Local {
     IDTYP = map['IDTYP'];
     IDTYP_D = map['IDTYP_D'];
     BACBNF = map['BACBNF'];
+    balance = map['balance'];
   }
 
   Acc_Mov_D_Local.fromMapSum(Map<dynamic, dynamic> map) {

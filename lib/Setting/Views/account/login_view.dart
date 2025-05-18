@@ -619,69 +619,56 @@ class _LoginViewState extends State<LoginView> {
                                       )),
                                 ),
                               ),
-                              // SizedBox(height: mediaQuery.size.height * 0.010,),
-                              // SizedBox(
-                              //   width: double.infinity,
-                              //   height: mediaQuery.size.height * 0.059,
-                              //   child: OutlinedButton.icon(
-                              //     // icon: Icon(Icons.refresh, color: Colors.red[800]),
-                              //     label: Text('StringDisplay_Version'.tr,
-                              //         style: TextStyle(color: Colors.red[800],
-                              //           fontSize: mediaQuery.size.width * 0.04,)),
-                              //     style: OutlinedButton.styleFrom(
-                              //       padding: const EdgeInsets.symmetric(vertical: 15),
-                              //       side: BorderSide(color: Colors.red[800]!),
-                              //       shape: RoundedRectangleBorder(
-                              //         borderRadius: BorderRadius.circular(25),
-                              //       ),
-                              //     ),
-                              //     onPressed:() {
-                              //       EasyLoading.instance
-                              //         ..displayDuration = const Duration(milliseconds: 2000)
-                              //         ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-                              //         ..loadingStyle = EasyLoadingStyle.custom
-                              //         ..indicatorSize = 45.0
-                              //         ..radius = 10.0
-                              //         ..progressColor = Colors.white
-                              //         ..backgroundColor = Colors.green
-                              //         ..indicatorColor = Colors.white
-                              //         ..textColor = Colors.white
-                              //         ..maskColor = Colors.blue.withOpacity(0.5)
-                              //         ..userInteractions = false
-                              //         ..dismissOnTap = false;
-                              //       EasyLoading.show(status: 'StringShow_Connent'.tr);
-                              //       controller.getIP();
-                              //       StringIP = controller.IPSERERController.text;
-                              //       StringPort = controller.PORTController.text;
-                              //       print(StringIP);
-                              //       print(StringPort);
-                              //       controller.update();
-                              //       LoginController().SET_P('baseApi','http://$StringIP:$StringPort');
-                              //       LoginController().SET_P('API','http://$StringIP:$StringPort');
-                              //       LoginController().SET_P('IP',controller.IPSERERController.text);
-                              //       LoginController().SET_P('PORT',controller.PORTController.text);
-                              //       UpdateMOB_VAR(8,controller.IPSERERController.text);
-                              //       UpdateMOB_VAR(9,controller.PORTController.text);
-                              //       UpdateMOB_VAR(10,'http://$StringIP:$StringPort');
-                              //       controller.update();
-                              //       ApiProviderLogin().Socket_IP(controller.IPSERERController.text,int.parse(controller.PORTController.text));
-                              //       // ApiProviderLogin().TEST_API();
-                              //     },
-                              //   ),
-                              // ),
-
-
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.center,
-                              //   children: [
-                              //     _buildIconButton(
-                              //       icon: Icons.settings,
-                              //       color: Colors.blue[600]!,
-                              //       onPressed: () => null,
-                              //     ),
-                              //     SizedBox(width: 30),
-                              //   ],
-                              // ),
+                              SizedBox(height: mediaQuery.size.height * 0.010,),
+                              SizedBox(
+                                width: double.infinity,
+                                height: mediaQuery.size.height * 0.059,
+                                child: OutlinedButton.icon(
+                                  // icon: Icon(Icons.refresh, color: Colors.red[800]),
+                                  label: Text('StringDisplay_Version'.tr,
+                                      style: TextStyle(color: Colors.red[800],
+                                        fontSize: mediaQuery.size.width * 0.04,)),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 15),
+                                    side: BorderSide(color: Colors.red[800]!),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                  onPressed:() {
+                                    EasyLoading.instance
+                                      ..displayDuration = const Duration(milliseconds: 2000)
+                                      ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+                                      ..loadingStyle = EasyLoadingStyle.custom
+                                      ..indicatorSize = 45.0
+                                      ..radius = 10.0
+                                      ..progressColor = Colors.white
+                                      ..backgroundColor = Colors.green
+                                      ..indicatorColor = Colors.white
+                                      ..textColor = Colors.white
+                                      ..maskColor = Colors.blue.withOpacity(0.5)
+                                      ..userInteractions = false
+                                      ..dismissOnTap = false;
+                                    EasyLoading.show(status: 'StringShow_Connent'.tr);
+                                    controller.getIP();
+                                    StringIP = controller.IPSERERController.text;
+                                    StringPort = controller.PORTController.text;
+                                    print(StringIP);
+                                    print(StringPort);
+                                    controller.update();
+                                    LoginController().SET_P('baseApi','http://$StringIP:$StringPort');
+                                    LoginController().SET_P('API','http://$StringIP:$StringPort');
+                                    LoginController().SET_P('IP',controller.IPSERERController.text);
+                                    LoginController().SET_P('PORT',controller.PORTController.text);
+                                    UpdateMOB_VAR(8,controller.IPSERERController.text);
+                                    UpdateMOB_VAR(9,controller.PORTController.text);
+                                    UpdateMOB_VAR(10,'http://$StringIP:$StringPort');
+                                    controller.update();
+                                    ApiProviderLogin().Socket_IP(controller.IPSERERController.text,int.parse(controller.PORTController.text));
+                                    // ApiProviderLogin().TEST_API();
+                                  },
+                                ),
+                              ),
                             ],
                           )),
                     ],

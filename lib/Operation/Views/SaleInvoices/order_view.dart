@@ -188,15 +188,8 @@ class _CheckOutState extends State<CheckOut> {
                          await deleteBIL_MOV_D_ONE('BIF_MOV_D',controller.cartFood[index].BMMID.toString(),
                               controller.cartFood[index].BMDID.toString());
                           controller.cartFood.removeAt(index);
-                            await controller.GET_SUMBMMAM();
-                            await controller.GET_SUMBMMAM2();
-                            await controller.GET_SUMBMDTXA();
-                            await controller.GET_SUMBMMDIF();
-                            await controller.GET_SUMBMMDI();
+                            await controller.GET_SUMBIL_P();
                             await controller.GET_CountRecode(controller.BMMID!);
-                            await controller.GET_COUNT_BMDNO_P(controller.BMMID!);
-                            await controller.GET_SUMBMDTXT();
-                            await controller.GET_SUM_AM_TXT_DI();
                             await controller.GET_BIF_MOV_D_P(controller.BMMID.toString(),'2');
                             controller.update();
 
