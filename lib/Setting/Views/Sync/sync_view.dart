@@ -125,13 +125,11 @@ class _SyncViewState extends State<SyncView> {
                IconButton(
                 icon: Icon(Icons.settings_input_antenna,color: Colors.white),
                 onPressed: () async{
-
                     if(controller.SyncOneTable==true){
                       ThemeHelper().ShowToastW( "'${'StringOutfromScreen'.tr} ");
                     }
                     else{
                       if( controller.checkclick==false || controller.CheckSync==false){
-                        setState(()  async {
                           controller.TypeSync=1;
                           controller.TypeSyncAll=1;
                           controller.CheckClickAll=true;
@@ -151,7 +149,6 @@ class _SyncViewState extends State<SyncView> {
                           //service.invoke("stopService");
                           LoginController().SET_N_P('Timer_Strat',1);
                           controller.Socket_IP();
-                        });
                       }
                     }
 

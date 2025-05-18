@@ -2187,6 +2187,8 @@ class SyncController extends GetxController {
       else{
         TotalIDE_LIN=0;
       }
+   print(TotalIDE_LIN);
+   print('TotalIDE_LIN');
 
     SYN_ORD=await GET_SYN_ORD('RES_SEC');
       if (SYN_ORD.isNotEmpty) {

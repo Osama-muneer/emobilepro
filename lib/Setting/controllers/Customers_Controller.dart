@@ -418,6 +418,8 @@ class CustomersController extends GetxController {
         BCADController.text= note.BCAD.toString()=='null'?'':note.BCAD.toString();
         BCMOController.text= note.BCMO.toString()=='null'?'':note.BCMO.toString();
         BCTXController.text= note.BCTX.toString()=='null'?'':note.BCTX.toString();
+        print(note.BCTX.toString());
+        print('note.BCTX.toString()');
         BCSNController.text= note.BCSN.toString()=='null'?'':note.BCSN.toString();
         BCINController.text= note.BCIN.toString()=='null'?'':note.BCIN.toString();
         BCHNController.text= note.BCHN.toString()=='null'?'':note.BCHN.toString();
