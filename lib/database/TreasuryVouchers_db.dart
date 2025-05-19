@@ -1,4 +1,3 @@
-import 'package:emobilepro/Widgets/config.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../Operation/models/acc_mov_d.dart';
@@ -367,7 +366,7 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_M(
       " ORDER BY A.AMMID DESC";
 
   var result = await dbClient!.rawQuery(sql);
-  printLongText(sql);
+  // printLongText(sql);
   print(result);
   List<Acc_Mov_M_Local> list = result.map((item) {
     return Acc_Mov_M_Local.fromMap(item);

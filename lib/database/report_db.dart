@@ -1,4 +1,3 @@
-import 'package:emobilepro/Widgets/config.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Operation/models/acc_mov_m.dart';
 import '../Operation/models/bif_cou_c.dart';
@@ -2835,8 +2834,8 @@ async {
       GROUP BY  M.BMKID,M.SCID,D.MGNO,D.MINO,D.MUID
   """;
 
-  printLongText(TYPE==101?sql2:sql);
+  // printLongText(TYPE==101?sql2:sql);
   final rows = await dbClient!.rawQuery(TYPE==101?sql2:sql);
-  printLongText(rows.toString());
+  // printLongText(rows.toString());
   return rows.map((m) => Bil_Mov_M_Local.fromMap(m)).toList();
 }

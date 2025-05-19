@@ -665,7 +665,8 @@ class CustomersController extends GetxController {
               BCSNController.text, BCBNController.text,BCONController.text,BCC1Controller.text,BCINController.text,
               LoginController().JTID,LoginController().SYID,LoginController().BIID,LoginController().CIID,
               LoginController().SUID,DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()),2,SelectDataBDID,BCC3Controller.text,
-              BCHNController.text,BCLONController.text,BCLATController.text);
+              BCHNController.text,BCLONController.text,BCLATController.text,
+              BCJTController.text,BCPCController.text,BCAD2Controller.text,BCQNDController.text);
           UpdateACC_ACC(AANO, BCNAController.text,BCNEController.text,
               LoginController().JTID,LoginController().SYID,LoginController().BIID,LoginController().CIID,
               LoginController().SUID,DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()));

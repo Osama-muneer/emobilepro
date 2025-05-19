@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:emobilepro/Widgets/config.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import '../Setting/controllers/setting_controller.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/models/AppPrinterDevice.dart';
+import '../Widgets/config.dart';
 import '../database/setting_db.dart';
 import 'pdf_perview.dart';
 import 'share_mode.dart';

@@ -5,7 +5,6 @@ import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import '../../../Operation/Controllers/sale_invoices_controller.dart';
 import '../../../Operation/Views/SaleInvoices/return_sale_invoices_view.dart';
 import '../../../PrintFile/Invoice/generate_invoice.dart';
-import '../../../PrintFile/file_helper.dart';
 import '../../../PrintFile/share_mode.dart';
 import '../../../Setting/controllers/login_controller.dart';
 import '../../../Setting/models/bil_poi.dart';
@@ -32,7 +31,6 @@ import 'package:flutter_search_bar/flutter_search_bar.dart' as search;
 import 'package:intl/intl.dart';
 import '../../models/bil_mov_d.dart';
 import 'Filter_Sale.dart';
-import 'table_view.dart';
 
 class Sale_Invoices_view extends StatefulWidget {
   const Sale_Invoices_view({Key? key}) : super(key: key);

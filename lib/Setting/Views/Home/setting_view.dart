@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:emobilepro/Setting/Views/Home/printers_settings_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import '../../../Setting/Views/Home/print_view.dart';
@@ -13,6 +12,7 @@ import '../../../Setting/controllers/setting_controller.dart';
 import '../../../Widgets/colors.dart';
 import '../../../Widgets/downloadfile.dart';
 import '../../../Widgets/theme_helper.dart';
+import 'printers_settings_page.dart';
 
 class SettingView extends StatefulWidget {
   @override
