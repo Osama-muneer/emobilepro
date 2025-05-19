@@ -821,7 +821,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                         Expanded(
                                           child: Column(
                                             children: [
-                                              if(('${item.BMMFST}' != '3' || '${item.BMMFST}' == '5') || '${item.BMMST}' == '4' ||
+                                              if(('${item.BMMFST}' == '3' || '${item.BMMFST}' == '5') || '${item.BMMST}' == '4' ||
                                                   (STMID == 'EORD' && ('${item.BMMST2}' == '2' || '${item.BMMST2}' == '4')))
                                                 Expanded(
                                                   child: IconButton(

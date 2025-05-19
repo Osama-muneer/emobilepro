@@ -61,6 +61,7 @@ import '../../Setting/models/sys_var.dart';
 import '../../Setting/models/usr_pri.dart';
 import '../../Setting/services/fat_mod.dart';
 import '../../Setting/services/syncronize.dart';
+import '../../Widgets/BarcodeService.dart';
 import '../../Widgets/DatePickerHelper.dart';
 import '../../Widgets/ES_FAT_PKG.dart';
 import '../../Widgets/ES_MAT_PKG.dart';
@@ -8118,7 +8119,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
-
   //جلب رقم
   Future GET_BCDID_P() async {
     GET_BCDID().then((data) {
@@ -8221,15 +8221,14 @@ class Sale_Invoices_Controller extends GetxController {
     DataGridPageInvoice();
     update();
   }
+
+
   scanBarcodeNormal() async {
     String barcodeScanRes;
 
-    try {
-      var result = await BarcodeScanner.scan();
-      barcodeScanRes = result.rawContent;
-    } catch (e) {
-      barcodeScanRes = 'Failed to get barcode.';
-    }
+
+    barcodeScanRes = await BarcodeService().scanBarcode();
+
 
     _scanBarcode = barcodeScanRes;
     FetchBarcodData(_scanBarcode);
@@ -8240,39 +8239,16 @@ class Sale_Invoices_Controller extends GetxController {
     });
   }
 
-  // scanBarcodeNormal() async {
-  //   String barcodeScanRes;
-  //   // Platform messages may fail, so we use a try/catch PlatformException.
-  //   try {
-  //     barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-  //         '#ff6666', 'Cancel', true, ScanMode.BARCODE);
-  //   } on PlatformException {
-  //     barcodeScanRes = 'Failed to get platform version.';
-  //   }
-  //   _scanBarcode = barcodeScanRes;
-  //   FetchBarcodData(_scanBarcode);
-  //   Timer(const Duration(milliseconds: 400), () {
-  //     displayAddItemsWindo();
-  //     myFocusNode.requestFocus();
-  //   });
-  // }
 
-
-  //تعديل الصنف(الكمية) مطاعم
   Future<void> UPDATE_BIF_MOV_D_ORD(Bil_Mov_D_Local food, int TYPE) async {
     if (food.SYST != 1) {
-      print('MGNOController2');
-      print(food.BMDID.toString());
-      print(food.MGNO.toString());
-      print('MGNOController2');
       BMDIDController.text = food.BMDID.toString();
       MGNOController.text = food.MGNO.toString();
       SelectDataMINO = food.MINO.toString();
       SelectDataMUID = food.MUID.toString();
       BMDNOController.text = food.BMDNO.toString();
       await GET_COUNT_MINO_P();
-      await GET_COUNT_NO_P(
-          food.MGNO.toString(), food.MINO.toString(), food.MUID!);
+      await GET_COUNT_NO_P(food.MGNO.toString(), food.MINO.toString(), food.MUID!);
       BMDNO_V = food.BMDNO;
       BMDNFController.text = food.BMDNF.toString();
       BMDAMController.text = food.BMDAMO.toString();
@@ -8482,7 +8458,6 @@ class Sale_Invoices_Controller extends GetxController {
       }
     }
   }
-
 
   Future GET_ECO_ACC_P(String AANO) async {
     ECO_ACC=await GET_ECO_ACC(AANO);
@@ -9642,8 +9617,7 @@ class Sale_Invoices_Controller extends GetxController {
         builder: ((controller) =>
             FutureBuilder<List<Acc_Cos_Local>>(
                 future: GET_ACC_COS(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Acc_Cos_Local>> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<List<Acc_Cos_Local>> snapshot) {
                   if (!snapshot.hasData) {
                     return Dropdown(
                       josnStatus: josnStatus,
@@ -9651,26 +9625,18 @@ class Sale_Invoices_Controller extends GetxController {
                     );
                   }
                   return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown(
-                        'StringACNOlableText'.tr),
+                    decoration: ThemeHelper().InputDecorationDropDown('StringACNOlableText'.tr),
                     isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringChi_ACNO', Colors.grey, 'S'),
+                    hint: ThemeHelper().buildText(context, 'StringChi_ACNO', Colors.grey, 'S'),
                     value: controller.SelectDataACNO,
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
+                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                     items: snapshot.data!.map((item) =>
                         DropdownMenuItem<String>(
                           value: item.ACNO.toString(),
-                          child: Text(
-                            "${item.ACNO.toString()} - ${item.ACNA_D
-                                .toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
+                          child: Text("${item.ACNO.toString()} - ${item.ACNA_D.toString()}",
+                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                           ),
-                        ))
-                        .toList()
-                        .obs,
+                        )).toList().obs,
                     onChanged: (value) {
                       controller.SelectDataACNO = value.toString();
                       controller.update();
