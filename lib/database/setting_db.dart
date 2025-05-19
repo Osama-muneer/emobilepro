@@ -509,6 +509,7 @@ Future<List<Acc_Cos_Local>> GET_ACC_COS() async {
       " AND D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
       " AND D.CIID_L=${LoginController().CIID} $Wheresql2 ) ORDER BY A.ACNO";
   final result = await dbClient!.rawQuery(sql);
+  print(result);
   return result.map((json) => Acc_Cos_Local.fromMap(json)).toList();
 }
 
@@ -1041,6 +1042,8 @@ Future<List<Bra_Inf_Local>> GET_BRA(int GETTYPE) async {
   List<Bra_Inf_Local> list = result.map((item) {
     return Bra_Inf_Local.fromMap(item);
   }).toList();
+  print(result);
+  print(sql);
   return list;
 }
 
@@ -1743,6 +1746,8 @@ Future<List<Acc_Cos_Local>> GET_ACC_COS_ONE() async {
       " AND D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
       " AND D.CIID_L=${LoginController().CIID} $Wheresql2 ) ORDER BY A.ACNO LIMIT 1 ";
   final result = await dbClient!.rawQuery(sql);
+  print(result);
+  print('Acc_Cos_Local');
   return result.map((json) => Acc_Cos_Local.fromMap(json)).toList();
 }
 

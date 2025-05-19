@@ -436,6 +436,10 @@ class CustomersController extends GetxController {
         BCBLController.text= note.BCBL.toString()=='null'?'':note.BCBL.toString();
         BCDMController.text= note.BCDM.toString()=='null'?'':note.BCDM.toString();
         BCCRController.text= note.BCCR.toString()=='null'?'':note.BCCR.toString();
+        BCC1Controller.text= note.BCC1.toString()=='null'?'':note.BCC1.toString();
+
+        print(note.BCJT.toString());
+        print(note.BCC1.toString());
         // SelectDataCWID2 = note.CWID2.toString()=='null'?null:note.CWID2.toString();
         SelectDataCWID2 = note.CWID.toString()=='null'?null:
         "${note.CWID.toString() + " +++ " + "${LoginController().LAN==2?note.CWNE.toString():note.CWNA.toString()}"}";

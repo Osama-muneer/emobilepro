@@ -4050,7 +4050,7 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_PAY_ONE_P(PKID.toString());
     await GET_ECO_ACC_P(AANOController.text);
     P_COSS == '1' || (P_COSS == '4' && UPIN_USE_ACNO == 1)
-        ? LoginController().ACNO_SALE != 0?
+        ? LoginController().ACNO_SALE != '0'?
          SelectDataACNO= LoginController().ACNO_SALE.toString():
     GET_ACC_COS_ONE_P()
           : null;
@@ -4059,7 +4059,6 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_PAY_KIN_P();
     await GET_Allow_give_Discount();
     await GET_Allow_give_Free_Quantities();
-    //OSAMA
     STMID == 'EORD' ? await GET_BIF_MOV_D_P(BMMID.toString(), '2') : false;
     update();
     Get.to(() => STMID == 'EORD' ? const Add_Edit_Sale_order() :
