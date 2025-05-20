@@ -1695,10 +1695,10 @@ class Sale_Invoices_Controller extends GetxController {
     else {
       BMDTX3Controller.text = '0';
     }
-    print('GET_TAX_LIN_P');
-    print(BMDTXController.text);
-    print(BMDTX2Controller.text);
-    print(BMDTX3Controller.text);
+    // print('GET_TAX_LIN_P');
+    // print(BMDTXController.text);
+    // print(BMDTX2Controller.text);
+    // print(BMDTX3Controller.text);
     BMDTX = double.parse(BMDTXController.text) +
         double.parse(BMDTX2Controller.text) +
         double.parse(BMDTX3Controller.text);
@@ -4043,6 +4043,7 @@ class Sale_Invoices_Controller extends GetxController {
     COUNTRecode_ORD = 0;
     SUMBAL=0.0;
     CountRecodeController.text = '0';
+    SelectDataRTID = null;
     update();
     await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
     await GET_BIL_ACC_C_P(AANOController.text, GUIDC,
@@ -5554,7 +5555,7 @@ class Sale_Invoices_Controller extends GetxController {
     SelectDataMINO = '';
     SelectDataSNED = '';
     SelectDataSNED = null;
-    SelectDataRTID = null;
+    // SelectDataRTID = null;
     // SelectDataMGNO = null;
     BMDAMController.clear();
     BMDINController.clear();
@@ -5997,10 +5998,10 @@ class Sale_Invoices_Controller extends GetxController {
 
   //وسعر الوحدة  دالة احتساب الكميه والمجاني
   Calculate_BMD_NO_AM() {
-    print('Calculate_BMD_NO_AM');
-    print(USING_TAX_SALES);
-    print(Price_include_Tax);
-    print(UPIN_USING_TAX_SALES);
+    // print('Calculate_BMD_NO_AM');
+    // print(USING_TAX_SALES);
+    // print(Price_include_Tax);
+    // print(UPIN_USING_TAX_SALES);
     //الكميه الحقيقه
     //التحقق من المتغير رقم 431 هل المجاني ضمن الكميه ام لا وعليه عندما يكون المتغير المجاني ضمن العدد يتم عند الحفظ انقاص المجاني من العدد وحفظه في حقل BMDNO
     USE_BMDFN == '1' ? BMDNO_V = double.parse(BMDNOController.text)
@@ -6012,8 +6013,8 @@ class Sale_Invoices_Controller extends GetxController {
 
     if (USING_TAX_SALES == '1' || (USING_TAX_SALES == '3'
         && (UPIN_USING_TAX_SALES == 1 && Price_include_Tax == true))) {
-      print('BMDAMController.text');
-      print(BMDAMController.text);
+      // print('BMDAMController.text');
+      // print(BMDAMController.text);
 
       BMDTXA_V = roundDouble(double.parse(BMDAMController.text) *
           (100 / (100 + (double.parse(BMDTXController.text) * TCVL!))), 6);
@@ -6056,9 +6057,9 @@ class Sale_Invoices_Controller extends GetxController {
 
       BMDAM1 =
       BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMTXController.text);
-      print('BMDAM1');
-      print(BMDAM1);
-      print(BMDAMTXController.text);
+      // print('BMDAM1');
+      // print(BMDAM1);
+      // print(BMDAMTXController.text);
 
       //اجمالي المبلغ الكميه في السعر
       SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
@@ -6071,11 +6072,11 @@ class Sale_Invoices_Controller extends GetxController {
       SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
     }
 
-    print('BMDAMTXController');
-    print(BMDAM1);
-    print(BMDNOController.text);
-    print(BMDAMController.text);
-    print(SUMBMDAMController.text);
+    // print('BMDAMTXController');
+    // print(BMDAM1);
+    // print(BMDNOController.text);
+    // print(BMDAMController.text);
+    // print(SUMBMDAMController.text);
     //اجمالي المجاني
     SUMBMDAMTFController.text =
         roundDouble(BMDAM1! * double.parse(BMDNFController.text), 6).toString();
@@ -6119,7 +6120,7 @@ class Sale_Invoices_Controller extends GetxController {
     }
 
 
-    print(['<$TTID2>'].contains(TTIDC1));
+    // print(['<$TTID2>'].contains(TTIDC1));
 
     if (TSDI1 == 1) {
       //BMDTXA = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
@@ -6556,7 +6557,9 @@ class Sale_Invoices_Controller extends GetxController {
     try {
       STB_N = 'S1';
       GUIDD = uuid.v4();
-      await GET_BMDID_P();
+      GET_BMDID_P();
+      print('STP-2');
+      print(BMDIDController.text.toString());
       BMDNFController.text.isEmpty
           ? BMDNFController.text = '0'
           : BMDNFController.text = BMDNFController.text;
@@ -6569,7 +6572,8 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         STB_N = 'S2';
         return false;
-      } else if (!BMDNOController.text.isNum) {
+      }
+      else if (!BMDNOController.text.isNum) {
         Fluttertoast.showToast(
             msg: 'StrinReq_SMDFN_NUM'.tr,
             toastLength: Toast.LENGTH_LONG,
@@ -6577,7 +6581,8 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         STB_N = 'S3';
         return false;
-      } else if (MGKI == 1 && lARGEST_VALUE_QUANTITY != 0 &&
+      }
+      else if (MGKI == 1 && lARGEST_VALUE_QUANTITY != 0 &&
           double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY) {
         Fluttertoast.showToast(
             msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
@@ -6586,7 +6591,8 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         STB_N = 'S8';
         return false;
-      } else if (MGKI == 2 && lARGEST_VALUE_QUANTITY2 != 0 &&
+      }
+      else if (MGKI == 2 && lARGEST_VALUE_QUANTITY2 != 0 &&
           double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY2) {
         Fluttertoast.showToast(
             msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
@@ -6595,7 +6601,8 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         STB_N = 'S8';
         return false;
-      } else if (MGKI == 1 && lARGEST_VALUE_PRICE != 0 &&
+      }
+      else if (MGKI == 1 && lARGEST_VALUE_PRICE != 0 &&
           BMDAM1! > lARGEST_VALUE_PRICE) {
         Fluttertoast.showToast(
             msg: 'StrinlARGEST_VALUE_PRICE'.tr,
@@ -6604,7 +6611,8 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         STB_N = 'S9';
         return false;
-      } else if (MGKI == 2 && lARGEST_VALUE_PRICE2 != 0 &&
+      }
+      else if (MGKI == 2 && lARGEST_VALUE_PRICE2 != 0 &&
           BMDAM1! > lARGEST_VALUE_PRICE2) {
         Fluttertoast.showToast(
             msg: 'StrinlARGEST_VALUE_PRICE'.tr,
@@ -6632,6 +6640,8 @@ class Sale_Invoices_Controller extends GetxController {
           TCAMT = 0;
         }
         if (COUNT_NO > 0) {
+          print('STP-3');
+          print(BMDIDController.text.toString());
           MES_ADD_EDIT = 'StringED'.tr;
           STB_N = 'S13';
           UpdateBil_Mov_D(
@@ -7849,7 +7859,8 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   // حفظ جدول نقل الطاولات
-  Future<bool> Save_BIF_TRA_TBL_P() async {
+  Future<bool> Save_BIF_TRA_TBL_P(GETGUID) async {
+    var GUID_TBL=uuid.v4().toUpperCase();
     try {
       if ( SelectDataGETTYPE == '1' && ( ( SelectDataRSIDO == null || SelectDataRSIDO=='null') ||
           ( SelectDataRTIDO == null || SelectDataRTIDO =='null') ||
@@ -7867,10 +7878,11 @@ class Sale_Invoices_Controller extends GetxController {
           RTIDO: SelectDataRTIDO ,
           RSIDN: int.parse(SelectDataRSID!) ,
           RTIDN: SelectDataRTID ,
-          GUIDF : GUID,
+          GUIDF : GETGUID,
           BTTST : 2,
           STMIDI : STMID,
-          GUID: uuid.v4().toUpperCase(),
+          SOMIDI : int.parse(LoginController().SYDV_ID.toString()),
+          GUID: GUID_TBL,
           SUID: LoginController().SUID.toString(),
           DATEI: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
           DEVI: LoginController().DeviceName.toString(),
@@ -7897,6 +7909,7 @@ class Sale_Invoices_Controller extends GetxController {
             toastLength: Toast.LENGTH_LONG,
             textColor: Colors.white,
             backgroundColor: Colors.green);
+        await Socket_IP_Connect_BIF_TRA_TBL(GUID_TBL);
         GET_BIL_MOV_M_P('DateNow');
       }
         return true;
@@ -8240,57 +8253,82 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
 
+  List<int> pendingActions = []; // 1 = إضافة، 0 = إنقاص
+  bool isProcessing = false;
+
+// تضيف الطلب وتبدأ التنفيذ إن لم يكن قيد التنفيذ
+  Future<void> enqueueUpdate(Bil_Mov_D_Local food, int TYPE) async {
+    pendingActions.add(TYPE);
+    await processQueue(food);
+  }
+
+// تنفذ الطلبات واحدة تلو الأخرى
+  Future<void> processQueue(Bil_Mov_D_Local food) async {
+    if (isProcessing) return;
+
+    isProcessing = true;
+
+    while (pendingActions.isNotEmpty) {
+      int currentType = pendingActions.removeAt(0);
+      await UPDATE_BIF_MOV_D_ORD(food, currentType);
+    }
+
+    isProcessing = false;
+  }
+
   Future<void> UPDATE_BIF_MOV_D_ORD(Bil_Mov_D_Local food, int TYPE) async {
-    if (food.SYST != 1) {
-      BMDIDController.text = food.BMDID.toString();
-      MGNOController.text = food.MGNO.toString();
-      SelectDataMINO = food.MINO.toString();
-      SelectDataMUID = food.MUID.toString();
-      BMDNOController.text = food.BMDNO.toString();
-      await GET_COUNT_MINO_P();
-      await GET_COUNT_NO_P(food.MGNO.toString(), food.MINO.toString(), food.MUID!);
-      BMDNO_V = food.BMDNO;
-      BMDNFController.text = food.BMDNF.toString();
-      BMDAMController.text = food.BMDAMO.toString();
-      BMDDIController.text = food.BMDDI.toString();
-      BMDDIRController.text = food.BMDDIR.toString();
-      SelectDataSNED = food.BMDED.toString();
-      BMDTXAController.text = food.BMDTXA.toString();
-      BMDTX = food.BMDTX;
-      BMDTXController.text = food.BMDTX1.toString();
-      BMDTX2Controller.text = food.BMDTX2.toString();
-      BMDTX3Controller.text = food.BMDTX3.toString();
-      BMDTXA = food.BMDTXA1;
-      BMDTXA2 = food.BMDTXA2;
-      BMDTXA3 = food.BMDTXA3;
-      BMDTXT1 = food.BMDTXT1;
-      BMDTXT2 = food.BMDTXT2;
-      BMDTXT3 = food.BMDTXT3;
-      if (TTID1 != null) {
-        await GET_TAX_LIN_P('MAT', food.MGNO.toString(), food.MINO.toString());
-      }
-      if (TYPE == 1) {
-        print((double.parse(food.BMDNO.toString()) + 1));
-        BMDNOController.text =
-            (double.parse(food.BMDNO.toString()) + 1).toString();
-        // Timer(const Duration(milliseconds: 200), () async {
+    try {
+      if (food.SYST != 1) {
+        print('STP-1');
+        print(BMDIDController.text.toString());
+        BMDIDController.text = food.BMDID.toString();
+        print('STP-10');
+        print(BMDIDController.text.toString());
+        MGNOController.text = food.MGNO.toString();
+        SelectDataMINO = food.MINO.toString();
+        SelectDataMUID = food.MUID.toString();
+        BMDNOController.text = food.BMDNO.toString();
+        await GET_COUNT_MINO_P();
+        await GET_COUNT_NO_P(food.MGNO.toString(), food.MINO.toString(), food.MUID!);
+        BMDNO_V = food.BMDNO;
+        BMDNFController.text = food.BMDNF.toString();
+        BMDAMController.text = food.BMDAMO.toString();
+        BMDDIController.text = food.BMDDI.toString();
+        BMDDIRController.text = food.BMDDIR.toString();
+        SelectDataSNED = food.BMDED.toString();
+        BMDTXAController.text = food.BMDTXA.toString();
+        BMDTX = food.BMDTX;
+        BMDTXController.text = food.BMDTX1.toString();
+        BMDTX2Controller.text = food.BMDTX2.toString();
+        BMDTX3Controller.text = food.BMDTX3.toString();
+        BMDTXA = food.BMDTXA1;
+        BMDTXA2 = food.BMDTXA2;
+        BMDTXA3 = food.BMDTXA3;
+        BMDTXT1 = food.BMDTXT1;
+        BMDTXT2 = food.BMDTXT2;
+        BMDTXT3 = food.BMDTXT3;
+
+        if (TTID1 != null) {
+          await GET_TAX_LIN_P('MAT', food.MGNO.toString(), food.MINO.toString());
+        }
+
+        if (TYPE == 1) {
+          // زيادة
+          BMDNOController.text = (double.parse(food.BMDNO.toString()) + 1).toString();
           await Calculate_BMD_NO_AM();
           update();
           bool isValid = await Save_BIL_MOV_D_ORD_P();
           if (isValid) {
             // ClearBil_Mov_D_Data();
           }
-        // });
-      } else {
-        if ((food.BMDNO! - 1) < 1) {
-          deleteBIL_MOV_D_ONE(
-              'BIF_MOV_D', food.BMMID.toString(), food.BMDID.toString());
-          cartFood.removeWhere((element) => element == food);
-          update();
-        }
-        else {
-          BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();
-          // Timer(const Duration(milliseconds: 200), () async {
+        } else {
+          // نقصان
+          if ((food.BMDNO! - 1) < 1) {
+            await deleteBIL_MOV_D_ONE('BIF_MOV_D', food.BMMID.toString(), food.BMDID.toString());
+            cartFood.removeWhere((element) => element == food);
+            update();
+          } else {
+            BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();
             await Calculate_BMD_NO_AM();
             update();
             bool isValid = await Save_BIL_MOV_D_ORD_P();
@@ -8298,11 +8336,15 @@ class Sale_Invoices_Controller extends GetxController {
               // ClearBil_Mov_D_Data();
             }
             update();
+          }
         }
+        update();
       }
-      update();
+    } catch (e) {
+      print("حدث خطأ أثناء التحديث: $e");
     }
   }
+
 
   //جلب عدد السجلات على حسب المجموعة والصبف والوحدة من الفاتورة
   Future GET_COUNT_NO_P(String GETMGNO, String GETMINO, int GETMUID) async {
@@ -8521,6 +8563,29 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
+//الطاولات------------------------------
+  Future<void> Socket_IP_Connect_BIF_TRA_TBL(GetGUID) async {
+    try {
+      final socket = await Socket.connect(
+        LoginController().IP,
+        int.parse(LoginController().PORT),
+        timeout: const Duration(seconds: 5),
+      );
+      print("Socket Connection Successful");
+      await SyncBIF_TRA_TBL_P(GetGUID);
+      socket.destroy();
+    } catch (error) {
+      print("Socket Connection Failed: $error");
+    }
+  }
+
+  Future<void> SyncBIF_TRA_TBL_P( String GetGUID) async {
+    var listD = await SyncronizationData().FetchBIF_TRA_TBL(GetGUID);
+    if (listD.isNotEmpty) {
+      await SyncronizationData().SyncBIF_TRA_TBLToSystem(listD);
+    }
+  }
+//الطاولات------------------------------
 
   //----------- التصميم -------------
   Future<void> selectDateFromDays2(BuildContext context) async {

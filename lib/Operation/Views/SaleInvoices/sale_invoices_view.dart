@@ -1011,7 +1011,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                       ),
                                                     )
                                                 ),
-                                             STMID=='EORD' && item.RTNA_D.toString() != 'null' && '${item.BMMST2}' != '4' ?
+                                             STMID=='EORD' && item.RTNA_D.toString() != 'null' && '${item.BMMST2}' == '2' ?
                                               Expanded(
                                                 child: IconButton(
                                                     icon: Icon(
@@ -1028,7 +1028,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                       controller.SelectDataRTIDO=item.RTID.toString();
                                                       controller.SelectDataRSIDO=item.RSID.toString();
                                                       controller.SelectDataGETTYPE=item.BMATY.toString();
-                                                      showTableSheet('ED');
+                                                      showTableSheet('ED',item.GUID.toString());
                                                     }),
                                               ):Container(),
 
@@ -1165,7 +1165,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                   controller.SelectDataRTID = null;
                   controller.SelectDataREID = null;
                   controller.GET_RES_SEC_P(controller.SelectDataBIID.toString());
-                  showTableSheet('ADD');
+                  showTableSheet('ADD','');
                 }
                 else {
                   controller.SelectDataRTID = null;
@@ -1267,7 +1267,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
     );
   }
 
-  void showTableSheet(Type) {
+  void showTableSheet(Type,GETGUID) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     Get.bottomSheet(
@@ -1507,7 +1507,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                         Type=='ED' ?
                         {
                           if (controller.SelectDataRTIDO!=controller.SelectDataRTID){
-                          controller.Save_BIF_TRA_TBL_P(),
+                          controller.Save_BIF_TRA_TBL_P(GETGUID),
                           Get.back(),
                         }
                           else{
@@ -1919,7 +1919,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                       controller.SelectDataRTID = null;
                       controller.SelectDataREID = null;
                       controller.GET_RES_SEC_P(controller.SelectDataBIID.toString());
-                      showTableSheet('ADD');
+                      showTableSheet('ADD','');
                     //  Get.dialog(Table_View(),);
                     } else {
                       controller.AddSale_Invoices();

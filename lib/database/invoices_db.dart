@@ -396,19 +396,25 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
       " C.MUNE IS NOT NULL THEN B.MINO||'-'||B.MINE||'-'||C.MUNE ELSE B.MINO||' -'||B.MINA END  NAM_D, "
       " CASE WHEN ${LoginController().LAN}=2 AND B.MINE IS NOT NULL  THEN B.MINE ELSE B.MINA END  MINA_D,"
       " CASE WHEN ${LoginController().LAN}=2 AND C.MUNE IS NOT NULL  THEN C.MUNE ELSE C.MUNA END  MUNA_D,"
+      " CASE WHEN ${LoginController().LAN}=2 AND F.MUCNE IS NOT NULL THEN F.MUCNE ELSE F.MUCNA END  MUCNA_D,"
       " CASE WHEN ${LoginController().LAN}=2 AND D.MGNE IS NOT NULL  THEN D.MGNE ELSE D.MGNA END  MGNA_D "
       " $sqlCOU "
-      " FROM $TAB_N A,MAT_INF B,MAT_UNI C ,MAT_GRO D $sqlCOU2 "
+      " FROM $TAB_N A,MAT_INF B,MAT_UNI C ,MAT_GRO D,MAT_UNI_C F $sqlCOU2 "
       " WHERE $sqlBMDTY A.MINO=B.MINO AND A.MGNO=D.MGNO AND C.MUID=A.MUID AND B.MGNO=A.MGNO "
+      " AND (F.MGNO=A.MGNO AND F.MINO=A.MINO AND F.JTID_L=A.JTID_L AND F.CIID_L=A.CIID_L AND F.SYID_L=A.SYID_L $Wheresql)"
+      " AND (F.MGNO=B.MGNO AND F.MINO=B.MINO  AND F.JTID_L=B.JTID_L AND F.CIID_L=B.CIID_L"
+      " AND F.SYID_L=B.SYID_L $Wheresql2)"
+      " AND (F.MUID=C.MUID  AND F.JTID_L=C.JTID_L AND F.CIID_L=C.CIID_L AND F.SYID_L=C.SYID_L $Wheresql3)"
+      " AND (F.MGNO=D.MGNO  AND F.JTID_L=D.JTID_L AND F.CIID_L=D.CIID_L AND F.SYID_L=D.SYID_L $Wheresql4)"
       " AND A.BMMID=$BMMIDNUM  $sql2  $sqlCOU3"
       " AND A.JTID_L=${LoginController().JTID} "
-      " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L=${LoginController().CIID} $Wheresql"
-      " AND B.JTID_L=${LoginController().JTID} "
-      " AND B.SYID_L=${LoginController().SYID} AND B.CIID_L=${LoginController().CIID} $Wheresql2"
-      " AND C.JTID_L=${LoginController().JTID} "
-      " AND C.SYID_L=${LoginController().SYID} AND C.CIID_L=${LoginController().CIID} $Wheresql3"
-      " AND D.JTID_L=${LoginController().JTID} "
-      " AND D.SYID_L=${LoginController().SYID} AND D.CIID_L=${LoginController().CIID} $Wheresql4";
+      " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L=${LoginController().CIID} $Wheresql";
+      // " AND B.JTID_L=${LoginController().JTID} "
+      // " AND B.SYID_L=${LoginController().SYID} AND B.CIID_L=${LoginController().CIID} $Wheresql2"
+      // " AND C.JTID_L=${LoginController().JTID} "
+      // " AND C.SYID_L=${LoginController().SYID} AND C.CIID_L=${LoginController().CIID} $Wheresql3"
+      // " AND D.JTID_L=${LoginController().JTID} "
+      // " AND D.SYID_L=${LoginController().SYID} AND D.CIID_L=${LoginController().CIID} $Wheresql4";
   var result = await dbClient!.rawQuery(sql);
   // print(sql);
   // print(result);
@@ -566,9 +572,9 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
       " $SqlORD ORDER BY A.BMMID DESC";
 
   var result = await dbClient!.rawQuery(sql);
-   printLongText(sql);
-   print(result);
-  print(GETBMKID.toString());
+   // printLongText(sql);
+  //  print(result);
+  // print(GETBMKID.toString());
   List<Bil_Mov_M_Local> list = result.map((item) {return Bil_Mov_M_Local.fromMap(item);
   }).toList();
   return list;
@@ -1891,8 +1897,8 @@ Future<List<Res_Tab_Local>> GET_RES_TAB(String GETRSID) async {
   List<Res_Tab_Local> list = result.map((item) {
     return Res_Tab_Local.fromMap(item);
   }).toList();
-  print(sql);
-  print(result);
+  // print(sql);
+  // print(result);
   return list;
 }
 
@@ -2457,8 +2463,8 @@ Future<List<Fat_Csid_Inf_Local>> GET_CSID(BIIDV_V,STMIDV_V,SOMGUV_V,SUIDV_V,BMKI
       " AND JTIDL=${LoginController().JTID} AND BIIDL=${LoginController().BIIDL_N} AND A.FCIST=1 ";
 
 
-  print('SOMGUV_V');
-  print(SOMGUV_V);
+  // print('SOMGUV_V');
+  // print(SOMGUV_V);
   if (BIIDV_V != null) {
     sql+=" AND ( INSTR(A.BIIDV,'$BIIDV_V')>0 ) ";
   }
@@ -2519,9 +2525,9 @@ Future<List<Ide_Lin_Local>> GET_IDE_LIN(ILTY,ILNO) async {
       " AND A.CIID_L='${LoginController().CIID}' $Wheresql LIMIT 1 ";
 
   var result = await dbClient!.rawQuery(sql);
-  print(sql);
-  print(result);
-  print('GET_IDE_LIN');
+  // print(sql);
+  // print(result);
+  // print('GET_IDE_LIN');
   List<Ide_Lin_Local> list = result.map((item) {
     return Ide_Lin_Local.fromMap(item);
   }).toList();

@@ -34,8 +34,7 @@ class BIF_TRA_TBL_Local {
       'GUIDF': GUIDF,
       'GUID': GUID,
       'STMIDI': STMIDI,
-
-
+      'SOMIDI': SOMIDI,
       'SUID': SUID,
       'BTTST': BTTST,
       'DATEI': DATEI,

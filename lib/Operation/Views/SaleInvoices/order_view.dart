@@ -123,12 +123,20 @@ class _CheckOutState extends State<CheckOut> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    controller.cartFood[index].NAM.toString().length >= 25 ?
+                                    controller.cartFood[index].MUCNA_D.toString().length >= 25 ?
                                     SizedBox(
                                         width: MediaQuery.of(context).size.width * 0.56,
-                                        child: AnimatedTextWidget(text:controller.cartFood[index].NAM.toString())):
-                                    Text(controller.cartFood[index].NAM.toString(),
-                                      style:  ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                        child: AnimatedTextWidget(text:controller.DisplayItemsOnScreen=='3' ?
+                                        controller.cartFood[index].MUCNA_D.toString():
+                                        '${controller.cartFood[index].MUCNA_D.toString()} - ${controller.cartFood[index].MUNA_D.toString()}'
+                                        )):
+                                    Text(
+                                      controller.DisplayItemsOnScreen=='3' ?
+                                      controller.cartFood[index].MUCNA_D.toString():
+                                      '${controller.MAT_INF_DATE[index].MUCNA_D.toString()} - ${controller.MAT_INF_DATE[index].MUNA_D.toString()}',
+                                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M',),
+                                      // overflow: TextOverflow.ellipsis,
+                                      // maxLines: 1,
                                     ),
                                     SizedBox(width: 0.03 * width),
                                     Text(
@@ -255,11 +263,17 @@ class _CheckOutState extends State<CheckOut> {
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      controller.cartFood[index].NAM.toString().length >= 25 ?
+                                      controller.cartFood[index].MUCNA_D.toString().length >= 25 ?
                                       SizedBox(
                                           width: MediaQuery.of(context).size.width * 0.56,
-                                          child: AnimatedTextWidget(text:controller.cartFood[index].NAM.toString())):
-                                      Text(controller.cartFood[index].NAM.toString(),
+                                          child: AnimatedTextWidget(text:controller.DisplayItemsOnScreen=='3' ?
+                                          controller.cartFood[index].MUCNA_D.toString():
+                                          '${controller.cartFood[index].MUCNA_D.toString()} - ${controller.cartFood[index].MUNA_D.toString()}'
+                                          )):
+                                      Text(
+                                        controller.DisplayItemsOnScreen=='3' ?
+                                        controller.cartFood[index].MUCNA_D.toString():
+                                        '${controller.cartFood[index].MUCNA_D.toString()} - ${controller.cartFood[index].MUNA_D.toString()}',
                                         style: ThemeHelper().buildTextStyle(context, Colors.black, 'M',),
                                         // overflow: TextOverflow.ellipsis,
                                         // maxLines: 1,
@@ -275,8 +289,8 @@ class _CheckOutState extends State<CheckOut> {
                                   Column(
                                     children: [
                                       CounterButton(
-                                        onIncrementSelected: () => controller.UPDATE_BIF_MOV_D_ORD(controller.cartFood[index],1),
-                                        onDecrementSelected: () => controller.UPDATE_BIF_MOV_D_ORD(controller.cartFood[index],2),
+                                        onIncrementSelected: () => controller.enqueueUpdate(controller.cartFood[index],1),
+                                        onDecrementSelected: () => controller.enqueueUpdate(controller.cartFood[index],2),
                                         size: controller.cartFood[index].SYST==1?const Size(0, 0):
                                         Size(0.027* height, 0.027* height),
                                         padding: 0,

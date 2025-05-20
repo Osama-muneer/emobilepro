@@ -128,6 +128,7 @@ class Bil_Mov_D_Local {
   int? SCIDC;
   String? BMKNA;
   String? BMMDO;
+  String? MUCNA_D;
 
 
   Bil_Mov_D_Local({this.BMKID,this.MGNO,this.MINO,this.MUID,this.SIID,this.GUID,this.BMMID,this.BMDAM,this.BIID,
@@ -138,7 +139,7 @@ class Bil_Mov_D_Local {
     this.BMDAMTF,this.BMDDIT,this.BMDDIM,this.MITSK,this.BMDEQC,this.BMDAMRE,this.MGKI,this.BMDTX1,this.BMDTX2,this.BMDTX3,
   this.BMDTXA1,this.BMDTXA2,this.BMDTXA3,this.BMDTXT1,this.BMDTXT2,this.BMDTXT3,this.TDKID,this.TCKID,
     this.TCVL,this.TCRA,this.TCSDID,this.TCSDSY,this.TCID,this.TCSY,this.BMDAM_TX,this.BMDDI_TX,
-    this.BMDAMT3,this.TCAMT,this.BMDAM1,this.CTMID,this.CIMID,this.SCIDC});
+    this.BMDAMT3,this.TCAMT,this.BMDAM1,this.CTMID,this.CIMID,this.SCIDC,this.MUCNA_D});
 
 
   Map<String, dynamic> toMap() {
@@ -337,6 +338,7 @@ class Bil_Mov_D_Local {
     SCIDC = map['SCIDC'];
     BMKNA = map['BMKNA'];
     BMMDO = map['BMMDO'];
+    MUCNA_D = map['MUCNA_D'];
 
   }
 
