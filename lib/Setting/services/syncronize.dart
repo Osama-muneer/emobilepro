@@ -2013,20 +2013,6 @@ class SyncronizationData {
 
 //الطاولات------------------------------
 
-  Future<void> SyncBIF_TRA_TBL(String GETGUID) async {
-    // Fetch BIL_MOV_MList asynchronously
-    final BIF_TRA_TBLList = await SyncronizationData().FetchBIF_TRA_TBL(GETGUID);
-
-    // Check if the list is not empty
-    if (BIF_TRA_TBLList.isNotEmpty) {
-      // Sync the data if the list has items
-      await SyncronizationData().SyncBIF_TRA_TBLToSystem(BIF_TRA_TBLList);
-    } else  {
-      // If no data and TypeAuto is true, show loading message
-      configloading("StringNoDataSync".tr);
-    }
-  }
-
   Future<List<BIF_TRA_TBL_Local>> FetchBIF_TRA_TBL(String GETGUID) async {
     final dbClient = await conn.database;
     List<BIF_TRA_TBL_Local> List_D = [];
@@ -2034,7 +2020,7 @@ class SyncronizationData {
     String SQL2 = ''' AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} 
                   AND CIID_L=${LoginController().CIID} $SQLBIID_L''';
     try {
-      final maps = await dbClient!.query('BIF_TRA_TBL', where: 'GUID=$GETGUID $SQL2');
+      final maps = await dbClient!.query('BIF_TRA_TBL', where: "GUID='$GETGUID' $SQL2");
       for (var item in maps) {
         List_D.add(BIF_TRA_TBL_Local.fromMap(item));
       }
@@ -2047,6 +2033,7 @@ class SyncronizationData {
   Future SyncBIF_TRA_TBLToSystem(List<BIF_TRA_TBL_Local> contactList)
   async {
     for (var i = 0; i < contactList.length; i++) {
+      print('SyncBIF_TRA_TBLToSystem');
       var data = {
         "RSIDO": contactList[i].RSIDO.toString(),
         "RTIDO": contactList[i].RTIDO.toString(),
@@ -2106,6 +2093,8 @@ class SyncronizationData {
         "JSON_V2":"",
         "JSON_V3":""
       };
+      print(params);
+      print('SyncBIF_TRA_TBLToSystem');
       var bodylang = utf8.encode(json.encode(params));
       var body = json.encode(params);
       try {

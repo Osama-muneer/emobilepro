@@ -2654,7 +2654,7 @@ Future<List<Bil_Mov_M_Local>> getSumBal(SCID,String GETDATE_F, String GETDATE_T)
     ''';
 
     var result = await dbClient!.rawQuery(sql);
-    printLongText(sql);
+    // printLongText(sql);
     return result.map((item) => Bil_Mov_M_Local.fromMap(item)).toList();
   } catch (e) {
     print('Error in getSumBal: $e');
@@ -2885,7 +2885,7 @@ AND A.SYID_L=${LoginController().SYID} ) AND A.AANO='$AANO' AND A.SCID=$SCID  ) 
 
   var result = await dbClient!.rawQuery(sql,);
   print('SUM_BAL');
-  printLongText('SQL: $sql');
+  // printLongText('SQL: $sql');
   print('Args: [$lastSyncIso]');
   print('Result: $result');
   List<Bil_Mov_M_Local> list = result.map((item) {
