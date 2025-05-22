@@ -80,8 +80,7 @@ Future<Acc_Mov_D_Local> Save_ACC_MOV_D(Acc_Mov_D_Local data) async {
   }
 }
 
-Future<List<Acc_Mov_D_Local>> GET_ACC_MOV_D(
-    String GETAMKID, String GETAMMID) async {
+Future<List<Acc_Mov_D_Local>> GET_ACC_MOV_D(String GETAMKID, String GETAMMID) async {
   var dbClient = await conn.database;
   String sql;
   String sqlAMKID = '';
@@ -519,14 +518,12 @@ Future<List<Acc_Acc_Local>> GET_ACC_ACC(String GETBIID, int GETAMKID) async {
       : Wheresql4 = '';
 
   if (GETAMKID == 2) {
-    WhereAMKID =
-    ' AND (A.BIID IS NULL OR (A.BIID IS NOT NULL AND A.BIID=$GETBIID)) ';
+    WhereAMKID = ' AND (A.BIID IS NULL OR (A.BIID IS NOT NULL AND A.BIID=$GETBIID)) ';
   } else {
     WhereAMKID = '';
   }
 
-  sql =
-  "SELECT A.*,CASE WHEN ${LoginController().LAN}=2 AND A.AANE IS NOT NULL THEN A.AANE ELSE A.AANA END  AANA_D"
+  sql="SELECT A.*,CASE WHEN ${LoginController().LAN}=2 AND A.AANE IS NOT NULL THEN A.AANE ELSE A.AANA END  AANA_D"
       " FROM ACC_ACC A,ACC_USR U WHERE (U.AANO=A.AANO) AND A.AAST!=2 AND A.AATY=2 $WhereAMKID "
       " AND U.AUIN=1 AND (U.SUID IS NOT NULL AND U.SUID=${LoginController().SUID})"
       " AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} AND A.CIID_L=${LoginController().CIID} $Wheresql"
@@ -536,8 +533,7 @@ Future<List<Acc_Acc_Local>> GET_ACC_ACC(String GETBIID, int GETAMKID) async {
       " AND (A.JTID_L=P.JTID_L AND A.SYID_L=P.SYID_L AND A.CIID_L=P.CIID_L $Wheresql3) )) "
       " ORDER BY A.AANO";
 
-  sql2 =
-  "SELECT A.*,CASE WHEN ${LoginController().LAN}=2 AND A.AANE IS NOT NULL THEN A.AANE ELSE A.AANA END  AANA_D"
+  sql2="SELECT A.*,CASE WHEN ${LoginController().LAN}=2 AND A.AANE IS NOT NULL THEN A.AANE ELSE A.AANA END  AANA_D"
       " FROM ACC_ACC A,ACC_USR U,BIL_CUS B  WHERE A.AANO=B.AANO AND U.AANO=B.AANO AND (U.AANO=A.AANO)"
       " AND A.AAST!=2 AND A.AATY=2 AND (A.BIID IS NULL OR (A.BIID IS NOT NULL AND A.BIID=$GETBIID))"
       " AND U.AUIN=1 AND (U.SUID IS NOT NULL AND U.SUID=${LoginController().SUID})"

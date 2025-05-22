@@ -38,6 +38,8 @@ STMID=='COU' ? "ايليت المحطات": "ايليت للمخازن و الج
 
 String SYDV_APPV= STMID=='MOB' ? '1.57' : STMID=='INVC' ? '1.22' : STMID=='EORD' ? '1.4' : '1.20';
 
+
+
 String SYDV_APPV_APP= STMID=='MOB' ? '1.0.58' : STMID=='INVC' ? '1.0.22' : STMID=='EORD' ? '1.0.4' : '1.0.20';
 String APP_V= STMID=='MOB' ? '1.0.58' :
 STMID=='INVC' ? '1.0.22' :
