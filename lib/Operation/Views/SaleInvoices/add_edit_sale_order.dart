@@ -394,6 +394,9 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                         controller.BMDDIRController.text = '0';
                                         controller.BMDDIController.text = '0';
                                         controller.MPS1 = double.parse(controller.BMDAMController.text);
+                                        print(controller.MPS1 );
+                                        print(controller.BMDAMController.text);
+                                        print('controller.BMDAMController.text');
                                         if(controller.TTID1!=null){
                                           await controller.GET_TAX_LIN_P('MAT',controller.MAT_INF_DATE[index].MGNO.toString(),
                                               controller.MAT_INF_DATE[index].MINO.toString());
@@ -401,7 +404,11 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                         // Timer(const Duration(milliseconds: 200), () async {
                                           print('STP-2');
                                           if(controller.COUNT_NO<=0){
-                                            await controller.Calculate_BMD_NO_AM();
+                                            print(controller.BMDAMController.text);
+                                            print('controller.BMDAMController.text');
+                                            await  controller.Calculate_BMD_NO_AM();
+                                            print(controller.BMDAMController.text);
+                                            print('controller.BMDAMController.text');
                                            print('STP-3');
                                             bool isValid =await controller.Save_BIL_MOV_D_ORD_P();
                                             if (isValid) {
@@ -414,6 +421,8 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                             }
                                           }
                                         // });
+
+
                                         controller.update();
                                       },
                                       child:  Container(
@@ -449,6 +458,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                                     ,controller.MAT_INF_DATE[index].MGNO.toString(),
                                                     controller.MAT_INF_DATE[index].MINO.toString(),
                                                     controller.MAT_INF_DATE[index].MUID!),
+
                                                 builder: (BuildContext context, AsyncSnapshot<List<Bil_Mov_D_Local>> snapshot) {
                                                   if (!snapshot.hasData || snapshot.data!.length==0 ) {
                                                     return Container();
@@ -471,38 +481,38 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                       ),
                                     ),
                                   ),
-                                  // ✅ أيقونة  في الأعلى يسار العنصر
-                                  int.parse(controller.COUNTRecode_ORD.toString())!=0?
-                                  Positioned(
-                                    top: MediaQuery.of(context).size.height * 0.01,
-                                    left: MediaQuery.of(context).size.height * 0.01,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        //
-                                      },
-                                      child: InkWell(
-                                        onTap: () {
-                                          //  if(int.parse(controller.CountRecodeController.text.isEmpty ? '0' : controller.CountRecodeController.text) > 0){
-                                          controller.GET_BMDID_COUNT_P();
-                                          controller.GET_BIF_MOV_D_P(controller.BMMID.toString(),'2');
-                                          controller.BMATY_SHOW(false);
-                                          controller.RSID_SHOW(false);
-                                          controller.RTID_SHOW(false);
-                                          controller.REID_SHOW(false);
-                                          controller.TYPE_ORDER=1;
-                                          controller.CheckOutTemplate=1;
-                                          Get.dialog(
-                                            CheckOut(Show:true),
-                                          );
-                                          // }
-                                          //   Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckOut()));
-                                        },
-                                        child: Icon(Icons.add_card_rounded,color: Colors.grey,
-                                          size: MediaQuery.of(context).size.height * 0.026,
-                                        ),
-                                      ),
-                                    ),
-                                  ):Container(),
+                                  // // ✅ أيقونة  في الأعلى يسار العنصر
+                                  // controller.COUNT_NO>0?
+                                  // Positioned(
+                                  //   top: MediaQuery.of(context).size.height * 0.01,
+                                  //   left: MediaQuery.of(context).size.height * 0.01,
+                                  //   child: GestureDetector(
+                                  //     onTap: () {
+                                  //       //
+                                  //     },
+                                  //     child: InkWell(
+                                  //       onTap: () {
+                                  //         //  if(int.parse(controller.CountRecodeController.text.isEmpty ? '0' : controller.CountRecodeController.text) > 0){
+                                  //         controller.GET_BMDID_COUNT_P();
+                                  //         controller.GET_BIF_MOV_D_P(controller.BMMID.toString(),'2');
+                                  //         controller.BMATY_SHOW(false);
+                                  //         controller.RSID_SHOW(false);
+                                  //         controller.RTID_SHOW(false);
+                                  //         controller.REID_SHOW(false);
+                                  //         controller.TYPE_ORDER=1;
+                                  //         controller.CheckOutTemplate=1;
+                                  //         Get.dialog(
+                                  //           CheckOut(Show:true),
+                                  //         );
+                                  //         // }
+                                  //         //   Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckOut()));
+                                  //       },
+                                  //       child: Icon(Icons.add_card_rounded,color: Colors.grey,
+                                  //         size: MediaQuery.of(context).size.height * 0.026,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ):Container(),
                                 ],
                                 );
                               },

@@ -232,13 +232,17 @@ class FileHelper {
 
   static Future<void> printToAll(String pdfPath, int copies) async {
     final printers = await loadPrinters();
-
+    // print(printers.elementAt(0).deviceName);
+    // print(printers.elementAt(0).address);
     if (printers.isEmpty) {
       _showToast('لا توجد طابعات مسجلة', success: false);
       return;
     }
 
     for (var device in printers) {
+      print(device.address);
+      print(device.deviceName);
+      print('printers.length');
       switch (device.typePrinter) {
         case 'bluetooth':
           await _bluetoothPrint(device, pdfPath, copies);
@@ -271,68 +275,56 @@ class FileHelper {
     }
   }
 
-  static Future<void> _bluetoothPrint(AppPrinterDevice device,String path, int copies) async {
+  static Future<void> _bluetoothPrint(AppPrinterDevice device, String path, int copies) async {
     try {
-      // 1) إيقاف Discovery لتجنب التضارب
-      //await FlutterBluetoothSerial.instance.cancelDiscovery();
-      bool isConn = await bluetooth.isConnected ?? false;
-      if (!(await bluetooth.isConnected ?? false)) {
-        await bluetooth.disconnect();
+      print(device.address);
+      print(device.deviceName);
+      print(path);
+      print(copies);
+      print('printers.length55');
 
+      // التأكد من أن الاتصال غير مفعل فقط، ثم الاتصال
+      bool isConn = await bluetooth.isConnected ?? false;
+
+      if (!isConn) {
         final bonded = await bluetooth.getBondedDevices();
-        // حاول إيجاد الجهاز حسب address المحفوظ في جدولك
         final found = bonded.firstWhereOrNull((d) => d.address == device.address);
+
         if (found == null) {
           _showToast('طابعة Bluetooth غير متصلة: ${device.deviceName}', success: false);
           return;
         }
-        await bluetooth.connect(found);
-        bluetooth.connect(found).catchError((error) {
-          print(error.toString());
+
+        try {
+          await bluetooth.connect(found);
+          await Future.delayed(const Duration(milliseconds: 500));
+        } catch (error) {
+          print('Connection error: $error');
           Fluttertoast.showToast(
               msg: error.toString(),
               toastLength: Toast.LENGTH_LONG,
               textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
-        });
-        await Future.delayed(const Duration(seconds: 1));
+              backgroundColor: Colors.redAccent
+          );
+          return;
+        }
       }
 
-      // if (!isConnected) {
-      //   final device = await getDevice();
-      //   if (device != null) {
-      //     await bluetooth.connect(device);
-      //     await Future.delayed(const Duration(seconds: 1));
-      //   } else {
-      //     _showToast('لم يتم العثور على الطابعة', success: false);
-      //     return;
-      //   }
-      // }
-
       for (int copy = 0; copy < copies; copy++) {
-       await _renderAndPrintPdfViaBluetooth(path);
-        // إذا أردت قص الورق:
-        // await bluetooth.writeBytes(BlueThermalPrinter.cut());
-        // await bluetooth.writeBytes([0x1D, 0x56, 0x00]); // قص الورق
-        // await bluetooth.writeBytes([0x1B, 0x42, 0x03, 0x02]); // صفارة
-        // await bluetooth.writeBytes(BlueThermalPrinter.cut());
-        // await bluetooth.writeBytes(BlueThermalPrinter.beep(n: 2));
+        await _renderAndPrintPdfViaBluetooth(path);
       }
 
       _showToast("تمت الطباعة بنجاح!", success: true);
     } catch (e, st) {
-      printLongText('Error bluetoothPrint ' + e.toString());
-     // printLongText(st);
+      printLongText('Error bluetoothPrint $e');
       _showErrorToast(e, st);
     } finally {
-      // 3) فصل الاتصال بعد الانتهاء لضمان عمل الجلسة التالية
       if (await bluetooth.isConnected ?? false) {
         await bluetooth.disconnect();
         await Future.delayed(const Duration(milliseconds: 500));
       }
     }
   }
-
 
   static void _showErrorToast(Object e, StackTrace stack) {
     print("Error: $e\n$stack");

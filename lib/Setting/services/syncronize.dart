@@ -141,6 +141,7 @@ class SyncronizationData {
         "MUID": List_D[i].MUID.toString(),
         "BMDNF": List_D[i].BMDNF.toString(),
         "BMDNO": List_D[i].BMDNO.toString(),
+        "BMDIN": List_D[i].BMDIN.toString(),
         "BMDAM": List_D[i].BMDAM.toString(),
         "BMDED": List_D[i].BMDED.toString(),
         "BMDTX": List_D[i].BMDTX.toString(),

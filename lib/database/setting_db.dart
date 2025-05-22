@@ -109,9 +109,9 @@ Future<List<Bra_Inf_Local>> Get_Bra_Inf(int GETJTID, int GETBIID) async {
   " SELECT BIID,CASE WHEN ${LoginController().LAN}=2 AND BINE IS NOT NULL THEN BINE ELSE BINA END  BINA_D"
       " FROM BRA_INF_ACC  WHERE JTID=$GETJTID AND BIID=$GETBIID AND BIST=1";
   var result = await dbClient!.rawQuery(sql);
-  print(sql);
-  print(result);
-  print('Get_Bra_Inf');
+  // print(sql);
+  // print(result);
+  // print('Get_Bra_Inf');
   List<Bra_Inf_Local> list = result.map((item) {
     return Bra_Inf_Local.fromMap(item);
   }).toList();
@@ -124,9 +124,9 @@ Future<List<Bra_Inf_Local>> Get_Bra_Inf_One(int GETJTID) async {
   sql = " SELECT BIID,CASE WHEN ${LoginController().LAN}=2 AND BINE IS NOT NULL THEN BINE ELSE BINA END  BINA_D"
       " FROM BRA_INF_ACC  WHERE JTID=$GETJTID ORDER BY BIID  LIMIT 1 ";
   var result = await dbClient!.rawQuery(sql);
-  print(sql);
-  print(result);
-  print('Get_Bra_Inf_One');
+  // print(sql);
+  // print(result);
+  // print('Get_Bra_Inf_One');
   List<Bra_Inf_Local> list = result.map((item) {
     return Bra_Inf_Local.fromMap(item);
   }).toList();
@@ -509,7 +509,7 @@ Future<List<Acc_Cos_Local>> GET_ACC_COS() async {
       " AND D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
       " AND D.CIID_L=${LoginController().CIID} $Wheresql2 ) ORDER BY A.ACNO";
   final result = await dbClient!.rawQuery(sql);
-  print(result);
+  // print(result);
   return result.map((json) => Acc_Cos_Local.fromMap(json)).toList();
 }
 
@@ -1042,8 +1042,8 @@ Future<List<Bra_Inf_Local>> GET_BRA(int GETTYPE) async {
   List<Bra_Inf_Local> list = result.map((item) {
     return Bra_Inf_Local.fromMap(item);
   }).toList();
-  print(result);
-  print(sql);
+  // print(result);
+  // print(sql);
   return list;
 }
 
@@ -1746,8 +1746,8 @@ Future<List<Acc_Cos_Local>> GET_ACC_COS_ONE() async {
       " AND D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
       " AND D.CIID_L=${LoginController().CIID} $Wheresql2 ) ORDER BY A.ACNO LIMIT 1 ";
   final result = await dbClient!.rawQuery(sql);
-  print(result);
-  print('Acc_Cos_Local');
+  // print(result);
+  // print('Acc_Cos_Local');
   return result.map((json) => Acc_Cos_Local.fromMap(json)).toList();
 }
 
@@ -2884,10 +2884,10 @@ WHERE (A.CIID_L='${LoginController().CIID}' AND A.JTID_L= ${LoginController().JT
 AND A.SYID_L=${LoginController().SYID} ) AND A.AANO='$AANO' AND A.SCID=$SCID  ) AS A1 ''';
 
   var result = await dbClient!.rawQuery(sql,);
-  print('SUM_BAL');
-  // printLongText('SQL: $sql');
-  print('Args: [$lastSyncIso]');
-  print('Result: $result');
+  // print('SUM_BAL');
+  // // printLongText('SQL: $sql');
+  // print('Args: [$lastSyncIso]');
+  // print('Result: $result');
   List<Bil_Mov_M_Local> list = result.map((item) {
     return Bil_Mov_M_Local.fromMap(item);
   }).toList();

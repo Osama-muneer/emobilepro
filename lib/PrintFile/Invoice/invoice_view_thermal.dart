@@ -604,6 +604,8 @@ taxTikcetReportThermal({
                       ),
                     ]),
                             buildFooter(),
+                    Container(height: 15),
+                    SimplePdf.spaceH(height: 15),
                   ],
                 );
         },

@@ -1017,7 +1017,8 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                       },
                                                       barrierDismissible: false,
                                                     );
-                                                  } else {
+                                                  }
+                                                  else {
                                                     controller.GET_ACC_MOV_M_PRINT_P(controller
                                                           .ACC_MOV_M_List[index].AMMID!,
                                                       controller.ACC_MOV_M_List[index].AMKID!,
@@ -1056,9 +1057,6 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                         );
 
                                                     }
-
-
-
                                                   }
 
                                               },

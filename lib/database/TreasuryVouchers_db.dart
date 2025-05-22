@@ -103,7 +103,7 @@ Future<List<Acc_Mov_D_Local>> GET_ACC_MOV_D(
       ? Wheresql2 = " AND  B.BIID_L=${LoginController().BIID}"
       : Wheresql2 = '';
   LoginController().BIID_ALL_V == '1'
-      ? Wheresql2 = " AND  C.BIID_L=${LoginController().BIID}"
+      ? Wheresql3 = " AND  C.BIID_L=${LoginController().BIID}"
       : Wheresql3 = '';
   LoginController().BIID_ALL_V == '1'
       ? Wheresql6 = " AND F.JTID_L=${LoginController().JTID} "
@@ -111,8 +111,7 @@ Future<List<Acc_Mov_D_Local>> GET_ACC_MOV_D(
       : Wheresql6 = " AND F.JTID_L=${LoginController().JTID} "
       " AND F.SYID_L=${LoginController().SYID} AND F.CIID_L='${LoginController().CIID}'";
 
-  sql =
-  "SELECT A.*,F.BACBA,F.BACBNF,CASE WHEN ${LoginController().LAN}=2 AND B.AANE IS NOT NULL THEN B.AANE ELSE B.AANA END  AANA_D,C.SCSY"
+  sql = "SELECT A.*,F.BACBA,F.BACBNF,CASE WHEN ${LoginController().LAN}=2 AND B.AANE IS NOT NULL THEN B.AANE ELSE B.AANA END  AANA_D,C.SCSY"
       " FROM ACC_MOV_D A,ACC_ACC B,SYS_CUR C left join BAL_ACC_C F "
       " on A.AANO=F.AANO AND A.SCID=F.SCID $Wheresql6  WHERE A.JTID_L=${LoginController().JTID} "
       " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql "

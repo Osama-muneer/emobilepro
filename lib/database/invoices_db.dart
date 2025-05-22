@@ -390,7 +390,7 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
       " AND E.JTID_L=${LoginController().JTID} AND E.SYID_L=${LoginController().SYID} AND "
       " E.CIID_L='${LoginController().CIID}' $Wheresql5":sqlCOU3='';
 
-  sql =" SELECT *,CASE WHEN ${LoginController().LAN}=2 AND B.MINE IS NOT NULL AND "
+  sql =" SELECT *,A.BMDID,A.BMDIN,CASE WHEN ${LoginController().LAN}=2 AND B.MINE IS NOT NULL AND "
       " C.MUNE IS NOT NULL THEN B.MINE||'-'||C.MUNE ELSE B.MINA||'-'||C.MUNA END  NAM,"
       " CASE WHEN ${LoginController().LAN}=2 AND B.MINE IS NOT NULL AND "
       " C.MUNE IS NOT NULL THEN B.MINO||'-'||B.MINE||'-'||C.MUNE ELSE B.MINO||' -'||B.MINA END  NAM_D, "
@@ -583,6 +583,8 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
 Future<Bil_Mov_D_Local> Save_BIF_MOV_D(String TAB_N,Bil_Mov_D_Local data) async {
   var dbClient = await conn.database;
   data.BMDID = await dbClient!.insert(TAB_N, data.toMap());
+  print(data);
+  print('data');
   return data;
 }
 
@@ -2172,6 +2174,8 @@ Future<int> UpdateBMDIN(String TAB_N,String GETBMMID,String GETBMDID,String GETB
   String SQL='';
   SQL = "UPDATE $TAB_N SET BMDIN='$GETBMDIN'  WHERE  BMMID=$GETBMMID AND BMDID=$GETBMDID ";
   var result = await dbClient!.rawUpdate(SQL);
+  print(SQL);
+  print(result);
   return result;
 }
 

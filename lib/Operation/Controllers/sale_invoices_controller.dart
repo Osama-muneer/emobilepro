@@ -581,6 +581,7 @@ class Sale_Invoices_Controller extends GetxController {
       BMDNF = 0,
       TCAMT = 0,
       SUMBAL = 0,
+      BIL_MOV_D_BMDNO  = 0,
       SumBal=0;
   RxDouble? longitude = 0.0.obs;
   RxDouble? latitude = 0.0.obs;
@@ -5063,9 +5064,7 @@ class Sale_Invoices_Controller extends GetxController {
     BIF_MOV_D = await GET_BMDID(
         BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
     if (BIF_MOV_D.isNotEmpty) {
-      BMDID = BIF_MOV_D
-          .elementAt(0)
-          .BMDID;
+      BMDID = BIF_MOV_D.elementAt(0).BMDID;
     }
   }
 
@@ -6007,10 +6006,8 @@ class Sale_Invoices_Controller extends GetxController {
     USE_BMDFN == '1' ? BMDNO_V = double.parse(BMDNOController.text)
         : BMDNO_V =
     (double.parse(BMDNOController.text) - double.parse(BMDNFController.text));
-
     BMDAM1 =
     BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
-
     if (USING_TAX_SALES == '1' || (USING_TAX_SALES == '3'
         && (UPIN_USING_TAX_SALES == 1 && Price_include_Tax == true))) {
       // print('BMDAMController.text');
@@ -6047,19 +6044,21 @@ class Sale_Invoices_Controller extends GetxController {
       else {
         BMDTXA3 = 0;
       }
-
+      print(BMDAMTXController.text);
       //احتساب سعر الوحدة مع سعر شامل الضريبه
       ['<$TTID2>'].contains(TTIDC1) ? BMDAMTXController.text =
           roundDouble(BMDTXA_V!, 8).toString() :
-
       BMDAMTXController.text = roundDouble(double.parse(BMDAMController.text) -
           (BMDTXA! + BMDTXA2! + BMDTXA3!), 6).toString();
 
-      BMDAM1 =
-      BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMTXController.text);
-      // print('BMDAM1');
-      // print(BMDAM1);
-      // print(BMDAMTXController.text);
+      print(BMDAMTXController.text);
+      print(BMDAMController.text.isEmpty);
+      print(BMDAMController.text);
+      print('BMDAMController.text444');
+      BMDAM1 = BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMTXController.text);
+      print('BMDAM1');
+      print(BMDAM1);
+      print(BMDAMTXController.text);
 
       //اجمالي المبلغ الكميه في السعر
       SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
@@ -6072,11 +6071,11 @@ class Sale_Invoices_Controller extends GetxController {
       SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
     }
 
-    // print('BMDAMTXController');
-    // print(BMDAM1);
-    // print(BMDNOController.text);
-    // print(BMDAMController.text);
-    // print(SUMBMDAMController.text);
+    print('BMDAMTXController');
+    print(BMDAM1);
+    print(BMDNOController.text);
+    print(BMDAMController.text);
+    print(SUMBMDAMController.text);
     //اجمالي المجاني
     SUMBMDAMTFController.text =
         roundDouble(BMDAM1! * double.parse(BMDNFController.text), 6).toString();
@@ -6557,7 +6556,7 @@ class Sale_Invoices_Controller extends GetxController {
     try {
       STB_N = 'S1';
       GUIDD = uuid.v4();
-      GET_BMDID_P();
+      await  GET_BMDID_P();
       print('STP-2');
       print(BMDIDController.text.toString());
       BMDNFController.text.isEmpty
@@ -6621,7 +6620,8 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
         STB_N = 'S9';
         return false;
-      } else {
+      }
+      else {
         BMDAM_TX = BMDAM1! + BMDTXA2!;
 
         BMDNF = BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text);
@@ -6688,6 +6688,12 @@ class Sale_Invoices_Controller extends GetxController {
         else {
           STB_N = 'S14';
           print('STP-4');
+          print(BMDAM1);
+          print(BMDTXA! + BMDTXA2! + BMDTXA3!);
+          print(BMDTXA2);
+          print(BMDTXA);
+          print(roundDouble(BMDAM1! * double.parse(SCEXController.text), 6));
+          print('MGNOController.text');
           Bil_Mov_D_Local e = Bil_Mov_D_Local(
             BMMID: BMMID,
             BMDID: BMDID,
@@ -8352,9 +8358,7 @@ class Sale_Invoices_Controller extends GetxController {
         BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
         BMMID.toString(), GETMGNO, GETMINO, GETMUID);
     if (GET_COUNT.isNotEmpty) {
-      COUNT_NO = GET_COUNT
-          .elementAt(0)
-          .COUNT_MINO!;
+      COUNT_NO = GET_COUNT.elementAt(0).COUNT_MINO!;
     } else {
       COUNT_NO = 0;
     }

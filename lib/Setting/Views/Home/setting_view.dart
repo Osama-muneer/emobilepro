@@ -1645,6 +1645,7 @@ class _SettingViewState extends State<SettingView> {
             ThemeHelper().buildTextStyle(context, Colors.black,'S')),
             title: ThemeHelper().buildText(context,'StrinPrinter', Colors.black,'M')),
         Divider(color: Colors.black,),
+
         ListTile(
             onTap: (){
               buildShowDialogLang(context);
