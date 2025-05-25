@@ -90,7 +90,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
     }else{
     if((controller.edit == true || controller.CheckBack == 0)){
       if(controller.edit == true ){
-        controller.CheckBack == 0 ? null : controller.Save_ACC_MOV_M_P(controller.AMMID!,context);
+        controller.CheckBack == 0 ? null : controller.Save_ACC_MOV_M_P(controller.edit,context);
       }
 
       Navigator.of(context).pop(false);

@@ -393,6 +393,7 @@ async {
     OrdSql = ' ORDER BY A.SIID ';
   }else if(ORD_BY=='6') {
     OrdSql = ' ORDER BY A.BMMMT ';
+
   }
 
   ORD_BY2=='2'?Ord2Sql='DESC':Ord2Sql='ASC';

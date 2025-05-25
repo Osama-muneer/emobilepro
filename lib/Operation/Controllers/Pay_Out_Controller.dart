@@ -1079,12 +1079,18 @@ class Pay_Out_Controller extends GetxController {
   editMode(BuildContext context) {
     contentFocusNode.unfocus();
     loading(true);
+<<<<<<< HEAD
     print('editMode');
     print(Get.arguments);
     print(CountRecodeController.text);
     print(Get.arguments == null);
     if (Get.arguments == null) {
       print('Save_ACC_MOV_M_P33');
+=======
+    print(Get.arguments);
+    print('Get.arguments');
+    if (Get.arguments == null && edit == false) {
+>>>>>>> 053abf8aaeb14be5e2df95320d93b053d2b2eab2
       if (CountRecodeController.text == '0') {
         Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
             backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
@@ -1092,6 +1098,7 @@ class Pay_Out_Controller extends GetxController {
             isDismissible: true,
             dismissDirection: DismissDirection.horizontal,
             forwardAnimationCurve: Curves.easeOutBack);
+<<<<<<< HEAD
       } else {
         print('Save_ACC_MOV_M_P44');
         Save_ACC_MOV_M_P(0,context);
@@ -1099,6 +1106,14 @@ class Pay_Out_Controller extends GetxController {
     } else {
       print('Save_ACC_MOV_M_P55');
       Save_ACC_MOV_M_P(Get.arguments,context);
+=======
+      }
+      else {
+        Save_ACC_MOV_M_P(edit,context);
+      }
+    } else {
+      Save_ACC_MOV_M_P(edit,context);
+>>>>>>> 053abf8aaeb14be5e2df95320d93b053d2b2eab2
     }
   }
   //دالة التقريب
@@ -1115,7 +1130,7 @@ class Pay_Out_Controller extends GetxController {
       }else{
         COUNT_RECODE = data;
         CountRecodeController.text = COUNT_RECODE.elementAt(0).COU.toString();
-        CheckBack=COUNT_RECODE.elementAt(0).COU!;
+        // CheckBack=COUNT_RECODE.elementAt(0).COU!;
         UpdateROWN1(int.parse(CountRecodeController.text), AMMID);
         update();
       }
@@ -1179,7 +1194,7 @@ class Pay_Out_Controller extends GetxController {
   }
 
   //حفظ سند رئيسي
-  Future<bool> Save_ACC_MOV_M_P(int id,BuildContext context) async {
+  Future<bool> Save_ACC_MOV_M_P(bool TypeSave,BuildContext context) async {
     try {
       print('Save_ACC_MOV_M_P');
       STB_N='S1';
@@ -1245,9 +1260,13 @@ class Pay_Out_Controller extends GetxController {
         return false;
       }
       else {
+<<<<<<< HEAD
         print('Save_ACC_MOV_M_P2');
         print(id);
         if(id==0){
+=======
+        if(TypeSave==false){
+>>>>>>> 053abf8aaeb14be5e2df95320d93b053d2b2eab2
           SCEXController.text=SCEXController.text.toString().contains('.0') ? double.parse(SCEXController.text).round().toString() :SCEXController.text;
           AMMINController.text=AMKID!=15? AMMINCHECK==AMMINController.text ?
           AMKID==2?"(MOB) ${'StringPayTo'.tr}: ${AANADetails}":

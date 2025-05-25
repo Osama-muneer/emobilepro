@@ -117,6 +117,31 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
               searchBar.getSearchAction(context),
               InkWell(
                 onTap: () {
+                  controller.crossAxisCountMAT_INF==2?
+                  controller.crossAxisCountMAT_INF=3:
+                  controller.crossAxisCountMAT_INF==3?
+                  controller.crossAxisCountMAT_INF=4:
+                  controller.crossAxisCountMAT_INF=2;
+                  LoginController().SET_N_P('crossAxisCountMAT_INF',controller.crossAxisCountMAT_INF);
+                  controller.update();
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadiusDirectional.circular(10),
+                  ),
+                  child:
+                  Icon(controller.crossAxisCountMAT_INF==2?Icons.grid_view_sharp:
+                  controller.crossAxisCountMAT_INF==3?
+                  Icons.view_module:
+                  Icons.grid_on_sharp ,color: Colors.white
+                    //  color: colorSiji,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              InkWell(
+                onTap: () {
                   //  if(int.parse(controller.CountRecodeController.text.isEmpty ? '0' : controller.CountRecodeController.text) > 0){
                   controller.GET_BMDID_COUNT_P();
                   controller.GET_BIF_MOV_D_P(controller.BMMID.toString(),'2');
@@ -351,7 +376,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                               // physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
+                                crossAxisCount: controller.crossAxisCountMAT_INF,
                                 crossAxisSpacing: 12.0,
                                 mainAxisSpacing: 15.0,
                                 mainAxisExtent: 200,
@@ -404,11 +429,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                         // Timer(const Duration(milliseconds: 200), () async {
                                           print('STP-2');
                                           if(controller.COUNT_NO<=0){
-                                            print(controller.BMDAMController.text);
-                                            print('controller.BMDAMController.text');
                                             await  controller.Calculate_BMD_NO_AM();
-                                            print(controller.BMDAMController.text);
-                                            print('controller.BMDAMController.text');
                                            print('STP-3');
                                             bool isValid =await controller.Save_BIL_MOV_D_ORD_P();
                                             if (isValid) {
@@ -421,8 +442,6 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                             }
                                           }
                                         // });
-
-
                                         controller.update();
                                       },
                                       child:  Container(

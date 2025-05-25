@@ -369,11 +369,13 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
   String Wheresql3='';
   String Wheresql4='';
   String Wheresql5='';
+  String Wheresql6='';
   LoginController().BIID_ALL_V=='1'? Wheresql= " AND A.BIID_L=${LoginController().BIID}":Wheresql='';
   LoginController().BIID_ALL_V=='1'? Wheresql2= " AND B.BIID_L=${LoginController().BIID}":Wheresql='';
   LoginController().BIID_ALL_V=='1'? Wheresql3= " AND C.BIID_L=${LoginController().BIID}":Wheresql3='';
   LoginController().BIID_ALL_V=='1'? Wheresql4= " AND D.BIID_L=${LoginController().BIID}":Wheresql4='';
   LoginController().BIID_ALL_V=='1'? Wheresql5= " AND E.BIID_L=${LoginController().BIID}":Wheresql5='';
+  LoginController().BIID_ALL_V=='1'? Wheresql6= " AND F.BIID_L=${LoginController().BIID}":Wheresql5='';
 
   if (GETTYPE_SHOW=='2'){
     sqlBMDTY=' A.BMDTY=1 AND ';
@@ -401,7 +403,7 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
       " $sqlCOU "
       " FROM $TAB_N A,MAT_INF B,MAT_UNI C ,MAT_GRO D,MAT_UNI_C F $sqlCOU2 "
       " WHERE $sqlBMDTY A.MINO=B.MINO AND A.MGNO=D.MGNO AND C.MUID=A.MUID AND B.MGNO=A.MGNO "
-      " AND (F.MGNO=A.MGNO AND F.MINO=A.MINO AND F.JTID_L=A.JTID_L AND F.CIID_L=A.CIID_L AND F.SYID_L=A.SYID_L $Wheresql)"
+      " AND (F.MGNO=A.MGNO AND F.MINO=A.MINO AND F.JTID_L=A.JTID_L AND F.CIID_L=A.CIID_L AND F.SYID_L=A.SYID_L $Wheresql6)"
       " AND (F.MGNO=B.MGNO AND F.MINO=B.MINO  AND F.JTID_L=B.JTID_L AND F.CIID_L=B.CIID_L"
       " AND F.SYID_L=B.SYID_L $Wheresql2)"
       " AND (F.MUID=C.MUID  AND F.JTID_L=C.JTID_L AND F.CIID_L=C.CIID_L AND F.SYID_L=C.SYID_L $Wheresql3)"
@@ -416,7 +418,7 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
       // " AND D.JTID_L=${LoginController().JTID} "
       // " AND D.SYID_L=${LoginController().SYID} AND D.CIID_L=${LoginController().CIID} $Wheresql4";
   var result = await dbClient!.rawQuery(sql);
-  // print(sql);
+  // printLongText(sql);
   // print(result);
   // print('GET_BIL_MOV_D');
   List<Bil_Mov_D_Local> list = result.map((item) {

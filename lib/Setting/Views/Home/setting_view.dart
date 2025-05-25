@@ -1839,10 +1839,11 @@ class _SettingViewState extends State<SettingView> {
         Divider(color: Colors.black,),
         if(LoginController().experimentalcopy != 1)
         ListTile(
-            onTap: (){
+            onTap: () async {
+              await controller.Get_Printers();
               Navigator.push(context, MaterialPageRoute(builder: (_)=>
-              StteingController().Type_Print==false?
-              Print_View():Bule_Print_View(),));
+              // StteingController().Type_Print==false?PrintersSettingsPage():Bule_Print_View(),));
+              PrintersSettingsPage()));
             },
             leading: const Icon(Icons.print,color: Colors.black),
             subtitle: Text(controller.PrintController.text, style: TextStyle(

@@ -2094,6 +2094,7 @@ class SyncronizationData {
         "JSON_V2":"",
         "JSON_V3":""
       };
+      print(data);
       print(params);
       print('SyncBIF_TRA_TBLToSystem');
       var bodylang = utf8.encode(json.encode(params));
