@@ -382,30 +382,31 @@ async {
   LoginController().BIID_ALL_V=='1'? Wheresql7= " AND  G.BIID_L=${LoginController().BIID}":Wheresql7='';
 
   if(ORD_BY=='1'){
-    OrdSql=' ORDER BY BIID ';
+    OrdSql=' ORDER BY A.BIID ';
   }else if(ORD_BY=='2') {
-    OrdSql = ' ORDER BY BMKID ';
+    OrdSql = ' ORDER BY A.BMKID ';
   }else if(ORD_BY=='3') {
-    OrdSql = ' ORDER BY BMMNO ';
+    OrdSql = ' ORDER BY A.BMMNO ';
   }else if(ORD_BY=='4') {
-    OrdSql = ' ORDER BY BMMDO ';
+    OrdSql = ' ORDER BY A.BMMDO ';
   }else if(ORD_BY=='5') {
-    OrdSql = ' ORDER BY SIID ';
+    OrdSql = ' ORDER BY A.SIID ';
   }else if(ORD_BY=='6') {
-    OrdSql = ' ORDER BY BMMMT ';
+    OrdSql = ' ORDER BY A.BMMMT ';
   }
 
   ORD_BY2=='2'?Ord2Sql='DESC':Ord2Sql='ASC';
 
 
-  sql = "SELECT BMMID,BMKID,BMMNO,BMMRE,BMMDO,BMMAM,BMMDI,BMMTX,BMMDIF,BMMMT,BMMNA,BMMST,A.DATEI,A.BIID,A.BCID"
-      ",CASE WHEN ${LoginController().LAN}=2 AND B.BINE IS NOT NULL THEN B.BINE ELSE B.BINA END  BINA_D, "
+  sql = "SELECT A.BMMID,A.BMKID,A.BMMNO,A.BMMRE,A.BMMDO,A.BMMAM,A.BMMDI,A.BMMTX,A.BMMDIF,A.BMMMT,"
+      " A.BMMNA,A.BMMST,A.SIID,A.DATEI,A.BIID2,A.BIID,A.BCID, "
+      " CASE WHEN ${LoginController().LAN}=2 AND B.BINE IS NOT NULL THEN B.BINE ELSE B.BINA END  BINA_D, "
       " CASE WHEN ${LoginController().LAN}=2 AND F.SCNE IS NOT NULL THEN F.SCNE ELSE F.SCNA END  SCNA_D,"
       " CASE WHEN ${LoginController().LAN}=2 AND G.PKNE IS NOT NULL THEN G.PKNE ELSE G.PKNA END  PKNA_D "
       " FROM BIL_MOV_M A,BRA_INF B ,SYS_CUR F,PAY_KIN G WHERE "
       " A.BIID2 BETWEEN $GETBIID_F AND $GETBIID_T AND A.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T' $DATEIsql "
-      "  $SCIDsql $PKIDsql  AND A.JTID_L=${LoginController().JTID} "
-      "  AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql"
+      " $SCIDsql $PKIDsql  AND A.JTID_L=${LoginController().JTID} "
+      " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql"
       " AND B.BIID=A.BIID2  AND B.JTID_L=${LoginController().JTID} "
       " AND B.SYID_L=${LoginController().SYID} AND B.CIID_L='${LoginController().CIID}' $Wheresql2"
       " AND F.SCID=A.SCID AND  F.JTID_L=${LoginController().JTID} "
@@ -413,7 +414,8 @@ async {
       " AND G.PKID=A.PKID AND  G.JTID_L=${LoginController().JTID} "
       " AND G.SYID_L=${LoginController().SYID} AND G.CIID_L='${LoginController().CIID}' $Wheresql7"
       " UNION ALL "
-      " SELECT BMMID,BMKID,BMMNO,BMMRE,BMMDO,BMMAM,BMMDI,BMMTX,BMMDIF,BMMMT,BMMNA,BMMST,A.DATEI,A.BIID,A.BCID"
+      " SELECT A.BMMID,A.BMKID,A.BMMNO,A.BMMRE,A.BMMDO,A.BMMAM,A.BMMDI,A.BMMTX,A.BMMDIF,A.BMMMT,"
+      " A.BMMNA,A.BMMST,A.SIID,A.DATEI,A.BIID2,A.BIID,A.BCID "
       ",CASE WHEN ${LoginController().LAN}=2 AND B.BINE IS NOT NULL THEN B.BINE ELSE B.BINA END  BINA_D, "
       " CASE WHEN ${LoginController().LAN}=2 AND F.SCNE IS NOT NULL THEN F.SCNE ELSE F.SCNA END  SCNA_D,"
       " CASE WHEN ${LoginController().LAN}=2 AND G.PKNE IS NOT NULL THEN G.PKNE ELSE G.PKNA END  PKNA_D "
