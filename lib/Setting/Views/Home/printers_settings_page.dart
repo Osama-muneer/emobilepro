@@ -48,7 +48,7 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
                 SizedBox(height: 20),
                 Text('StringThere_printers_yet'.tr),
                 SizedBox(height: 10),
-                Text('StringHere_printers'.tr),
+                // Text('StringHere_printers'.tr),
               ],
             ),
           );
@@ -110,7 +110,8 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
       //   return 
         GetBuilder<StteingController>(
         builder: (controller) =>  AlertDialog(
-          title: Text(isEditing ? 'StringEdit'.tr : 'StringAdd'.tr,textAlign: TextAlign.center),
+          title:
+          Text(isEditing ? 'StringEdit'.tr : 'StringAdd'.tr,textAlign: TextAlign.center),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -134,16 +135,16 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
                 //     }
                 //   },
                 // ),
-              
+                SizedBox(height: 10),
                  DropdownButtonFormField<PrinterType>(
                     value: controller.getTypePrinter( printer?.typePrinter),
                     decoration: const InputDecoration(
                       prefixIcon: Icon(
                         Icons.print,
-                        size: 24,
+                        size: 20,
                       ),
-                      labelText: "Type Printer Device",
-                      labelStyle: TextStyle(fontSize: 18.0),
+                      // labelText: "Type Printer Device",
+                      // labelStyle: TextStyle(fontSize: 18.0),
                       focusedBorder: InputBorder.none,
                       enabledBorder: InputBorder.none,
                     ),
@@ -177,7 +178,7 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
                     },
                   ),
 
-                 Divider(height: 10, thickness: 1, color: const Color.fromARGB(255, 218, 218, 218)), // Separator
+                 Divider(height: 10, thickness: 3, color: const Color.fromARGB(255, 218, 218, 218)), // Separator
                             Row(
                 children: [
                   Text('طابعة : ${controller.selectedPrinter?.deviceName ?? "غير محدد"}'),
@@ -185,7 +186,7 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: controller.defaultPrinterType == 'null'
-                          ? null 
+                          ? null
                           : () {
               controller.scan();
               _showDeviceDialog();
@@ -197,15 +198,15 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
               ),
              Divider(height: 10, thickness: 1, color: const Color.fromARGB(255, 218, 218, 218)), // Separator
                 OutlinedButton(
-                                onPressed: controller.selectedPrinter == null 
+                                onPressed: controller.selectedPrinter == null
                                     ? null
                                     : () async {
-                                     
+
                                        // _printReceiveTest();
                                         try {
-                                         controller.printTestTicket(); 
+                                         controller.printTestTicket();
                                         } catch (e) {
-                                          print(e); 
+                                          print(e);
                                         }
                                       },
                                 child: const Padding(

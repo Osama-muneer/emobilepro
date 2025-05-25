@@ -1031,6 +1031,7 @@ class LoginController extends GetxController {
   String get SOMGU => userDataBox.get('SOMGU', defaultValue: '');
   int get SSID_N => userDataBox.get('SSID_N', defaultValue: 601);
   int get SCSFL_TX => userDataBox.get('SCSFL_TX', defaultValue: 3);
+  int get crossAxisCountMAT_INF => userDataBox.get('crossAxisCountMAT_INF', defaultValue: 2);
 
   String get CTMID_V => userDataBox.get('CTMID_V');
   String get BCNA_V => userDataBox.get('BCNA', defaultValue: '');

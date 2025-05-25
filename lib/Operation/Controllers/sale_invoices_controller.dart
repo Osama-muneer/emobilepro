@@ -400,6 +400,7 @@ class Sale_Invoices_Controller extends GetxController {
       COUNTRecode_ORD = 0,
       UseSignature = 0,
       ShowSignatureAlert = 0,
+      crossAxisCountMAT_INF = 2,
       currentIndex=0;
 
   int? BMKID,
@@ -4062,6 +4063,7 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_PAY_KIN_P();
     await GET_Allow_give_Discount();
     await GET_Allow_give_Free_Quantities();
+    crossAxisCountMAT_INF=LoginController().crossAxisCountMAT_INF;
     STMID == 'EORD' ? await GET_BIF_MOV_D_P(BMMID.toString(), '2') : false;
     update();
     Get.to(() => STMID == 'EORD' ? const Add_Edit_Sale_order() :
@@ -8332,6 +8334,7 @@ class Sale_Invoices_Controller extends GetxController {
           if ((food.BMDNO! - 1) < 1) {
             await deleteBIL_MOV_D_ONE('BIF_MOV_D', food.BMMID.toString(), food.BMDID.toString());
             cartFood.removeWhere((element) => element == food);
+            await GET_SUMBIL_P();
             update();
           } else {
             BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();

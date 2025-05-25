@@ -1078,7 +1078,9 @@ class Pay_Out_Controller extends GetxController {
   editMode(BuildContext context) {
     contentFocusNode.unfocus();
     loading(true);
-    if (Get.arguments == null) {
+    print(Get.arguments);
+    print('Get.arguments');
+    if (Get.arguments == null && edit == false) {
       if (CountRecodeController.text == '0') {
         Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
             backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
@@ -1086,11 +1088,12 @@ class Pay_Out_Controller extends GetxController {
             isDismissible: true,
             dismissDirection: DismissDirection.horizontal,
             forwardAnimationCurve: Curves.easeOutBack);
-      } else {
-        Save_ACC_MOV_M_P(0,context);
+      }
+      else {
+        Save_ACC_MOV_M_P(edit,context);
       }
     } else {
-      Save_ACC_MOV_M_P(Get.arguments,context);
+      Save_ACC_MOV_M_P(edit,context);
     }
   }
   //دالة التقريب
@@ -1107,7 +1110,7 @@ class Pay_Out_Controller extends GetxController {
       }else{
         COUNT_RECODE = data;
         CountRecodeController.text = COUNT_RECODE.elementAt(0).COU.toString();
-        CheckBack=COUNT_RECODE.elementAt(0).COU!;
+        // CheckBack=COUNT_RECODE.elementAt(0).COU!;
         UpdateROWN1(int.parse(CountRecodeController.text), AMMID);
         update();
       }
@@ -1171,7 +1174,7 @@ class Pay_Out_Controller extends GetxController {
   }
 
   //حفظ سند رئيسي
-  Future<bool> Save_ACC_MOV_M_P(int id,BuildContext context) async {
+  Future<bool> Save_ACC_MOV_M_P(bool TypeSave,BuildContext context) async {
     try {
       STB_N='S1';
       if (SelectDataBIID == null || SelectDataSCID == null ){
@@ -1236,7 +1239,7 @@ class Pay_Out_Controller extends GetxController {
         return false;
       }
       else {
-        if(id==0){
+        if(TypeSave==false){
           SCEXController.text=SCEXController.text.toString().contains('.0') ? double.parse(SCEXController.text).round().toString() :SCEXController.text;
           AMMINController.text=AMKID!=15? AMMINCHECK==AMMINController.text ?
           AMKID==2?"(MOB) ${'StringPayTo'.tr}: ${AANADetails}":
