@@ -22,7 +22,7 @@ EORD
 REP
 */
 
-var STMID="EORD";
+var STMID="MOB";
 
 /*
 ANDROID

@@ -6227,7 +6227,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
-
   //حفظ فاتورة فرعي
   Future<bool> Save_BIL_MOV_D_P() async {
     try {
@@ -6890,8 +6889,7 @@ class Sale_Invoices_Controller extends GetxController {
 
 
   //اضافة الاصناف التابعة والمرتبطة
-  Future ADD_MAT_FOL_TO_MOV_D(String GETBIID, String GETMGNO, String GETMINO,
-      int GETBMDID) async {
+  Future ADD_MAT_FOL_TO_MOV_D(String GETBIID, String GETMGNO, String GETMINO, int GETBMDID) async {
     await GET_MAT_FOL(GETBIID, GETMGNO, GETMINO).then((userList) async {
       if (userList.isNotEmpty) {
         print('ADD_MAT_FOL_TO_MOV_D');
@@ -7020,8 +7018,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   //تعديل المردود
-  Future UPDATE_BIL_MOV_D(String GetBMMID, int GetBMMID2,
-      String GETGUID) async {
+  Future UPDATE_BIL_MOV_D(String GetBMMID, int GetBMMID2,String GETGUID) async {
     await fetchBIL_MOV_D(GetBMMID).then((userList) async {
       if (userList.isNotEmpty) {
         for (var i = 0; i < userList.length; i++) {
@@ -8016,11 +8013,8 @@ class Sale_Invoices_Controller extends GetxController {
         BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M').then((data) {
       if (data.isNotEmpty) {
         BIF_MOV_D = data;
-        DEL_SMMID = BIF_MOV_D
-            .elementAt(0)
-            .BMMID;
-        deleteBIL_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-            DEL_SMMID.toString());
+        DEL_SMMID = BIF_MOV_D.elementAt(0).BMMID;
+        deleteBIL_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', DEL_SMMID.toString());
       }
     });
   }
@@ -8262,7 +8256,7 @@ class Sale_Invoices_Controller extends GetxController {
   List<int> pendingActions = []; // 1 = إضافة، 0 = إنقاص
   bool isProcessing = false;
 
-// تضيف الطلب وتبدأ التنفيذ إن لم يكن قيد التنفيذ
+  // تضيف الطلب وتبدأ التنفيذ إن لم يكن قيد التنفيذ
   Future<void> enqueueUpdate(Bil_Mov_D_Local food, int TYPE) async {
     pendingActions.add(TYPE);
     await processQueue(food);

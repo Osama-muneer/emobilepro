@@ -16,7 +16,7 @@ class Accounts_ArchiveController extends GetxController {
   //TODO: Implement HomeController
   var isloading = false.obs;
   bool value = false,isTablet=false,value1 = false;
- String SDDSA='',SONA='',SONE='',SORN='',SOLN='', SDDDA = '',AANA='';
+ String SDDSA='',SONA='',SONE='',SORN='',SOLN='', SDDDA = '',AANA='',TYPE_T='1',TYPE_ORD2='1';
  // late  DateTime dateFromDays =  DateFormat('dd-MM-yyyy').format(DateTime.now()) as DateTime;
   DateTime dateFromDays1 = DateTime.now();
   final formatter = intl.NumberFormat.decimalPattern();
@@ -197,7 +197,7 @@ class Accounts_ArchiveController extends GetxController {
   Future GET_ACC_MOV_REP_P() async {
     ACC_MOV_M_PDF=await GET_ACC_MOV_REP(SelectDataFromBIID!,SelectDataToBIID!,SelectFromDays!,
         SelectToDays!, SelectDataSCID.toString(),PKID.toString(),AANA,
-        SelectFromDATEI.toString(),SelectToDATEI.toString());
+        SelectFromDATEI.toString(),SelectToDATEI.toString(),TYPE_T,TYPE_ORD2);
     ACC_MOV_M_SUM_PDF =await GET_ACC_MOV_SUM_REP(SelectDataFromBIID!,SelectDataToBIID!,SelectFromDays!,
         SelectToDays!, SelectDataSCID.toString(),PKID.toString(),AANA,
         SelectFromDATEI.toString(),SelectToDATEI.toString());

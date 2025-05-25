@@ -18,7 +18,8 @@ class _DataGridPageState extends State<Show_DataGrid_archive> {
   Future<ProductDataGridSource> getProductDataSource() async {
     var ACC_MOVList = await  GET_ACC_MOV_REP(controller.SelectDataFromBIID!,controller.SelectDataToBIID!,controller.SelectFromDays!,
         controller.SelectToDays!, controller.SelectDataSCID.toString(),controller.PKID.toString(),controller.AANA,
-        controller.SelectFromDATEI.toString(),controller.SelectToDATEI.toString());
+        controller.SelectFromDATEI.toString(),controller.SelectToDATEI.toString(),controller.TYPE_T,
+        controller.TYPE_ORD2);
     return ProductDataGridSource(ACC_MOVList);
   }
 

@@ -233,18 +233,38 @@ Future<List<Acc_Acc_Local>> query_Acc_Acc(String GETBIID,String GETSCID) async {
 }
 
 Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_REP(String GETBIID_F,String GETBIID_T,String GETAMMDO_F,String GETAMMDO_T,
-    String GETSCID,String GETPKID,String GETAANO_D,String GETDATE_F,String GETDATE_T) async {
+    String GETSCID,String GETPKID,String GETAANO_D,String GETDATE_F,String GETDATE_T,String ORD_BY,
+    String ORD_BY2) async {
   var dbClient = await conn.database;
   String sql;
   String Wheresql='';
   String SCIDsql='';
   String PKIDsql='';
   String DATEIsql='';
+  String OrdSql='';
+  String Ord2Sql='';
   (GETDATE_F.isEmpty || GETDATE_F=='null' || GETDATE_T.isEmpty || GETDATE_T=='null') ?
   DATEIsql= "":DATEIsql= "  AND (A.DATEI BETWEEN '$GETDATE_F 00:00' AND '$GETDATE_T 23:59') ";
 
   (GETSCID.isEmpty || GETSCID=='null')? SCIDsql= "":SCIDsql= "  AND  A.SCID=$GETSCID";
   (GETPKID.isEmpty || GETPKID=='null')? PKIDsql= "":PKIDsql= "  AND  A.PKID=$GETPKID";
+
+  if(ORD_BY=='1'){
+    OrdSql=' ORDER BY A.BIID ';
+  }else if(ORD_BY=='2') {
+    OrdSql = ' ORDER BY A.AMKID ';
+  }else if(ORD_BY=='3') {
+    OrdSql = ' ORDER BY A.AMMNO ';
+  }else if(ORD_BY=='4') {
+    OrdSql = ' ORDER BY A.AMMDO ';
+  }else if(ORD_BY=='5') {
+    OrdSql = ' ORDER BY A.SIID ';
+  }else if(ORD_BY=='6') {
+    OrdSql = ' ORDER BY A.AMMAM ';
+  }
+
+  ORD_BY2=='2'?Ord2Sql='DESC':Ord2Sql='ASC';
+
 
   sql="SELECT A.BIID,A.AMMID,A.AMKID,A.AMMNO,A.AMMDO,A.SCID,A.AMMAM,A.PKID,A.AMMST,A.AMMDOR,A.DATEI,A.AMMIN,E.SCSY, "
       " CASE WHEN 1=2 AND B.BINE IS NOT NULL THEN B.BINE ELSE B.BINA END  BINA_D, "
@@ -273,7 +293,7 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_REP(String GETBIID_F,String GETBIID_T,
   " AND (A.BIID=B.BIID AND A.CIID_L=B.CIID_L AND A.JTID_L=B.JTID_L  AND A.BIID_L=B.BIID_L AND A.SYID_L=B.SYID_L) "
   " AND (A.PKID=D.PKID AND A.CIID_L=D.CIID_L AND A.JTID_L=D.JTID_L AND A.BIID_L=D.BIID_L AND A.SYID_L=D.SYID_L) "
   " AND (A.SCID=E.SCID AND A.CIID_L=E.CIID_L AND A.JTID_L=E.JTID_L AND A.BIID_L=E.BIID_L  AND A.SYID_L=E.SYID_L) "
-  " ORDER BY A.AMKID,A.AMMID DESC";
+  " $OrdSql $Ord2Sql ";
 
   var result = await dbClient!.rawQuery(sql);
   List<Acc_Mov_M_Local> list = result.map((item) {
@@ -337,7 +357,9 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_SUM_REP(String GETBIID_F,String GETBII
 }
 
 Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_REP(String GETBIID_F,String GETBIID_T,String GETBMMDO_F,String GETBMMDO_T,
-    String GETSCID,String GETPKID,String GETDATE_F,String GETDATE_T) async {
+    String GETSCID,String GETPKID,String GETDATE_F,String GETDATE_T,String ORD_BY,
+String ORD_BY2)
+async {
   var dbClient = await conn.database;
   String sql;
   String SCIDsql='';
@@ -347,6 +369,8 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_REP(String GETBIID_F,String GETBIID_T,
   String Wheresql2='';
   String Wheresql6='';
   String Wheresql7='';
+  String OrdSql='';
+  String Ord2Sql='';
   (GETDATE_F.isEmpty || GETDATE_F=='null' || GETDATE_T.isEmpty || GETDATE_T=='null') ?
   DATEIsql= "":DATEIsql= "  AND (A.DATEI BETWEEN '$GETDATE_F 00:00' AND '$GETDATE_T 23:59') ";
 
@@ -356,6 +380,23 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_REP(String GETBIID_F,String GETBIID_T,
   LoginController().BIID_ALL_V=='1'? Wheresql2= " AND  B.BIID_L=${LoginController().BIID}":Wheresql2='';
   LoginController().BIID_ALL_V=='1'? Wheresql6= " AND  F.BIID_L=${LoginController().BIID}":Wheresql6='';
   LoginController().BIID_ALL_V=='1'? Wheresql7= " AND  G.BIID_L=${LoginController().BIID}":Wheresql7='';
+
+  if(ORD_BY=='1'){
+    OrdSql=' ORDER BY BIID ';
+  }else if(ORD_BY=='2') {
+    OrdSql = ' ORDER BY BMKID ';
+  }else if(ORD_BY=='3') {
+    OrdSql = ' ORDER BY BMMNO ';
+  }else if(ORD_BY=='4') {
+    OrdSql = ' ORDER BY BMMDO ';
+  }else if(ORD_BY=='5') {
+    OrdSql = ' ORDER BY SIID ';
+  }else if(ORD_BY=='6') {
+    OrdSql = ' ORDER BY BMMMT ';
+  }
+
+  ORD_BY2=='2'?Ord2Sql='DESC':Ord2Sql='ASC';
+
 
   sql = "SELECT BMMID,BMKID,BMMNO,BMMRE,BMMDO,BMMAM,BMMDI,BMMTX,BMMDIF,BMMMT,BMMNA,BMMST,A.DATEI,A.BIID,A.BCID"
       ",CASE WHEN ${LoginController().LAN}=2 AND B.BINE IS NOT NULL THEN B.BINE ELSE B.BINA END  BINA_D, "
@@ -386,7 +427,7 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_REP(String GETBIID_F,String GETBIID_T,
       " AND F.SYID_L=${LoginController().SYID} AND F.CIID_L='${LoginController().CIID}' $Wheresql6"
       " AND G.PKID=A.PKID AND  G.JTID_L=${LoginController().JTID} "
       " AND G.SYID_L=${LoginController().SYID} AND G.CIID_L='${LoginController().CIID}' $Wheresql7"
-      " ORDER BY BMKID,BMMID ";
+      " $OrdSql  $Ord2Sql ";
   var result = await dbClient!.rawQuery(sql);
   List<Bil_Mov_M_Local> list = result.map((item) {
     return Bil_Mov_M_Local.fromMap(item);
@@ -1003,12 +1044,22 @@ Future<List<Bal_Acc_C_Local>> GET_Customers_Balances(int TYPE,String GETBIID_F,S
   }
 
 
-  var result = await dbClient!.rawQuery(sql);
+  //var result = await dbClient!.rawQuery(sql);
   print(sql);
-  print(result);
+//  print(result);
   print('GET_Customers_Balances');
-  List<Bal_Acc_C_Local> list = result.map((item) {return Bal_Acc_C_Local.fromMap(item);}).toList();
-  return list;
+ // List<Bal_Acc_C_Local> list = result.map((item) {return Bal_Acc_C_Local.fromMap(item);}).toList();
+  return dbClient!.transaction<List<Bal_Acc_C_Local>>((txn) async {
+    // إذا أحببت يمكنك ضبط مهلة الانتظار هنا (مثلاً 5 ثواني بدل 10):
+   // await txn.rawExecute("PRAGMA busy_timeout = 5000");
+
+    // شغّل الـ rawQuery على كائن المعاملة txn وليس dbClient
+    final result = await txn.rawQuery(sql);
+
+    // تحويل النتيجة إلى كائناتك
+    return result.map((item) => Bal_Acc_C_Local.fromMap(item)).toList();
+  });
+
 }
 
 
@@ -2526,8 +2577,8 @@ Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BCCAM3(String GETBIID_F,String GETBII
 Future<List<Bil_Mov_M_Local>> GET_TotalDetailedItem_REP2(int TYPE,String TAB_M,String TAB_D,
     String GETBMKID_F,String GETBMKID_T,String GETBIID_F,String GETBIID_T,String GETBMMDO_F,
     String GETBMMDO_T,String GETMGNO_F,String GETMGNO_T,String GETMINO_F,String GETMINO_T,
-    String GETSCID_F,String GETSCID_T,
-    String GETPKID_F,String GETPKID_T,String GETBMMST_F,String GETBMMST_T)
+    String GETSCID_F,String GETSCID_T, String GETPKID_F,String GETPKID_T,String GETBMMST_F,
+    String GETBMMST_T)
 async {
   final dbClient = await conn.database;
   String S='';
@@ -2639,8 +2690,7 @@ async {
       $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
       $BMKIDsql $BMKSTsql
       $PKIDsql $SCIDsql $S  $M  $N
-      UNION ALL
-      
+      UNION ALL      
       SELECT 
       M.BMKID,
       K.BMKNA AS BMKID_D,
@@ -2707,8 +2757,7 @@ async {
       AND M.CIID_L = '${LoginController().CIID}'
       $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
       $BMKIDsql $BMKSTsql $PKIDsql $SCIDsql $S  $M  $N
-      ORDER BY M.BMMDO ASC
-  """;
+      ORDER BY M.BMMDO ASC """;
 
   final sql2 = """
       SELECT  M.SCID,D.MGNO,D.MINO,D.MUID,M.BMKID,K.BMKNA AS BMKID_D,
@@ -2728,11 +2777,11 @@ async {
       -- مورد
       SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDNO ELSE 0.0 END) AS BMDNO_IN,
       SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDNF ELSE 0.0 END) AS BMDNF_IN,
-      SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDAM ELSE 0.0 END) AS BMDAM_IN,
+      SUM(CASE WHEN M.BMKID IN (1,4,6,12) THEN D.BMDAMT ELSE 0.0 END) AS BMDAM_IN,
       -- منصرف
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNO ELSE 0.0 END) AS BMDNO_OUT,
       SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDNF ELSE 0.0 END) AS BMDNF_OUT,
-      SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDAM ELSE 0.0 END) AS BMDAM_OUT
+      SUM(CASE WHEN M.BMKID IN (2,3,5,11) THEN D.BMDAMT ELSE 0.0 END) AS BMDAM_OUT
       FROM BIL_MOV_M AS M
       JOIN BIL_MOV_D AS D 
       ON M.BMMID = D.BMMID
@@ -2769,7 +2818,7 @@ async {
       $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
       $BMKIDsql $BMKSTsql
       $PKIDsql $SCIDsql $S  $M  $N
-      GROUP BY  M.BMKID,M.SCID,D.MGNO,D.MINO,D.MUID
+      GROUP BY  M.SCID,D.MGNO,D.MINO,D.MUID
      
       UNION ALL
       SELECT  M.SCID,D.MGNO,D.MINO,D.MUID,M.BMKID,K.BMKNA AS BMKID_D,
@@ -2831,7 +2880,7 @@ async {
       $extraWhere AND  M.BMMDOR BETWEEN '$GETBMMDO_F' AND '$GETBMMDO_T'
       $BMKIDsql $BMKSTsql
       $PKIDsql $SCIDsql $S  $M  $N
-      GROUP BY  M.BMKID,M.SCID,D.MGNO,D.MINO,D.MUID
+      GROUP BY  M.SCID,D.MGNO,D.MINO,D.MUID
   """;
 
   // printLongText(TYPE==101?sql2:sql);

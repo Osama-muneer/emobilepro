@@ -123,7 +123,8 @@ class Pay_Out_Controller extends GetxController {
 
   onInit() {
     super.onInit();
-    (Get.arguments==1 || Get.arguments==11 || AMKID==1) ? AMKID=1 : (Get.arguments==2 || AMKID==2) ? AMKID=2 :
+    (Get.arguments==1 || Get.arguments==11 || AMKID==1) ? AMKID=1
+    : (Get.arguments==2 || AMKID==2) ? AMKID=2 :
     (Get.arguments==3 || AMKID==3) ? AMKID=3 : AMKID=15;
     AANOController =   TextEditingController();
     AANAController =   TextEditingController();
@@ -1078,7 +1079,12 @@ class Pay_Out_Controller extends GetxController {
   editMode(BuildContext context) {
     contentFocusNode.unfocus();
     loading(true);
+    print('editMode');
+    print(Get.arguments);
+    print(CountRecodeController.text);
+    print(Get.arguments == null);
     if (Get.arguments == null) {
+      print('Save_ACC_MOV_M_P33');
       if (CountRecodeController.text == '0') {
         Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
             backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
@@ -1087,9 +1093,11 @@ class Pay_Out_Controller extends GetxController {
             dismissDirection: DismissDirection.horizontal,
             forwardAnimationCurve: Curves.easeOutBack);
       } else {
+        print('Save_ACC_MOV_M_P44');
         Save_ACC_MOV_M_P(0,context);
       }
     } else {
+      print('Save_ACC_MOV_M_P55');
       Save_ACC_MOV_M_P(Get.arguments,context);
     }
   }
@@ -1173,6 +1181,7 @@ class Pay_Out_Controller extends GetxController {
   //حفظ سند رئيسي
   Future<bool> Save_ACC_MOV_M_P(int id,BuildContext context) async {
     try {
+      print('Save_ACC_MOV_M_P');
       STB_N='S1';
       if (SelectDataBIID == null || SelectDataSCID == null ){
         Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
@@ -1236,6 +1245,8 @@ class Pay_Out_Controller extends GetxController {
         return false;
       }
       else {
+        print('Save_ACC_MOV_M_P2');
+        print(id);
         if(id==0){
           SCEXController.text=SCEXController.text.toString().contains('.0') ? double.parse(SCEXController.text).round().toString() :SCEXController.text;
           AMMINController.text=AMKID!=15? AMMINCHECK==AMMINController.text ?
@@ -1278,6 +1289,8 @@ class Pay_Out_Controller extends GetxController {
             CIID_L: LoginController().CIID,
           );
           Save_ACC_MOV_M(M);
+          print('Save_ACC_MOV_M_P3');
+          print(M);
         }
         else{
           UpdateACC_MOV_M(AMKID!,AMMID!,'$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}'
@@ -1290,6 +1303,7 @@ class Pay_Out_Controller extends GetxController {
               AMKID == 15?0.0:roundDouble((double.parse(AMMAMController.text.toString())*double.parse(SCEXController.text.toString())),2),
               AMMREController.text,AMMINController.text,AMMCNController.text,
               LoginController().SUID,DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),LoginController().DeviceName);
+          print('Save_ACC_MOV_M_P4');
         }
         CheckBack = 0;
         STB_N='S3';
@@ -1306,6 +1320,7 @@ class Pay_Out_Controller extends GetxController {
         LoginController().SET_N_P('TIMER_POST',0);
         //value ? UpdateACC_MOV_D_SCID(AMKID!,AMMID!,SelectDataSCID.toString(),SCEXController.text): null;
         ClearACC_Mov_M_Data();
+        print('Save_ACC_MOV_M_P5');
         Get.snackbar(
             'StringMesSave'.tr, "${'StringMesSave'.tr}-$AMMID",
             backgroundColor: Colors.green,

@@ -170,14 +170,11 @@ class Inv_Rep_Controller extends GetxController {
   Future GET_BIL_CRE_C_P() async {
     GET_BIL_CRE_C_APPROVE().then((data) {
       BIL_CRE_C_List = data;
-      print('GET_BIL_CRE_C_P');
-      print(BIL_CRE_C_List.length);
     });
   }
 
   Future GET_TotalDetailedItem_REP_P() async {
     isloading.value=true;
-
     Bil_Mov_M=await GET_TotalDetailedItem_REP2(BMKID,
         SelectDataBMKID=='11' || SelectDataBMKID=='12'?'BIF_MOV_M':'BIL_MOV_M',
         SelectDataBMKID=='11'?'BIF_MOV_D':'BIL_MOV_D',SelectDataBMKID.toString(),
@@ -203,7 +200,24 @@ class Inv_Rep_Controller extends GetxController {
       //  var Bil_Mov_M= await fetchDetailedMovements();
       // generatePdfReport(controller.Bil_Mov_M);
 
-      final pdfFile =  await Pdf.TotalDetailedItemReport_Pdf2(
+      final pdfFile = BMKID==101?
+      await  Pdf.TotalDetailedItemReport_Pdf(
+          BMKID.toString(),
+          SelectDataBMKID.toString(),
+          SelectDataFromBINA.toString(),
+          SelectDataToBINA.toString(),
+          SDDSA, SONA,
+          SONE,
+          SORN,
+          SOLN,
+          LoginController().SUNA,
+          SelectFromDays.toString().substring(0,10),
+          SelectToDays.toString().substring(0,10),
+          SUMBMDNO,
+          SUMBMDMT,
+          Bil_Mov_M
+      )
+          : await  Pdf.TotalDetailedItemReport_Pdf2(
           BMKID.toString(),
           SelectDataBMKID.toString(),
           SelectDataFromBINA.toString(),
