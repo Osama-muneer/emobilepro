@@ -257,8 +257,6 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
 
   @override
   Widget build(BuildContext context) {
-
-
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return GetBuilder<Sale_Invoices_Controller>(
@@ -377,15 +375,18 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                               shrinkWrap: true,
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: controller.crossAxisCountMAT_INF,
-                                crossAxisSpacing: 12.0,
-                                mainAxisSpacing: 15.0,
-                                mainAxisExtent: 200,
+                               // crossAxisSpacing: 12.0,
+                               // mainAxisSpacing: 15.0,
+                                mainAxisExtent: 200,       // ← يثبّت الارتفاع
+                               // childAspectRatio: 1,       // ← نسبة العرض
+                                crossAxisSpacing: 3.10,
+                                mainAxisSpacing:  3.10,
+                                childAspectRatio: (5 / 1.1),
                               ),
                               itemCount: controller.MAT_INF_DATE.length,
                               itemBuilder: (context, index) {
                                 return Stack(
                                 children: [
-
                                   Container(
                                     decoration: BoxDecoration(
                                       border: Border.all(color: Colors.red, width: 0.5),

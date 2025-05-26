@@ -48,19 +48,19 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
   );
   Future<void> selectDateFromDays(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate:  controller.dateTimeDays,
-        firstDate: DateTime(2022,5),
-        lastDate: DateTime(2050),
-        builder: (context, child) {
-      return   Theme(
-        data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFF4A5BF6),
-            colorScheme: ColorScheme.fromSwatch(primarySwatch: buttonTextColor).copyWith(secondary: const Color(0xFF4A5BF6))//selection color
-        ),
-        child: child!,
-      );
-    },
+      context: context,
+      initialDate:  controller.dateTimeDays,
+      firstDate: DateTime(2022,5),
+      lastDate: DateTime(2050),
+      builder: (context, child) {
+        return   Theme(
+          data: ThemeData.light().copyWith(
+              primaryColor: const Color(0xFF4A5BF6),
+              colorScheme: ColorScheme.fromSwatch(primarySwatch: buttonTextColor).copyWith(secondary: const Color(0xFF4A5BF6))//selection color
+          ),
+          child: child!,
+        );
+      },
     );
 
 
@@ -88,38 +88,37 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
       Navigator.of(context).pop(false);
       return true;
     }else{
-    if((controller.edit == true || controller.CheckBack == 0)){
-      if(controller.edit == true ){
-        controller.CheckBack == 0 ? null : controller.Save_ACC_MOV_M_P(controller.edit,context);
+      if((controller.edit == true || controller.CheckBack == 0)){
+        if(controller.edit == true ){
+          controller.CheckBack == 0 ? null : controller.Save_ACC_MOV_M_P(controller.edit,context);
+        }
+        Navigator.of(context).pop(false);
+        controller.ClearACC_Mov_M_Data();
+        controller.GET_ACC_MOV_M_P('DateNow',controller.AMKID!);
+        shouldPop = await Get.toNamed('/View_Pay_Out');
       }
-
-      Navigator.of(context).pop(false);
-      controller.ClearACC_Mov_M_Data();
-      controller.GET_ACC_MOV_M_P('DateNow',controller.AMKID!);
-       shouldPop = await Get.toNamed('/View_Pay_Out');
+      else{
+        shouldPop = await Get.defaultDialog(
+          title: 'StringChiksave2'.tr,
+          middleText: 'StringChiksave'.tr,
+          backgroundColor: Colors.white,
+          radius: 40,
+          textCancel: 'StringNo'.tr,
+          cancelTextColor: Colors.red,
+          textConfirm: 'StringYes'.tr,
+          confirmTextColor: Colors.white,
+          onConfirm: () {
+            Navigator.of(context).pop(false);
+            bool isValid = controller.DELETE_ACC_MOV(controller.AMMID.toString(), 2);
+            controller.ClearACC_Mov_M_Data();
+            if (isValid) {
+              Get.offAndToNamed('/View_Pay_Out');
+            }
+          },
+        );
+      }
+      return shouldPop ?? false;
     }
-    else{
-       shouldPop = await Get.defaultDialog(
-        title: 'StringChiksave2'.tr,
-        middleText: 'StringChiksave'.tr,
-        backgroundColor: Colors.white,
-        radius: 40,
-        textCancel: 'StringNo'.tr,
-        cancelTextColor: Colors.red,
-        textConfirm: 'StringYes'.tr,
-        confirmTextColor: Colors.white,
-        onConfirm: () {
-          Navigator.of(context).pop(false);
-          bool isValid = controller.DELETE_ACC_MOV(controller.AMMID.toString(), 2);
-          controller.ClearACC_Mov_M_Data();
-          if (isValid) {
-            Get.offAndToNamed('/View_Pay_Out');
-          }
-        },
-      );
-    }
-    return shouldPop ?? false;
-  }
   }
 
   Widget build(BuildContext context) {
@@ -140,7 +139,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                   onPressed: () async {
                     if(controller.UPINCUS==1){
                       Get.to(() => Add_Ed_Customer(),arguments: 1);
-                   //   Get.toNamed('/Add_Ed_Customer',arguments: 1);
+                      //   Get.toNamed('/Add_Ed_Customer',arguments: 1);
                     }else{
                       Get.snackbar('StringUPIN'.tr, 'String_CHK_UPIN'.tr,
                           backgroundColor: Colors.red,
@@ -213,7 +212,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
             )
           ],
           title: Text('${controller.titleScreen} ${controller.AMKID==1 ? 'StringReceipt'.tr : controller.AMKID==2 ?
-                       'StringPayment'.tr : controller.AMKID==3? 'StringCollectionsVoucher'.tr:
+          'StringPayment'.tr : controller.AMKID==3? 'StringCollectionsVoucher'.tr:
           'StringJournalVouchers'.tr }',style:
           ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')),
           centerTitle: true,
@@ -248,8 +247,8 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                                     });
                                   },
                                   child: Text(
-                                    (controller.SelectDays ?? (controller.SelectDays=DateFormat('dd-MM-yyyy').format(DateTime.now()).toString().split(" ")[0])),
-                                    style:   ThemeHelper().buildTextStyle(context, Colors.black,'M')
+                                      (controller.SelectDays ?? (controller.SelectDays=DateFormat('dd-MM-yyyy').format(DateTime.now()).toString().split(" ")[0])),
+                                      style:   ThemeHelper().buildTextStyle(context, Colors.black,'M')
                                   ),
                                 )),
                           ),
@@ -257,58 +256,58 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                       ),
                       SizedBox(height: 0.01 * height),
                       if(controller.AMKID!=15)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width / 2.15,
-                            child: Row(children: [
-                              Checkbox(
-                                value: controller.ValueAMMCC,
-                                onChanged: (value) {
-                                  if(controller.ValueAMMCC==true  ){
-                                    controller.ValueAMMCC=false;
-                                    controller.ValueAMMCC = value!;
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 2.15,
+                              child: Row(children: [
+                                Checkbox(
+                                  value: controller.ValueAMMCC,
+                                  onChanged: (value) {
+                                    if(controller.ValueAMMCC==true  ){
+                                      controller.ValueAMMCC=false;
+                                      controller.ValueAMMCC = value!;
+                                      controller.update();
+                                    }
+                                    else{
+                                      controller.ValueAMMCC = value!;
+                                      controller.update();
+                                    }
                                     controller.update();
-                                  }
-                                  else{
-                                    controller.ValueAMMCC = value!;
-                                    controller.update();
-                                  }
+                                  },
+                                  activeColor: AppColors.MainColor,
+                                ),
+                                ThemeHelper().buildText(context,'StrinChangeCur', Colors.black,'L'),
+                              ],),
+                            ),
+                            controller.ValueAMMCC?
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 2.15,
+                              child: TextField(
+                                style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+                                controller: controller.AMMAM1Controller,
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                onChanged: (v){
+                                  controller.AMMEQController.text=controller.roundDouble((double.parse(controller.AMMAM1Controller.text)*
+                                      double.parse(controller.SCEXController.text)),0).toString();
                                   controller.update();
                                 },
-                                activeColor: AppColors.MainColor,
+                                decoration:  InputDecoration(
+
+                                    labelText:" ${'StringAmount'.tr}  ( ${'StringTotalequivalent'.tr} ${double.parse(controller.AMMEQController.text)} )",
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(0.015*height),
+                                        borderSide: BorderSide(color: Colors.grey.shade500)),
+                                    labelStyle: TextStyle(color: Colors.grey),
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(0.015*height)))),
                               ),
-                              ThemeHelper().buildText(context,'StrinChangeCur', Colors.black,'L'),
-                            ],),
-                          ),
-                          controller.ValueAMMCC?
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width / 2.15,
-                            child: TextField(
-                              style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
-                              controller: controller.AMMAM1Controller,
-                              textAlign: TextAlign.center,
-                              keyboardType: TextInputType.number,
-                              onChanged: (v){
-                                controller.AMMEQController.text=controller.roundDouble((double.parse(controller.AMMAM1Controller.text)*
-                                    double.parse(controller.SCEXController.text)),0).toString();
-                                controller.update();
-                              },
-                              decoration:  InputDecoration(
-                                  
-                                  labelText:" ${'StringAmount'.tr}  ( ${'StringTotalequivalent'.tr} ${double.parse(controller.AMMEQController.text)} )",
-                                  focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(0.015*height),
-                                      borderSide: BorderSide(color: Colors.grey.shade500)),
-                                  labelStyle: TextStyle(color: Colors.grey),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                      BorderRadius.all(Radius.circular(0.015*height)))),
-                            ),
-                          ) :Container(),
-                        ],
-                      ),
+                            ) :Container(),
+                          ],
+                        ),
                       SizedBox(height: 0.01 * height),
                       controller.AMKID!=15?
                       Row(
@@ -336,80 +335,80 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                         ],
                       ),
                       if(controller.AMKID!=15)
-                      controller.PKID==1 ?
-                      Column(
-                        children: [
-                          SizedBox(height: 0.01 * height),
-                          DropdownACC_CASBuilder(),
-                        ],
-                      ):
-                      controller.PKID == 9 || controller.PKID == 2 ?
-                      Column(
-                        children: [
-                          SizedBox(height: 0.01 * height),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width / 2.15,
-                                child: DropdownACC_BANBuilder(),
-                              ),
-                              SizedBox(
+                        controller.PKID==1 ?
+                        Column(
+                          children: [
+                            SizedBox(height: 0.01 * height),
+                            DropdownACC_CASBuilder(),
+                          ],
+                        ):
+                        controller.PKID == 9 || controller.PKID == 2 ?
+                        Column(
+                          children: [
+                            SizedBox(height: 0.01 * height),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
                                   width: MediaQuery.of(context).size.width / 2.15,
-                                  child: TextFormField(
-                                    controller: controller.AMMCNController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-                                        labelText: controller.PKID == 9 ?  'StringTransferNo'.tr :
-                                        'StringCheckNo'.tr,
-                                        labelStyle: ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                0.15 * height),
-                                            borderSide: BorderSide(
-                                                color: Colors.grey.shade500)),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(0.015 * height)))),
-                                  )),
-                            ],
-                          ),
-                        ],
-                      ):
-                      Column(
-                        children: [
-                          SizedBox(height: 0.01 * height),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width / 2.15,
-                                child:   DropdownBIL_CRE_CBuilder(),
-                              ),
-                              SizedBox(
+                                  child: DropdownACC_BANBuilder(),
+                                ),
+                                SizedBox(
+                                    width: MediaQuery.of(context).size.width / 2.15,
+                                    child: TextFormField(
+                                      controller: controller.AMMCNController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                                          labelText: controller.PKID == 9 ?  'StringTransferNo'.tr :
+                                          'StringCheckNo'.tr,
+                                          labelStyle: ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                  0.15 * height),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey.shade500)),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(0.015 * height)))),
+                                    )),
+                              ],
+                            ),
+                          ],
+                        ):
+                        Column(
+                          children: [
+                            SizedBox(height: 0.01 * height),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
                                   width: MediaQuery.of(context).size.width / 2.15,
-                                  child:  TextFormField(
-                                    controller: controller.AMMCNController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-                                        labelText: 'StringTransferNo'.tr,
-                                        labelStyle:  ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                0.15 * height),
-                                            borderSide: BorderSide(
-                                                color: Colors.grey.shade500)),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(0.015 * height)))),
-                                  )
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                                  child:   DropdownBIL_CRE_CBuilder(),
+                                ),
+                                SizedBox(
+                                    width: MediaQuery.of(context).size.width / 2.15,
+                                    child:  TextFormField(
+                                      controller: controller.AMMCNController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                                          labelText: 'StringTransferNo'.tr,
+                                          labelStyle:  ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                  0.15 * height),
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey.shade500)),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(0.015 * height)))),
+                                    )
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       SizedBox(height: 0.01 * height),
                       controller.AMKID!=15?
                       Row(
@@ -423,24 +422,24 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                               decoration: ThemeHelper().InputDecorationDropDown('StringReference'.tr),
                             ),
                           ),
-                       SizedBox(
-                            width: MediaQuery.of(context).size.width / 2.15,
-                            child: DropdownBIL_DISBuilder()
+                          SizedBox(
+                              width: MediaQuery.of(context).size.width / 2.15,
+                              child: DropdownBIL_DISBuilder()
                           ),
                         ],
                       )
-                      :Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                      Expanded(
-                      child: TextFormField(
-                        style:  ThemeHelper().buildTextStyle(context, Colors.black,'L'),
-                        controller: controller.AMMREController,
-                        decoration: ThemeHelper().InputDecorationDropDown('StringReference'.tr),
+                          :Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              style:  ThemeHelper().buildTextStyle(context, Colors.black,'L'),
+                              controller: controller.AMMREController,
+                              decoration: ThemeHelper().InputDecorationDropDown('StringReference'.tr),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    ],
-                   ),
                       SizedBox(height: 0.01 * height),
                       controller.P_COSM!='1' || (controller.P_COS_SEQ!='1' && controller.P_COS1!='1' &&  controller.P_COS1!='2')
                           ? Container() :  DropdownACC_COSBuilder(),
@@ -453,11 +452,11 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                               controller: controller.AMMINController,
                               decoration: InputDecoration(
 
-                                suffixIcon: IconButton(icon: Icon(Icons.error_outline),onPressed: (){
-                                  if(controller.GET_AMMIN.isNotEmpty){
-                                    buildShowDialogGET_AMMIN(context);
-                                  }
-                                }),
+                                  suffixIcon: IconButton(icon: Icon(Icons.error_outline),onPressed: (){
+                                    if(controller.GET_AMMIN.isNotEmpty){
+                                      buildShowDialogGET_AMMIN(context);
+                                    }
+                                  }),
                                   labelText: 'StringDetails'.tr,
                                   labelStyle:  ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
                                   focusedBorder: OutlineInputBorder(
@@ -491,7 +490,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                                   }
                                   else if (controller.ValueAMMCC &&
                                       (double.parse(controller.AMMAM1Controller.text.isEmpty?'0.0':controller.AMMAM1Controller.text) <= 0.0
-                                      || controller.AMMAM1Controller.text.isEmpty || controller.AMMAM1Controller.isNull)) {
+                                          || controller.AMMAM1Controller.text.isEmpty || controller.AMMAM1Controller.isNull)) {
                                     Fluttertoast.showToast(
                                         msg: 'StringvalidateAMDMD'.tr,
                                         textColor: Colors.white,
@@ -500,7 +499,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                                   else if
                                   (controller.edit == false && controller.SCEXController.text.isEmpty ||
                                       (controller.SCHRController.text.isNotEmpty && double.parse(controller.SCEXController.text)>
-                                       double.parse(controller.SCHRController.text)) ||
+                                          double.parse(controller.SCHRController.text)) ||
                                       (controller.SCLRController.text.isNotEmpty && double.parse(controller.SCEXController.text)<
                                           double.parse(controller.SCLRController.text))) {
                                     Fluttertoast.showToast(
@@ -535,51 +534,51 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
         ),
         bottomNavigationBar:  GetBuilder<Pay_Out_Controller>(
           init: Pay_Out_Controller(),
-            builder: ((value) => Container(
-           // decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-            child:controller.AMKID==15 ?
-            Container(
-              color: Colors.grey[100],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildBottomColumn(context,
-                      title: "${'StringAMDMD'.tr}",
-                      value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
-                      controller.formatter.format(double.parse(controller.AMMAMController.text))}",
-                      value2: "${controller.formatter.format(controller.SUMAMDEQ_MD)}"),
-                  _buildBottomColumn(context,
-                      title: "${'StringAMDDA'.tr}",
-                      value: "${controller.SUMAMDAController.text.isEmpty?controller.SUMAMDAController.text='0':
-                      controller.formatter.format(double.parse(controller.SUMAMDAController.text))}",
-                      value2: "${controller.formatter.format(controller.SUMAMDEQ_DA)}"),
-                  _buildBottomColumn(context,
-                      title: "${'StringDefernt'.tr}",
-                      value: "${controller.SUMAMDAController.text.isEmpty?
-                      '0': controller.formatter.format(double.parse(
-                          controller.AMMAMController.text)-double.parse(
-                          controller.SUMAMDAController.text))}",
-                      value2: "${controller.formatter.format(controller.Difference_AMDEQ_MD_DA)}"),
-                 ],
-              ),
-            )
-            :
-            Container(
-              color: Colors.grey[100],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildBottomColumn(context,
-                      title: "${controller.AMKID==2 || controller.AMKID==15 ? 'StringAMDMD'.tr:'StringAMDDA'.tr}",
-                      value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
-                      controller.formatter.format(double.parse(controller.AMMAMController.text))}"),
-                  _buildBottomColumn(context,
-                      title: "${'StringTotalequivalent'.tr}",
-                      value: "${controller.AMDEQController.text.isEmpty?controller.AMDEQController.text='0':
-                      controller.formatter.format(double.parse(controller.AMDEQController.text))}"),
-                ],
-              ),
-            )
+          builder: ((value) => Container(
+            // decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+              child:controller.AMKID==15 ?
+              Container(
+                color: Colors.grey[100],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildBottomColumn(context,
+                        title: "${'StringAMDMD'.tr}",
+                        value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
+                        controller.formatter.format(double.parse(controller.AMMAMController.text))}",
+                        value2: "${controller.formatter.format(controller.SUMAMDEQ_MD)}"),
+                    _buildBottomColumn(context,
+                        title: "${'StringAMDDA'.tr}",
+                        value: "${controller.SUMAMDAController.text.isEmpty?controller.SUMAMDAController.text='0':
+                        controller.formatter.format(double.parse(controller.SUMAMDAController.text))}",
+                        value2: "${controller.formatter.format(controller.SUMAMDEQ_DA)}"),
+                    _buildBottomColumn(context,
+                        title: "${'StringDefernt'.tr}",
+                        value: "${controller.SUMAMDAController.text.isEmpty?
+                        '0': controller.formatter.format(double.parse(
+                            controller.AMMAMController.text)-double.parse(
+                            controller.SUMAMDAController.text))}",
+                        value2: "${controller.formatter.format(controller.Difference_AMDEQ_MD_DA)}"),
+                  ],
+                ),
+              )
+                  :
+              Container(
+                color: Colors.grey[100],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildBottomColumn(context,
+                        title: "${controller.AMKID==2 || controller.AMKID==15 ? 'StringAMDMD'.tr:'StringAMDDA'.tr}",
+                        value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
+                        controller.formatter.format(double.parse(controller.AMMAMController.text))}"),
+                    _buildBottomColumn(context,
+                        title: "${'StringTotalequivalent'.tr}",
+                        value: "${controller.AMDEQController.text.isEmpty?controller.AMDEQController.text='0':
+                        controller.formatter.format(double.parse(controller.AMDEQController.text))}"),
+                  ],
+                ),
+              )
           )),
         ),
       ),
@@ -587,7 +586,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
   }
 
   Widget _buildBottomColumn(BuildContext context,{required String title, required String value,
-     String? value2}) {
+    String? value2}) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -663,88 +662,88 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
 
   FutureBuilder<List<Bil_Dis_Local>> DropdownBIL_DISBuilder() {
     return  FutureBuilder<List<Bil_Dis_Local>>(
-            future: GET_BIL_DIS(controller.SelectDataBIID.toString()),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<Bil_Dis_Local>> snapshot) {
-              if (!snapshot.hasData) {
-                return Dropdown(
-                  josnStatus: josnStatus,
-                  GETSTRING: 'StringCollector'.tr,
-                );
-              }
-              return DropdownButtonFormField2(
-                decoration: ThemeHelper().InputDecorationDropDown('StringCollector'.tr),
-                isDense: true,
-                isExpanded: true,
-                hint: ThemeHelper().buildText(context,'StringCollector', Colors.grey,'S'),
-                items: snapshot.data!
-                    .map((item) => DropdownMenuItem<String>(
-                  onTap: (){
-                    controller.SelectDataBDID = item.BDID.toString();
-                    controller.update();
-                  },
-                  value: item.BDNA.toString(),
-                  child: Text(
-                    "${item.BDID.toString()} - ${item.BDNA.toString()}",
-                    style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+        future: GET_BIL_DIS(controller.SelectDataBIID.toString()),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Bil_Dis_Local>> snapshot) {
+          if (!snapshot.hasData) {
+            return Dropdown(
+              josnStatus: josnStatus,
+              GETSTRING: 'StringCollector'.tr,
+            );
+          }
+          return DropdownButtonFormField2(
+            decoration: ThemeHelper().InputDecorationDropDown('StringCollector'.tr),
+            isDense: true,
+            isExpanded: true,
+            hint: ThemeHelper().buildText(context,'StringCollector', Colors.grey,'S'),
+            items: snapshot.data!
+                .map((item) => DropdownMenuItem<String>(
+              onTap: (){
+                controller.SelectDataBDID = item.BDID.toString();
+                controller.update();
+              },
+              value: item.BDNA.toString(),
+              child: Text(
+                "${item.BDID.toString()} - ${item.BDNA.toString()}",
+                style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+              ),
+            )).toList().obs,
+            value: controller.SelectDataBDID2,
+            onChanged: (value) {
+              controller.SelectDataBDID2=value.toString();
+              controller.update();
+            },
+            dropdownStyleData: const DropdownStyleData(
+              maxHeight: 250,
+            ),
+            dropdownSearchData: DropdownSearchData(
+                searchController: controller.TextEditingSercheController,
+                searchInnerWidget: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 8,
+                    bottom: 4,
+                    right: 8,
+                    left: 8,
                   ),
-                )).toList().obs,
-                value: controller.SelectDataBDID2,
-                onChanged: (value) {
-                  controller.SelectDataBDID2=value.toString();
-                  controller.update();
-                },
-                dropdownStyleData: const DropdownStyleData(
-                  maxHeight: 250,
-                ),
-                dropdownSearchData: DropdownSearchData(
-                    searchController: controller.TextEditingSercheController,
-                    searchInnerWidget: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8,
-                        bottom: 4,
-                        right: 8,
-                        left: 8,
+                  child: TextFormField(
+                    controller: controller.TextEditingSercheController,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      suffixIcon: IconButton(icon: const Icon(
+                        Icons.clear,
+                        size: 20,
                       ),
-                      child: TextFormField(
-                        controller: controller.TextEditingSercheController,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          suffixIcon: IconButton(icon: const Icon(
-                            Icons.clear,
-                            size: 20,
-                          ),
-                            onPressed: (){
-                              controller.TextEditingSercheController.clear();
-                              controller.update();
-                            },),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
-                          ),
-                          hintText: 'StringSearch_for_BDID'.tr,
-                          hintStyle:  ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
+                        onPressed: (){
+                          controller.TextEditingSercheController.clear();
+                          controller.update();
+                        },),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      hintText: 'StringSearch_for_BDID'.tr,
+                      hintStyle:  ThemeHelper().buildTextStyle(context, Colors.grey,'S'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    searchMatchFn: (item, searchValue) {
-                      return (item.value
-                          .toString()
-                          .toLowerCase()
-                          .contains(searchValue));
-                    },
-                    searchInnerWidgetHeight: 50),
-                //This to clear the search value when you close the menu
-                onMenuStateChange: (isOpen) {
-                  if (!isOpen) {
-                    controller.TextEditingSercheController.clear();
-                  }
+                  ),
+                ),
+                searchMatchFn: (item, searchValue) {
+                  return (item.value
+                      .toString()
+                      .toLowerCase()
+                      .contains(searchValue));
                 },
-              );
-            });
+                searchInnerWidgetHeight: 50),
+            //This to clear the search value when you close the menu
+            onMenuStateChange: (isOpen) {
+              if (!isOpen) {
+                controller.TextEditingSercheController.clear();
+              }
+            },
+          );
+        });
   }
 
   FutureBuilder<List<Acc_Cos_Local>> DropdownACC_COSBuilder() {
@@ -804,8 +803,8 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                 ): IconButton(icon: Icon(Icons.error_outline), iconSize:21,
                     onPressed: (){
                       controller.GET_SYS_CUR_DAT_P(controller.SelectDataSCID.toString());
-                  buildShowSYS_CUR(context);
-                  },
+                      buildShowSYS_CUR(context);
+                    },
                     padding: EdgeInsets.only(bottom: 12, right: 25)
                   //  padding: EdgeInsets.only(bottom: 12,right: 25)
                 ),
@@ -864,7 +863,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
               isExpanded: true,
               hint: ThemeHelper().buildText(context,'StringType', Colors.grey,'S'),
               iconStyleData: IconStyleData(
-               icon:  const Icon(
+                icon:  const Icon(
                   Icons.arrow_drop_down,
                   color: Colors.black45,
                 ),
@@ -950,9 +949,9 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                 .map((item) => DropdownMenuItem<String>(
               value: item.PKID.toString(),
               onTap: () {
-                  controller.PKID=item.PKID!;
-                  controller.GETDefaultDescription_Voucher();
-                  controller.update();
+                controller.PKID=item.PKID!;
+                controller.GETDefaultDescription_Voucher();
+                controller.update();
               },
               child: Text(
                 "${item.PKID.toString()} - ${item.PKNA_D.toString()}",
@@ -970,7 +969,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
               controller.SelectDataPKID = value.toString();
               controller.PKID = int.parse(value.toString());
               controller.GETDefaultDescription_Voucher();
-                controller.update();
+              controller.update();
             },
           );
         });
