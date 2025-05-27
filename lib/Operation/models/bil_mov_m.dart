@@ -227,6 +227,8 @@ class Bil_Mov_M_Local {
   double? BMDNO_OUT;
   double? BMDNF_IN;
   double? BMDNF_OUT;
+  double? BMDAM_IN;
+  double? BMDAM_OUT;
 
   Bil_Mov_M_Local({this.BMKID,this.BMMDO,this.SCEX,this.BMMNO,this.BMMID,this.BMMCN,this.BCID,this.BCCID,this.SCID,this.PKID
     ,this.BDID,this.GUID,this.BIID,this.DATEI,this.DEVI,this.DATEU,this.DEVU,this.SUCH,this.BPID
@@ -578,6 +580,8 @@ class Bil_Mov_M_Local {
     BMDTXT2 = map['BMDTXT2'];
     BMDDIA = map['BMDDIA'];
     BMDDIF = map['BMDDIF'];
+    BMDAM_IN = map['BMDAM_IN'];
+    BMDAM_OUT = map['BMDAM_OUT'];
   }
 
 }

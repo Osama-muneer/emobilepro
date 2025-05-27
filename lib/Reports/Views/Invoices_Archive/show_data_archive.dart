@@ -18,7 +18,8 @@ class _DataGridPageState extends State<Show_DataGrid_archive> {
   Future<ProductDataGridSource> getProductDataSource() async {
     var productList = await  GET_BIL_MOV_REP(controller.SelectDataFromBIID!,controller.SelectDataToBIID!,controller.SelectFromDays!,
         controller.SelectToDays!, controller.SelectDataSCID.toString(),controller.PKID.toString(),controller.SelectFromDATEI.toString(),
-        controller.SelectToDATEI.toString());
+        controller.SelectToDATEI.toString(),controller.TYPE_T,
+        controller.TYPE_ORD2);
 
     controller.totalBmmam=0;
     controller.totalBmmtx=0;

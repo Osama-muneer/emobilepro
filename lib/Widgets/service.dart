@@ -97,15 +97,24 @@ void onStart(ServiceInstance service) async {
 
   /// OPTIONAL when use custom notification
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  // 1) اربط الخدمة كمقدّمة أمامية فوراً
   if (service is AndroidServiceInstance) {
-    service.on('setAsForeground').listen((event) {
-      service.setAsForegroundService();
-    });
-
-    service.on('setAsBackground').listen((event) {
-      service.setAsBackgroundService();
-    });
+    service.setAsForegroundService();
+    service.setForegroundNotificationInfo(
+      title: STMID=='EORD' ? 'EOrder SERVICE' : 'EMobile Pro SERVICE',
+      content: 'Synchronize',
+    );
   }
+
+  // if (service is AndroidServiceInstance) {
+  //   service.on('setAsForeground').listen((event) {
+  //     service.setAsForegroundService();
+  //   });
+  //
+  //   service.on('setAsBackground').listen((event) {
+  //     service.setAsBackgroundService();
+  //   });
+  // }
 
   service.on('stopService').listen((event) {
     service.stopSelf();

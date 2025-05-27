@@ -102,6 +102,64 @@ class _Show_Acc_MovState extends State<Show_Acc_Mov> {
     );
   }
 
+
+  final List<Map> GET_CON_3 = [
+    {"id": '1', "name": 'StringBIID'.tr},
+    {"id": '2', "name": 'StringType'.tr},
+    {"id": '3', "name": 'StringManualNO'.tr},
+    {"id": '4', "name": 'StringSMDED2'.tr},
+    {"id": '5', "name": 'StringSCIDlableText'.tr},
+    {"id": '6', "name":"${'StringAmount'.tr}"},
+  ].obs;
+
+  GetBuilder<Accounts_ArchiveController> DropdownTYPE_TBuilder() {
+    return GetBuilder<Accounts_ArchiveController>(
+        init: Accounts_ArchiveController(),
+        builder: ((controller) => DropdownButtonFormField2(
+          decoration:  ThemeHelper().InputDecorationDropDown("StringOrderBy".tr),
+          isExpanded: true,
+          value: controller.TYPE_T,
+          style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+          items: GET_CON_3.map((item) => DropdownMenuItem<String>(
+            value: item['id'],
+            child: Text(
+              item['name'],
+              style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+            ),
+          )).toList().obs,
+          onChanged: (value) {
+            controller.TYPE_T = value.toString();
+            controller.update();
+          },
+        )));
+  }
+
+  final List<Map> TYP_ORD_L = [
+    {"id": '1', "name": 'StringASC_DE1'.tr},
+    {"id": '2', "name": 'StringASC_DE2'.tr},
+  ].obs;
+  GetBuilder<Accounts_ArchiveController> DropdownTYPE_ORDBuilder() {
+    return GetBuilder<Accounts_ArchiveController>(
+        init: Accounts_ArchiveController(),
+        builder: ((controller) => DropdownButtonFormField2(
+          decoration:  ThemeHelper().InputDecorationDropDown("StringOrderBy".tr),
+          isExpanded: true,
+          value: controller.TYPE_ORD2,
+          style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+          items: TYP_ORD_L.map((item) => DropdownMenuItem<String>(
+            value: item['id'],
+            child: Text(
+              item['name'],
+              style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
+            ),
+          )).toList().obs,
+          onChanged: (value) {
+            controller.TYPE_ORD2 = value.toString();
+            controller.update();
+          },
+        )));
+  }
+
   Widget _buildFilterContent(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -260,6 +318,35 @@ class _Show_Acc_MovState extends State<Show_Acc_Mov> {
                                     ),
                                   ],
                                 )
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 0.02 * height),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                                margin: EdgeInsets.only(left: 0.02 * height),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(0.02 * width)),
+                                child: DropdownTYPE_TBuilder(),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                                margin: EdgeInsets.only(right: 0.02 * height),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(0.02 * width)),
+                                child: DropdownTYPE_ORDBuilder(),
                             ),
                           ),
                         ],

@@ -2392,18 +2392,22 @@ Future<List<Bil_Mov_M_Local>> getMonthlySales(SCID,String GETDATE_F, String GETD
       ? " AND  A.BIID_L=${LoginController().BIID}" :  '';
 
   String sql = '''
-  SELECT  substr(A.BMMDO, 7, 4) || '-' || substr(A.BMMDO, 4, 2) AS BMMDO,SUM(A.BMMMT) AS BMMMT
+  SELECT  substr(A.BMMDO, 7, 4) || '-' || substr(A.BMMDO, 4, 2) AS BMMDO,
+  SUM(CASE WHEN BMKID IN (3,5,11) THEN A.BMMMT ELSE 0.0 END) - 
+  SUM(CASE WHEN BMKID IN (4,12) THEN A.BMMMT ELSE 0.0 END)  AS BMMMT
   FROM BIL_MOV_M A WHERE A.SCID=$SCID 
   AND A.JTID_L=${LoginController().JTID} 
   AND A.SYID_L=${LoginController().SYID} AND A.CIID_L=${LoginController().CIID} $SQLBIID_L
-  AND A.BMMDO IS NOT NULL AND A.BMKID IN (3,11,5) 
+  AND A.BMMDO IS NOT NULL 
   GROUP BY substr(A.BMMDO, 7, 4), substr(A.BMMDO, 4, 2)
   UNION ALL
-  SELECT  substr(A.BMMDO, 7, 4) || '-' || substr(A.BMMDO, 4, 2) AS BMMDO,SUM(A.BMMMT) AS BMMMT
+  SELECT  substr(A.BMMDO, 7, 4) || '-' || substr(A.BMMDO, 4, 2) AS BMMDO,
+  SUM(CASE WHEN BMKID IN (3,5,11) THEN A.BMMMT ELSE 0.0 END) - 
+  SUM(CASE WHEN BMKID IN (4,12) THEN A.BMMMT ELSE 0.0 END)  AS BMMMT
   FROM BIF_MOV_M A WHERE A.SCID=$SCID 
   AND A.JTID_L=${LoginController().JTID} 
   AND A.SYID_L=${LoginController().SYID} AND A.CIID_L=${LoginController().CIID} $SQLBIID_L
-  AND A.BMMDO IS NOT NULL AND A.BMKID IN (3,11,5) 
+  AND A.BMMDO IS NOT NULL  
   GROUP BY substr(A.BMMDO, 7, 4), substr(A.BMMDO, 4, 2)
   ''';
 
@@ -2851,7 +2855,7 @@ AS DA,A.BMMST AS SYN_ST,  A.CIID_L,A.JTID_L,A.BIID_L,A.SYID_L FROM BIL_MOV_M A
 LEFT JOIN BIL_MOV_K AS B ON(A.BMKID=B.BMKID AND A.CIID_L=B.CIID_L  AND A.JTID_L=B.JTID_L  
 AND A.BIID_L=B.BIID_L AND A.SYID_L=B.SYID_L ) WHERE $sqlBMMID
  B.BMKTY IN(1,2) AND B.BMKAN IS NOT NULL AND (Ifnull(A.BCID,A.BIID) IS NOT NULL) 
-AND A.BPID IS NULL AND A.PKID IN(3)
+AND A.BPID IS NULL AND A.PKID IN(3) AND $sqlBMMST
 
 UNION ALL 
   SELECT C.AANO,A.SCID,(CASE WHEN B.BMKTY = 2 THEN(  Ifnull (A.BMMAM, 0)- Ifnull (A.BMMDI, 0)
@@ -2884,10 +2888,10 @@ WHERE (A.CIID_L='${LoginController().CIID}' AND A.JTID_L= ${LoginController().JT
 AND A.SYID_L=${LoginController().SYID} ) AND A.AANO='$AANO' AND A.SCID=$SCID  ) AS A1 ''';
 
   var result = await dbClient!.rawQuery(sql,);
-  // print('SUM_BAL');
-  // // printLongText('SQL: $sql');
+   print('SUM_BAL');
+   printLongText('SQL: $sql');
   // print('Args: [$lastSyncIso]');
-  // print('Result: $result');
+   print('Result: $result');
   List<Bil_Mov_M_Local> list = result.map((item) {
     return Bil_Mov_M_Local.fromMap(item);
   }).toList();

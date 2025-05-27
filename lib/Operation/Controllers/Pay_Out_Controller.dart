@@ -84,9 +84,9 @@ class Pay_Out_Controller extends GetxController {
       P_COS1='2', P_COS2='2',P_COSS='2',P_COSM='1',P_COS_SEQ='2',AMKID_TYPE='15',TYPE_SHOW = "DateNow",
       Multi_CUR='1', LastBAL_ACC_C='';
   int SCSFL=2,UPIN_PKID=1,PKID=1,TYPYPKID=1,CheckBack=0,ShowRePrinting=0,AACT = 1, UseSignature=0,
-   ShowSignatureAlert=0, currentIndex=0,TYPE_SER=2;
+      ShowSignatureAlert=0, currentIndex=0,TYPE_SER=2;
   int? AMMID,AMKID,AMDID,AMMNO,Allow_to_Inserted_Date_of_Voucher,SCID_C,BYST=1,UPCH=1,UPINCUS=1,
-       UPIN=1,UPQR=1,UPDL=1,UPPR=1,AKID=1,CheckSearech,  ArrLengthCus = 0;
+      UPIN=1,UPQR=1,UPDL=1,UPPR=1,AKID=1,CheckSearech,  ArrLengthCus = 0;
   late TextEditingController AANAController,AANOController,SCNAController,
       SCEXController,SCEX2Controller,AMDDAController,
       PKIDController,BCCIDController,BCCNAController,ABIDController,ABNAController,
@@ -339,7 +339,7 @@ class Pay_Out_Controller extends GetxController {
         :TYPE_SHOW=="FromDate"?SelectNumberOfDays:'',GETAMKID,currentIndex,
         selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
         ToDaysController.text,SelectDataSCID_S.toString(),TYPE_SER);
-        update();
+    update();
   }
 
   //التأكد من السنة المالية من انه فعالة
@@ -392,17 +392,17 @@ class Pay_Out_Controller extends GetxController {
 
   //جلب العمله عند الدخول
   Future GET_SYS_CUR_ONE_PAY_P() async {
-   var SYS_CUR=await GET_SYS_CUR_ONE();
-      if(SYS_CUR.isNotEmpty){
-        SelectDataSCID=SYS_CUR.elementAt(0).SCID.toString();
-        SCEXController.text=SYS_CUR.elementAt(0).SCEX.toString();
-        SCHRController.text=SYS_CUR.elementAt(0).SCHR.toString();
-        SCLRController.text=SYS_CUR.elementAt(0).SCLR.toString();
-        SCSY=SYS_CUR.elementAt(0).SCSY!;
-        SCNA=SYS_CUR.elementAt(0).SCNA!;
-        SCSFL=SYS_CUR.elementAt(0).SCSFL!;
-        update();
-      }
+    var SYS_CUR=await GET_SYS_CUR_ONE();
+    if(SYS_CUR.isNotEmpty){
+      SelectDataSCID=SYS_CUR.elementAt(0).SCID.toString();
+      SCEXController.text=SYS_CUR.elementAt(0).SCEX.toString();
+      SCHRController.text=SYS_CUR.elementAt(0).SCHR.toString();
+      SCLRController.text=SYS_CUR.elementAt(0).SCLR.toString();
+      SCSY=SYS_CUR.elementAt(0).SCSY!;
+      SCNA=SYS_CUR.elementAt(0).SCNA!;
+      SCSFL=SYS_CUR.elementAt(0).SCSFL!;
+      update();
+    }
   }
 
 
@@ -432,42 +432,42 @@ class Pay_Out_Controller extends GetxController {
   // هل يتم استخدام مراكز التكلفة بشكل عام
   Future GET_USE_Cost_Centers() async {
     var data =await GET_SYS_VAR(351);
-      if (data.isNotEmpty) {
-        P_COSM =  data.elementAt(0).SVVL!;
-      } else {
-        P_COSM = '2';
-      }
+    if (data.isNotEmpty) {
+      P_COSM =  data.elementAt(0).SVVL!;
+    } else {
+      P_COSM = '2';
+    }
   }
 
   //ربط حسابات المركز المالي-الميزانيه بمراكز التكلفه
   Future GET_USE_Linking_Accounts_Cost_Centers() async {
     var data =await GET_SYS_VAR(352);
-      if (data.isNotEmpty) {
-        P_COS1 =  data.elementAt(0).SVVL!;
-      } else {
-        P_COS1 = '2';
-      }
+    if (data.isNotEmpty) {
+      P_COS1 =  data.elementAt(0).SVVL!;
+    } else {
+      P_COS1 = '2';
+    }
   }
 
   //ربط حسابات قائمة الدخل-الارباح,المتاجره بمراكز التكلفه
   Future GET_USE_Linking_Income_Accounts_Cost_Centers() async {
     var data =await GET_SYS_VAR(353);
-      if (data.isNotEmpty) {
-        P_COS2 =  data.elementAt(0).SVVL!;
-      } else {
-        P_COS2 = '2';
-      }
+    if (data.isNotEmpty) {
+      P_COS2 =  data.elementAt(0).SVVL!;
+    } else {
+      P_COS2 = '2';
+    }
   }
 
   //تسلسل الحركة حسب مراكز التكلفة في الشاشة
   Future GET_COS_SEQ() async {
     var data =await GET_SYS_VAR(AMKID == 15 ? 383 :375);
-      if (data.isNotEmpty) {
-        P_COS_SEQ =  data.elementAt(0).SVVL!;
-        P_COS_SEQ=='4' ? P_COS_SEQ='1' : P_COS_SEQ='2';
-      } else {
-        P_COS_SEQ = '2';
-      }
+    if (data.isNotEmpty) {
+      P_COS_SEQ =  data.elementAt(0).SVVL!;
+      P_COS_SEQ=='4' ? P_COS_SEQ='1' : P_COS_SEQ='2';
+    } else {
+      P_COS_SEQ = '2';
+    }
     await SET_COS();
   }
 
@@ -496,29 +496,29 @@ class Pay_Out_Controller extends GetxController {
 
   Future GET_SYS_CUR_DAT_P(String GETSCID) async {
     var SYS_CUR=await GET_SYS_CUR_DAT(GETSCID);
-      if(SYS_CUR.isNotEmpty){
-       // SCEXController.text=SYS_CUR.elementAt(0).SCEX.toString();
-        SCEX=SYS_CUR.elementAt(0).SCEX!;
-        SCHRController.text=SYS_CUR.elementAt(0).SCHR.toString();
-        SCLRController.text=SYS_CUR.elementAt(0).SCLR.toString();
-        SCSY=SYS_CUR.elementAt(0).SCSY!;
-        SCNA=SYS_CUR.elementAt(0).SCNA!;
-        SCSFL=SYS_CUR.elementAt(0).SCSFL!;
-        update();
-      }
+    if(SYS_CUR.isNotEmpty){
+      // SCEXController.text=SYS_CUR.elementAt(0).SCEX.toString();
+      SCEX=SYS_CUR.elementAt(0).SCEX!;
+      SCHRController.text=SYS_CUR.elementAt(0).SCHR.toString();
+      SCLRController.text=SYS_CUR.elementAt(0).SCLR.toString();
+      SCSY=SYS_CUR.elementAt(0).SCSY!;
+      SCNA=SYS_CUR.elementAt(0).SCNA!;
+      SCSFL=SYS_CUR.elementAt(0).SCSFL!;
+      update();
+    }
   }
 
   Future GET_SYS_CUR_ONE_SALE_P(String GETSCID) async {
     var SYS_CUR=await GET_SYS_CUR_ONE_P(GETSCID);
-      if (SYS_CUR.isNotEmpty) {
-        SelectDataSCID = SYS_CUR.elementAt(0).SCID.toString();
-        SCEXController.text = SYS_CUR.elementAt(0).SCEX.toString();
-        SCSY = SYS_CUR.elementAt(0).SCSY!;
-        SCSFL = SYS_CUR.elementAt(0).SCSFL!;
-      }else{
-        await GET_SYS_CUR_ONE_PAY_P();
-      }
-      update();
+    if (SYS_CUR.isNotEmpty) {
+      SelectDataSCID = SYS_CUR.elementAt(0).SCID.toString();
+      SCEXController.text = SYS_CUR.elementAt(0).SCEX.toString();
+      SCSY = SYS_CUR.elementAt(0).SCSY!;
+      SCSFL = SYS_CUR.elementAt(0).SCSFL!;
+    }else{
+      await GET_SYS_CUR_ONE_PAY_P();
+    }
+    update();
   }
 
   Future GET_SUMO() async {
@@ -652,9 +652,9 @@ class Pay_Out_Controller extends GetxController {
   //جلب رقم الحركة
   Future GET_AMMNO_P() async {
     var ACC_MOV_M_AMMNO =await GET_AMMNO(AMKID!);
-      if(ACC_MOV_M_AMMNO.isNotEmpty){
-        AMMNO=ACC_MOV_M_AMMNO.elementAt(0).AMMNO;
-      }
+    if(ACC_MOV_M_AMMNO.isNotEmpty){
+      AMMNO=ACC_MOV_M_AMMNO.elementAt(0).AMMNO;
+    }
   }
 
 
@@ -691,12 +691,12 @@ class Pay_Out_Controller extends GetxController {
 
   Future GET_AMMID_P() async {
     var ACC_MOV_M_AMMNO=await GET_AMMID();
-      if(ACC_MOV_M_AMMNO.isNotEmpty){
-        AMMID=ACC_MOV_M_AMMNO.elementAt(0).AMMID;
-        update();
-        GET_CountRecode();
-        GETSUMAMDEQ();
-      }
+    if(ACC_MOV_M_AMMNO.isNotEmpty){
+      AMMID=ACC_MOV_M_AMMNO.elementAt(0).AMMID;
+      update();
+      GET_CountRecode();
+      GETSUMAMDEQ();
+    }
   }
 
 
@@ -754,15 +754,15 @@ class Pay_Out_Controller extends GetxController {
 
   Future GET_ACC_MOV_D_View_P(String GetAMKID,String GetAMMID) async {
     ListACC_MOV_D=await GET_ACC_MOV_D(GetAMKID,GetAMMID);
-      update();
+    update();
   }
 
   //جلب رقم الحركة الفرعي
   Future GET_AMDID_P() async {
     ACC_MOV_D=await GET_AMDID(AMKID!,AMMID!);
-      if(ACC_MOV_D.isNotEmpty){
-        AMDID=ACC_MOV_D.elementAt(0).AMDID;
-      }
+    if(ACC_MOV_D.isNotEmpty){
+      AMDID=ACC_MOV_D.elementAt(0).AMDID;
+    }
   }
 
 
@@ -791,22 +791,22 @@ class Pay_Out_Controller extends GetxController {
   }
 
   GETSUMAMDEQ() async {
-   var SUM_MOUNT=await CountAMMAM(AMMID.toString(),AMKID!);
-      if(SUM_MOUNT.isEmpty){
-        AMMAMController.text ='0.0';
-        AMDEQController.text ='0.0';
-        AMDEQSController.text ='0.0';
-        SUMAMDAController.text ='0.0';
-        loading(false);
-        update();
-      }
-      AMMAMController.text=(AMKID==2 || AMKID==15) ? SUM_MOUNT.elementAt(0).SUMAMDMD.toString():SUM_MOUNT.elementAt(0).SUMAMDDA.toString();
-      SUMAMDAController.text=SUM_MOUNT.elementAt(0).SUMAMDDA.toString();
-      AMKID!=15?
-      AMDEQController.text= roundDouble((double.parse(SUM_MOUNT.elementAt(0).SUMAMDEQ.toString())),2).toString():null;
-      AMKID!=15?
-      AMDEQSController.text= formatter.format(roundDouble(
-          (double.parse(SUM_MOUNT.elementAt(0).SUMAMDEQ.toString())),2)).toString():null;
+    var SUM_MOUNT=await CountAMMAM(AMMID.toString(),AMKID!);
+    if(SUM_MOUNT.isEmpty){
+      AMMAMController.text ='0.0';
+      AMDEQController.text ='0.0';
+      AMDEQSController.text ='0.0';
+      SUMAMDAController.text ='0.0';
+      loading(false);
+      update();
+    }
+    AMMAMController.text=(AMKID==2 || AMKID==15) ? SUM_MOUNT.elementAt(0).SUMAMDMD.toString():SUM_MOUNT.elementAt(0).SUMAMDDA.toString();
+    SUMAMDAController.text=SUM_MOUNT.elementAt(0).SUMAMDDA.toString();
+    AMKID!=15?
+    AMDEQController.text= roundDouble((double.parse(SUM_MOUNT.elementAt(0).SUMAMDEQ.toString())),2).toString():null;
+    AMKID!=15?
+    AMDEQSController.text= formatter.format(roundDouble(
+        (double.parse(SUM_MOUNT.elementAt(0).SUMAMDEQ.toString())),2)).toString():null;
     SUMAMDEQ_BYAMDTY_P(1);
     SUMAMDEQ_BYAMDTY_P(2);
     update();
@@ -816,13 +816,13 @@ class Pay_Out_Controller extends GetxController {
     var SUMAMDEQ=await SUMAMDEQ_BYAMDTY(AMMID.toString(),AMDTY);
     if(SUMAMDEQ.isEmpty){
       AMDTY==2?SUMAMDEQ_MD =0.0:SUMAMDEQ_DA =0.0;
-        update();
-      }
-    AMDTY==2?
-      SUMAMDEQ_MD=roundDouble((double.parse(SUMAMDEQ.elementAt(0).SUMAMDEQ.toString())),2):
-      SUMAMDEQ_DA=roundDouble((double.parse(SUMAMDEQ.elementAt(0).SUMAMDEQ.toString())),2);
-      Difference_AMDEQ_MD_DA=SUMAMDEQ_MD-SUMAMDEQ_DA;
       update();
+    }
+    AMDTY==2?
+    SUMAMDEQ_MD=roundDouble((double.parse(SUMAMDEQ.elementAt(0).SUMAMDEQ.toString())),2):
+    SUMAMDEQ_DA=roundDouble((double.parse(SUMAMDEQ.elementAt(0).SUMAMDEQ.toString())),2);
+    Difference_AMDEQ_MD_DA=SUMAMDEQ_MD-SUMAMDEQ_DA;
+    update();
   }
 
   //جلب الفروع
@@ -857,12 +857,12 @@ class Pay_Out_Controller extends GetxController {
     GET_ACC_CAS_ONE(SelectDataBIID.toString(),SelectDataSCID.toString(),'AC',
         AMKID==3?1:AMKID!,LoginController().ACID_Voucher).then((data) {
       ACC_CAS = data;
-        if(ACC_CAS.isNotEmpty){
-          LoginController().PKID_Voucher == 1 && LoginController().ACID_Voucher!=0 ?
-          SelectDataACID=LoginController().ACID_Voucher.toString():'';
-          update();
-        }else{
-          SelectDataACID=null;
+      if(ACC_CAS.isNotEmpty){
+        LoginController().PKID_Voucher == 1 && LoginController().ACID_Voucher!=0 ?
+        SelectDataACID=LoginController().ACID_Voucher.toString():'';
+        update();
+      }else{
+        SelectDataACID=null;
       }
     });
   }
@@ -871,11 +871,11 @@ class Pay_Out_Controller extends GetxController {
   Future GET_ACC_BAN_P() async {
     GET_ACC_BAN_ONE(SelectDataBIID.toString(),LoginController().ABID_Voucher).then((data) {
       ACC_BAN_List  = data;
-        if(ACC_BAN_List.isNotEmpty){
-          LoginController().PKID_Voucher == 9 || LoginController().PKID_Voucher == 2
-              ? SelectDataABID=LoginController().ABID_Voucher.toString():'';
-        }else{
-          SelectDataABID=null;
+      if(ACC_BAN_List.isNotEmpty){
+        LoginController().PKID_Voucher == 9 || LoginController().PKID_Voucher == 2
+            ? SelectDataABID=LoginController().ABID_Voucher.toString():'';
+      }else{
+        SelectDataABID=null;
       }
     });
   }
@@ -884,11 +884,11 @@ class Pay_Out_Controller extends GetxController {
   Future GET_BIL_CRE_C_P() async {
     GET_BIL_CRE_C_ONE(SelectDataBIID.toString(),LoginController().BCCID_Voucher).then((data) {
       BIL_CRE_C_List  = data;
-        if( BIL_CRE_C_List.isNotEmpty){
-          LoginController().PKID_Voucher == 8 ? SelectDataBCCID=LoginController().BCCID_Voucher.toString():'';
-          update();
-        }else{
-          SelectDataBCCID=null;
+      if( BIL_CRE_C_List.isNotEmpty){
+        LoginController().PKID_Voucher == 8 ? SelectDataBCCID=LoginController().BCCID_Voucher.toString():'';
+        update();
+      }else{
+        SelectDataBCCID=null;
       }
     });
   }
@@ -1139,17 +1139,17 @@ class Pay_Out_Controller extends GetxController {
 
         //    SUM_BAL(2,1,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
         // استدعاء جلب الرصيد
-     //   SUM_M = await SUM_BAL(2,2,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+        //   SUM_M = await SUM_BAL(2,2,AMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
         SUM_M = await SUM_BAL(
-          2,2,
-          mov.AMMID,
-          mov.AANO,
-          mov.SCID,
-          LastBAL_ACC_C.toString()
+            2,2,
+            mov.AMMID,
+            mov.AANO,
+            mov.SCID,
+            LastBAL_ACC_C.toString()
         );
 
         // تعبئة الحقل داخل الموديل
-       // mov.balance = bal;
+        // mov.balance = bal;
       }
 
       // GET_BAL_P(get_ACC_MOV_D.elementAt(0).AMMID.toString(),
@@ -1213,7 +1213,7 @@ class Pay_Out_Controller extends GetxController {
         return false;
       }
       else if (( ValueAMMCC   && double.parse(AMDEQController.text) != double.parse(AMMEQController.text))
-        || (AMKID==15 && Difference_AMDEQ_MD_DA!=0) ){
+          || (AMKID==15 && Difference_AMDEQ_MD_DA!=0) ){
         Fluttertoast.showToast(
             msg: 'Stringtransactionnot'.tr,
             toastLength: Toast.LENGTH_LONG,
@@ -1323,7 +1323,7 @@ class Pay_Out_Controller extends GetxController {
         GET_ACC_MOV_M_P('DateNow',AMKID!);
         if(Get.arguments==11){
           Navigator.of(context).pop(false);
-         //  Get.back();
+          //  Get.back();
           return true;
         }else{
           Get.offNamed('/View_Pay_Out');
@@ -1489,7 +1489,7 @@ class Pay_Out_Controller extends GetxController {
               AMDMD: AMKID == 2  ? roundDouble(double.parse(AMDMOController.text.toString()),2) :
               (AMKID == 15  && Debit==true && Credit==false) ? roundDouble(double.parse(AMDMOController.text.toString()),2):0.0,
               AMDEQ: roundDouble((double.parse(AMDMOController.text.toString())*
-                     double.parse(ValueAMMCC || ( Multi_CUR=='1' && AMKID==15) ? SCEX2.toString() : SCEXController.text)),2),
+                  double.parse(ValueAMMCC || ( Multi_CUR=='1' && AMKID==15) ? SCEX2.toString() : SCEXController.text)),2),
               AMDTY: (AMKID == 2 || AMKID == 15) && Debit==true ? '2' : '1',
               AMDST: '1',
               GUID: uuid.v1(),
@@ -1762,10 +1762,10 @@ class Pay_Out_Controller extends GetxController {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text("${'StringAMDMD'.tr}:",
-              style: ThemeHelper().buildTextStyle(context, Colors.black87,'M')),
+                style: ThemeHelper().buildTextStyle(context, Colors.black87,'M')),
             SizedBox(width: 0.02*height),
             Text(formatter.format(BACBMD).toString(),
-              style:ThemeHelper().buildTextStyle(context, Colors.black,'M'))
+                style:ThemeHelper().buildTextStyle(context, Colors.black,'M'))
           ],
         ),
         SizedBox(height: 0.015 * height),
@@ -1838,440 +1838,440 @@ class Pay_Out_Controller extends GetxController {
         return GetBuilder<Pay_Out_Controller>(
             init: Pay_Out_Controller(),
             builder: ((controller) =>Form(
-          key: ADD_EDformKey,
-          child: SingleChildScrollView(
-            child: Column(
-              //mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(0.02*height),
-                      topLeft: Radius.circular(0.02*height),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(0.02*height),
-                            topLeft: Radius.circular(0.02*height),
+              key: ADD_EDformKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  //mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(0.02*height),
+                          topLeft: Radius.circular(0.02*height),
+                        ),
+                        color: Colors.white,
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(0.02*height),
+                                topLeft: Radius.circular(0.02*height),
+                              ),
+                              color: Colors.grey,
+                            ),
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0.01 * height),
+                            child: Center(
+                              child: Text(titleAddScreen,
+                                  style: ThemeHelper().buildTextStyle(context, Colors.white,'L')),
+                            ),
                           ),
-                          color: Colors.grey,
-                        ),
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 0.01 * height),
-                        child: Center(
-                          child: Text(titleAddScreen,
-                              style: ThemeHelper().buildTextStyle(context, Colors.white,'L')),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 0.05 * width,left:0.05 * width),
-                        child: Column(
-                          children: [
-                            if(AMKID==15)
-                            Card(
-                              elevation: 2,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0.02*width),
-                              ),
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              child: Container(
-                                width: double.infinity,
-                                color: Colors.white,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Row(children: [
-                                      Switch(
-                                        value: Debit,
-                                        activeColor: AppColors.MainColor,
-                                        onChanged: (value) {
-                                          Repeatingedit!=true ?
-                                          setState(() {
-                                            Debit=value;
-                                            if(value==true){
-                                              Credit=false;
-                                            }
-                                            else{
-                                              Credit=true;
-                                            }
-                                          }):
-                                          false;
-                                        },
-                                      ),
-                                      ThemeHelper().buildText(context,'StringAMDMD', Colors.black,'M'),
-                                    ],),
-                                    Row(children: [
-                                      Switch(
-                                        value: Credit,
-                                        activeColor: AppColors.MainColor,
-                                        onChanged: (value) {
-                                          Repeatingedit!=true ?
-                                          setState(() {
-                                            Credit=value;
-                                            if(value==true){
-                                              Debit=false;
-                                            }
-                                            else{
-                                              Debit=true;
-                                            }
-                                          }):false;
-                                        },
-                                      ),
-                                      ThemeHelper().buildText(context,'StringAMDDA', Colors.black,'M'),
-                                    ],),
-                                  ],
-                                )
-                              ),
-                            ),
-                            Row(
+                          Padding(
+                            padding: EdgeInsets.only(right: 0.05 * width,left:0.05 * width),
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: Autocomplete<Acc_Acc_Local>(
-                                    optionsBuilder: (TextEditingValue textEditingValue) {
-                                      return autoCompleteData
-                                          .where((Acc_Acc_Local county) =>
-                                          county.AANA_D.toString().toLowerCase().contains(textEditingValue.text.toLowerCase())).toList();
-                                    },  displayStringForOption:
-                                      (Acc_Acc_Local option) =>
-                                  AANAController.text == '' ? '' : option.AANA_D.toString(),
-                                    fieldViewBuilder: (BuildContext context,
-                                        textEditingController,
-                                        FocusNode myFocus,
-                                        VoidCallback onFieldSubmitted) {
-                                      _autocompleteFocusNode = myFocus;
-                                      return AANAController.text ==
-                                          '' ? TextFormField(
-                                        controller: textEditingController,
-                                        focusNode: myFocus,
-                                        validator: (v) {
-                                          return validateAANO(v!);
-                                        },
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center,
-                                        decoration:  InputDecoration(
-                                          labelText: 'StringAccount'.tr,
-                                        ),
-                                      )
-                                          : TextFormField(
-                                        controller:
-                                        AANAController,
-                                        validator: (v) {
-                                          return validateAANO(v!);
-                                        },
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center,
-                                        decoration: InputDecoration(
-                                          suffixIcon: IconButton(
-                                            icon: const Icon(
-                                              Icons.clear,
-                                              color: Colors.black,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                setState(() {
-                                                  textEditingController.text = "";
-                                                  AANAController.clear();
-                                                  SelectDataAANO='';
-                                                  myFocus.requestFocus();
-                                                });
-                                              });
-                                            },
-                                          ),
-                                          icon: IconButton(
-                                            icon: const Icon(
-                                              Icons.error,
-                                              color: Colors.black,
-                                            ),
-                                            onPressed: () async{
-
-                                                GET_BIL_ACC_C_P(SelectDataAANO.toString(),'','',SelectDataSCID.toString());
-                                                await Future.delayed(const Duration(milliseconds: 100));
-                                                buildShowBIL_ACC_C(context);
-                                            },
-                                          ),
-                                          labelText: 'StringAccount'.tr,
-                                        ),
-                                      );
-                                    },
-                                    onSelected: (Acc_Acc_Local selection) {
-                                      setState(() {
-                                        AANAController.text=selection.AANA_D.toString();
-                                        SelectDataAANO=selection.AANO.toString();
-                                        SelectDataAANO=selection.AANO.toString();
-                                        AACT=int.parse(selection.AACT.toString());
-                                        SCID_C=selection.SCID;
-                                        BIID_D=selection.BIID.toString();
-                                        SelectDataACNO_D=SelectDataACNO;
-                                        GETAANOCOUNT_P();
-                                        GET_AKID_P();
-                                        GET_BAL_P(AMMID.toString(),
-                                            selection.AANO.toString(),
-                                            SelectDataSCID.toString());
-                                        myFocusNode.requestFocus();
-                                      });
-                                    },
-                                    optionsViewBuilder: (BuildContext context,AutocompleteOnSelected<Acc_Acc_Local>
-                                        onSelected, Iterable<Acc_Acc_Local> options) {
-                                      return Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Container(
-                                          width: double.infinity,
-                                          height: (options.length * 100.0).clamp(150.0, 0.4 * MediaQuery.of(context).size.height),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(color: Colors.grey),
-                                            borderRadius: BorderRadius.circular(8.0),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey.withOpacity(0.5),
-                                                spreadRadius: 1,
-                                                blurRadius: 5,
-                                                offset: Offset(0, 3),
+                                if(AMKID==15)
+                                  Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0.02*width),
+                                    ),
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    child: Container(
+                                        width: double.infinity,
+                                        color: Colors.white,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            Row(children: [
+                                              Switch(
+                                                value: Debit,
+                                                activeColor: AppColors.MainColor,
+                                                onChanged: (value) {
+                                                  Repeatingedit!=true ?
+                                                  setState(() {
+                                                    Debit=value;
+                                                    if(value==true){
+                                                      Credit=false;
+                                                    }
+                                                    else{
+                                                      Credit=true;
+                                                    }
+                                                  }):
+                                                  false;
+                                                },
                                               ),
-                                            ],
-                                          ),
-                                            child: ListView.builder(
-                                              itemCount: options.length,
-                                              itemBuilder:
-                                                  (BuildContext context, int index) {
-                                                final Acc_Acc_Local option = options.elementAt(index);
-                                                return GestureDetector(
-                                                  onTap: () {
-                                                    onSelected(option);
-                                                  },
-                                                  child: Center(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.all(0.009 * height),
-                                                        child: Text(option.AANA_D.toString(),
-                                                            textAlign:
-                                                            TextAlign.center,
-                                                            style: const TextStyle(
-                                                                color: Colors.black,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
-                                                      )),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        );
-                                    },
+                                              ThemeHelper().buildText(context,'StringAMDMD', Colors.black,'M'),
+                                            ],),
+                                            Row(children: [
+                                              Switch(
+                                                value: Credit,
+                                                activeColor: AppColors.MainColor,
+                                                onChanged: (value) {
+                                                  Repeatingedit!=true ?
+                                                  setState(() {
+                                                    Credit=value;
+                                                    if(value==true){
+                                                      Debit=false;
+                                                    }
+                                                    else{
+                                                      Debit=true;
+                                                    }
+                                                  }):false;
+                                                },
+                                              ),
+                                              ThemeHelper().buildText(context,'StringAMDDA', Colors.black,'M'),
+                                            ],),
+                                          ],
+                                        )
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            TextFormField(
-                              controller: AMDINController,
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                  suffixIcon: IconButton(icon: Icon(Icons.error_outline),onPressed: (){
-                                    if(controller.GET_AMDIN.isNotEmpty){
-                                      buildShowDialogGET_AMDIN(context);
-                                    }
-                                  }),
-                                  labelText: 'StringDetails'.tr,
-                                  hintStyle: const TextStyle(
-                                      color: Colors.blue)),
-                            ),
-                            SizedBox(height: 0.02 * height),
-                           if( ValueAMMCC ||( Multi_CUR=='1' && AMKID==15))
-                            Column(
-                              children: [
-                                DropdownSYS_CUR2Builder(),
-                                SizedBox(height: 0.02 * height),
-                                // Padding(
-                                //   padding:  EdgeInsets.only(right: 0.02 * height,left:0.02 * height,bottom:0.02 * height ),
-                                //   child: Row(
-                                //     crossAxisAlignment: CrossAxisAlignment.start,
-                                //     children: [
-                                //     Text("${'Stringexchangerate'.tr}    ${SCEX2}",
-                                //               style: TextStyle(fontSize: 0.01 * height)),
-                                //     ],
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                            P_COSM!='1' || ((P_COS1 =='4' ||   P_COS1 =='5') && (P_COS2 =='4' ||   P_COS2 =='5'))
-                                ? Container() :  DropdownACC_COS_DBuilder(),
-                            AMKID==15?  Row(
-                              children: [
-                                ExpandedAMDMO(),
-                                SizedBox(width: 0.08* width),
-                               Expanded(
-                                    child: TextFormField(
-                                      controller: AMDEQSController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                      textAlign: TextAlign.center,
-                                      inputFormatters: [
-                                      //  FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
-                                        ThousandsSeparatorInputFormatter(),
-                                      ],
-                                      onChanged: (v){
-                                        if(v.isNotEmpty){
-                                          String sanitizedValue = v.replaceAll(',', '');
-                                          AMDEQController.text=sanitizedValue.toString();
-                                          if(AMKID==15 ){
-                                            SelectDataSCID2.toString()!='1'?
-                                            SCEX2=double.parse(AMDEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
-                                            update();
-                                          }
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: AMDMOHintController.text.toString().replaceAll(regex, ''),
-                                          labelText: 'StringTotalequivalent'.tr,
-                                          hintStyle: const TextStyle(
-                                              color: Colors.blue)),
-                                    )),
-                              ],
-                            ): Row(
-                              children: [
-                                ExpandedAMDMO(),
-                                SizedBox(width: 0.08* width),
-                                ContainerSave(context, width, height, setState),
-                              ],
-                            ),
-                            AMKID==15?ContainerSave(context, width, height, setState):Container(),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Autocomplete<Acc_Acc_Local>(
+                                        optionsBuilder: (TextEditingValue textEditingValue) {
+                                          return autoCompleteData
+                                              .where((Acc_Acc_Local county) =>
+                                              county.AANA_D.toString().toLowerCase().contains(textEditingValue.text.toLowerCase())).toList();
+                                        },  displayStringForOption:
+                                          (Acc_Acc_Local option) =>
+                                      AANAController.text == '' ? '' : option.AANA_D.toString(),
+                                        fieldViewBuilder: (BuildContext context,
+                                            textEditingController,
+                                            FocusNode myFocus,
+                                            VoidCallback onFieldSubmitted) {
+                                          _autocompleteFocusNode = myFocus;
+                                          return AANAController.text ==
+                                              '' ? TextFormField(
+                                            controller: textEditingController,
+                                            focusNode: myFocus,
+                                            validator: (v) {
+                                              return validateAANO(v!);
+                                            },
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                            textAlign: TextAlign.center,
+                                            decoration:  InputDecoration(
+                                              labelText: 'StringAccount'.tr,
+                                            ),
+                                          )
+                                              : TextFormField(
+                                            controller:
+                                            AANAController,
+                                            validator: (v) {
+                                              return validateAANO(v!);
+                                            },
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                            textAlign: TextAlign.center,
+                                            decoration: InputDecoration(
+                                              suffixIcon: IconButton(
+                                                icon: const Icon(
+                                                  Icons.clear,
+                                                  color: Colors.black,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    setState(() {
+                                                      textEditingController.text = "";
+                                                      AANAController.clear();
+                                                      SelectDataAANO='';
+                                                      myFocus.requestFocus();
+                                                    });
+                                                  });
+                                                },
+                                              ),
+                                              icon: IconButton(
+                                                icon: const Icon(
+                                                  Icons.error,
+                                                  color: Colors.black,
+                                                ),
+                                                onPressed: () async{
 
-                            SizedBox(height: 0.02* height),
-                          ],
-                        ),
+                                                  GET_BIL_ACC_C_P(SelectDataAANO.toString(),'','',SelectDataSCID.toString());
+                                                  await Future.delayed(const Duration(milliseconds: 100));
+                                                  buildShowBIL_ACC_C(context);
+                                                },
+                                              ),
+                                              labelText: 'StringAccount'.tr,
+                                            ),
+                                          );
+                                        },
+                                        onSelected: (Acc_Acc_Local selection) {
+                                          setState(() {
+                                            AANAController.text=selection.AANA_D.toString();
+                                            SelectDataAANO=selection.AANO.toString();
+                                            SelectDataAANO=selection.AANO.toString();
+                                            AACT=int.parse(selection.AACT.toString());
+                                            SCID_C=selection.SCID;
+                                            BIID_D=selection.BIID.toString();
+                                            SelectDataACNO_D=SelectDataACNO;
+                                            GETAANOCOUNT_P();
+                                            GET_AKID_P();
+                                            GET_BAL_P(AMMID.toString(),
+                                                selection.AANO.toString(),
+                                                SelectDataSCID.toString());
+                                            myFocusNode.requestFocus();
+                                          });
+                                        },
+                                        optionsViewBuilder: (BuildContext context,AutocompleteOnSelected<Acc_Acc_Local>
+                                        onSelected, Iterable<Acc_Acc_Local> options) {
+                                          return Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Container(
+                                              width: double.infinity,
+                                              height: (options.length * 100.0).clamp(150.0, 0.4 * MediaQuery.of(context).size.height),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                border: Border.all(color: Colors.grey),
+                                                borderRadius: BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey.withOpacity(0.5),
+                                                    spreadRadius: 1,
+                                                    blurRadius: 5,
+                                                    offset: Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: ListView.builder(
+                                                itemCount: options.length,
+                                                itemBuilder:
+                                                    (BuildContext context, int index) {
+                                                  final Acc_Acc_Local option = options.elementAt(index);
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      onSelected(option);
+                                                    },
+                                                    child: Center(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.all(0.009 * height),
+                                                          child: Text(option.AANA_D.toString(),
+                                                              textAlign:
+                                                              TextAlign.center,
+                                                              style: const TextStyle(
+                                                                  color: Colors.black,
+                                                                  fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                        )),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                TextFormField(
+                                  controller: AMDINController,
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                      suffixIcon: IconButton(icon: Icon(Icons.error_outline),onPressed: (){
+                                        if(controller.GET_AMDIN.isNotEmpty){
+                                          buildShowDialogGET_AMDIN(context);
+                                        }
+                                      }),
+                                      labelText: 'StringDetails'.tr,
+                                      hintStyle: const TextStyle(
+                                          color: Colors.blue)),
+                                ),
+                                SizedBox(height: 0.02 * height),
+                                if( ValueAMMCC ||( Multi_CUR=='1' && AMKID==15))
+                                  Column(
+                                    children: [
+                                      DropdownSYS_CUR2Builder(),
+                                      SizedBox(height: 0.02 * height),
+                                      // Padding(
+                                      //   padding:  EdgeInsets.only(right: 0.02 * height,left:0.02 * height,bottom:0.02 * height ),
+                                      //   child: Row(
+                                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                                      //     children: [
+                                      //     Text("${'Stringexchangerate'.tr}    ${SCEX2}",
+                                      //               style: TextStyle(fontSize: 0.01 * height)),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                P_COSM!='1' || ((P_COS1 =='4' ||   P_COS1 =='5') && (P_COS2 =='4' ||   P_COS2 =='5'))
+                                    ? Container() :  DropdownACC_COS_DBuilder(),
+                                AMKID==15?  Row(
+                                  children: [
+                                    ExpandedAMDMO(),
+                                    SizedBox(width: 0.08* width),
+                                    Expanded(
+                                        child: TextFormField(
+                                          controller: AMDEQSController,
+                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                          textAlign: TextAlign.center,
+                                          inputFormatters: [
+                                            //  FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
+                                            ThousandsSeparatorInputFormatter(),
+                                          ],
+                                          onChanged: (v){
+                                            if(v.isNotEmpty){
+                                              String sanitizedValue = v.replaceAll(',', '');
+                                              AMDEQController.text=sanitizedValue.toString();
+                                              if(AMKID==15 ){
+                                                SelectDataSCID2.toString()!='1'?
+                                                SCEX2=double.parse(AMDEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
+                                                update();
+                                              }
+                                            }
+                                          },
+                                          decoration: InputDecoration(
+                                              hintText: AMDMOHintController.text.toString().replaceAll(regex, ''),
+                                              labelText: 'StringTotalequivalent'.tr,
+                                              hintStyle: const TextStyle(
+                                                  color: Colors.blue)),
+                                        )),
+                                  ],
+                                ): Row(
+                                  children: [
+                                    ExpandedAMDMO(),
+                                    SizedBox(width: 0.08* width),
+                                    ContainerSave(context, width, height, setState),
+                                  ],
+                                ),
+                                AMKID==15?ContainerSave(context, width, height, setState):Container(),
+
+                                SizedBox(height: 0.02* height),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        )));
+              ),
+            )));
       }),
     );
   }
 
   Container ContainerSave(BuildContext context, double width, double height, StateSetter setState) {
-                               return Container(
-                                width: AMKID==15?MediaQuery.of(context).size.width / 1
-                                    :MediaQuery.of(context).size.width / 3,
-                                margin: EdgeInsets.only(right: 0.02 * width,top: 0.02 * height),
-                                child: Obx(() {
-                                  return isloading.value ==
-                                      true
-                                      ? ThemeHelper().circularProgress()
-                                      : TextButton(
-                                    //icon: Icon(Icons.add,color:  Colors.black,),
-                                    style: ButtonStyle(
-                                      shape: WidgetStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(
-                                                  0.02 * height),
-                                              side: const BorderSide(
-                                                  color: Colors
-                                                      .black45))),
-                                      padding: WidgetStateProperty
-                                          .all<EdgeInsets>(
-                                          EdgeInsets.only(
-                                              left: 0.02 * height,
-                                              right: 0.02 * height)),
-                                    ),
-                                    child: Text(
-                                        StringButton,
-                                        style:  ThemeHelper().buildTextStyle(context, Colors.black,'M')
-                                    ),
-                                    onPressed: () async {
-                                      GETAANOCOUNT_P();
-                                      if (Repeatingedit==false && RepeatingSameAccount=='1' && int.parse(AANOCOUNT)!=0) {
-                                        Get.defaultDialog(
-                                          title: 'StringMestitle'.tr,
-                                          middleText: 'StringRepeatingSameAccount'.tr,
-                                          backgroundColor:
-                                          Colors.white,
-                                          radius: 40,
-                                          textCancel: 'StringNo'.tr,
-                                          cancelTextColor:
-                                          Colors.red,
-                                          textConfirm: 'StringYes'.tr,
-                                          confirmTextColor:
-                                          Colors.white,
-                                          onConfirm: () {
-                                            Navigator.of(context).pop(false);
-                                            setState(() async {
-                                              GET_AMDID_P();
-                                              await Future.delayed(const Duration(milliseconds: 10));{
-                                                Save_ACC_MOV_D_P();
-                                              }
-                                            });
-                                          },
-                                          barrierDismissible: false,
-                                        );
-                                      }
-                                      else{
-                                        GET_AMDID_P();
-                                        await Future.delayed(const Duration(milliseconds: 10));{
-                                          Save_ACC_MOV_D_P();
-                                        }
-                                      }
+    return Container(
+      width: AMKID==15?MediaQuery.of(context).size.width / 1
+          :MediaQuery.of(context).size.width / 3,
+      margin: EdgeInsets.only(right: 0.02 * width,top: 0.02 * height),
+      child: Obx(() {
+        return isloading.value ==
+            true
+            ? ThemeHelper().circularProgress()
+            : TextButton(
+          //icon: Icon(Icons.add,color:  Colors.black,),
+          style: ButtonStyle(
+            shape: WidgetStateProperty.all<
+                RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.circular(
+                        0.02 * height),
+                    side: const BorderSide(
+                        color: Colors
+                            .black45))),
+            padding: WidgetStateProperty
+                .all<EdgeInsets>(
+                EdgeInsets.only(
+                    left: 0.02 * height,
+                    right: 0.02 * height)),
+          ),
+          child: Text(
+              StringButton,
+              style:  ThemeHelper().buildTextStyle(context, Colors.black,'M')
+          ),
+          onPressed: () async {
+            GETAANOCOUNT_P();
+            if (Repeatingedit==false && RepeatingSameAccount=='1' && int.parse(AANOCOUNT)!=0) {
+              Get.defaultDialog(
+                title: 'StringMestitle'.tr,
+                middleText: 'StringRepeatingSameAccount'.tr,
+                backgroundColor:
+                Colors.white,
+                radius: 40,
+                textCancel: 'StringNo'.tr,
+                cancelTextColor:
+                Colors.red,
+                textConfirm: 'StringYes'.tr,
+                confirmTextColor:
+                Colors.white,
+                onConfirm: () {
+                  Navigator.of(context).pop(false);
+                  setState(() async {
+                    GET_AMDID_P();
+                    await Future.delayed(const Duration(milliseconds: 10));{
+                      Save_ACC_MOV_D_P();
+                    }
+                  });
+                },
+                barrierDismissible: false,
+              );
+            }
+            else{
+              GET_AMDID_P();
+              await Future.delayed(const Duration(milliseconds: 10));{
+                Save_ACC_MOV_D_P();
+              }
+            }
 
-                                    },
-                                  );
-                                }),
-                              );
+          },
+        );
+      }),
+    );
   }
 
   Expanded ExpandedAMDMO() {
-                                  return Expanded(
-                                  child: TextFormField(
-                                    controller: AMDMOSController,
-                                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                    textAlign: TextAlign.center,
-                                    focusNode: myFocusNode,
-                                    inputFormatters: [
-                                   //   FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
-                                      ThousandsSeparatorInputFormatter(),
-                                    ],
-                                    onChanged: (v){
-                                      if(v.isNotEmpty){
-                                        String sanitizedValue = v.replaceAll(',', '');
-                                        AMDMO=double.parse(sanitizedValue);
-                                        AMDMOController.text=sanitizedValue.toString();
-                                        if(ValueAMMCC ){
-                                          SelectDataSCID2.toString()!='1'?
-                                          SCEX2=double.parse(AMMEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
-                                        }
-                                        if(AMKID==15 ){
-                                          AMDEQController.text=roundDouble((double.parse(AMDMOController.text.toString())*
-                                              double.parse(ValueAMMCC || ( Multi_CUR=='1' && AMKID==15) ? SCEX2.toString() : SCEXController.text)),2).toString();
-                                          AMDEQSController.text=formatter.format(roundDouble(
-                                              (double.parse(AMDMOController.text.toString())*
-                                              double.parse(ValueAMMCC || ( Multi_CUR=='1' && AMKID==15) ? SCEX2.toString() : SCEXController.text)),2)).toString();
-                                          print('onChanged');
-                                          print(AMDEQController.text);
-                                          print('onChanged');
-                                          SelectDataSCID2.toString()!='1'?
-                                          SCEX2=double.parse(AMDEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
-                                        }
-                                        update();
-                                      }else{
-                                        AMDMO=0;
-                                        AMDMOController.text='0';
-                                      }
-                                    },
-                                    decoration: InputDecoration(
-                                        hintText: AMDMOHintController.text.toString().replaceAll(regex, ''),
-                                        labelText: 'StringAmount'.tr,
-                                        hintStyle: const TextStyle(
-                                            color: Colors.blue)),
-                                  ));
+    return Expanded(
+        child: TextFormField(
+          controller: AMDMOSController,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          textAlign: TextAlign.center,
+          focusNode: myFocusNode,
+          inputFormatters: [
+            //   FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
+            ThousandsSeparatorInputFormatter(),
+          ],
+          onChanged: (v){
+            if(v.isNotEmpty){
+              String sanitizedValue = v.replaceAll(',', '');
+              AMDMO=double.parse(sanitizedValue);
+              AMDMOController.text=sanitizedValue.toString();
+              if(ValueAMMCC ){
+                SelectDataSCID2.toString()!='1'?
+                SCEX2=double.parse(AMMEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
+              }
+              if(AMKID==15 ){
+                AMDEQController.text=roundDouble((double.parse(AMDMOController.text.toString())*
+                    double.parse(ValueAMMCC || ( Multi_CUR=='1' && AMKID==15) ? SCEX2.toString() : SCEXController.text)),2).toString();
+                AMDEQSController.text=formatter.format(roundDouble(
+                    (double.parse(AMDMOController.text.toString())*
+                        double.parse(ValueAMMCC || ( Multi_CUR=='1' && AMKID==15) ? SCEX2.toString() : SCEXController.text)),2)).toString();
+                print('onChanged');
+                print(AMDEQController.text);
+                print('onChanged');
+                SelectDataSCID2.toString()!='1'?
+                SCEX2=double.parse(AMDEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
+              }
+              update();
+            }else{
+              AMDMO=0;
+              AMDMOController.text='0';
+            }
+          },
+          decoration: InputDecoration(
+              hintText: AMDMOHintController.text.toString().replaceAll(regex, ''),
+              labelText: 'StringAmount'.tr,
+              hintStyle: const TextStyle(
+                  color: Colors.blue)),
+        ));
   }
 
   FutureBuilder<List<Acc_Cos_Local>> DropdownACC_COS_DBuilder() {

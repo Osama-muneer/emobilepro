@@ -280,19 +280,20 @@ class Cus_Bal_Rep_Controller extends GetxController {
     var BAL_ACC_C =await GET_Customers_Balances(TYPE_REP!,GETBIID_F,GETBIID_T,GETSCID_F,GETSCID_T,GETAANO_F,GETAANO_T, GETBCTID_F, GETBCTID_T,GETBCST_F,
         GETBCST_T,GETCWID_F,GETCWID_T,GETBAID_F,GETBAID_T,NOT_BAL,TYPE_ORD,TYPE_ORD2);
       update();
-    var BAL_ACC_C_SUM=  await GET_Customers_Balances_SUM(TYPE_REP!,GETBIID_F,GETBIID_T,GETSCID_F,GETSCID_T,GETAANO_F,GETAANO_T, GETBCTID_F, GETBCTID_T,GETBCST_F,
-          GETBCST_T,GETCWID_F,GETCWID_T,GETBAID_F,GETBAID_T,NOT_BAL,TYPE_ORD,TYPE_ORD2);
-        if(BAL_ACC_C_SUM.isNotEmpty){
-          SUM_BACBMD=double.parse(BAL_ACC_C_SUM.elementAt(0).SUM_BACBMD.toString());
-          SUM_BACBDA=double.parse(BAL_ACC_C_SUM.elementAt(0).SUM_BACBDA.toString());
-          SUM_BACBA=double.parse(BAL_ACC_C_SUM.elementAt(0).SUM_BACBA.toString());
-          update();
-        }else{
-          SUM_BACBMD=0.0;
-          SUM_BACBDA=0.0;
-          SUM_BACBA=0.0;
-        }
-        update();
+    // var BAL_ACC_C_SUM=  await GET_Customers_Balances_SUM(TYPE_REP!,GETBIID_F,GETBIID_T,GETSCID_F,GETSCID_T,GETAANO_F,GETAANO_T, GETBCTID_F, GETBCTID_T,GETBCST_F,
+    //       GETBCST_T,GETCWID_F,GETCWID_T,GETBAID_F,GETBAID_T,NOT_BAL,TYPE_ORD,TYPE_ORD2);
+    //     if(BAL_ACC_C_SUM.isNotEmpty){
+    //       SUM_BACBMD=double.parse(BAL_ACC_C_SUM.elementAt(0).SUM_BACBMD.toString());
+    //       SUM_BACBDA=double.parse(BAL_ACC_C_SUM.elementAt(0).SUM_BACBDA.toString());
+    //       SUM_BACBA=double.parse(BAL_ACC_C_SUM.elementAt(0).SUM_BACBA.toString());
+    //       update();
+    //     }
+    //     else{
+    //       SUM_BACBMD=0.0;
+    //       SUM_BACBDA=0.0;
+    //       SUM_BACBA=0.0;
+    //     }
+     //   update();
       if (BAL_ACC_C.isEmpty) {
         Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
             backgroundColor: Colors.red,

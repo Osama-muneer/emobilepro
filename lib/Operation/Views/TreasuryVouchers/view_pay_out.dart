@@ -784,38 +784,22 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                     size: 0.026 * height
                                                 ),
                                                 onPressed: () async {
-                                                  print(controller.UPDL);
                                                   Get.defaultDialog(
                                                     title: 'StringMestitle'.tr,
                                                     // titleStyle: TextStyle(),
-                                                    middleText:
-                                                    'StringDeleteMessage'
-                                                        .tr,
+                                                    middleText: 'StringDeleteMessage'.tr,
                                                     backgroundColor:
                                                     Colors.white,
                                                     radius: 40,
                                                     textCancel: 'StringNo'.tr,
                                                     cancelTextColor: Colors.red,
                                                     textConfirm: 'StringYes'.tr,
-                                                    confirmTextColor:
-                                                    Colors.white,
+                                                    confirmTextColor: Colors.white,
                                                     onConfirm: () {
-                                                      if (controller.UPDL ==
-                                                          1) {
-                                                        print(controller
-                                                            .ACC_MOV_M_List[
-                                                        index]
-                                                            .AMMID);
-                                                        print(
-                                                            'controller.ACC_MOV_M_List[index].AMMID');
-                                                        bool isValid = controller
-                                                            .DELETE_ACC_MOV(
-                                                            controller
-                                                                .ACC_MOV_M_List[
-                                                            index]
-                                                                .AMMID
-                                                                .toString(),
-                                                            2);
+                                                      if (controller.UPDL == 1) {
+                                                        print(controller.ACC_MOV_M_List[index].AMMID);
+                                                        print('controller.ACC_MOV_M_List[index].AMMID');
+                                                        bool isValid = controller.DELETE_ACC_MOV(controller.ACC_MOV_M_List[index].AMMID.toString(), 2);
                                                         if (isValid) {
                                                           controller
                                                               .GET_ACC_MOV_M_P(

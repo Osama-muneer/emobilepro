@@ -1104,73 +1104,138 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                           child:  DropdownST_Builder(),
                       ),
                       SizedBox(height: 0.01 * height,),
-                      Obx(() => controller.isloading.value == true
-                            ? ThemeHelper().circularProgress()
-                            : Container(
-                          decoration: ThemeHelper().buttonBoxDecoration(context),
-                          child: MaterialButton(
-                              onPressed: ()  {
-                                controller.BMKID!=101 && controller.BMKID!=102 ?
-                                  controller.Fetch_GET_BIF_REP_PdfData():
-                                  controller.GET_TotalDetailedItem_REP_P();
-                                controller.BMKID!=101 && controller.BMKID!=102 ?
-                                  Timer(const Duration(seconds: 5), () async {
-                                    if(BIF_MOV_M_List.isEmpty || BIF_MOV_M_REP.isEmpty || BIF_MOV_M_REP2.isEmpty){
-                                      Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
-                                          backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
-                                          colorText:Colors.white,
-                                          isDismissible: true,
-                                          dismissDirection: DismissDirection.horizontal,
-                                          forwardAnimationCurve: Curves.easeOutBack);
-                                        controller.isloading.value=false;
-                                    }else {
-                                      final pdfFile = await Pdf.Total_Amount_of_Point_Pdf(
-                                        controller.BMKID.toString(),
-                                        controller.SelectFromDays.toString().substring(0, 10),
-                                        controller.SelectToDays.toString().substring(0, 10),
-                                        controller.SelectDataFromBIID.toString(),
-                                        controller.SelectDataToBIID.toString(),
-                                        LoginController().SUNA,
-                                        controller.SONA
-                                      );
-                                      PdfPakage.openFile(pdfFile);
-                                      controller.isloading.value=false;
-                                    }
-                                  }):
-                                  Timer(const Duration(seconds: 3), () async {
-                                  if(controller.SelectDataBMKID==null ){
-                                    Get.snackbar('StringMestitle'.tr, 'StringChooseTheType'.tr,
-                                        backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
-                                        colorText:Colors.white,
-                                        isDismissible: true,
-                                        dismissDirection: DismissDirection.horizontal,
-                                        forwardAnimationCurve: Curves.easeOutBack);
-                                    controller.isloading.value=false;
-                                  }
-                                  else {
-                                   await controller.GET_TotalDetailedItem_REP_P();
-                                  }
-                                });
-                              },
-                              child: Container(
-                                height: 0.05 * height,
-                                width: 2 * width,
-                                alignment: Alignment.center,
-                                child: Text('StringPrint'.tr,
-                                  style: ThemeHelper().buildTextStyle(context, Colors.white,'L')
-                                ),
-                                decoration: BoxDecoration(
-                                    color: AppColors.MainColor,
-                                    borderRadius:
-                                    BorderRadius.circular(0.01 * height)),
-                              )),
-                        ),
-                      ),
+                      Button_Ser(width,height),
+                      // Obx(() => controller.isloading.value == true
+                      //       ? ThemeHelper().circularProgress()
+                      //       : Container(
+                      //     decoration: ThemeHelper().buttonBoxDecoration(context),
+                      //     child: MaterialButton(
+                      //         onPressed: ()  async {
+                      //           controller.BMKID!=101 && controller.BMKID!=102 ?
+                      //           await controller.Fetch_GET_BIF_REP_PdfData():
+                      //            await controller.GET_TotalDetailedItem_REP_P();
+                      //           controller.BMKID!=101 && controller.BMKID!=102 ?
+                      //             Timer(const Duration(seconds: 5), () async {
+                      //               if(BIF_MOV_M_List.isEmpty || BIF_MOV_M_REP.isEmpty || BIF_MOV_M_REP2.isEmpty){
+                      //                 Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
+                      //                     backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
+                      //                     colorText:Colors.white,
+                      //                     isDismissible: true,
+                      //                     dismissDirection: DismissDirection.horizontal,
+                      //                     forwardAnimationCurve: Curves.easeOutBack);
+                      //                   controller.isloading.value=false;
+                      //               }else {
+                      //                 final pdfFile = await Pdf.Total_Amount_of_Point_Pdf(
+                      //                   controller.BMKID.toString(),
+                      //                   controller.SelectFromDays.toString().substring(0, 10),
+                      //                   controller.SelectToDays.toString().substring(0, 10),
+                      //                   controller.SelectDataFromBIID.toString(),
+                      //                   controller.SelectDataToBIID.toString(),
+                      //                   LoginController().SUNA,
+                      //                   controller.SONA
+                      //                 );
+                      //                 PdfPakage.openFile(pdfFile);
+                      //                 controller.isloading.value=false;
+                      //               }
+                      //             }):
+                      //             Timer(const Duration(seconds: 3), () async {
+                      //             if(controller.SelectDataBMKID==null ){
+                      //               Get.snackbar('StringMestitle'.tr, 'StringChooseTheType'.tr,
+                      //                   backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
+                      //                   colorText:Colors.white,
+                      //                   isDismissible: true,
+                      //                   dismissDirection: DismissDirection.horizontal,
+                      //                   forwardAnimationCurve: Curves.easeOutBack);
+                      //               controller.isloading.value=false;
+                      //             }
+                      //             else {
+                      //              await controller.GET_TotalDetailedItem_REP_P();
+                      //             }
+                      //           });
+                      //         },
+                      //         child: Container(
+                      //           height: 0.05 * height,
+                      //           width: 2 * width,
+                      //           alignment: Alignment.center,
+                      //           child: Text('StringPrint'.tr,
+                      //             style: ThemeHelper().buildTextStyle(context, Colors.white,'L')
+                      //           ),
+                      //           decoration: BoxDecoration(
+                      //               color: AppColors.MainColor,
+                      //               borderRadius:
+                      //               BorderRadius.circular(0.01 * height)),
+                      //         )),
+                      //   ),
+                      //),
                     ],
                   ),
                 ),
               )),
         ));
+  }
+
+  Widget Button_Ser(double? width,double? height){
+    return Obx(() => controller.isloading.value == true
+        ? ThemeHelper().circularProgress()
+        : Container(
+      decoration: ThemeHelper().buttonBoxDecoration(context),
+      child: MaterialButton(
+          onPressed: ()  async {
+            controller.BMKID!=101 && controller.BMKID!=102 ?
+            await controller.Fetch_GET_BIF_REP_PdfData():
+            await controller.GET_TotalDetailedItem_REP_P();
+            controller.BMKID!=101 && controller.BMKID!=102 ?
+            Timer(const Duration(seconds: 5), () async {
+              if(BIF_MOV_M_List.isEmpty || BIF_MOV_M_REP.isEmpty || BIF_MOV_M_REP2.isEmpty){
+                Get.snackbar('StringNo_Data_Rep'.tr, 'StringChk_No_Data'.tr,
+                    backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
+                    colorText:Colors.white,
+                    isDismissible: true,
+                    dismissDirection: DismissDirection.horizontal,
+                    forwardAnimationCurve: Curves.easeOutBack);
+                controller.isloading.value=false;
+              }else {
+                final pdfFile = await Pdf.Total_Amount_of_Point_Pdf(
+                    controller.BMKID.toString(),
+                    controller.SelectFromDays.toString().substring(0, 10),
+                    controller.SelectToDays.toString().substring(0, 10),
+                    controller.SelectDataFromBIID.toString(),
+                    controller.SelectDataToBIID.toString(),
+                    LoginController().SUNA,
+                    controller.SONA
+                );
+                PdfPakage.openFile(pdfFile);
+                controller.isloading.value=false;
+              }
+            }):
+            Timer(const Duration(seconds: 3), () async {
+              if(controller.SelectDataBMKID==null ){
+                Get.snackbar('StringMestitle'.tr, 'StringChooseTheType'.tr,
+                    backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
+                    colorText:Colors.white,
+                    isDismissible: true,
+                    dismissDirection: DismissDirection.horizontal,
+                    forwardAnimationCurve: Curves.easeOutBack);
+                controller.isloading.value=false;
+              }
+              else {
+                await controller.GET_TotalDetailedItem_REP_P();
+              }
+            });
+          },
+          child: Container(
+            height: 0.05 * height!,
+            width: 2 * width!,
+            alignment: Alignment.center,
+            child: Text('StringPrint'.tr,
+                style: ThemeHelper().buildTextStyle(context, Colors.white,'L')
+            ),
+            decoration: BoxDecoration(
+                color: AppColors.MainColor,
+                borderRadius:
+                BorderRadius.circular(0.01 * height)),
+          )),
+    ));
   }
 
 }

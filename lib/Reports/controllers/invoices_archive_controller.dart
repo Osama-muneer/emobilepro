@@ -18,7 +18,7 @@ class Invoices_ArchiveController extends GetxController {
   bool value = false,isTablet = false;
   bool value1 = false;
   double totalBmmam = 0,totalBmmtx = 0,totalBmmmt = 0,totalBmmdi = 0,totalBmmdif=0;
- String SDDSA='',SONA='',SONE='',SORN='',SOLN='', SDDDA = '';
+ String SDDSA='',SONA='',SONE='',SORN='',SOLN='', SDDDA = '',TYPE_T='1',TYPE_ORD2='1';
  // late  DateTime dateFromDays =  DateFormat('dd-MM-yyyy').format(DateTime.now()) as DateTime;
   DateTime dateFromDays1 = DateTime.now();
   final formatter = intl.NumberFormat.decimalPattern();
@@ -216,7 +216,7 @@ class Invoices_ArchiveController extends GetxController {
   Future GET_BIL_MOV_REP_P() async {
     BIF_MOV_M_PDF =await GET_BIL_MOV_REP(SelectDataFromBIID!,SelectDataToBIID!,SelectFromDays!,
         SelectToDays!, SelectDataSCID.toString(),PKID.toString(),
-        SelectFromDATEI.toString(),SelectToDATEI.toString());
+        SelectFromDATEI.toString(),SelectToDATEI.toString(),TYPE_T,TYPE_ORD2);
     BIF_MOV_M_SUM_PDF=await  GET_BIL_MOV_REP_SUM(SelectDataFromBIID!,SelectDataToBIID!,SelectFromDays!,
         SelectToDays!, SelectDataSCID.toString(),PKID.toString(),
         SelectFromDATEI.toString(),SelectToDATEI.toString());
