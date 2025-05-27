@@ -5935,8 +5935,6 @@ class Sale_Invoices_Controller extends GetxController {
       update();
     }
     update();
-    print('SUMBAL');
-    print(SUMBAL);
     GET_BAL_APP_P(BMMID,AANO,SCID);
     update();
   }
@@ -10520,8 +10518,7 @@ class Sale_Invoices_Controller extends GetxController {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              "${'StringUn_Balance'.tr}:",
+            Text("${'StringUn_Balance'.tr}:",
               style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
             ),
             Text(formatter.format(SUMBAL).toString(),
@@ -10533,8 +10530,7 @@ class Sale_Invoices_Controller extends GetxController {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-                "${'StringCurrent_Balance'.tr}:",
+            Text("${'StringCurrent_Balance'.tr}:",
                 style: ThemeHelper().buildTextStyle(
                     context, Colors.black87, 'M')
             ),

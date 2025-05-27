@@ -31,9 +31,66 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   HomeController controller = Get.find();
   int touchedIndex = -1;
+  final String imagePath = ImagePath;
+  // خرائط الربط بين SSID والصورة والعنوان والإجراء
+  static const Map<int, String> _imgMap = {
+    601: 'Sale_Invoices.png',
+    901: 'Purchases Invoices.png',
+    102: 'Receipt Vouchers.png',
+    103: 'Payment Vouchers.png',
+    742: 'Sale_Invoices.png',
+    621: 'Sale_Invoices.png',
+    611: 'Return_Sale.png',
+    743: 'Return_Sale.png',
+    111: 'JournalVouchers.png',
+    91:  'Customer.png',
+    202: 'Account_Statement.png',
+  };
+
+  static const Map<int, String> _labelMap = {
+    601: 'StringSalesInvoice',
+    901: 'StringPurchases',
+    102: 'StringReceipt',
+    103: 'StringPayment',
+    742: 'StringSalesInvoice',
+    621: 'StringSalesInvoice',
+    611: 'StringReturn_Sale_Inv',
+    743: 'StringReturn_Sale_Inv',
+    111: 'StringJournalVouchers_Home',
+    91:  'StringCustomer_Home',
+    202: 'StringAccount_Statement',
+  };
+
+  late final Map<int, VoidCallback> _actionMap = {
+    601: () => controller.GoToInvoiceSales(3),
+    901: () => controller.GoToInvoiceSales(1),
+    102: () => controller.GoToPay_Out(1),
+    103: () => controller.GoToPay_Out(2),
+    742: () => controller.GoToInvoiceSales(11),
+    621: () => controller.GoToInvoiceSales(5),
+    611: () => controller.GoToInvoiceSales(4),
+    743: () => controller.GoToInvoiceSales(12),
+    111: () => controller.GoToPay_Out(15),
+    91:  () {
+      if (controller.UPIN_CUS != 1) {
+        controller.buildShowDialogPRIV();
+      } else {
+        Get.toNamed('/View_Customers');
+      }
+    },
+    202: () {
+      if (controller.UPIN_ACS != 1) {
+        controller.buildShowDialogPRIV();
+      } else {
+        Get.toNamed('/Account_Statement', arguments: 1);
+      }
+    },
+  };
+
   Widget build(BuildContext context) {
-    return
-      STMID=='EORD' && LoginController().experimentalcopy != 1?
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    return STMID=='EORD' && LoginController().experimentalcopy != 1?
       Scaffold(
           appBar:controller.currentIndex == 0? buildAppBar(context):null,
           drawer: ThemeHelper().buildDrawer(context),
@@ -755,12 +812,12 @@ class _HomeViewState extends State<HomeView> {
                 body:  UpgradeAlert(
                   child: SingleChildScrollView(
                     child: controller.currentIndex == 0
-                        ? SizedBox(
-                      height: displayHeight(context) * 0.80,
+                          ? SizedBox(
+                      height: displayHeight(context) * 0.90,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // controller.FAS_ACC_USR2.isEmpty ?
+                           controller.FAS_ACC_USR2.isEmpty ?
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -794,88 +851,86 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                               ],),
                             ],
-                          ),
-                          //     : Expanded(
-                          //   child: GridView.builder(
-                          //     shrinkWrap: true,
-                          //     itemCount: controller.FAS_ACC_USR2.length,
-                          //     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                          //       maxCrossAxisExtent: 280,
-                          //       childAspectRatio: 2,
-                          //     ),
-                          //     itemBuilder: (BuildContext context, int index) {
-                          //       return InkWell(
-                          //         child: Stack(
-                          //             alignment: Alignment.topCenter,
-                          //             children: [
-                          //               Image.asset(controller.FAS_ACC_USR2[index].SSID==601?"${ImagePath}Sale_Invoices.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==901?"${ImagePath}Purchases Invoices.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==102?"${ImagePath}Receipt Vouchers.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==103?"${ImagePath}Payment Vouchers.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==742?"${ImagePath}Sale_Invoices.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==621?"${ImagePath}Sale_Invoices.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==611?"${ImagePath}Return_Sale.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==743?"${ImagePath}Return_Sale.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==111?"${ImagePath}JournalVouchers.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==91?"${ImagePath}Customer.png":
-                          //               controller.FAS_ACC_USR2[index].SSID==202?"${ImagePath}Account_Statement.png":
-                          //               "${ImagePath}Sale_Invoices.png",),
-                          //               Positioned(
-                          //                 bottom:width >900 ? MediaQuery.of(context).size.height / 100:
-                          //                 MediaQuery.of(context).size.height / 77,
-                          //                 right: width >900 ? MediaQuery.of(context).size.height /  16.5:
-                          //                 MediaQuery.of(context).size.height / 12.3,
-                          //                 child: ThemeHelper().buildText(context,
-                          //                     controller.FAS_ACC_USR2[index].SSID==601?'StringSalesInvoice':
-                          //                     controller.FAS_ACC_USR2[index].SSID==901?'StringPurchases':
-                          //                     controller.FAS_ACC_USR2[index].SSID==102? 'StringReceipt':
-                          //                     controller.FAS_ACC_USR2[index].SSID==103? 'StringPayment':
-                          //                     controller.FAS_ACC_USR2[index].SSID==742? 'StringSalesInvoice':
-                          //                     controller.FAS_ACC_USR2[index].SSID==621? 'StringSalesInvoice':
-                          //                     controller.FAS_ACC_USR2[index].SSID==611? 'StringReturn_Sale_Inv':
-                          //                     controller.FAS_ACC_USR2[index].SSID==743? 'StringReturn_Sale_Inv':
-                          //                     controller.FAS_ACC_USR2[index].SSID==111? 'StringJournalVouchers_Home':
-                          //                     controller.FAS_ACC_USR2[index].SSID==91? 'StringCustomer_Home':
-                          //                     controller.FAS_ACC_USR2[index].SSID==202? 'StringAccount_Statement':
-                          //                     'StringSalesInvoice', Colors.white,'L'),
-                          //               ) ]),
-                          //         onTap: () async {
-                          //           if(controller.FAS_ACC_USR2[index].SSID==601){
-                          //             controller.GoToInvoiceSales(3);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==901){
-                          //             controller.GoToInvoiceSales(1);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==102){
-                          //             controller.GoToPay_Out(1);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==103){
-                          //             controller.GoToPay_Out(2);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==742){
-                          //             controller.GoToInvoiceSales(11);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==621){
-                          //             controller.GoToInvoiceSales(5);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==611){
-                          //             controller.GoToInvoiceSales(4);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==743){
-                          //             controller.GoToInvoiceSales(12);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==111){
-                          //             controller.GoToPay_Out(15);
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==91){
-                          //             if(controller.UPIN_CUS!=1 ){
-                          //               controller.buildShowDialogPRIV();
-                          //             }else{
-                          //               Get.toNamed('/View_Customers');
-                          //             }
-                          //           }else  if(controller.FAS_ACC_USR2[index].SSID==202){
-                          //             if(controller.UPIN_ACS!=1  ){
-                          //               controller.buildShowDialogPRIV();
-                          //             }else{
-                          //               Get.toNamed('/Account_Statement',arguments: 1);
-                          //             }
-                          //           }
-                          //         },
-                          //       );
-                          //     },
-                          //   ),
-                          // ),
+                          )
+                              : GridView.builder(
+                                shrinkWrap: true,
+                                itemCount: controller.FAS_ACC_USR2.length,
+                                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 280,
+                                  childAspectRatio: 2,
+                                ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return InkWell(
+                                    child: Stack(
+                                        alignment: Alignment.topCenter,
+                                        children: [
+                                          Image.asset(controller.FAS_ACC_USR2[index].SSID==601?"${ImagePath}Sale_Invoices.png":
+                                          controller.FAS_ACC_USR2[index].SSID==901?"${ImagePath}Purchases Invoices.png":
+                                          controller.FAS_ACC_USR2[index].SSID==102?"${ImagePath}Receipt Vouchers.png":
+                                          controller.FAS_ACC_USR2[index].SSID==103?"${ImagePath}Payment Vouchers.png":
+                                          controller.FAS_ACC_USR2[index].SSID==742?"${ImagePath}Sale_Invoices.png":
+                                          controller.FAS_ACC_USR2[index].SSID==621?"${ImagePath}Sale_Invoices.png":
+                                          controller.FAS_ACC_USR2[index].SSID==611?"${ImagePath}Return_Sale.png":
+                                          controller.FAS_ACC_USR2[index].SSID==743?"${ImagePath}Return_Sale.png":
+                                          controller.FAS_ACC_USR2[index].SSID==111?"${ImagePath}JournalVouchers.png":
+                                          controller.FAS_ACC_USR2[index].SSID==91?"${ImagePath}Customer.png":
+                                          controller.FAS_ACC_USR2[index].SSID==202?"${ImagePath}Account_Statement.png":
+                                          "${ImagePath}Sale_Invoices.png",),
+                                          Positioned(
+                                            bottom:width >900 ? MediaQuery.of(context).size.height / 100:
+                                            MediaQuery.of(context).size.height / 77,
+                                            right: width >900 ? MediaQuery.of(context).size.height /  16.5:
+                                            MediaQuery.of(context).size.height / 12.3,
+                                            child: ThemeHelper().buildText(context,
+                                                controller.FAS_ACC_USR2[index].SSID==601?'StringSalesInvoice':
+                                                controller.FAS_ACC_USR2[index].SSID==901?'StringPurchases':
+                                                controller.FAS_ACC_USR2[index].SSID==102? 'StringReceipt':
+                                                controller.FAS_ACC_USR2[index].SSID==103? 'StringPayment':
+                                                controller.FAS_ACC_USR2[index].SSID==742? 'StringSalesInvoice':
+                                                controller.FAS_ACC_USR2[index].SSID==621? 'StringSalesInvoice':
+                                                controller.FAS_ACC_USR2[index].SSID==611? 'StringReturn_Sale_Inv':
+                                                controller.FAS_ACC_USR2[index].SSID==743? 'StringReturn_Sale_Inv':
+                                                controller.FAS_ACC_USR2[index].SSID==111? 'StringJournalVouchers_Home':
+                                                controller.FAS_ACC_USR2[index].SSID==91? 'StringCustomer_Home':
+                                                controller.FAS_ACC_USR2[index].SSID==202? 'StringAccount_Statement':
+                                                'StringSalesInvoice', Colors.white,'L'),
+                                          ) ]),
+                                    onTap: () async {
+                                      if(controller.FAS_ACC_USR2[index].SSID==601){
+                                        controller.GoToInvoiceSales(3);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==901){
+                                        controller.GoToInvoiceSales(1);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==102){
+                                        controller.GoToPay_Out(1);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==103){
+                                        controller.GoToPay_Out(2);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==742){
+                                        controller.GoToInvoiceSales(11);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==621){
+                                        controller.GoToInvoiceSales(5);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==611){
+                                        controller.GoToInvoiceSales(4);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==743){
+                                        controller.GoToInvoiceSales(12);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==111){
+                                        controller.GoToPay_Out(15);
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==91){
+                                        if(controller.UPIN_CUS!=1 ){
+                                          controller.buildShowDialogPRIV();
+                                        }else{
+                                          Get.toNamed('/View_Customers');
+                                        }
+                                      }else  if(controller.FAS_ACC_USR2[index].SSID==202){
+                                        if(controller.UPIN_ACS!=1  ){
+                                          controller.buildShowDialogPRIV();
+                                        }else{
+                                          Get.toNamed('/Account_Statement',arguments: 1);
+                                        }
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
                           Expanded(
                             child: SingleChildScrollView(
                               child: Column(

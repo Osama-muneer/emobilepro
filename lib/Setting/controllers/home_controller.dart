@@ -221,6 +221,9 @@ class HomeController extends GetxController {
     SUNAController = TextEditingController();
     searchController = TextEditingController();
    // await ES_WS_PKG.GET_P();
+    await GET_SYS_SCR_FAS_P2();
+    await GET_SYS_SCR_FAS_P();
+    update();
     await GET_GEN_VAR_P();
     GET_SUNA();
     Get_JTNA_DATA();
@@ -229,8 +232,6 @@ class HomeController extends GetxController {
     GET_BIL_MOV_M_GET_BIF_MOV_M_STATE_P('2');
     GET_BIL_MOV_M_GET_BIF_MOV_M_STATE_P('4');
     update();
-    await GET_SYS_SCR_FAS_P2();
-    await GET_SYS_SCR_FAS_P();
     // LoginController().Androidversion();
     if(LoginController().experimentalcopy==1){
       ThemeHelper().saveData();
@@ -852,20 +853,13 @@ class HomeController extends GetxController {
   }
 
   Future GET_SYS_SCR_FAS_P() async {
-    GET_FAS_ACC_USR('2').then((data) {
-      FAS_ACC_USR=data;
+    FAS_ACC_USR= await GET_FAS_ACC_USR('2');
       update();
-    });
   }
 
   Future GET_SYS_SCR_FAS_P2() async {
-    GET_FAS_ACC_USR('1').then((data) {
-      if(data.isNotEmpty){
-        FAS_ACC_USR2=data;
+    FAS_ACC_USR2= await GET_FAS_ACC_USR('1');
         update();
-      }
-      update();
-    });
   }
 
   Future SAVE_FAS_ACC_USR() async {
