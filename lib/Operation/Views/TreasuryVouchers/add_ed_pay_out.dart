@@ -92,7 +92,6 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
       if(controller.edit == true ){
         controller.CheckBack == 0 ? null : controller.Save_ACC_MOV_M_P(controller.edit,context);
       }
-
       Navigator.of(context).pop(false);
       controller.ClearACC_Mov_M_Data();
       controller.GET_ACC_MOV_M_P('DateNow',controller.AMKID!);
