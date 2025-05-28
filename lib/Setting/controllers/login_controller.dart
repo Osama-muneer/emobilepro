@@ -227,21 +227,21 @@ class LoginController extends GetxController {
     GETMOB_VAR_P(5);
     APPVersion();
     getIP();
-    if(CHIKE_ALL == 1){
-      SelectDataJTID=LoginController().JTID.toString();
-      BIIDController.text=LoginController().BIID.toString();
-      SYIDController.text=LoginController().SYID.toString();
-      SYNOController.text=LoginController().SYNO_V.toString();
-      usernameController.text=LoginController().SUID.toString();
-      Get_Bra_InfData();
-      GET_SYID_Data();
-      GET_SUNA();
-      CONV_P(passwordController.text);
-      CHIKE_USER_PAS();
-      myFocusSUPW.requestFocus();
-    }else{
+    // if(CHIKE_ALL == 1){
+    //   SelectDataJTID=LoginController().JTID.toString();
+    //   BIIDController.text=LoginController().BIID.toString();
+    //   SYIDController.text=LoginController().SYID.toString();
+    //   SYNOController.text=LoginController().SYNO_V.toString();
+    //   usernameController.text=LoginController().SUID.toString();
+    //   Get_Bra_InfData();
+    //   GET_SYID_Data();
+    //   GET_SUNA();
+    //   CONV_P(passwordController.text);
+    //   CHIKE_USER_PAS();
+    //   myFocusSUPW.requestFocus();
+    // }else{
       GET_JTID_ONEData();
-    }
+    // }
     GET_ACC_ACT_TYP();
     super.onInit();
   }

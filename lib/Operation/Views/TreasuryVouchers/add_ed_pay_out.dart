@@ -95,7 +95,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
       Navigator.of(context).pop(false);
       controller.ClearACC_Mov_M_Data();
       controller.GET_ACC_MOV_M_P('DateNow',controller.AMKID!);
-       shouldPop = await Get.toNamed('/View_Pay_Out');
+      shouldPop = await Get.toNamed('/View_Pay_Out');
     }
     else{
        shouldPop = await Get.defaultDialog(

@@ -377,7 +377,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                 crossAxisCount: controller.crossAxisCountMAT_INF,
                                // crossAxisSpacing: 12.0,
                                // mainAxisSpacing: 15.0,
-                                mainAxisExtent: 200,       // ← يثبّت الارتفاع
+                                mainAxisExtent: 170,       // ← يثبّت الارتفاع
                                // childAspectRatio: 1,       // ← نسبة العرض
                                 crossAxisSpacing: 3.10,
                                 mainAxisSpacing:  3.10,
@@ -385,155 +385,119 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                               ),
                               itemCount: controller.MAT_INF_DATE.length,
                               itemBuilder: (context, index) {
-                                return Stack(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.red, width: 0.5),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        controller.SelectDataMINO = controller.MAT_INF_DATE[index].MINO.toString();
-                                        print('STP-1');
-                                        controller.MGNOController.text = controller.MAT_INF_DATE[index].MGNO.toString();
-                                        controller.SelectDataMUID = controller.MAT_INF_DATE[index].MUID.toString();
-                                        controller.MGKI = controller.MAT_INF_DATE[index].MGKI;
-                                        controller.update();
-                                        await controller.GET_COUNT_MINO_P();
-                                        await controller.GET_COUNT_NO_P(
-                                            controller.MAT_INF_DATE[index].MGNO.toString(),
-                                            controller.MAT_INF_DATE[index].MINO.toString(),
-                                            controller.MAT_INF_DATE[index].MUID!);
-                                        await controller.GET_BROCODE_P( controller.MGNOController.text,controller.SelectDataMINO.toString(),controller.SelectDataMUID.toString());
-                                        controller.MINAController.text = controller.MAT_INF_DATE[index].MINA_D.toString();
-                                        controller.MIED = controller.MAT_INF_DATE[index].MIED;
-                                        controller.BMDNOController.text = '1';
-                                        controller.BMDNO_V = 1;
-                                        controller.BMDAMController.text = controller.BCPR==2?
-                                        controller.MAT_INF_DATE[index].MPS2.toString(): controller.BCPR==3?
-                                        controller.MAT_INF_DATE[index].MPS3.toString() :controller.BCPR==4?
-                                        controller.MAT_INF_DATE[index].MPS4.toString():
-                                        controller.MAT_INF_DATE[index].MPS1.toString();
-                                        controller.BMDNFController.text = '0';
-                                        controller.SUMBMDAMController.text = '0';
-                                        controller.BMDDIRController.text = '0';
-                                        controller.BMDDIController.text = '0';
-                                        controller.MPS1 = double.parse(controller.BMDAMController.text);
-                                        print(controller.MPS1 );
-                                        print(controller.BMDAMController.text);
-                                        print('controller.BMDAMController.text');
-                                        if(controller.TTID1!=null){
-                                          await controller.GET_TAX_LIN_P('MAT',controller.MAT_INF_DATE[index].MGNO.toString(),
-                                              controller.MAT_INF_DATE[index].MINO.toString());
-                                        }
-                                        // Timer(const Duration(milliseconds: 200), () async {
-                                          print('STP-2');
-                                          if(controller.COUNT_NO<=0){
-                                            await  controller.Calculate_BMD_NO_AM();
-                                           print('STP-3');
-                                            bool isValid =await controller.Save_BIL_MOV_D_ORD_P();
-                                            if (isValid) {
-                                              // controller.ClearBil_Mov_D_Data();
-                                              await controller.ADD_MAT_FOL_TO_MOV_D(controller.SelectDataBIID.toString(),
-                                                  controller.MAT_INF_DATE[index].MGNO.toString(),
-                                                  controller.MAT_INF_DATE[index].MINO.toString(),
-                                                  controller.BMDID!
-                                              );
-                                            }
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.red, width: 0.5),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      controller.SelectDataMINO = controller.MAT_INF_DATE[index].MINO.toString();
+                                      print('STP-1');
+                                      controller.MGNOController.text = controller.MAT_INF_DATE[index].MGNO.toString();
+                                      controller.SelectDataMUID = controller.MAT_INF_DATE[index].MUID.toString();
+                                      controller.MGKI = controller.MAT_INF_DATE[index].MGKI;
+                                      controller.update();
+                                      await controller.GET_COUNT_MINO_P();
+                                      await controller.GET_COUNT_NO_P(
+                                          controller.MAT_INF_DATE[index].MGNO.toString(),
+                                          controller.MAT_INF_DATE[index].MINO.toString(),
+                                          controller.MAT_INF_DATE[index].MUID!);
+                                      await controller.GET_BROCODE_P( controller.MGNOController.text,controller.SelectDataMINO.toString(),controller.SelectDataMUID.toString());
+                                      controller.MINAController.text = controller.MAT_INF_DATE[index].MINA_D.toString();
+                                      controller.MIED = controller.MAT_INF_DATE[index].MIED;
+                                      controller.BMDNOController.text = '1';
+                                      controller.BMDNO_V = 1;
+                                      controller.BMDAMController.text = controller.BCPR==2?
+                                      controller.MAT_INF_DATE[index].MPS2.toString(): controller.BCPR==3?
+                                      controller.MAT_INF_DATE[index].MPS3.toString() :controller.BCPR==4?
+                                      controller.MAT_INF_DATE[index].MPS4.toString():
+                                      controller.MAT_INF_DATE[index].MPS1.toString();
+                                      controller.BMDNFController.text = '0';
+                                      controller.SUMBMDAMController.text = '0';
+                                      controller.BMDDIRController.text = '0';
+                                      controller.BMDDIController.text = '0';
+                                      controller.MPS1 = double.parse(controller.BMDAMController.text);
+                                      print(controller.MPS1 );
+                                      print(controller.BMDAMController.text);
+                                      print('controller.BMDAMController.text');
+                                      if(controller.TTID1!=null){
+                                        await controller.GET_TAX_LIN_P('MAT',controller.MAT_INF_DATE[index].MGNO.toString(),
+                                            controller.MAT_INF_DATE[index].MINO.toString());
+                                      }
+                                      // Timer(const Duration(milliseconds: 200), () async {
+                                        print('STP-2');
+                                        if(controller.COUNT_NO<=0){
+                                          await  controller.Calculate_BMD_NO_AM();
+                                         print('STP-3');
+                                          bool isValid =await controller.Save_BIL_MOV_D_ORD_P();
+                                          if (isValid) {
+                                            // controller.ClearBil_Mov_D_Data();
+                                            await controller.ADD_MAT_FOL_TO_MOV_D(controller.SelectDataBIID.toString(),
+                                                controller.MAT_INF_DATE[index].MGNO.toString(),
+                                                controller.MAT_INF_DATE[index].MINO.toString(),
+                                                controller.BMDID!
+                                            );
                                           }
-                                        // });
-                                        controller.update();
-                                      },
-                                      child:  Container(
-                                        decoration: BoxDecoration(
-                                          color:  Colors.white,
-                                          borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center, // المحاذاة في المنتصف أفقياً
-                                          mainAxisAlignment: MainAxisAlignment.center, // المحاذاة في المنتصف رأسياً
-                                          children: [
-                                            ClipOval(
-                                                child: Image.file(File("${SignPicture_MAT}${controller.MAT_INF_DATE[index].MGNO}-${controller.MAT_INF_DATE[index].MINO}.png"),
-                                                  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                                    return Image.asset(ImageEORDPOS, fit:BoxFit.fill,height: 0.1 *height);
-                                                  },
-                                                  fit: BoxFit.fitWidth,height: 0.1 *height,)
-                                            ),
-                                            // Image(image:AssetImage(ImagePath + "sushi5.png"),fit:BoxFit.fill,height: 70),
-                                            Text("${ controller.formatter.format(controller.BCPR==2? controller.MAT_INF_DATE[index].MPS2:controller.BCPR==3?
-                                            controller.MAT_INF_DATE[index].MPS3:controller.BCPR==4? controller.MAT_INF_DATE[index].MPS4:controller.MAT_INF_DATE[index].MPS1).toString()} ${controller.SCSY} ",
-                                                style: ThemeHelper().buildTextStyle(context, Colors.red,'M')),
-                                            controller.MAT_INF_DATE[index].MUCNA_D.toString().length >= 30 ?
-                                            AnimatedTextWidget(text: controller.MAT_INF_DATE[index].MUCNA_D.toString(),):
-                                            Text(controller.DisplayItemsOnScreen=='3' ? controller.MAT_INF_DATE[index].MUCNA_D.toString():
-                                              '${controller.MAT_INF_DATE[index].MUCNA_D.toString()} - ${controller.MAT_INF_DATE[index].MUNA_D.toString()}',
-                                              style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                                            ),
-                                            if(controller.isTablet==false)
-                                            FutureBuilder<List<Bil_Mov_D_Local>>(
-                                                future: GET_BIL_MOV_D_ORD(controller.BMKID == 11 || controller.BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D'
-                                                    ,controller.BMMID.toString()
-                                                    ,controller.MAT_INF_DATE[index].MGNO.toString(),
-                                                    controller.MAT_INF_DATE[index].MINO.toString(),
-                                                    controller.MAT_INF_DATE[index].MUID!),
-
-                                                builder: (BuildContext context, AsyncSnapshot<List<Bil_Mov_D_Local>> snapshot) {
-                                                  if (!snapshot.hasData || snapshot.data!.length==0 ) {
-                                                    return Container();
-                                                  }
-                                                  return CounterButton(
-                                                    onIncrementSelected: () => controller.enqueueUpdate(snapshot.data!.elementAt(0), 1),
-                                                    onDecrementSelected: () => controller.enqueueUpdate(snapshot.data!.elementAt(0), 2),
-                                                    // onIncrementSelected: () => controller.UPDATE_BIF_MOV_D_ORD(snapshot.data!.elementAt(0),1),
-                                                    // onDecrementSelected: () => controller.UPDATE_BIF_MOV_D_ORD(snapshot.data!.elementAt(0),2),
-                                                    size:  Size(0.03* height, 0.03* height),
-                                                    padding: 0,
-                                                    label: Text(controller.formatter.format(snapshot.data!.elementAt(0).BMDNO).toString(),
-                                                        style: ThemeHelper().buildTextStyle(context, Colors.black,'M')
-                                                    ),
-                                                  );
-                                                }),
-                                            // SizedBox(height: 5,)
-                                          ],
-                                        ).fadeAnimation(0.7),
+                                        }
+                                      // });
+                                      controller.update();
+                                    },
+                                    child:  Container(
+                                      decoration: BoxDecoration(
+                                        color:  Colors.white,
+                                        borderRadius: const BorderRadius.all(Radius.circular(20)),
                                       ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center, // المحاذاة في المنتصف أفقياً
+                                        mainAxisAlignment: MainAxisAlignment.center, // المحاذاة في المنتصف رأسياً
+                                        children: [
+                                          ClipOval(
+                                              child: Image.file(File("${SignPicture_MAT}${controller.MAT_INF_DATE[index].MGNO}-${controller.MAT_INF_DATE[index].MINO}.png"),
+                                                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                                  return Image.asset(ImageEORDPOS, fit:BoxFit.fill,height: 0.1 *height);
+                                                },
+                                                fit: BoxFit.fitWidth,height: 0.1 *height,)
+                                          ),
+                                          // Image(image:AssetImage(ImagePath + "sushi5.png"),fit:BoxFit.fill,height: 70),
+                                          Text("${ controller.formatter.format(controller.BCPR==2? controller.MAT_INF_DATE[index].MPS2:controller.BCPR==3?
+                                          controller.MAT_INF_DATE[index].MPS3:controller.BCPR==4? controller.MAT_INF_DATE[index].MPS4:controller.MAT_INF_DATE[index].MPS1).toString()} ${controller.SCSY} ",
+                                              style: ThemeHelper().buildTextStyle(context, Colors.red,'M')),
+                                          controller.MAT_INF_DATE[index].MUCNA_D.toString().length >= 30 ?
+                                          AnimatedTextWidget(text: controller.MAT_INF_DATE[index].MUCNA_D.toString(),):
+                                          Text(controller.DisplayItemsOnScreen=='3' ? controller.MAT_INF_DATE[index].MUCNA_D.toString():
+                                            '${controller.MAT_INF_DATE[index].MUCNA_D.toString()} - ${controller.MAT_INF_DATE[index].MUNA_D.toString()}',
+                                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                          ),
+                                          if(controller.isTablet==false)
+                                          FutureBuilder<List<Bil_Mov_D_Local>>(
+                                              future: GET_BIL_MOV_D_ORD(controller.BMKID == 11 || controller.BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D'
+                                                  ,controller.BMMID.toString()
+                                                  ,controller.MAT_INF_DATE[index].MGNO.toString(),
+                                                  controller.MAT_INF_DATE[index].MINO.toString(),
+                                                  controller.MAT_INF_DATE[index].MUID!),
+
+                                              builder: (BuildContext context, AsyncSnapshot<List<Bil_Mov_D_Local>> snapshot) {
+                                                if (!snapshot.hasData || snapshot.data!.length==0 ) {
+                                                  return Container();
+                                                }
+                                                return CounterButton(
+                                                  onIncrementSelected: () => controller.enqueueUpdate(snapshot.data!.elementAt(0), 1),
+                                                  onDecrementSelected: () => controller.enqueueUpdate(snapshot.data!.elementAt(0), 2),
+                                                  // onIncrementSelected: () => controller.UPDATE_BIF_MOV_D_ORD(snapshot.data!.elementAt(0),1),
+                                                  // onDecrementSelected: () => controller.UPDATE_BIF_MOV_D_ORD(snapshot.data!.elementAt(0),2),
+                                                  size:  Size(0.03* height, 0.03* height),
+                                                  padding: 0,
+                                                  label: Text(controller.formatter.format(snapshot.data!.elementAt(0).BMDNO).toString(),
+                                                      style: ThemeHelper().buildTextStyle(context, Colors.black,'M')
+                                                  ),
+                                                );
+                                              }),
+                                          // SizedBox(height: 5,)
+                                        ],
+                                      ).fadeAnimation(0.7),
                                     ),
                                   ),
-                                  // // ✅ أيقونة  في الأعلى يسار العنصر
-                                  // controller.COUNT_NO>0?
-                                  // Positioned(
-                                  //   top: MediaQuery.of(context).size.height * 0.01,
-                                  //   left: MediaQuery.of(context).size.height * 0.01,
-                                  //   child: GestureDetector(
-                                  //     onTap: () {
-                                  //       //
-                                  //     },
-                                  //     child: InkWell(
-                                  //       onTap: () {
-                                  //         //  if(int.parse(controller.CountRecodeController.text.isEmpty ? '0' : controller.CountRecodeController.text) > 0){
-                                  //         controller.GET_BMDID_COUNT_P();
-                                  //         controller.GET_BIF_MOV_D_P(controller.BMMID.toString(),'2');
-                                  //         controller.BMATY_SHOW(false);
-                                  //         controller.RSID_SHOW(false);
-                                  //         controller.RTID_SHOW(false);
-                                  //         controller.REID_SHOW(false);
-                                  //         controller.TYPE_ORDER=1;
-                                  //         controller.CheckOutTemplate=1;
-                                  //         Get.dialog(
-                                  //           CheckOut(Show:true),
-                                  //         );
-                                  //         // }
-                                  //         //   Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckOut()));
-                                  //       },
-                                  //       child: Icon(Icons.add_card_rounded,color: Colors.grey,
-                                  //         size: MediaQuery.of(context).size.height * 0.026,
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // ):Container(),
-                                ],
                                 );
                               },
                             ),)
