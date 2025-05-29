@@ -5189,10 +5189,7 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_MUNA(GETMUID).then((data) {
       MAT_UNI = data;
       if (MAT_UNI.isNotEmpty) {
-        SelectDataMUCNA = MAT_UNI
-            .elementAt(0)
-            .MUNA_D
-            .toString();
+        SelectDataMUCNA = MAT_UNI.elementAt(0).MUNA_D.toString();
       }
     });
   }
@@ -5651,44 +5648,22 @@ class Sale_Invoices_Controller extends GetxController {
       if (BIL_MOV_M.isNotEmpty) {
         if (SVVL_NO == '1') {
           print('BMMNO1');
-          if (SelectDataPKID.toString() == '1' ||
-              SelectDataPKID.toString() == '8') {
+          if (SelectDataPKID.toString() == '1' || SelectDataPKID.toString() == '8') {
             print('BMMNO2');
-            BIL_MOV_M
-                .elementAt(0)
-                .BMMNO
-                .toString()
-                .length <= 1 ? BMMNO = LoginController().PKID1 : BMMNO =
-                BIL_MOV_M
-                    .elementAt(0)
-                    .BMMNO
-                    .toString();
+            BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID1 : BMMNO =
+                BIL_MOV_M.elementAt(0).BMMNO.toString();
           } else if (SelectDataPKID.toString() == '3') {
             print('BMMNO3');
-            BIL_MOV_M
-                .elementAt(0)
-                .BMMNO
-                .toString()
-                .length <= 1 ? BMMNO = LoginController().PKID2 : BMMNO =
-                BIL_MOV_M
-                    .elementAt(0)
-                    .BMMNO
-                    .toString();
+            BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID2 : BMMNO =
+                BIL_MOV_M.elementAt(0).BMMNO.toString();
           }
         }
         else {
           print(LoginController().PKID1);
           print('LoginController().PKID1');
-          BIL_MOV_M
-              .elementAt(0)
-              .BMMNO
-              .toString()
-              .length <= 1 ?
+          BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ?
           BMMNO = LoginController().PKID1.toString() :
-          BMMNO = BIL_MOV_M
-              .elementAt(0)
-              .BMMNO
-              .toString();
+          BMMNO = BIL_MOV_M.elementAt(0).BMMNO.toString();
           print(LoginController().PKID1);
           print('BMMNO');
         }
@@ -5923,7 +5898,6 @@ class Sale_Invoices_Controller extends GetxController {
   // }
 
 
-
   //جلب رصيد غير مرحل
   GET_BAL_P(BMMID,AANO,SCID) async {
     SUMBAL = 0.0;
@@ -6092,8 +6066,7 @@ class Sale_Invoices_Controller extends GetxController {
         (double.parse(BMDDIRController.text) / 100)), 6);
     //مبلغ التخفيض على مستوي للصنف
     BMDDITController.text = roundDouble(double.parse(BMDDIController.text) +
-        (((double.parse(BMDDIRController.text) / 100) * BMDAM1!)), 6)
-        .toString();
+        (((double.parse(BMDDIRController.text) / 100) * BMDAM1!)), 6).toString();
     //الاجمالي المبلغ الكلي للتخفيض
     SUM_Totle_BMDDI = roundDouble(double.parse(BMDDITController.text) * BMDNO_V!, 6);
     GET_USING_TAX_P();
@@ -6107,9 +6080,7 @@ class Sale_Invoices_Controller extends GetxController {
 
     if (TTID2 != null) {
       if (TSDI2 == 1) {
-        BMDTXA2 = roundDouble(
-            (BMDAM1!) * ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100),
-            6);
+        BMDTXA2 = roundDouble((BMDAM1!) * ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100), 6);
       } else {
         BMDTXA2 = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
             ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100), 6);
@@ -6126,8 +6097,7 @@ class Sale_Invoices_Controller extends GetxController {
       BMDTXA = ['<$TTID2>'].contains(TTIDC1) ?
       roundDouble((BMDAM1! + BMDTXA2!) *
           ((double.parse(BMDTXController.text) * TCVL!) / 100), 6) :
-      roundDouble(
-          (BMDAM1!) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
+      roundDouble((BMDAM1!) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
     } else {
       //BMDTXA = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
       BMDTXA = ['<$TTID2>'].contains(TTIDC1) ?
@@ -6140,8 +6110,7 @@ class Sale_Invoices_Controller extends GetxController {
 
     if (TTID3 != null) {
       if (TSDI3 == 1) {
-        BMDTXA3 = roundDouble((BMDAM1!) *
-            ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
+        BMDTXA3 = roundDouble((BMDAM1!) * ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
       } else {
         BMDTXA3 = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
             ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
@@ -6158,8 +6127,7 @@ class Sale_Invoices_Controller extends GetxController {
     BMDTXT2 = roundDouble(BMDTXA2! * BMDNO_V!, 6);
     BMDTXT3 = roundDouble(BMDTXA3! * BMDNO_V!, 6);
 
-    BMDTXTController.text =
-        roundDouble((BMDTXA! + BMDTXA2! + BMDTXA3!) * BMDNO_V!, 6).toString();
+    BMDTXTController.text = roundDouble((BMDTXA! + BMDTXA2! + BMDTXA3!) * BMDNO_V!, 6).toString();
 
     update();
 
@@ -6184,14 +6152,13 @@ class Sale_Invoices_Controller extends GetxController {
           (double.parse(BMMDIRController.text) / 100)), SCSFL).toString();
     }
     await Future.delayed(const Duration(milliseconds: 500));
-    await UpdateBIL_MOV_D_BMDDI(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        BMMID.toString(),
-        double.parse(BMMAMController.text),
-        SUMBMMDIF!,
-        double.parse(BMMDIController.text),
-        0,
-        USE_BMDFN!);
+    await updateBilMovRecords(
+      tableName: BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+        bmmId: BMMID.toString(),
+        totalAmount: double.parse(BMMAMController.text),
+        deductedAmount: SUMBMMDIF!,
+        bmddiFactor: double.parse(BMMDIController.text),
+        bmddirValue: 0);
     update();
     // await Future.delayed(const Duration(milliseconds: 800));
     await GET_SUMBIL_P();

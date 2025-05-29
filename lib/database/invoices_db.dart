@@ -1255,37 +1255,165 @@ Future<int> UpdateSTO_NUM(String  GETSIID,String GETMGNO,String GETMINO,String G
   return result;
 }
 
-Future<int> UpdateBIL_MOV_D_BMDDI(String  TAB_N,String  GETBMMID,double GETBMMAM,double GETBMDAMTF,double GETBMMDI,double GETBMDDIR,String GETUSE_BMDFN) async {
+Future<int> updateBilMovRecords({
+  required String tableName,
+  required String bmmId,
+  required double totalAmount,       // corresponds to GETBMMAM
+  required double deductedAmount,    // corresponds to GETBMDAMTF
+  required double bmddiFactor,       // corresponds to GETBMMDI
+  required double bmddirValue,       // corresponds to GETBMDDIR
+}) async {
+  final dbClient = await conn.database;
+
+  try {
+    return await dbClient!.transaction((txn) async {
+      var totalRowsAffected = 0;
+
+      // 1. BMDDI & BMDDIR
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET
+          BMDDI = CASE
+                     WHEN BMDNO > 0 THEN ROUND(((BMDAMT / (? - ?)) * ?) / BMDNO, 6)
+                     ELSE 0
+                   END,
+          BMDDIR = ?
+        WHERE BMMID = ?
+        ''',
+        [totalAmount, deductedAmount, bmddiFactor, bmddirValue, bmmId],
+      );
+
+      // 2. BMDDIT
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET BMDDIT = ROUND((BMDDI + (? * BMDAM)), 6)
+        WHERE BMMID = ?
+        ''',
+        [bmddirValue, bmmId],
+      );
+
+      // 3. BMDDIM
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET BMDDIM = ROUND((BMDDIT * BMDNO), 6)
+        WHERE BMMID = ?
+        ''',
+        [bmmId],
+      );
+
+      // 4. BMDTXA22 & BMDTXT2 (when BMDTX22 > 0)
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET
+          BMDTXA22 = ROUND((BMDAM) * (BMDTX22 / 100), 6),
+          BMDTXT2  = ROUND(((BMDAM) * (BMDTX22 / 100)) * BMDNO, 6)
+        WHERE BMMID = ? AND BMDTX22 > 0
+        ''',
+        [bmmId],
+      );
+
+      // 5. BMDTXA11 & BMDTXT1
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET
+          BMDTXA11 = ROUND(((BMDAM - BMDDIT) + BMDTXA22) * (BMDTX11 / 100), 6),
+          BMDTXT1  = ROUND((((BMDAM - BMDDIT) + BMDTXT2) * (BMDTX11 / 100)) * BMDNO, 6)
+        WHERE BMMID = ?
+        ''',
+        [bmmId],
+      );
+
+      // 6. BMDTXA33 & BMDTXT3 (when BMDTX33 > 0)
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET
+          BMDTXA33 = ROUND((BMDAM) * (BMDTX33 / 100), 6),
+          BMDTXT3  = ROUND(((BMDAM) * (BMDTX33 / 100)) * BMDNO, 6)
+        WHERE BMMID = ? AND BMDTX33 > 0
+        ''',
+        [bmmId],
+      );
+
+      // 7. BMDTXA & BMDTXT (aggregate)
+      totalRowsAffected += await txn.rawUpdate(
+        '''
+        UPDATE $tableName
+        SET
+          BMDTXA = ROUND(BMDTXA22 + BMDTXA11 + BMDTXA33, 6),
+          BMDTXT = ROUND(BMDTXT2 + BMDTXT1 + BMDTXT3, 6)
+        WHERE BMMID = ?
+        ''',
+        [bmmId],
+      );
+
+      return totalRowsAffected;
+    });
+  } catch (e) {
+    // سجل الخطأ أو تبرعه حسب احتياجك
+    print('Error updating records in $tableName: $e');
+    return -1;
+  }
+}
+
+
+Future<int> UpdateBIL_MOV_D_BMDDI(String TAB_N,String GETBMMID,double GETBMMAM,double GETBMDAMTF,
+    double GETBMMDI,double GETBMDDIR,String GETUSE_BMDFN) async {
+
   var dbClient = await conn.database;
   String SQLUPDATE;
   String SQLUPDATE2;
   String SQLUPDATEBMDDIT;
-  String SQLUPDATETX;
+  String SQLUPDATEBMDDIM;
+  String SQLUPDATETTID1;
   String SQLUPDATETTID2;
   String SQLUPDATETTID3;
+  String SQLUPDATETTX;
+  print(GETBMMAM);
+  print(GETBMDAMTF);
+  print(GETBMMDI);
+  print(GETBMDDIR);
+
+
   SQLUPDATE = " UPDATE  $TAB_N SET  BMDDI=round(((BMDAMT/($GETBMMAM-$GETBMDAMTF))*$GETBMMDI)/BMDNO,6) ,"
       " BMDDIR=$GETBMDDIR WHERE BMMID=$GETBMMID AND BMDNO>0";
+
   SQLUPDATE2 = " UPDATE  $TAB_N SET  BMDDI=0 , BMDDIR=$GETBMDDIR WHERE BMMID=$GETBMMID AND BMDNO<0 ";
+
   SQLUPDATEBMDDIT = "UPDATE  $TAB_N SET  BMDDIT=round((BMDDI+($GETBMDDIR*BMDAM)),6)  WHERE BMMID=$GETBMMID ";
 
-  SQLUPDATETX = " UPDATE  $TAB_N SET  BMDDIM=round((BMDDIT*BMDNO),6) , BMDTXA=round((BMDAM-BMDDIT)*(BMDTX / 100),6),"
-      " BMDTXT=round(((BMDAM-BMDDIT) * (BMDTX / 100))*BMDNO,6),"
-      " BMDTXA11=round((BMDAM-BMDDIT)*(BMDTX11 / 100),6),"
-      " BMDTXT1=round(((BMDAM-BMDDIT) * (BMDTX11 / 100))*BMDNO,6) "
+  SQLUPDATEBMDDIM = " UPDATE  $TAB_N SET  BMDDIM=round((BMDDIT*BMDNO),6) WHERE BMMID=$GETBMMID ";
+
+  SQLUPDATETTID2 = "UPDATE  $TAB_N SET  BMDTXA22=round((BMDAM)*(BMDTX22 / 100),6) ,"
+      " BMDTXT2=round(((BMDAM) * (BMDTX22 / 100))*BMDNO,6)  WHERE BMMID=$GETBMMID AND BMDTX22>0 ";
+
+  SQLUPDATETTID1 = " UPDATE  $TAB_N SET  "
+      " BMDTXA11=round(((BMDAM-BMDDIT)+(BMDTXA22))*(BMDTX11 / 100),6),"
+      " BMDTXT1=round((((BMDAM-BMDDIT)+(BMDTXT2)) * (BMDTX11 / 100))*BMDNO,6) "
       " WHERE BMMID=$GETBMMID ";
 
-  SQLUPDATETTID2 = "UPDATE  $TAB_N SET  BMDTXA22=round((BMDAM-BMDDIT)*(BMDTX22 / 100),6) ,"
-      " BMDTXT2=round(((BMDAM-BMDDIT) * (BMDTX22 / 100))*BMDNO,6)  WHERE BMMID=$GETBMMID AND BMDTX22>0 ";
+  SQLUPDATETTID3 = "UPDATE  $TAB_N SET  BMDTXA33=round((BMDAM)*(BMDTX33 / 100),6) ,"
+      " BMDTXT3=round(((BMDAM) * (BMDTX33 / 100))*BMDNO,6)  WHERE BMMID=$GETBMMID AND BMDTX33>0 ";
 
-  SQLUPDATETTID3 = "UPDATE  $TAB_N SET  BMDTXA33=round((BMDAM-BMDDIT)*(BMDTX33 / 100),6) ,"
-      " BMDTXT3=round(((BMDAM-BMDDIT) * (BMDTX33 / 100))*BMDNO,6)  WHERE BMMID=$GETBMMID AND BMDTX33>0 ";
+  SQLUPDATETTX = "UPDATE  $TAB_N SET  BMDTXA=round(BMDTXA22+BMDTXA11+BMDTXA33,6), "
+      " BMDTXT=round(BMDTXT2+BMDTXT1+BMDTXT3,6) WHERE BMMID=$GETBMMID ";
 
+  print(SQLUPDATETTID2);
+  print(SQLUPDATETTID1);
+  print(SQLUPDATETTID3);
   final result = await dbClient!.rawUpdate(SQLUPDATE);
   final result2 = await dbClient.rawUpdate(SQLUPDATE2);
   final result3 = await dbClient.rawUpdate(SQLUPDATEBMDDIT);
-  final result4 = await dbClient.rawUpdate(SQLUPDATETX);
+  final result4 = await dbClient.rawUpdate(SQLUPDATEBMDDIM);
   final result5 = await dbClient.rawUpdate(SQLUPDATETTID2);
-  final result6 = await dbClient.rawUpdate(SQLUPDATETTID3);
+  final result6 = await dbClient.rawUpdate(SQLUPDATETTID1);
+  final result7 = await dbClient.rawUpdate(SQLUPDATETTID3);
+  final result8 = await dbClient.rawUpdate(SQLUPDATETTX);
   return result;
 }
 

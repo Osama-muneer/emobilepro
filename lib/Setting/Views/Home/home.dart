@@ -805,7 +805,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ],
                 )
-            ) :
+            ):
             Scaffold(
                 appBar: buildAppBar(context),
                 drawer: ThemeHelper().buildDrawer(context),
@@ -813,7 +813,7 @@ class _HomeViewState extends State<HomeView> {
                   child: SingleChildScrollView(
                     child: controller.currentIndex == 0
                           ? SizedBox(
-                      height: displayHeight(context) * 0.90,
+                      height: displayHeight(context) * 0.85,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
