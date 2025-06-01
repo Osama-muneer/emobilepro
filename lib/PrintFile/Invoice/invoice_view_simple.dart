@@ -101,9 +101,10 @@ Pdf_Invoices_Samplie({
 
     // دالة مساعدة لبناء الصف الشرطي
     Widget buildAdditionalInfoRow() {
-      if (item.BMKID == 7 || item.BMKID == 10) {
-        return buildRow2('${'StringBMMGR2'.tr}${item.BMMGR}', 13);
-      } else if (item.BMKID == 7) {
+      // if (item.BMKID == 7 || item.BMKID == 10) {
+      //   return buildRow2('${'StringBMMGR2'.tr}${item.BMMGR}', 13);
+      // } else
+        if (item.BMKID == 7) {
         return buildRow2(controller.Statement_Quotation, 9);
       } else if (item.BMKID == 10) {
         return  Row(

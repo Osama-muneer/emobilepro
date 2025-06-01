@@ -1067,6 +1067,7 @@ class LocalString extends Translations{
       'StringReturn_Purchase':'مردود مشتريات',
       'StringPKID_F':'من الدفع',
       'StringPKID_T':'الى الدفع',
+      'StringOffline_Sync_Balance':'رصيد على حسب اخر مزامنة اوفلاين',
 
     },
     'en':{
@@ -2121,6 +2122,7 @@ class LocalString extends Translations{
       'StringReturn_Purchase':'Return Purchase',
       'StringPKID_F':'From Payment',
       'StringPKID_T':'To Payment',
+      'StringOffline_Sync_Balance':'Balance based on the last offline sync',
     }
   };
 }

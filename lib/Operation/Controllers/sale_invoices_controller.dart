@@ -5969,19 +5969,361 @@ class Sale_Invoices_Controller extends GetxController {
     update();
   }
 
+
+  // دوال مساعدة لتحويل النص إلى رقم وتجنب الاستثناء عند النص الفارغ
+  double parseOrZero(String text) => text.isEmpty ? 0.0 : double.parse(text);
+
+// دالة مساعدة لإزالة الضريبة من السعر المشمول بها:
+//   - priceWithTax: السعر الذي يتضمن الضريبة
+//   - taxRatePct: نسبة الضريبة (مثلاً "5" يعني 5%)
+//   - multiplier: معامل TCVL (غالباً 1.0 أو قيمة أخرى حسب نوع الضريبة)
+  double removeTax(double priceWithTax, double taxRatePct, int multiplier) {
+    final effectiveRate = taxRatePct * multiplier;
+    return (priceWithTax * (100 / (100 + effectiveRate)));
+  }
+
+// =========================
+// داخل كلاس الكونترولر Controller
+// =========================
+
+   Calculate_BMD_NO_AM() {
+    // **1. قراءة متغيرات الكمية والمجاني وحساب الكمية الحقيقية**
+    final rawQty      = parseOrZero(BMDNOController.text);   // الكمية الكلية المدخلة
+    final rawFreeQty  = parseOrZero(BMDNFController.text);   // الكمية المجانية المُدخلة
+    final actualQty = (USE_BMDFN == '1')
+        ? rawQty
+        : (rawQty - rawFreeQty);
+    BMDNO_V = actualQty; // حفظ الكمية الحقيقية في الحقل
+
+    // **2. قراءة سعر الوحدة الأصلي قبل أي تعديل**
+    final rawUnitPrice = parseOrZero(BMDAMController.text);
+
+    double unitPrice;        // السعر الذي سيُستخدم لحساب الإجمالي
+    String unitPriceText;    // النص الذي سيُعرض في BMDAMTXController
+
+    // **3. هل نطبق منطق الضريبة (USING_TAX_SALES == '1') أو السعر شمل الضريبة (== '3' مع الشروط)؟**
+    final isTaxAlways       = (USING_TAX_SALES == '1');
+    final isTaxIncludedCase = (USING_TAX_SALES == '3' &&
+        UPIN_USING_TAX_SALES == 1 &&
+        Price_include_Tax == true);
+
+    if (isTaxAlways || isTaxIncludedCase) {
+      // قراءة نسب الضرائب ومعاملاتها
+      final tax1Pct   = parseOrZero(BMDTXController.text);   // نسبة الضريبة الأولى (%)
+      final tax2Pct   = parseOrZero(BMDTX2Controller.text);  // نسبة الضريبة الثانية (%)
+      final tax3Pct   = parseOrZero(BMDTX3Controller.text);  // نسبة الضريبة الثالثة (%)
+      final mult1     = (TCVL  ?? 1); // معامل الضريبة الأولى (غالبًا 1.0)
+      final mult2     = (TCVL2 ?? 1); // معامل الضريبة الثانية
+      final mult3     = (TCVL3 ?? 1); // معامل الضريبة الثالثة
+
+      // **3.1. حساب السعر قبل الضريبة الأولى (level 1) إذا كان السعر مشمولاً**
+      double basePriceLevel1;
+      if (isTaxIncludedCase) {
+        // السعر الأصلي (rawUnitPrice) يشمل ضريبة المستوى الأول
+        basePriceLevel1 = removeTax(rawUnitPrice, tax1Pct, mult1);
+      } else {
+        // إذا لم يكن السعر مشمول، نفترض بنية الحساب نفسها (العميل يريد فصل الضريبة)
+        basePriceLevel1 = removeTax(rawUnitPrice, tax1Pct, mult1);
+      }
+      BMDTXA_V = double.parse(roundDouble(basePriceLevel1, 6).toString());
+
+      // **3.2. حساب مبلغ الضريبة الثانية (level 2) بناءً على قاعدة TSDI2**
+      if (TTID2 != null) {
+        if (TSDI2 == 1) {
+          // تُحسب ضريبة المستوى الثاني على السعر بعد فصل ضريبة المستوى الأول
+          BMDTXA2 = roundDouble(
+            basePriceLevel1 * ((tax2Pct * mult2) / 100),
+            6,
+          );
+        } else {
+          // تُحسب ضريبة المستوى الثاني على السعر بعد الخصم (والخصم لم يُحسب بعد هنا)
+          // لكن بما أننا في هذه المرحلة لا يوجد خصم، نستخدم basePriceLevel1
+          BMDTXA2 = roundDouble(
+            (basePriceLevel1 - 0.0) * ((tax2Pct * mult2) / 100),
+            6,
+          );
+        }
+      } else {
+        BMDTXA2 = 0.0;
+      }
+
+      // **3.3. حساب مبلغ الضريبة الثالثة (level 3) بناءً على قاعدة TSDI3**
+      if (TTID3 != null) {
+        if (TSDI3 == 1) {
+          BMDTXA3 = roundDouble(
+            basePriceLevel1 * ((tax3Pct * mult3) / 100),
+            6,
+          );
+        } else {
+          BMDTXA3 = roundDouble(
+            (basePriceLevel1 - 0.0) * ((tax3Pct * mult3) / 100),
+            6,
+          );
+        }
+      } else {
+        BMDTXA3 = 0.0;
+      }
+
+      // **3.4. حساب مبلغ الضريبة الأولى (level 1) الفعلي بعد الأخذ في الاعتبار TTIDC1 ووجود ضريبة ثانية**
+      final ttid2Tag = '<${TTID2 ?? ''}>';
+      final isLayeredOnTTID1 = (TTIDC1 == ttid2Tag);
+
+      if (TSDI1 == 1) {
+        // الضريبة الأولى على السعر الأصلي (قبل الخصم)
+        if (isLayeredOnTTID1) {
+          BMDTXA = roundDouble(
+            (rawUnitPrice - basePriceLevel1) + (BMDTXA2! * (tax1Pct / 100)),
+            6,
+          );
+        } else {
+          BMDTXA = roundDouble(
+            rawUnitPrice * ((tax1Pct * mult1) / 100),
+            6,
+          );
+        }
+      } else {
+        // الضريبة الأولى تحسب بعد الخصم (الخصم لم يُطبَّق بعد هنا، لكن سنفترض 0)
+        if (isLayeredOnTTID1) {
+          BMDTXA = roundDouble(
+            (rawUnitPrice - 0.0 - basePriceLevel1 + BMDTXA2!) * ((tax1Pct * mult1) / 100),
+            6,
+          );
+        } else {
+          BMDTXA = roundDouble(
+            (rawUnitPrice - 0.0) * ((tax1Pct * mult1) / 100),
+            6,
+          );
+        }
+      }
+
+      // **3.5. حساب سعر الوحدة الشامل الضريبة لإظهار المستخدم**
+      if (isLayeredOnTTID1) {
+        // إذا كان هناك تدرُّج ضريبي، نأخذ مبلغ basePriceLevel1 مع الضريبة الأولى كعرض:
+        unitPrice = basePriceLevel1;
+      } else {
+        // السعر الشامل هو السعر الأصلي ناقص مجموع مبالغ الضرائب الثلاثة
+        unitPrice = rawUnitPrice - (BMDTXA! + BMDTXA2! + BMDTXA3!);
+      }
+      unitPrice = roundDouble(unitPrice, 6);
+      unitPriceText = unitPrice.toString();
+
+      BMDAMTXController.text = unitPriceText;
+      BMDAM1 = unitPrice;
+
+      // **3.6. حساب إجمالي مبلغ الكمية*(سعر الوحدة)**
+      SUMBMDAMController.text = roundDouble(unitPrice * actualQty, 6).toString();
+    }
+    else {
+      // **4. الحالة التي لا يوجد فيها ضريبة على الإطلاق**
+      unitPrice = rawUnitPrice;
+      unitPriceText = unitPrice.toString();
+      BMDAMTXController.text = unitPriceText;
+      BMDAM1 = unitPrice;
+
+      // إجمالي المبلغ = سعر الوحدة × الكمية الحقيقية
+      SUMBMDAMController.text = roundDouble(unitPrice * actualQty, 6).toString();
+    }
+
+    // **5. حساب إجمالي المبلغ المجاني (للكمية المجانية)**
+    final freeQty = rawFreeQty;
+    SUMBMDAMTFController.text = roundDouble(unitPrice * freeQty, 6).toString();
+
+    // **6. استدعاء دالة حساب الخصم بعد الإنتهاء من السعر والضرائب**
+    Calculate_BMDDI_IR();
+
+    // **7. في النهاية نحدّث واجهة المستخدم مرة واحدة فقط**
+    update();
+  }
+
+   Calculate_BMDDI_IR() {
+    // **1. قراءة بيانات الخصم من الحقول وحمايتها من النص الفارغ**
+    final discountValPercent = parseOrZero(BMDDIController.text); // خصم ثابت للوحدة
+    final discountPercent    = parseOrZero(BMDDIRController.text); // نسبة خصم من السعر (%)
+    final unitPriceCurrent   = BMDAM1 ?? 0.0;                     // السعر الجاري لكل وحدة بعد الضريبة
+    final actualQty          = BMDNO_V ?? 0.0;                    // الكمية الحقيقية
+
+    // **2. حساب إجمالي مبلغ الخصم الثابت على مستوى الفاتورة**
+    SUMBMDDI = roundDouble(actualQty * discountValPercent, 6);
+
+    // **3. حساب إجمالي مبلغ الخصم النسبي (٪) على مستوى الفاتورة**
+    final sumBeforeTax = parseOrZero(SUMBMDAMController.text);
+    SUMBMDDIR = roundDouble(sumBeforeTax * (discountPercent / 100), 6);
+
+    // **4. حساب مبلغ الخصم الإجمالي على الوحدة (ثابت + نسبي)**
+    final unitTotalDiscount = roundDouble(
+      discountValPercent + ((discountPercent / 100) * unitPriceCurrent),
+      6,
+    );
+    BMDDITController.text = unitTotalDiscount.toString();
+
+    // **5. إجمالي الخصم الكلي للفواتير = قيمة الخصم على الوحدة × الكمية**
+    SUM_Totle_BMDDI = roundDouble(unitTotalDiscount * actualQty, 6);
+
+    // **6. بعد احتساب الخصم نجدد حساب الضريبة على القيمة الجديدة**
+    GET_USING_TAX_P();
+
+    // **7. تحديث واجهة المستخدم مرة واحدة**
+    update();
+  }
+
+   GET_USING_TAX_P() {
+    // **1. تأكد من وجود السعر الحالي**
+    BMDAM1 = (BMDAM1 == null) ? 0.0 : BMDAM1;
+
+    // **2. قراءة نسب الضرائب ومعاملاتها وحماية النصوص الفارغة**
+    final tax1Pct   = parseOrZero(BMDTXController.text);
+    final tax2Pct   = parseOrZero(BMDTX2Controller.text);
+    final tax3Pct   = parseOrZero(BMDTX3Controller.text);
+    final mult1     = (TCVL  ?? 1.0);
+    final mult2     = (TCVL2 ?? 1.0);
+    final mult3     = (TCVL3 ?? 1.0);
+
+    // **3. حساب ضريبة المستوى الثاني بعد الخصم بحسب TSDI2**
+    if (TTID2 != null) {
+      final unitDiscountTotal = parseOrZero(BMDDITController.text);
+      if (TSDI2 == 1) {
+        BMDTXA2 = roundDouble(
+          (BMDAM1!) * ((tax2Pct * mult2) / 100),
+          6,
+        );
+      } else {
+        BMDTXA2 = roundDouble(
+          (BMDAM1! - unitDiscountTotal) * ((tax2Pct * mult2) / 100),
+          6,
+        );
+      }
+    } else {
+      BMDTXA2 = 0.0;
+    }
+
+    // **4. حساب ضريبة المستوى الثالث بعد الخصم بحسب TSDI3**
+    if (TTID3 != null) {
+      final unitDiscountTotal = parseOrZero(BMDDITController.text);
+      if (TSDI3 == 1) {
+        BMDTXA3 = roundDouble(
+          (BMDAM1!) * ((tax3Pct * mult3) / 100),
+          6,
+        );
+      } else {
+        BMDTXA3 = roundDouble(
+          (BMDAM1! - unitDiscountTotal) * ((tax3Pct * mult3) / 100),
+          6,
+        );
+      }
+    } else {
+      BMDTXA3 = 0.0;
+    }
+
+    // **5. حساب ضريبة المستوى الأول بعد الخصم بحسب TSDI1 ووجود ضريبة ثانية (TTID2)**
+    final unitDiscountTotal = parseOrZero(BMDDITController.text);
+    final ttid2Tag = '<${TTID2 ?? ''}>';
+    final isLayeredOnTTID1 = (TTIDC1 == ttid2Tag);
+
+    if (TSDI1 == 1) {
+      if (isLayeredOnTTID1) {
+        BMDTXA = roundDouble(
+          (BMDAM1! + BMDTXA2!) * ((tax1Pct * mult1) / 100),
+          6,
+        );
+      } else {
+        BMDTXA = roundDouble(
+          (BMDAM1!) * ((tax1Pct * mult1) / 100),
+          6,
+        );
+      }
+    } else {
+      if (isLayeredOnTTID1) {
+        BMDTXA = roundDouble(
+          (BMDAM1! - unitDiscountTotal + BMDTXA2!) * ((tax1Pct * mult1) / 100),
+          6,
+        );
+      } else {
+        BMDTXA = roundDouble(
+          (BMDAM1! - unitDiscountTotal) * ((tax1Pct * mult1) / 100),
+          6,
+        );
+      }
+    }
+
+    // **6. تجميع الضريبة الإجمالية لكل وحدة في الحقل المخصص**
+    BMDTXAController.text = (BMDTXA! + BMDTXA2! + BMDTXA3!).toString();
+
+    // **7. حساب إجمالي الضريبة على مستوى الكمية**
+    final actualQty = BMDNO_V ?? 0.0;
+    BMDTXT1 = roundDouble(BMDTXA! * actualQty, 6);
+    BMDTXT2 = roundDouble(BMDTXA2! * actualQty, 6);
+    BMDTXT3 = roundDouble(BMDTXA3! * actualQty, 6);
+
+    BMDTXTController.text = roundDouble(
+      (BMDTXA! + BMDTXA2! + BMDTXA3!) * actualQty,
+      6,
+    ).toString();
+
+    // **8. حساب إجمالي الصنف (المبلغ قبل الضريبة + إجمالي الضريبة – إجمالي الخصم)**
+    final sumBeforeTax = parseOrZero(SUMBMDAMController.text);
+    final sumTaxAll   = parseOrZero(BMDTXTController.text);
+    final totalAfterDiscountAndTax = (sumBeforeTax + sumTaxAll) - SUM_Totle_BMDDI!;
+    SUMBMDAMTController.text = formatter.format(
+      roundDouble(totalAfterDiscountAndTax, SCSFL),
+    ).toString();
+    TOTSUMBMDAM = roundDouble(totalAfterDiscountAndTax, SCSFL);
+
+    // **9. تحديث واجهة المستخدم مرة واحدة**
+    update();
+  }
+
+  Future<void> UPDATE_BMMDI() async {
+    final selectedFlag = SelectDataBMMDN;
+    final percentText  = BMMDIRController.text;
+    final invoiceTotal = parseOrZero(BMMAMController.text);
+
+    // **1. إذا كانت حالة التحديد 0 و يوجد نسبة خصم صحيحة > 0**
+    if (selectedFlag == '0' && percentText.isNotEmpty && double.parse(percentText) > 0) {
+      // تأخير قصير إن احتجنا لانتظار UI، وإلا يمكن حذفه
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      final percent = double.parse(percentText);
+      // حساب مبلغ الخصم الثابت على مستوى الفاتورة
+      BMMDIController.text = roundDouble(invoiceTotal * (percent / 100), SCSFL).toString();
+    }
+
+    // **2. تأخير إضافي إن لزم لتنظيم التحديثات**
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // **3. تحديث السجل في قاعدة البيانات (إما BIF_MOV_D أو BIL_MOV_D حسب BMKID)**
+    final tableName = (BMKID == 11 || BMKID == 12) ? 'BIF_MOV_D' : 'BIL_MOV_D';
+    await updateBilMovRecords(
+      tableName: tableName,
+      bmmId: BMMID.toString(),
+      totalAmount: invoiceTotal,
+      deductedAmount: SUMBMMDIF! /* تأكد من أن هذه القيمة مُحاسبة */,
+      bmddiFactor: parseOrZero(BMMDIController.text),
+      bmddirValue: 0,
+    );
+
+    // **4. إعادة حساب المجموع الكلي بعد تعديل الخصم على الفاتورة**
+    await GET_SUMBIL_P();
+
+    // **5. تحديث واجهة المستخدم مرة واحدة في النهاية**
+    update();
+  }
+
+
   //وسعر الوحدة  دالة احتساب الكميه والمجاني
-  Calculate_BMD_NO_AM() {
+  Calculate_BMD_NO_AM2() {
     // print('Calculate_BMD_NO_AM');
     // print(USING_TAX_SALES);
     // print(Price_include_Tax);
     // print(UPIN_USING_TAX_SALES);
     //الكميه الحقيقه
     //التحقق من المتغير رقم 431 هل المجاني ضمن الكميه ام لا وعليه عندما يكون المتغير المجاني ضمن العدد يتم عند الحفظ انقاص المجاني من العدد وحفظه في حقل BMDNO
-    USE_BMDFN == '1' ? BMDNO_V = double.parse(BMDNOController.text)
+
+    USE_BMDFN == '1' ?
+    BMDNO_V = BMDNOController.text.isEmpty? 0: double.parse(BMDNOController.text)
         : BMDNO_V =
-    (double.parse(BMDNOController.text) - double.parse(BMDNFController.text));
-    BMDAM1 =
-    BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
+    ( BMDNOController.text.isEmpty?0:double.parse(BMDNOController.text) -
+        double.parse(BMDNFController.text));
+    BMDAM1 = BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
     if (USING_TAX_SALES == '1' || (USING_TAX_SALES == '3'
         && (UPIN_USING_TAX_SALES == 1 && Price_include_Tax == true))) {
       // print('BMDAMController.text');
@@ -6058,7 +6400,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   // دالة احتساب نسبه الخصم و مبلغ الخصم
-  Calculate_BMDDI_IR() {
+  Calculate_BMDDI_IR2() {
     //اجمالي مبلغ التخفيض
     SUMBMDDI = roundDouble(BMDNO_V! * double.parse(BMDDIController.text), 6);
     //اجمالي نسبه التخفيض
@@ -6074,7 +6416,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   //  `دالة احتساب الضريبه و الاجمالي
-  GET_USING_TAX_P() {
+  GET_USING_TAX_P2() {
     // if(MITSK==1){
     (BMDAM1.isNull) ? BMDAM1 = 0 : BMDAM1 = BMDAM1;
 
@@ -6143,7 +6485,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   //تعديل الخصم
-  Future UPDATE_BMMDI() async {
+  Future UPDATE_BMMDI2() async {
     if (SelectDataBMMDN == '0' && BMMDIRController.text.isNotEmpty &&
         double.parse(BMMDIRController.text) > 0) {
       await Future.delayed(const Duration(milliseconds: 300));
@@ -10489,6 +10831,18 @@ class Sale_Invoices_Controller extends GetxController {
               style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
             ),
             Text(formatter.format(SUMBAL).toString(),
+                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+            ),
+          ],
+        ),
+        SizedBox(height: 0.015 * height),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text("${'StringOffline_Sync_Balance'.tr}:",
+              style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+            ),
+            Text(formatter.format(SumBal).toString(),
                 style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
             ),
           ],

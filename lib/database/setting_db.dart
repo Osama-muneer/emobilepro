@@ -2809,6 +2809,8 @@ Future<List<Bil_Mov_M_Local>> SUM_BAL(TYPE,TYPE2,GETID,AANO,SCID,Last_Asyn) asyn
   String sqlAMMID='';
   final inputFormat = DateFormat('dd-MM-yyyy HH:mm:ss');
   final dt = inputFormat.parse(Last_Asyn);
+  print(inputFormat);
+  print(dt);
   final outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   final lastSyncIso = outputFormat.format(dt);
   print(lastSyncIso);
