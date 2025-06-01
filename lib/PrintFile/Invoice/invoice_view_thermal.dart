@@ -6,7 +6,6 @@ import '../../PrintFile/simple_pdf.dart';
 import '../../Setting/controllers/setting_controller.dart';
 import 'package:flutter/services.dart';
 import '../../Setting/controllers/login_controller.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -67,7 +66,7 @@ taxTikcetReportThermal({
           children: [
             Column(children: [
               StteingController().Print_Image == true
-                  ? Container(width: 50.w, child: Image(image))
+                  ? Container(width: 50, child: Image(image))
                   : Container(),
               LoginController().experimentalcopy == 1
                   ? pw.Image(image, height: 55, width: 55)

@@ -7,7 +7,6 @@ import '../../../Reports/controllers/invoices_archive_controller.dart';
 import '../../../Setting/controllers/login_controller.dart';
 import '../../../Widgets/config.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:pdf/pdf.dart';
@@ -52,12 +51,12 @@ Invoices_Archive_Pdf({
               Expanded(child:
               Column(
                   children: [
-                    Text(controller.SONE,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 10.5.sp)),
-                    Text(controller.SOLN,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 10.5.sp)),
+                    Text(controller.SONE,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 10.5)),
+                    Text(controller.SOLN,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 10.5)),
                   ]),),
               Expanded(child:Column(children: [
                 Container(
-                    width: 50.w,
+                    width: 50,
                     child: Image(image)
                 ),
                 Container( margin: const EdgeInsets.symmetric(vertical: 4),
@@ -66,13 +65,13 @@ Invoices_Archive_Pdf({
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(' ${'StrinInvoices_Archive'.tr} ',
-                        style: TextStyle(color: PdfColors.black, fontSize: 13.sp))),
+                        style: TextStyle(color: PdfColors.black, fontSize: 13))),
               ])),
               Expanded(
                 child: Column(
                     children: [
-                      Text(controller.SONA,style: TextStyle(color: PdfColors.black, fontSize: 11.sp)),
-                      Text(controller.SORN,style: TextStyle(color: PdfColors.black, fontSize: 11.sp)),
+                      Text(controller.SONA,style: TextStyle(color: PdfColors.black, fontSize: 11)),
+                      Text(controller.SORN,style: TextStyle(color: PdfColors.black, fontSize: 11)),
                     ]),)
             ],
           ),
@@ -101,13 +100,13 @@ Invoices_Archive_Pdf({
                                           pw.Column(children: [
                                             pw.Text(
                                               '${'StringBIID_TlableText'.tr} ${GetBINAT} :',
-                                              style: TextStyle(fontSize: 13.0.sp),
+                                              style: TextStyle(fontSize: 13.0),
                                             ),
                                           ]),
                                           pw.Column(children: [
                                             pw.Text(
                                               ' ${'StringBIID_FlableText'.tr} ${GetBINAF} :',
-                                              style: TextStyle(fontSize: 13.0.sp),
+                                              style: TextStyle(fontSize: 13.0),
                                             ),
                                           ]),
 
@@ -119,13 +118,13 @@ Invoices_Archive_Pdf({
                                           pw.Column(children: [
                                             pw.Text(
                                               '${'StringToDate_Rep'.tr} ${GetBMMDAT} ',
-                                              style: TextStyle(fontSize: 13.0.sp),
+                                              style: TextStyle(fontSize: 13.0),
                                             ),
                                           ]),
                                           pw.Column(children: [
                                             pw.Text(
                                               ' ${'StringFromDate_Rep'.tr} ${GetBMMDAF}',
-                                              style: TextStyle(fontSize: 13.0.sp),
+                                              style: TextStyle(fontSize: 13.0),
                                             ),
                                           ]),
                                         ],

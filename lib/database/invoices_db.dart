@@ -1600,6 +1600,8 @@ Future<List<Bil_Poi_Local>> GET_BIL_POI(String GETBIID) async {
   List<Bil_Poi_Local> list = result.map((item) {
     return Bil_Poi_Local.fromMap(item);
   }).toList();
+  print(sql);
+  print(result);
   return list;
 }
 

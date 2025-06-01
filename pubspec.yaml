@@ -87,7 +87,6 @@ dependencies:
   lucide_icons:
   marquee:
   syncfusion_flutter_charts:
-  sizer:
   flutter_launcher_icons:
   cupertino_icons:
   isar:

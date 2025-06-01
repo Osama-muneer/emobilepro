@@ -1,4 +1,3 @@
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +31,7 @@ class ExportedInvoicesView extends GetWidget<ExportedInvoicesController> {
               if (!state[index].path.contains('.pdf')) return SizedBox();
               return Container(
                 color:Colors.blue,
-                margin: EdgeInsets.all(5.sp),
+                margin: EdgeInsets.all(5),
                 child: ListTile(
                   leading: Icon(Icons.file_present_outlined),
                 //  onTap: () => controller.openFile(state[index]),

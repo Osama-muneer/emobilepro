@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:ui' as UI;
 import '../../../Setting/controllers/setting_controller.dart';
 import '../../../database/inventory_db.dart';
@@ -91,7 +90,7 @@ class _DataGridPageInventoryState extends State<DataGridPageInventory> {
                   child: SfDataGrid(
                     //key: _key,
                     allowSwiping: true,
-                    swipeMaxOffset: 85.w,
+                    swipeMaxOffset: 80,
                     columnWidthMode: ColumnWidthMode.fill,
                     allowEditing: true,
                     endSwipeActionsBuilder: _bildswipeingEdit,
@@ -144,7 +143,7 @@ class _DataGridPageInventoryState extends State<DataGridPageInventory> {
               source: snapshot.data,
               columns: getColumns(),
               allowSwiping: true,
-              swipeMaxOffset: 85.w,
+              swipeMaxOffset: 80,
               selectionMode: SelectionMode.single,
               navigationMode: GridNavigationMode.cell,
               editingGestureType: EditingGestureType.tap,

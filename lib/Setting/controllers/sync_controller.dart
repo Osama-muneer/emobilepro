@@ -3434,13 +3434,13 @@ class SyncController extends GetxController {
       TAB_N = "BIL_POI_U";
       TypeCheckSync = TypeSync;
       TypeGet = 'BIL_POI_U';
-      await Future.delayed(const Duration(seconds: 1));
-      if (TotalBIL_POI_U != 0 &&
-          (CHIKE_ALL == 1 || TotalBIL_POI_U != CheckBIL_POI_U)) {
+      if (TotalBIL_POI_U != 0 && (CHIKE_ALL == 1 || TotalBIL_POI_U != CheckBIL_POI_U)) {
         FROM_DATE = LastBIL_POI_U;
+        print('BIL_POI_U1');
         apiProvider.GetAllBIL_POI_U(VarGUIDMap.toString().toUpperCase());
         awaitFunc();
       } else {
+        print('BIL_POI_U111');
         startWorking();
       }
       update();
@@ -4611,6 +4611,9 @@ class SyncController extends GetxController {
 // دوال للتحقق من جدوال التمب اذا لم تنتقل البيانات الى الجدوال
   GetCheckSaveTmp(String GetTable,int total) async {
     for (var i = 0; i <= 50; i++) {
+      print('BIL_POI_U2');
+      print(GetTable);
+      print('BIL_POI_U2');
       await GetSaveTmp(GetTable);
       await Future.delayed(const Duration(milliseconds : 500));{
         if( CheckDataBaseTmp!=-1){
@@ -4618,6 +4621,10 @@ class SyncController extends GetxController {
           i=50;
           String TableNameTmp='$GetTable''_TMP';
           update();
+          print('GetTable1');
+          print(TableNameTmp);
+          print(GetTable);
+          print('GetTable1');
           await Update_TABLE_ALL(TableNameTmp);
           await DeleteALLData(GetTable,ClickAllOrLastTime);
           await SaveALLData(GetTable);
@@ -5186,6 +5193,7 @@ class SyncController extends GetxController {
         'saveTmp': () => GetCheckSaveTmp('BIL_POI',TotalBIL_POI),
         'updateOrder': () => Update_SYN_ORD('BIL_POI'),
       },//نقاط البيع
+
       'BIL_POI_U': {
         'total': TotalBIL_POI_U,
         'progress': () => BilPoiUProgress,

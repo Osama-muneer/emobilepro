@@ -7,7 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sizer/sizer.dart';
 import '../Setting/Views/Home/fast_acc_usr_view.dart';
 import '../Setting/controllers/home_controller.dart';
 import '../Setting/controllers/login_controller.dart';
@@ -96,37 +95,6 @@ class ThemeHelper {
         fontSize: TypeSize=='L'? L : TypeSize=='M' ? M :TypeSize=='S'?S: S2);
   }
 
-  TextStyle buildTextStyle2(BuildContext context, Color color, String typeSize) {
-    // 1. تحديد حجم الخط الأساسي باستخدام .sp
-    final double baseSize = switch (typeSize) {
-      'L' => 24.sp, // حجم كبير
-      'M' => 20.sp, // حجم متوسط
-      'S' => 16.sp, // حجم صغير
-      'S2' => 12.sp, // حجم صغير جدًا
-      _ => 16.sp, // افتراضي
-    };
-
-    // 2. تطبيق إعدادات حجم الخط من الإعدادات
-    final String userSize = StteingController().Size_Font;
-    final double scaledSize = baseSize * _getSizeFactor(userSize);
-
-    return TextStyle(
-      fontFamily: 'Hacen',
-      color: color,
-      fontWeight: FontWeight.bold,
-      fontSize: scaledSize,
-    );
-  }
-
-// 3. دالة مساعدة لتحديد معامل التحجيم
-  double _getSizeFactor(String size) {
-    return switch (size) {
-      'L' => 1.2, // زيادة 20%
-      'M' => 1.0, // الحجم الطبيعي
-      'S' => 0.8, // تقليل 20%
-      _ => 1.0, // افتراضي
-    };
-  }
 
   bool isNumeric(String str) {
     if (str == 'null') {

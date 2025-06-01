@@ -33,7 +33,6 @@ import '../../database/setting_db.dart';
 import '../../database/sync_db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -1675,8 +1674,8 @@ class Counter_Sales_Approving_Controller extends GetxController {
                     }
                   },
                   child: Container(
-                    height: 40.h,
-                    width: 330.w,
+                    height: 40,
+                    width: 330,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         color: AppColors.MainColor,
@@ -1698,8 +1697,8 @@ class Counter_Sales_Approving_Controller extends GetxController {
               Get.back();
             },
             child: Container(
-              height: 40.h,
-              width: 330.w,
+              height: 40,
+              width: 330,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                   color: AppColors.MainColor,

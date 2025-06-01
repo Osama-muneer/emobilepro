@@ -7,13 +7,11 @@ import '../../PrintFile/share_mode.dart';
 import '../../PrintFile/simple_pdf.dart';
 import '../../Setting/controllers/login_controller.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
-import '../../Widgets/config.dart';
 import '../file_helper.dart';
 
 Pdf_Inventory_Samplie({
@@ -45,12 +43,12 @@ Pdf_Inventory_Samplie({
             Expanded(child:
             Column(
                 children: [
-                  Text(controller.SONE,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 10.5.sp)),
-                  Text(controller.SOLN,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 10.5.sp)),
+                  Text(controller.SONE,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 13)),
+                  Text(controller.SOLN,style: TextStyle(fontWeight: FontWeight.bold, color: PdfColors.black, fontSize: 11)),
                 ]),),
             Expanded(child:Column(children: [
               Container(
-                  width: 50.w,
+                  width: 50,
                   child: Image(image)
               ),
               Container( margin: const EdgeInsets.symmetric(vertical: 2),
@@ -62,17 +60,17 @@ Pdf_Inventory_Samplie({
                       :controller.SMKID==11?'StringTransfer_Store_Request'.tr:controller.SMKID==131?'StringTransfer_Store_Branches'.tr:
                   controller.STO_MOV_M_PRINT.elementAt(0).BKID==-1 && controller.STO_MOV_M_PRINT.elementAt(0).SMKID==1?'StringIncoming_Store'.tr:
                   'StringInventoryTransferVoucher'.tr,
-                      style: TextStyle(color: PdfColors.black, fontSize: 13.sp))),
+                      style: TextStyle(color: PdfColors.black, fontSize: 13))),
             ])),
             Expanded(
               child: Column(
                   children: [
-                    Text(controller.SONA,style: TextStyle(color: PdfColors.black, fontSize: 11.sp)),
-                    Text(controller.SORN,style: TextStyle(color: PdfColors.black, fontSize: 11.sp)),
+                    Text(controller.SONA,style: TextStyle(color: PdfColors.black, fontSize: 11)),
+                    Text(controller.SORN,style: TextStyle(color: PdfColors.black, fontSize: 11)),
                     SimplePdf.text(
                       ' ${'StringAddress'.tr}  ${controller.SOAD.toString()} :',
                       font,
-                      fontSize: 11.sp,
+                      fontSize: 11,
                       color: PdfColors.black,
                     ),
                   ]),)

@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
-
 import '../../../database/invoices_db.dart';
 import '../../Controllers/counter_sale_approving_controller.dart';
 import '../../models/bif_cou_c.dart';
@@ -77,7 +75,7 @@ class _DataGridApprovePageState extends State<DataGridApprovePage> {
                   allowEditing: true,
                   allowSwiping: true,
                   selectionMode: SelectionMode.single,
-                  swipeMaxOffset: 85.w,
+                  swipeMaxOffset: 80,
                   controller: controller.dataGridController,
                   columnWidthMode: ColumnWidthMode.fill,
                   endSwipeActionsBuilder: _bildswipeingEdit,

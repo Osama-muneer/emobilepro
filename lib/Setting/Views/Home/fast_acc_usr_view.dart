@@ -2,10 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../Setting/controllers/home_controller.dart';
 import '../../../Widgets/colors.dart';
-import '../../../Widgets/dimensions.dart';
 import '../../../database/setting_db.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../Widgets/theme_helper.dart';
 
@@ -33,28 +31,29 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
     });
   }
 
-
+  Future<bool> onWillPop() async {
+    final shouldPop;
+    if (controller.FAS_ACC_USR2.length == 4 || controller.FAS_ACC_USR2.isEmpty) {
+      Navigator.of(context).pop(false);
+      controller.GET_SYS_SCR_FAS_P2();
+      controller.update();
+      shouldPop = await Get.toNamed('/Home');
+    } else {
+      shouldPop = await Get.defaultDialog(
+        title: 'StringMestitle'.tr,
+        middleText: 'StringSCR_FAS_ACC_CHK'.tr,
+        backgroundColor: Colors.white,
+        radius: 40,
+        textCancel: 'StringOK'.tr,
+        cancelTextColor: Colors.blue,
+      );
+    }
+    return shouldPop ?? false;
+  }
   @override
   Widget build(BuildContext context) {
-    Future<bool> onWillPop() async {
-      final shouldPop;
-      if (controller.FAS_ACC_USR2.length == 4 || controller.FAS_ACC_USR2.isEmpty) {
-        Navigator.of(context).pop(false);
-        controller.GET_SYS_SCR_FAS_P2();
-        controller.update();
-        shouldPop = await Get.toNamed('/Home');
-      } else {
-        shouldPop = await Get.defaultDialog(
-          title: 'StringMestitle'.tr,
-          middleText: 'StringSCR_FAS_ACC_CHK'.tr,
-          backgroundColor: Colors.white,
-          radius: 40,
-          textCancel: 'StringOK'.tr,
-          cancelTextColor: Colors.blue,
-        );
-      }
-      return shouldPop ?? false;
-    }
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return  WillPopScope(
       onWillPop: onWillPop,
       child: Scaffold(
@@ -64,7 +63,8 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
             builder: ((value) =>  SingleChildScrollView(
                   child:  Column(
                     children: [
-                     Text('StringSCR_SYS'.tr,style: TextStyle(fontSize: 16.sp, color: AppColors.MainColor, fontWeight: FontWeight.bold)),
+                     Text('StringSCR_SYS'.tr,style:
+                     ThemeHelper().buildTextStyle(context, AppColors.MainColor,'L')),
                       Container(
                       //  height: 345,
                         child: ListView.builder(
@@ -78,9 +78,7 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
                                     color: Colors.white,),
                                 ),
                                 title: Text(controller.FAS_ACC_USR[index].SSDA_D.toString(),
-                                  style: TextStyle(
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.bold),),
+                                  style: ThemeHelper().buildTextStyle(context, AppColors.black,'M'),),
                                 trailing: controller.FAS_ACC_USR[index].FAUST2==1 ?Icon(Icons.check_circle,color: Colors.red[700]):
                                 Icon(Icons.check_circle_outline,color: Colors.grey,),
                                 onTap: () async {
@@ -114,23 +112,21 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
                           controller.update();
                         },
                         child: Container(
-                          height: 30.h,
-                          width: 330.w,
+                          height: height * 0.05,
+                          width: width * 0.9,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                               color: AppColors.MainColor,
-                              borderRadius: BorderRadius.circular(Dimensions.height35)),
+                              borderRadius: BorderRadius.circular(5 * width)),
                           child: Text(
                             'StringAdd'.tr,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                            ),
+                            style: ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')
                           ),
                         ),
                       ),
                       Divider(height: 1,color: Colors.black,),
-                      Text('StringSCR_FAS'.tr,style: TextStyle(fontSize: 16.sp, color: AppColors.MainColor, fontWeight: FontWeight.bold)),
+                      Text('StringSCR_FAS'.tr,style:
+                      ThemeHelper().buildTextStyle(context, AppColors.MainColor,'L')),
                       // Row(
                       //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       //   children: [
@@ -163,9 +159,7 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
                                     color: Colors.white,),
                                 ),
                                 title: Text(controller.FAS_ACC_USR2[index].SSDA_D.toString(),
-                                  style: TextStyle(
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.bold),),
+                                  style: ThemeHelper().buildTextStyle(context, AppColors.black,'M')),
                                 trailing: controller.FAS_ACC_USR2[index].FAUST2==1 ?Icon(Icons.check_circle,color: Colors.red[700]):
                                 Icon(Icons.check_circle_outline,color: Colors.grey,),
                                 onTap: () async {
@@ -201,19 +195,17 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
                           controller.update();
                         },
                         child: Container(
-                          height: 30.h,
-                          width: 330.w,
+                          height: height * 0.05,
+                          width: width * 0.9,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                               color: AppColors.MainColor,
                               borderRadius:
-                              BorderRadius.circular(Dimensions.height35)),
+                              BorderRadius.circular(5 * width)),
                           child: Text(
                             'StringDeleteAppBar'.tr,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                            ),
+                            style:
+                            ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')
                           ),
                         ),
                       )

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:flutter/material.dart' as MA;
 import '../Operation/Controllers/inventory_controller.dart';
 import '../Operation/models/bil_mov_m.dart';
 import '../PrintFile/simple_pdf.dart';
@@ -25,7 +24,6 @@ import 'package:pdf/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../Setting/controllers/setting_controller.dart';
 import 'Group_Pdf.dart';
-import 'colors.dart';
 import 'pdfpakage.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart' as intl;

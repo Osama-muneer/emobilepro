@@ -6,7 +6,6 @@ import '../../PrintFile/simple_pdf.dart';
 import '../../Setting/controllers/login_controller.dart';
 import '../../Setting/controllers/setting_controller.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:number_to_word_arabic/number_to_word_arabic.dart';
 import 'package:pdf/pdf.dart';
@@ -90,7 +89,7 @@ Pdf_Vouchers_Samplie({
         return Expanded(
           child: Column(
             children: [
-              Container(width: 50.w, child: Image(image)),
+              Container(width: 50, child: Image(image)),
             ],
           ),
         );
@@ -203,11 +202,11 @@ Pdf_Vouchers_Samplie({
                                       pw.MainAxisAlignment.spaceBetween,
                                       children: <pw.Widget>[
                                         pw.Text(' ${'StringSMDED2'.tr} ${ListAcc_Mov_M.elementAt(0).AMMDO.toString()} :',
-                                          style: TextStyle(fontSize: 13.0.sp),
+                                          style: TextStyle(fontSize: 13),
                                         ),
                                         pw.Text(
                                           '${'StringBIID2'.tr} ${ListAcc_Mov_M.elementAt(0).BINA_D.toString()}',
-                                          style: TextStyle(fontSize: 13.0.sp),
+                                          style: TextStyle(fontSize: 13.0),
                                         ),
                                       ],
                                     ),
@@ -216,7 +215,7 @@ Pdf_Vouchers_Samplie({
                                       children: <pw.Widget>[
                                         Text(
                                           '${'StringSMMID'.tr} ${ListAcc_Mov_M.elementAt(0).AMMNO.toString()} :',
-                                          style: TextStyle(fontSize: 13.0.sp),
+                                          style: TextStyle(fontSize: 13.0),
                                         ),
                                         Text(
                                           GetAMKID == '1' || GetAMKID == '2' || GetAMKID == '2'
@@ -226,11 +225,11 @@ Pdf_Vouchers_Samplie({
                                               ? '${'StringCreditCard'.tr} : ${ListAcc_Mov_M.elementAt(0).BCCNA_D.toString()}'
                                               : '${'StringBank'.tr} : ${ListAcc_Mov_M.elementAt(0).ABNA_D.toString()}'
                                               : '${ListAcc_Mov_M.elementAt(0).SCNA_D.toString()}',
-                                          style: TextStyle(fontSize: 13.0.sp),
+                                          style: TextStyle(fontSize: 13.0),
                                         ),
                                         Text(
                                           '${'StringAMMID'.tr} ${ListAcc_Mov_M.elementAt(0).AMMID.toString()} :',
-                                          style: TextStyle(fontSize: 13.0.sp),
+                                          style: TextStyle(fontSize: 13.0),
                                         ),
                                       ],
                                     ),
@@ -243,13 +242,13 @@ Pdf_Vouchers_Samplie({
                                             LoginController().LAN == 2
                                                 ? '${controller.converter.convertDouble(double.parse(ListAcc_Mov_M.elementAt(0).AMMAM.toString().contains('.0') ? ListAcc_Mov_M.elementAt(0).AMMAM!.round().toString() : ListAcc_Mov_M.elementAt(0).AMMAM.toString())).replaceFirst(RegExp(r" و  و"), "")} ${ListAcc_Mov_M.elementAt(0).SCNA_D}'
                                                 : '${Tafqeet.convert( ListAcc_Mov_M.elementAt(0).AMMAM.toString())} ${ListAcc_Mov_M.elementAt(0).SCNA_D}',
-                                            style: TextStyle(fontSize: 13.0.sp),
+                                            style: TextStyle(fontSize: 13.0),
                                           ),
                                         ]),
                                         Column(children: [
                                           pw.Text(
                                             '${'StringAmount'.tr} ${'${controller.formatter.format(ListAcc_Mov_M.elementAt(0).AMMAM)} :'}',
-                                            style: TextStyle(fontSize: 13.0.sp),
+                                            style: TextStyle(fontSize: 13.0),
                                           ),
                                         ]),
                                       ],
@@ -260,7 +259,7 @@ Pdf_Vouchers_Samplie({
                                         children: [
                                           pw.Text(
                                             '${ListAcc_Mov_M.elementAt(0).AMMIN}',
-                                            style: TextStyle(fontSize: 13.0.sp),
+                                            style: TextStyle(fontSize: 13.0),
                                           ),
                                         ]),
                                   ]),
