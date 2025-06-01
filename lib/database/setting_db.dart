@@ -2807,30 +2807,42 @@ Future<List<Bil_Mov_M_Local>> SUM_BAL(TYPE,TYPE2,GETID,AANO,SCID,Last_Asyn) asyn
   String sqlAMMST='';
   String sqlBMMID='';
   String sqlAMMID='';
-  final inputFormat = DateFormat('dd-MM-yyyy HH:mm:ss');
+  print('Last_Asyn');
+  print(Last_Asyn);
+
+
+  // 1. نطبع السلسلة كما هي:
+  print('Last_Asyn: $Last_Asyn');
+  // → Last_Asyn: 01-06-2025 22:37:14
+
+  // 2. نصّحّح نمط القراءة ليتطابق مع "dd-MM-yyyy HH:mm:ss":
+  final inputFormat = DateFormat('dd-MM-yyyy hh:mm:ss');
   final dt = inputFormat.parse(Last_Asyn);
-  print(inputFormat);
-  print(dt);
-  final outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-  final lastSyncIso = outputFormat.format(dt);
-  print(lastSyncIso);
+  // dt الآن يساوي DateTime(2025, 6, 1, 22, 37, 14)
+
+  // 3. نختار نمط الإخراج ليكون "يوم-شهر-سنة" ثم "ساعة:دقيقة" (دون ثواني):
+  final outputFormat2 = DateFormat('yyyy-MM-dd hh:mm');
+  final lastSyncIso = outputFormat2.format(dt);
+
+  print('lastSyncIso: $lastSyncIso');
 
   if(TYPE2==1){
     sqlBMMST='  A.BMMST=2  ';
     sqlAMMST='  A.AMMST=2  ';
   }else{
 
- sqlBMMST='''   (A.BMMST=2 OR (A.BMMST=1 AND datetime(
- substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
- substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso'))) ''';
+ sqlBMMST='''   (A.BMMST=2 OR (A.BMMST=1 AND  datetime(
+  substr(COALESCE(A.DATEU, A.DATEI), 7, 4)  || '-'  || 
+    substr(COALESCE(A.DATEU, A.DATEI), 4, 2)  || '-'  || 
+    substr(COALESCE(A.DATEU, A.DATEI), 1, 2)  || ' '  || 
+    substr(COALESCE(A.DATEU, A.DATEI), 12, 5))  > datetime('$lastSyncIso'))) ''';
 
- sqlAMMST=''' (A.AMMST=2 OR (A.AMMST=1 AND datetime(
- substr(COALESCE(A.DATEU, A.DATEI), 7, 4) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 4, 2) || '-' ||
- substr(COALESCE(A.DATEU, A.DATEI), 1, 2) || ' ' ||
- substr(COALESCE(A.DATEU, A.DATEI), 12, 5)) > datetime('$lastSyncIso')))  ''';
+ sqlAMMST=''' (A.AMMST=2 OR (A.AMMST=1 AND 
+ datetime(
+   substr(COALESCE(A.DATEU, A.DATEI), 7, 4)  || '-'  || 
+    substr(COALESCE(A.DATEU, A.DATEI), 4, 2)  || '-'  ||
+    substr(COALESCE(A.DATEU, A.DATEI), 1, 2)  || ' '  ||
+    substr(COALESCE(A.DATEU, A.DATEI), 12, 5) )  > datetime('$lastSyncIso')))  ''';
   }
 
 
