@@ -948,8 +948,8 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                       size: 0.026 * height,
                                                     ),
                                                   ),
-                                                ) ,
-                                              if('${item.BMMFST}' != '10')
+                                                ),
+                                              if('${item.BMMFST}' != '10' || '${item.BMMST2}' == '4')
                                                 Expanded(
                                                     child: GestureDetector(
                                                       onTap: () async {
@@ -1031,7 +1031,6 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                       showTableSheet('ED',item.GUID.toString());
                                                     }),
                                               ):Container(),
-
                                               ('${item.BMMFST}' == '1' || '${item.BMMFST}' == '10') && ('${item.BMMST}' == '2')
                                                   ? Expanded(
                                                 child: IconButton(
