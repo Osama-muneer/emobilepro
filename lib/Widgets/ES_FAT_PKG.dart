@@ -238,7 +238,8 @@ class ES_FAT_PKG {
 
   //الدالة الاساسية التي يتم استدعاءه في الفاتورة
   static Future<bool> MAIN_FAT_SND_INV(BMKID_V,BMMID_V,BIID_V,BMMDO_V,BMMGU_V,BMMST_N,SSID_N,FAT_ST_N,
-      CHK_INV_EXIS_N,ST_O_N,MSG_O)  async {
+      CHK_INV_EXIS_N,ST_O_N,MSG_O)
+  async {
     var ERR_TYP_N,STP_N=1;
     INV_RE_TYP INV_RE_R=INV_RE_TYP();
     try {
@@ -394,7 +395,8 @@ class ES_FAT_PKG {
 
   // لارجاع رقم GUID لختم التشفير
   static Future<String> GET_CSID_F(P_BIIDV_V,P_STMIDV_V,P_SOMGUV_V,P_SUIDV_V,P_BMKIDV_V,P_FCIBTV_V,P_JOBS_N,P_AF1_V,P_AF2_V,
-      P_AF3_V,P_AF4_V,P_AF5_V) async {
+      P_AF3_V,P_AF4_V,P_AF5_V)
+  async {
     var STP_N=1;
     try {
     String RES='';
@@ -1163,7 +1165,8 @@ class ES_FAT_PKG {
 
   //دالة تحهيز json
   static Future<INV_RE_TYP> GEN_JS_AND_SND(API_TYP API_TYP_R,List<Bil_Cus_Local> BIL_CUS,List<Bil_Mov_M_Local>
-  BIL_MOV_M,List<Sys_Own_Local> SYS_OWN,List<Bil_Mov_D_Local> BIL_MOV_D,List<Fat_Csid_Inf_Local> FAT_CSID_INF) async {
+  BIL_MOV_M,List<Sys_Own_Local> SYS_OWN,List<Bil_Mov_D_Local> BIL_MOV_D,List<Fat_Csid_Inf_Local> FAT_CSID_INF)
+  async {
 
     INV_RE_TYP INV_RE_R=INV_RE_TYP();
     Buyer buyer=Buyer();
@@ -1299,7 +1302,8 @@ class ES_FAT_PKG {
 
   //دالة ارسال الفاتورة
   static Future<INV_RE_TYP> CALL_API_P(Invoice invoice,List<Fat_Api_Inf_Local> FAT_API_INF,
-      API_TYP API_TYP_R) async {
+      API_TYP API_TYP_R)
+  async {
     INV_RE_TYP INV_RE_R=INV_RE_TYP();
     var STP_N=1;
     Map<String, dynamic> jsonData;
@@ -1564,7 +1568,8 @@ class ES_FAT_PKG {
     required String P_BMMGU_V,
     required int? P_ST_O_N,
     required int? P_FISSEQ_O_N,
-  }) async {
+  })
+  async {
     int? FISST_N;
     int TMP_N = 0;
     String TBL_V = 'FAT_INV_SND';
@@ -1782,7 +1787,8 @@ class ES_FAT_PKG {
       String? P_WAR_C,
       String? P_ERR_C,
       String? P_REQ_C,
-      String? P_RES_C}) async {
+      String? P_RES_C})
+  async {
     if (P_BMMFST_N == null || P_FISGU_V == null || ![1, 2, 3, 4].contains(P_BMMFST_N)) {
       return; // إنهاء الدالة إذا كانت القيم غير صالحة
     }

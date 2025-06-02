@@ -2587,10 +2587,10 @@ Future<List<Tax_Typ_Bra_Local>> USE_TAX_TYP_BRA(V_TTID,BIID_V) async {
   return list;
 }
 
-Future<List<Fat_Csid_Inf_Local>> GET_CSID(BIIDV_V,STMIDV_V,SOMGUV_V,SUIDV_V,BMKIDV_V,FCIBTV_V,AF1_V,AF2_V,
-    AF3_V,AF4_V,AF5_V) async {
+Future<List<Fat_Csid_Inf_Local>> GET_CSID(BIIDV_V,STMIDV_V,SOMGUV_V,SUIDV_V,BMKIDV_V,FCIBTV_V,
+    AF1_V,AF2_V,AF3_V,AF4_V,AF5_V) async {
   var dbClient = await conn.database;
-  String sql;
+  String sql='';
   String Wheresql='';
 
   LoginController().BIID_ALL_V=='1'? Wheresql= " AND  A.BIID_L=${LoginController().BIID}":Wheresql='';

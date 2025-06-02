@@ -373,6 +373,8 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                   itemCount: controller.BIL_MOV_M_List.length,
                   itemBuilder: (BuildContext context, int index) {
                     var item =  controller.BIL_MOV_M_List[index];
+                    print('item.BMMFST');
+                    print(item.BMMFST);
                     return  InkWell(
                       onTap: () async {
                         controller.BIL_MOV_D_SHOW.clear();
@@ -949,7 +951,8 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                     ),
                                                   ),
                                                 ),
-                                              if('${item.BMMFST}' != '10' && LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
+                                            //  if('${item.BMMFST}' != '10' && LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
+                                              if(LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
                                                 Expanded(
                                                     child: GestureDetector(
                                                       onTap: () async {

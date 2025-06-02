@@ -734,14 +734,15 @@ class _LoginViewState extends State<LoginView> {
               labelStyle: TextStyle(
                   color: controller.JTIDFocus.hasFocus ? Colors.red : Colors.grey // تغيير لون النص بناءً على التركيز
               ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 11),
               //  filled: true,
               isDense: true,
               prefixIcon: Icon(
                 Icons.account_balance,
-                size: 22.h,
+             //   size: 22.h,
                 color: AppColors.IconColor,
               ),
-              contentPadding: EdgeInsets.zero,
+            //  contentPadding: EdgeInsets.zero,
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.red, width: 1),
                 borderRadius: BorderRadius.circular(100.0),
@@ -760,6 +761,7 @@ class _LoginViewState extends State<LoginView> {
               style: TextStyle(fontFamily: 'Hacen', fontSize: .019*height,
               ),
             ),
+            isExpanded: true,
             value: controller.SelectDataJTID,
             style: const TextStyle(fontFamily: 'Hacen', color: Colors.black),
             items: snapshot.data!.map((item) => DropdownMenuItem<String>(
@@ -771,7 +773,7 @@ class _LoginViewState extends State<LoginView> {
               child:Text(item.JTNA_D.toString(),
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
-                style: TextStyle(fontSize:item.JTNA_D!.length<23? 0.018*height : 0.013*height),
+                style: TextStyle(fontSize: 0.018*height),
               ),)).toList().obs,
             validator: (value) {
               if (value == null) {
