@@ -949,7 +949,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                     ),
                                                   ),
                                                 ),
-                                              if('${item.BMMFST}' != '10' || '${item.BMMST2}' == '4')
+                                              if('${item.BMMFST}' != '10' && LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
                                                 Expanded(
                                                     child: GestureDetector(
                                                       onTap: () async {
@@ -990,12 +990,11 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                         '${item.BMMFST}' == '1' ?
                                                         '${ImagePath}TAX_S.png' :
                                                         '${item.BMMFST}' == '5' ||
-                                                            '${item.BMMFST}' == '10' ?
+                                                        '${item.BMMFST}' == '10' ?
                                                         '${ImagePath}TAX_I.png' :
-                                                        '${item.BMMFST}' == '4'
-                                                            ?
+                                                        '${item.BMMFST}' == '4' ?
                                                         '${ImagePath}TAX4.png'
-                                                            : '${ImagePath}TAX_E.png', // استبدل بهذا المسار الصحيح للصورة
+                                                        : '${ImagePath}TAX_E.png', // استبدل بهذا المسار الصحيح للصورة
                                                       ),
                                                     )
                                                 ),
