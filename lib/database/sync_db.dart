@@ -141,7 +141,7 @@ DeleteSYN_ORD() async {
   String sql= "DELETE FROM SYN_ORD WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
       " AND CIID_L=${LoginController().CIID} $SQLBIID";
   final res = await dbClient!.rawDelete(sql);
-  print('DeleteSyn_ord ${sql} = ${res}');
+  // print('DeleteSyn_ord ${sql} = ${res}');
   return res;
 }
 
@@ -193,9 +193,9 @@ DeleteALLData(String GetTableName,bool TypeSync) async {
   String SQL_CSID_SEQ="DELETE FROM FAT_CSID_SEQ   WHERE EXISTS(SELECT 1 FROM FAT_CSID_SEQ_TMP B WHERE  B.FCIGU=FAT_CSID_SEQ.FCIGU  AND B.FCSNO>=FAT_CSID_SEQ.FCSNO)";
   String SQL_CSID_SEQ2="DELETE FROM FAT_CSID_SEQ_TMP   WHERE EXISTS(SELECT 1 FROM FAT_CSID_SEQ B WHERE  B.FCIGU=FAT_CSID_SEQ_TMP.FCIGU  AND B.FCSNO>FAT_CSID_SEQ_TMP.FCSNO)";
 
-  print(sql);
-  print(sql2);
-  print('DeleteALLData');
+  // print(sql);
+  // print(sql2);
+  // print('DeleteALLData');
   final res = await dbClient!.rawDelete(GetTableName=='FAT_CSID_SEQ' ? SQL_CSID_SEQ2 : TypeSync==true?sql:sql2);
   final res2 = GetTableName=='FAT_CSID_SEQ' ? await dbClient.rawDelete( SQL_CSID_SEQ ):null;
  // print('DeleteALLData ${GetTableName=='FAT_CSID_SEQ' ? SQL_CSID_SEQ : TypeSync==true?sql:sql2} = ${res}');
@@ -210,7 +210,7 @@ DeleteALLDataTMP(String GetTableName) async {
   String GetTableNameTMP= '$GetTableName''_TMP';
   String sql= "Delete FROM $GetTableNameTMP";
   final res = await dbClient!.rawDelete(sql);
-  print('${sql} = ${res}');
+  // print('${sql} = ${res}');
   return res;
 }
 
@@ -221,7 +221,7 @@ SaveALLData(String GetTableName) async {
   String sql;
   sql= 'INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ';
   final res = await dbClient!.rawInsert(sql);
-   print('SaveALLData ${sql} = ${res}');
+   // print('SaveALLData ${sql} = ${res}');
    DeleteALLDataTMP(GetTableName);
   return res;
 }
@@ -309,8 +309,8 @@ DeleteDataByGUID(String GetTableName,String GETGUID) async {
   GETGUID= '$GETGUID''';
   String sql="DELETE FROM $GetTableName WHERE GUID='${GETGUID}'" ;
   final  res = await dbClient!.rawDelete(sql);
-  print('${sql} = ${res}');
-  print('DeleteDataByGUID');
+  // print('${sql} = ${res}');
+  // print('DeleteDataByGUID');
   if(GetTableName=='BIL_CUS'){
     await SaveDataByGUID(GetTableName,GETGUID);
   }else {
@@ -554,7 +554,7 @@ UpdateSYN_ORD_ALL() async {
       " AND CIID_L=${LoginController().CIID} $SQLBIID";
   final result = await dbClient!.rawUpdate(sqlupdate);
   // print('${sqlupdate} = ${result}');
-  print('UpdateSYN_ORD_ALL');
+  // print('UpdateSYN_ORD_ALL');
   return result;
 }
 
@@ -671,7 +671,7 @@ Future<int> DeleteROWID(TableName,GUID) async {
   LoginController().BIID_ALL_V=='1'? Wheresql2= ",BIID_L":Wheresql2='';
   String sql =" DELETE FROM $TableName WHERE ROWID NOT IN(SELECT MIN(ROWID) FROM $TableName  GROUP BY $GUID,JTID_L,SYID_L,CIID_L $Wheresql2)";
   final res = await dbClient!.rawDelete(sql);
- print('DeleteROWID ${sql} = ${res}');
+ // print('DeleteROWID ${sql} = ${res}');
   return res;
 }
 
@@ -1866,7 +1866,7 @@ DeleteDataByUser(String GetTableName) async {
   var dbClient = await conn.database;
   String sql= "Delete FROM $GetTableName where SUID!=${LoginController().SUID}";
   final res = await dbClient!.rawDelete(sql);
-  print('${sql} = ${res}');
+  // print('${sql} = ${res}');
   return res;
 }
 
@@ -1879,6 +1879,6 @@ Future<int> Get_FAS_ACC_USRData_Check() async {
       " AND CIID_L=${LoginController().CIID} $SQLBIID";
   var x = await dbClient!.rawQuery(sql2);
   Count_Rec = Sqflite.firstIntValue(x)!;
-   print('Count_Check ${sql2} = ${Count_Rec}');
+   // print('Count_Check ${sql2} = ${Count_Rec}');
   return Count_Rec;
 }

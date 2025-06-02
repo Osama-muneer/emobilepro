@@ -1195,7 +1195,8 @@ class Sale_Invoices_Controller extends GetxController {
         UPQR = USR_PRI
             .elementAt(0)
             .UPQR;
-      } else {
+      }
+      else {
         UPIN = 2;
         UPCH = 2;
         UPDL = 2;
