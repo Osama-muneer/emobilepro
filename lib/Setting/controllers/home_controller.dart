@@ -5,53 +5,27 @@ import 'package:uuid/uuid.dart';
 import '../../Operation/models/acc_mov_m.dart';
 import '../../Operation/models/bil_mov_m.dart';
 import '../../Widgets/ES_WS_PKG.dart';
+import '../../Widgets/service.dart';
 import '../controllers/setting_controller.dart';
 import '../../Widgets/theme_helper.dart';
 import '../models/acc_mov_k.dart';
-import '../models/acc_usr.dart';
-import '../models/bil_cre_c.dart';
-import '../models/bil_cus.dart';
 import '../models/bil_mov_k.dart';
-import '../models/bil_poi.dart';
-import '../models/bil_poi_u.dart';
 import '../models/bk_inf.dart';
 import '../models/bra_inf.dart';
-import '../models/cos_usr.dart';
 import '../models/fas_acc_usr.dart';
-import '../models/mat_uni_b.dart';
-import '../models/pay_kin.dart';
 import '../models/syn_log.dart';
-import '../models/sys_cur.dart';
 import '../../database/report_db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
-import '../models/bra_yea.dart';
-import '../models/gro_usr.dart';
 import '../models/job_typ.dart';
-import '../models/mat_pri.dart';
-import '../models/sto_inf.dart';
-import '../models/sto_usr.dart';
-import '../models/sys_com.dart';
-import '../models/sys_doc_d.dart';
-import '../models/sys_own.dart';
 import '../models/sys_scr.dart';
 import '../models/sys_usr.dart';
-import '../models/sys_usr_b.dart';
-import '../models/sys_usr_p.dart';
-import '../models/sys_var.dart';
-import '../models/sys_yea.dart';
 import '../models/usr_pri.dart';
 import '../../Widgets/config.dart';
 import '../../database/setting_db.dart';
 import '../../database/sync_db.dart';
-import '../models/mat_gro.dart';
-import '../models/mat_inf.dart';
-import '../models/mat_uni.dart';
-import '../models/mat_uni_c.dart';
-import '../models/sto_num.dart';
 import 'package:intl/intl.dart' as intl;
 
 
@@ -280,9 +254,19 @@ class HomeController extends GetxController {
     GETMOB_VAR_P(7);
     CHICK_SERVICE();
     fetchBackups();
+    startBackgroundServiceSafely();
     loading(true);
     update();
     super.onInit();
+  }
+
+  void startBackgroundServiceSafely() async {
+    final service = FlutterBackgroundService();
+    print('service.isRunning000');
+    if (!(await service.isRunning())) {
+      print('service.isRunning');
+      await initializeService(); // هذا موجود في service.dart
+    }
   }
 
   @override

@@ -384,12 +384,13 @@ class ApiProvider {
   Future<dynamic> FetchData(String endpoint, Function fromMapFunction, String getGUIDMap) async {
     var url = "${LoginController().API}/ESAPI/ESGET";
     print("$url/$endpoint");
-    // print("$url/$params");
+    print("$url/$params");
     try {
       var response = await Dio().get(url, queryParameters: params);
 
       if (response.statusCode == 200 && controller.MyGUIDMap[getGUIDMap] == 1) {
         List<dynamic> arr = response.data['result'];
+        print("$arr");
         controller.arrlength = arr.length;
         return arr.map((data) {
           return fromMapFunction(data);

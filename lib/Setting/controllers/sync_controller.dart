@@ -901,8 +901,6 @@ class SyncController extends GetxController {
 
   Future SAVE_FAS_ACC_USR() async {
       await fetchSYS_USR().then((userList) async {
-        print(userList.length);
-        print('userList');
         if (userList.isNotEmpty) {
           for (var i = 0; i < userList.length; i++) {
             try {
@@ -2187,8 +2185,6 @@ class SyncController extends GetxController {
       else{
         TotalIDE_LIN=0;
       }
-   print(TotalIDE_LIN);
-   print('TotalIDE_LIN');
 
     SYN_ORD=await GET_SYN_ORD('RES_SEC');
       if (SYN_ORD.isNotEmpty) {
@@ -2361,8 +2357,6 @@ class SyncController extends GetxController {
       else{
         TotalACC_TAX_C=0;
       }
-      print(TotalACC_TAX_C);
-      print('TotalACC_TAX_C');
     SYN_ORD=await GET_SYN_ORD('TAX_MOV_T');
       if (SYN_ORD.isNotEmpty) {
         TotalTAX_MOV_T = SYN_ORD.elementAt(0).ROW_NUM!;
@@ -3436,11 +3430,9 @@ class SyncController extends GetxController {
       TypeGet = 'BIL_POI_U';
       if (TotalBIL_POI_U != 0 && (CHIKE_ALL == 1 || TotalBIL_POI_U != CheckBIL_POI_U)) {
         FROM_DATE = LastBIL_POI_U;
-        print('BIL_POI_U1');
         apiProvider.GetAllBIL_POI_U(VarGUIDMap.toString().toUpperCase());
         awaitFunc();
       } else {
-        print('BIL_POI_U111');
         startWorking();
       }
       update();
@@ -3557,8 +3549,6 @@ class SyncController extends GetxController {
     //اعدادت امزاع الحركات
     else if (TypeSync == 50 && round == true) {
       TAB_N = STMID=='INVC'?'STO_MOV_K':'BIL_MOV_K';
-      print(TAB_N);
-      print('TAB_N');
       TypeCheckSync = TypeSync;
       TypeGet = 'BIL_MOV_K';
       if (TotalBIL_MOV_K != 0 && (CHIKE_ALL == 1 || TotalBIL_MOV_K != CheckBIL_MOV_K)) {
@@ -4611,20 +4601,12 @@ class SyncController extends GetxController {
 // دوال للتحقق من جدوال التمب اذا لم تنتقل البيانات الى الجدوال
   GetCheckSaveTmp(String GetTable,int total) async {
     for (var i = 0; i <= 50; i++) {
-      print('BIL_POI_U2');
-      print(GetTable);
-      print('BIL_POI_U2');
       await GetSaveTmp(GetTable);
       await Future.delayed(const Duration(milliseconds : 500));{
         if( CheckDataBaseTmp!=-1){
-          print('SaveALLData12');
           i=50;
           String TableNameTmp='$GetTable''_TMP';
           update();
-          print('GetTable1');
-          print(TableNameTmp);
-          print(GetTable);
-          print('GetTable1');
           await Update_TABLE_ALL(TableNameTmp);
           await DeleteALLData(GetTable,ClickAllOrLastTime);
           await SaveALLData(GetTable);

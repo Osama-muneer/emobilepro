@@ -6,7 +6,6 @@ import 'Setting/controllers/login_controller.dart';
 import 'Setting/controllers/setting_controller.dart';
 import 'Widgets/config.dart';
 import 'Widgets/localestring.dart';
-import 'Widgets/service.dart';
 import 'routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes/dependences.dart' as dep;
@@ -15,7 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StteingController().initHive();
   await LoginController().initHive();
-  await initializeService();
+  // await initializeService();
   //await FlutterBackgroundService.initialize(onStart);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
   await dep.init();

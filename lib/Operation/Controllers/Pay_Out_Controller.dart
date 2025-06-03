@@ -1104,17 +1104,18 @@ class Pay_Out_Controller extends GetxController {
 
   //جلب عدد  السجلات
   GET_CountRecode() async {
-    GET_ROWN1(AMKID.toString(),AMMID.toString()).then((data) {
+    var data=await GET_ROWN1(AMKID.toString(),AMMID.toString());
       if (data.isEmpty) {
         CountRecodeController.text = '0';
-      }else{
+      }
+      else{
         COUNT_RECODE = data;
         CountRecodeController.text = COUNT_RECODE.elementAt(0).COU.toString();
         // CheckBack=COUNT_RECODE.elementAt(0).COU!;
         UpdateROWN1(int.parse(CountRecodeController.text), AMMID);
         update();
       }
-    });
+
     update();
   }
 
