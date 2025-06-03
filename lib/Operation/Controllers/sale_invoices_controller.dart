@@ -950,7 +950,7 @@ class Sale_Invoices_Controller extends GetxController {
     GETMOB_VAR_P(22);
     GET_USE_TAX_P();
     GET_USR_PRI_VOU();
-    GET_SYN_ORD_P();
+    GET_LAS_ACC_BAL();
     GET_How_Display_Items_Screen_P();
     LoginController().SET_P('Return_Type', '1');
     if (Get.arguments is Map<String, dynamic>) {
@@ -1085,12 +1085,28 @@ class Sale_Invoices_Controller extends GetxController {
     update();
   }
 
-  Future GET_SYN_ORD_P() async {
-    var SYN_ORD=await GET_SYN_ORD('BAL_ACC_C');
-    if (SYN_ORD.isNotEmpty) {
-      LastBAL_ACC_C = SYN_ORD.elementAt(0).SOLD.toString();
+  Future GET_LAS_ACC_BAL() async {
+    var GEN_VAR= await GET_GEN_VAR('LAS_ACC_BAL_JOB_RUN');
+    if (GEN_VAR.isNotEmpty) {
+      LastBAL_ACC_C = GEN_VAR.elementAt(0).VAL.toString();
+      // LoginController().SET_P('SYDV_ID',SYDV_ID_V);
+      // UpdateMOB_VAR(4,SYDV_ID_V);
+      if(LastBAL_ACC_C.contains('2900')){
+        GET_SYN_ORD_P();
+      }
+    }else{
+      GET_SYN_ORD_P();
     }
   }
+
+  Future GET_SYN_ORD_P() async {
+      var SYN_ORD=await GET_SYN_ORD('BAL_ACC_C');
+      if (SYN_ORD.isNotEmpty) {
+        LastBAL_ACC_C = SYN_ORD.elementAt(0).SOLD.toString();
+      }
+
+  }
+
 
   Future<void> onSelectFromDays(BuildContext context) async {
     final formatted = await DatePickerHelper.pickDate(
@@ -5901,6 +5917,7 @@ class Sale_Invoices_Controller extends GetxController {
   //جلب رصيد غير مرحل
   GET_BAL_P(BMMID,AANO,SCID) async {
     SUMBAL = 0.0;
+    await GET_LAS_ACC_BAL();
     SUM_M = await SUM_BAL(1,1,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
     if (SUM_M.isEmpty) {
       SUMBAL = 0.0;
