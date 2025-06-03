@@ -6,10 +6,6 @@ import 'Setting/controllers/login_controller.dart';
 import 'Setting/controllers/setting_controller.dart';
 import 'Widgets/config.dart';
 import 'Widgets/localestring.dart';
-<<<<<<< HEAD
-=======
-import 'Services/service.dart';
->>>>>>> a6ee55e48d6c506d8dbe2c5a15bbb5870744819e
 import 'routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes/dependences.dart' as dep;

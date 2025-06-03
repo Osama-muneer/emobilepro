@@ -1,8 +1,4 @@
 import '../../../Widgets/config.dart';
-<<<<<<< HEAD
-=======
-import '../../../Services/service.dart';
->>>>>>> a6ee55e48d6c506d8dbe2c5a15bbb5870744819e
 import '../../../Widgets/theme_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
