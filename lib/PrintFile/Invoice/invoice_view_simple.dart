@@ -80,8 +80,9 @@ Pdf_Invoices_Samplie({
 
     // دالة مساعدة لبناء الصف الشرطي
     Widget buildConditionalRow() {
-      if ((item.BMKID == 7 || item.BMKID == 10) && item.BMMGR.toString().isNotEmpty) {
-        return buildRow2(' ${'StringBMMGR2'.tr} ${item.BMMGR}', 13);
+      if ((item.BMKID == 7 || item.BMKID == 10)) {
+        return item.BMMGR.toString().isNotEmpty?
+        buildRow2(' ${'StringBMMGR2'.tr} ${item.BMMGR}', 13):Container();
       } else {
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
