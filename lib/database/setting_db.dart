@@ -60,7 +60,7 @@ import '../Setting/models/sys_var.dart';
 import '../Setting/models/sys_yea.dart';
 import '../Setting/models/usr_pri.dart';
 import '../Setting/services/fat_mod.dart';
-import '../Widgets/ES_FAT_PKG.dart';
+import '../Packages/ES_FAT_PKG.dart';
 import '../Widgets/config.dart';
 import '../database/database.dart';
 

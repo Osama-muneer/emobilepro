@@ -20,7 +20,7 @@ import '../Setting/services/fat_mod.dart';
 import '../database/database.dart';
 import '../database/invoices_db.dart';
 import '../database/setting_db.dart';
-import 'config.dart';
+import '../Widgets/config.dart';
 import 'package:http/http.dart' as http;
 
 class ES_FAT_PKG {

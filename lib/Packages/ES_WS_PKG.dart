@@ -11,7 +11,7 @@ import '../Setting/models/syn_off_m2.dart';
 import '../Setting/models/syn_set.dart';
 import '../Setting/services/fat_mod.dart';
 import '../database/setting_db.dart';
-import 'config.dart';
+import '../Widgets/config.dart';
 
 class ES_WS_PKG {
 

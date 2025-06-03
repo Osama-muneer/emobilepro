@@ -56,7 +56,7 @@ import '../Setting/models/tax_tbl_lnk.dart';
 import '../Setting/models/tax_typ.dart';
 import '../Setting/models/tax_typ_bra.dart';
 import '../Setting/models/tax_var_d.dart';
-import '../Widgets/ES_FAT_PKG.dart';
+import '../Packages/ES_FAT_PKG.dart';
 import '../Widgets/config.dart';
 import 'database.dart';
 
