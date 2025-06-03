@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../../Operation/models/acc_mov_m.dart';
 import '../../Operation/models/bil_mov_m.dart';
-import '../../Widgets/ES_WS_PKG.dart';
+import '../../Packages/ES_WS_PKG.dart';
 import '../controllers/setting_controller.dart';
 import '../../Widgets/theme_helper.dart';
 import '../models/acc_mov_k.dart';

@@ -15,7 +15,7 @@ import '../../../Setting/models/res_sec.dart';
 import '../../../Setting/models/sto_inf.dart';
 import '../../../Setting/models/sys_cur.dart';
 import '../../../Widgets/AnimatedTextWidget.dart';
-import '../../../Widgets/ES_FAT_PKG.dart';
+import '../../../Packages/ES_FAT_PKG.dart';
 import '../../../Widgets/clipper.dart';
 import '../../../Widgets/colors.dart';
 import '../../../Widgets/dropdown.dart';

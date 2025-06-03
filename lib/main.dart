@@ -6,7 +6,7 @@ import 'Setting/controllers/login_controller.dart';
 import 'Setting/controllers/setting_controller.dart';
 import 'Widgets/config.dart';
 import 'Widgets/localestring.dart';
-import 'Widgets/service.dart';
+import 'Services/service.dart';
 import 'routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes/dependences.dart' as dep;
