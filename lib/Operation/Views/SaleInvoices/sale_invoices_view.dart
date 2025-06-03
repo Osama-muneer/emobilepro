@@ -930,7 +930,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                                                           item.SCID.toString(),
                                                           item.PKID.toString(),
                                                           GETBMMID: item.BMMID.toString());
-                                                        await Future.delayed(const Duration(seconds: 1));
+                                                        // await Future.delayed(const Duration(seconds: 1));
                                                         await controller.PRINT_BALANCE_P(
                                                             BMMID: item.BMMID.toString(),
                                                             AANO:item.AANO.toString(),

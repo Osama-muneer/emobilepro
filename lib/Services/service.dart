@@ -49,7 +49,7 @@ Future<void> initializeService() async {
       onStart: onStart,
 
       // auto start service
-      autoStart: true,
+      autoStart: false,
       isForegroundMode: true,
       notificationChannelId: 'my_foreground',
       initialNotificationTitle: STMID=='EORD'?'EOrder SERVICE':'EMobile Pro SERVICE',

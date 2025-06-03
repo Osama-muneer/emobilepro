@@ -1,5 +1,4 @@
 import '../../../Widgets/config.dart';
-import '../../../Services/service.dart';
 import '../../../Widgets/theme_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +26,6 @@ class _SyncViewState extends State<SyncView> {
     DeleteROWIDFAS_ACC_USR();
     DeleteROWIDAll();
     if ((controller.PercentValue == 100 || controller.PercentValue == 0) && controller.TypeSync==0) {
-       await initializeService();
       STMID=='EORD'?Get.offNamed('/Home',arguments:controller.CHIKE_BACK_MAIN==0?0:3):Get.offAllNamed('/Home');
       return true;
    }
@@ -57,7 +55,6 @@ class _SyncViewState extends State<SyncView> {
          SystemNavigator.pop();
       }
       else{
-         STMID=='MOB'?await initializeService():false;
          STMID=='EORD'?Get.offNamed('/Home',arguments:controller.CHIKE_BACK_MAIN==0?0:3):Get.offAllNamed('/Home');
       }
       },
