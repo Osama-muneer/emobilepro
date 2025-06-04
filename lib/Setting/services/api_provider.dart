@@ -281,6 +281,7 @@ class ApiProvider {
       if (response.statusCode == 200 ) {
         List<dynamic> arr = response.data['result'];
         controller.arrlength=arr.length;
+        print('${arr}');
         return (response.data)['result'].map((data) {
           SaveGEN_VAR(Gen_Var_Local.fromMap(data));
           INSERT_SYN_LOG('GEN_VAR', '${controller.SLIN}', 'D');
@@ -384,13 +385,13 @@ class ApiProvider {
   Future<dynamic> FetchData(String endpoint, Function fromMapFunction, String getGUIDMap) async {
     var url = "${LoginController().API}/ESAPI/ESGET";
     print("$url/$endpoint");
-    print("$url/$params");
+    // print("$url/$params");
     try {
       var response = await Dio().get(url, queryParameters: params);
 
       if (response.statusCode == 200 && controller.MyGUIDMap[getGUIDMap] == 1) {
         List<dynamic> arr = response.data['result'];
-        print("$arr");
+        // print("$arr");
         controller.arrlength = arr.length;
         return arr.map((data) {
           return fromMapFunction(data);

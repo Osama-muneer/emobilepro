@@ -8889,6 +8889,8 @@ class Sale_Invoices_Controller extends GetxController {
 
   Future<void> SyncBIF_TRA_TBL_P( String GetGUID) async {
     var listD = await SyncronizationData().FetchBIF_TRA_TBL(GetGUID);
+    print(listD);
+    print('listD');
     if (listD.isNotEmpty) {
       await SyncronizationData().SyncBIF_TRA_TBLToSystem(listD);
     }
