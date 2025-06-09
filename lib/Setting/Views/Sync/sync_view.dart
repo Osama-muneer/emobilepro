@@ -85,13 +85,12 @@ class _SyncViewState extends State<SyncView> {
                 icon: Icon(
                   Icons.update,color: Colors.white
                 ),
-                onPressed: () {
+                onPressed: () async {
 
                     if(controller.SyncOneTable==true){
                       ThemeHelper().ShowToastW( "'${'StringOutfromScreen'.tr} ");
                     }
                     else{
-                      setState(() async {
                       if( controller.checkclick==false || controller.CheckSync==false){
                         controller.TypeSync=1;
                         controller.TypeSyncAll=0;
@@ -115,7 +114,6 @@ class _SyncViewState extends State<SyncView> {
                         print('round');
                         controller.Socket_IP();
                       }
-                      });
                     }
                 },
               ):Container(),

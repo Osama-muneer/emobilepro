@@ -349,6 +349,25 @@ class _Add_Ed_CustomerState extends State<Add_Ed_Customer> {
                                   borderRadius: BorderRadius.all(Radius.circular(0.015 * height)))),
                         ),
                         SizedBox(height: 0.01 * height),
+                        //
+                        TextFormField(
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          controller: controller.BCTLController,
+                          focusNode: controller.BCTLFocus,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
+                              labelText: 'StringBCDMO'.tr,
+                              labelStyle: TextStyle(
+                                color:  controller.BCTLFocus.hasFocus ? Colors.red : Colors.grey.shade500,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(0.15 * height),
+                                  borderSide: BorderSide(color: Colors.red)),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(0.015 * height)))),
+                        ),
+                        SizedBox(height: 0.01 * height),
                         //Cutomer Address
                         TextFormField(
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -1307,9 +1326,8 @@ class _Add_Ed_CustomerState extends State<Add_Ed_Customer> {
                     .obs,
                 value: controller.SelectDataBCTID,
                 onChanged: (value) {
-                  setState(() {
                     controller.SelectDataBCTID = value as String;
-                  });
+                    controller.update();
                 },
               );
             })));
