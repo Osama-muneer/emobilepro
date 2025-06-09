@@ -6003,7 +6003,7 @@ class Sale_Invoices_Controller extends GetxController {
 // داخل كلاس الكونترولر Controller
 // =========================
 
-   Calculate_BMD_NO_AM() {
+   Calculate_BMD_NO_AM2() {
     // **1. قراءة متغيرات الكمية والمجاني وحساب الكمية الحقيقية**
     final rawQty      = parseOrZero(BMDNOController.text);   // الكمية الكلية المدخلة
     final rawFreeQty  = parseOrZero(BMDNFController.text);   // الكمية المجانية المُدخلة
@@ -6152,7 +6152,7 @@ class Sale_Invoices_Controller extends GetxController {
     update();
   }
 
-   Calculate_BMDDI_IR() {
+   Calculate_BMDDI_IR2() {
     // **1. قراءة بيانات الخصم من الحقول وحمايتها من النص الفارغ**
     final discountValPercent = parseOrZero(BMDDIController.text); // خصم ثابت للوحدة
     final discountPercent    = parseOrZero(BMDDIRController.text); // نسبة خصم من السعر (%)
@@ -6183,7 +6183,7 @@ class Sale_Invoices_Controller extends GetxController {
     update();
   }
 
-   GET_USING_TAX_P() {
+   GET_USING_TAX_P2() {
     // **1. تأكد من وجود السعر الحالي**
     BMDAM1 = (BMDAM1 == null) ? 0.0 : BMDAM1;
 
@@ -6289,7 +6289,7 @@ class Sale_Invoices_Controller extends GetxController {
     update();
   }
 
-  Future<void> UPDATE_BMMDI() async {
+  Future<void> UPDATE_BMMDI2() async {
     final selectedFlag = SelectDataBMMDN;
     final percentText  = BMMDIRController.text;
     final invoiceTotal = parseOrZero(BMMAMController.text);
@@ -6327,7 +6327,7 @@ class Sale_Invoices_Controller extends GetxController {
 
 
   //وسعر الوحدة  دالة احتساب الكميه والمجاني
-  Calculate_BMD_NO_AM2() {
+  Calculate_BMD_NO_AM() {
     // print('Calculate_BMD_NO_AM');
     // print(USING_TAX_SALES);
     // print(Price_include_Tax);
@@ -6417,7 +6417,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   // دالة احتساب نسبه الخصم و مبلغ الخصم
-  Calculate_BMDDI_IR2() {
+  Calculate_BMDDI_IR() {
     //اجمالي مبلغ التخفيض
     SUMBMDDI = roundDouble(BMDNO_V! * double.parse(BMDDIController.text), 6);
     //اجمالي نسبه التخفيض
@@ -6433,7 +6433,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   //  `دالة احتساب الضريبه و الاجمالي
-  GET_USING_TAX_P2() {
+  GET_USING_TAX_P() {
     // if(MITSK==1){
     (BMDAM1.isNull) ? BMDAM1 = 0 : BMDAM1 = BMDAM1;
 
@@ -6502,7 +6502,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
   //تعديل الخصم
-  Future UPDATE_BMMDI2() async {
+  Future UPDATE_BMMDI() async {
     if (SelectDataBMMDN == '0' && BMMDIRController.text.isNotEmpty &&
         double.parse(BMMDIRController.text) > 0) {
       await Future.delayed(const Duration(milliseconds: 300));
@@ -7604,7 +7604,7 @@ class Sale_Invoices_Controller extends GetxController {
             textColor: Colors.white,
             backgroundColor: Colors.redAccent);
         return false;
-      } else if ((BMKID != 1 || BMKID != 2 )&& SelectDataPKID.toString() == '3' &&
+      } else if ((BMKID != 1 && BMKID != 2 ) && SelectDataPKID.toString() == '3' &&
           SelectDataBCID == null) {
         Fluttertoast.showToast(
             msg: 'StrinError_BCID'.tr,
