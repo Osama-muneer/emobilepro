@@ -26,7 +26,7 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
 
   final Sale_Invoices_Controller controller = Get.find();
 
- EDIT_INV (BuildContext context, DataGridRow row, int rowIndex) async {
+ EDIT_INV(BuildContext context, DataGridRow row, int rowIndex) async {
    controller.ClearBil_Mov_D_Data();
    if(controller.TTID1!=null){
      await controller.GET_TAX_LIN_P('MAT',row.getCells()[2].value.toString(),row.getCells()[11].value.toString());
@@ -93,7 +93,7 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
 }
 
  DELETE_INV(DataGridRow row) async {
-   deleteBIL_MOV_D_ONE(
+   await deleteBIL_MOV_D_ONE(
        row.getCells()[25].value==11 || row.getCells()[25].value==12?'BIF_MOV_D':'BIL_MOV_D',
        row.getCells()[0].value.toString(),row.getCells()[1].value.toString());
    controller.update();

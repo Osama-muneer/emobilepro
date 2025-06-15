@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import '../../Packages/ES_MAT_PKG.dart';
 import '../../Packages/ES_WS_PKG.dart';
@@ -5656,10 +5655,7 @@ class Sale_Invoices_Controller extends GetxController {
         P_ZERO.toString(), SVVL_NO.toString(), SelectDataPKID.toString(),
         ToDate).then((data) {
       BIL_MOV_M = data;
-      print(BIL_MOV_M
-          .elementAt(0)
-          .BMMNO
-          .toString());
+      print(BIL_MOV_M.elementAt(0).BMMNO.toString());
       print('BMMNO');
       if (BIL_MOV_M.isNotEmpty) {
         if (SVVL_NO == '1') {
@@ -8564,14 +8560,11 @@ class Sale_Invoices_Controller extends GetxController {
 
   scanBarcodeNormal() async {
     String barcodeScanRes;
-
-
     barcodeScanRes = await BarcodeService().scanBarcode();
-
-
     _scanBarcode = barcodeScanRes;
+    print(barcodeScanRes);
+    print('_scanBarcode');
     FetchBarcodData(_scanBarcode);
-
     Timer(const Duration(milliseconds: 400), () {
       Additem().displayAddItemsWindo();
       myFocusNode.requestFocus();

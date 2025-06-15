@@ -585,8 +585,6 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
 Future<Bil_Mov_D_Local> Save_BIF_MOV_D(String TAB_N,Bil_Mov_D_Local data) async {
   var dbClient = await conn.database;
   data.BMDID = await dbClient!.insert(TAB_N, data.toMap());
-  print(data);
-  print('data');
   return data;
 }
 
