@@ -85,7 +85,7 @@ class Pay_Out_Controller extends GetxController {
       Multi_CUR='1', LastBAL_ACC_C='';
   int SCSFL=2,UPIN_PKID=1,PKID=1,TYPYPKID=1,CheckBack=0,ShowRePrinting=0,AACT = 1, UseSignature=0,
       ShowSignatureAlert=0, currentIndex=0,TYPE_SER=2;
-  int? AMMID,AMKID,AMDID,AMMNO,Allow_to_Inserted_Date_of_Voucher,SCID_C,BYST=1,UPCH=1,UPINCUS=1,
+  int? AMMID,AMKID,AMMST,AMDID,AMMNO,Allow_to_Inserted_Date_of_Voucher,SCID_C,BYST=1,UPCH=1,UPINCUS=1,
       UPIN=1,UPQR=1,UPDL=1,UPPR=1,AKID=1,CheckSearech,  ArrLengthCus = 0;
   late TextEditingController AANAController,AANOController,SCNAController,
       SCEXController,SCEX2Controller,AMDDAController,
@@ -998,6 +998,7 @@ class Pay_Out_Controller extends GetxController {
         LoginController().SET_N_P('BMMID',note.AMMID!) ;
         AMMNO = note.AMMNO;
         AMMID = note.AMMID;
+        AMMST = note.AMMST;
         GUID = note.GUID;
         AMKID_TYPE=note.AMKID.toString();
         SelectDataBIID = note.BIID.toString();
@@ -1078,8 +1079,6 @@ class Pay_Out_Controller extends GetxController {
   editMode(BuildContext context) {
     contentFocusNode.unfocus();
     loading(true);
-    print(Get.arguments);
-    print('Get.arguments');
     if (Get.arguments == null && edit == false) {
       if (CountRecodeController.text == '0') {
         Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
@@ -1252,7 +1251,7 @@ class Pay_Out_Controller extends GetxController {
             AMMNO: AMMNO,
             PKID:   PKID.toString(),
             AMMDO: '$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}',
-            AMMST: 2,
+            AMMST: AMMST,
             AMMRE: AMMREController.text.isEmpty?AMMNO.toString():AMMREController.text,
             AMMCC: ValueAMMCC==true ? 1 : 2,
             SCID:  int.parse(SelectDataSCID.toString()),
@@ -1284,7 +1283,7 @@ class Pay_Out_Controller extends GetxController {
           Save_ACC_MOV_M(M);
         }
         else{
-          UpdateACC_MOV_M(AMKID!,AMMID!,'$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}'
+          UpdateACC_MOV_M(AMKID!,AMMID!,AMMST!,'$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}'
               ,SelectDataPKID.toString(),PKID==1?int.parse(SelectDataACID.toString()):null,
               PKID==9 || PKID==2?int.parse(SelectDataABID.toString()):null,
               PKID==8?int.parse(SelectDataBCCID.toString()):null,
@@ -1703,7 +1702,6 @@ class Pay_Out_Controller extends GetxController {
 
   Future<void> AwaitFunc(String TypeSync, String GetAMMID, bool TypeAuto) async {
     int retries = 0;
-
     while (ArrLengthCus != 0 && retries < 200) {
       await Future.delayed(const Duration(milliseconds: 500));
       print("Checking ArrLengthCus: $ArrLengthCus");

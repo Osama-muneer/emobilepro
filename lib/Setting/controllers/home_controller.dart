@@ -251,9 +251,9 @@ class HomeController extends GetxController {
     STMID=='REP'?GET_SYS_REP_P(1010):false;
     GET_COUNT_SYN_LOG_P();
     GETMOB_VAR_P(7);
-    CHICK_SERVICE();
     fetchBackups();
     startBackgroundServiceSafely();
+    CHICK_SERVICE();
     loading(true);
     update();
     super.onInit();
@@ -261,7 +261,6 @@ class HomeController extends GetxController {
 
   void startBackgroundServiceSafely() async {
     final service = FlutterBackgroundService();
-    print('service.isRunning000');
     if (!(await service.isRunning())) {
       print('service.isRunning');
       await initializeService(); // هذا موجود في service.dart
@@ -1046,7 +1045,6 @@ class HomeController extends GetxController {
       LoginController().SET_B_P('Service_isRunning',false);
     }
     update();
-    print(LoginController().Service_isRunning);
     Timer.periodic(Duration(minutes: 5), (timer) {
       if (isRunning) {
         LoginController().SET_B_P('Service_isRunning',true);

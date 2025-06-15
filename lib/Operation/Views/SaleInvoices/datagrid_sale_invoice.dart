@@ -19,12 +19,9 @@ class DataGridPageInvoice extends StatefulWidget {
 }
 class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
 
-  Future<InventoryDataGridSource> getInventoryDataSource() async {
-    var InvoicesList = await GET_BIL_MOV_D(controller.BMKID==11 || controller.BMKID==12?'BIF_MOV_D':'BIL_MOV_D',controller.BMMID.toString(),controller.SER_MINA.toString(),'2');
-    return InventoryDataGridSource(InvoicesList);
-  }
-
   final Sale_Invoices_Controller controller = Get.find();
+
+
 
  EDIT_INV(BuildContext context, DataGridRow row, int rowIndex) async {
    controller.ClearBil_Mov_D_Data();
@@ -155,7 +152,7 @@ class _DataGridPageInvoiceState extends State<DataGridPageInvoice> {
     return GetBuilder<Sale_Invoices_Controller>(
         init: Sale_Invoices_Controller(),
         builder: ((controller) =>FutureBuilder(
-      future: getInventoryDataSource(),
+      future: controller.getInventoryDataSource(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return snapshot.hasData
             ? SfDataGridTheme(

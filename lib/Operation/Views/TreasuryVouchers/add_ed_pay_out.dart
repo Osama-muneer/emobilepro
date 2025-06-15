@@ -154,7 +154,7 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                 IconButton(
                   icon: const Icon(Icons.save,color: Colors.white),
                   onPressed: () async {
-                    // controller.GET_AMMNO_P();
+                    controller.AMMST = 2;
                     if (controller.AMKID != 15  && controller.SHOW_BDID == '2'
                         && controller.SelectDataBDID == null ) {
                       Get.defaultDialog(
@@ -207,6 +207,79 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
                       );
                     }
                   },
+                ),
+                PopupMenuButton(
+                  color: Colors.white,
+                  enableFeedback: true,
+                  initialValue: 0,
+                  elevation: 0.0,
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                    PopupMenuItem(
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.pop(context);
+                          controller.AMMST = 4;
+                          if (controller.AMKID != 15  && controller.SHOW_BDID == '2'
+                              && controller.SelectDataBDID == null ) {
+                            Get.defaultDialog(
+                              title: 'StringMestitle'.tr,
+                              middleText: 'StringErr_BDID'.tr,
+                              backgroundColor: Colors.white,
+                              radius: 40,
+                              textCancel: 'StringNo'.tr,
+                              cancelTextColor: Colors.red,
+                              textConfirm: 'StringYes'.tr,
+                              confirmTextColor: Colors.white,
+                              onConfirm: () async {
+                                Navigator.of(context).pop(false);
+                                await Future.delayed(Duration(milliseconds: 400));
+                                Get.defaultDialog(
+                                  title: 'StringMestitle'.tr,
+                                  middleText: 'StringMessave'.tr,
+                                  backgroundColor: Colors.white,
+                                  radius: 40,
+                                  textCancel: 'StringNo'.tr,
+                                  cancelTextColor: Colors.red,
+                                  textConfirm: 'StringYes'.tr,
+                                  confirmTextColor: Colors.white,
+                                  onConfirm: () {
+                                    Navigator.of(context).pop(false);
+                                    controller.editMode(context);
+                                  },
+                                  // barrierDismissible: false,
+                                );
+                              },
+                            );
+                          }
+                          else {
+                            Get.defaultDialog(
+                              title: 'StringMestitle'.tr,
+                              middleText: 'StringMessave'.tr,
+                              backgroundColor: Colors.white,
+                              radius: 40,
+                              textCancel: 'StringNo'.tr,
+                              cancelTextColor: Colors.red,
+                              textConfirm: 'StringYes'.tr,
+                              confirmTextColor: Colors.white,
+                              onConfirm: () {
+                                Navigator.of(context).pop(false);
+                                controller.editMode(context);
+                                //      controller. get_BIF_MOV_M('DateNow');
+                              },
+                              // barrierDismissible: false,
+                            );
+                          }
+                        },
+                        leading: const Icon(
+                          Icons.save_outlined,
+                          color: Colors.black,
+                        ),
+                        title: ThemeHelper().buildText(
+                            context, 'StringSaveAppBar', Colors.black, 'M'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             )

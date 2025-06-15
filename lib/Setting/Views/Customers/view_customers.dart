@@ -107,6 +107,24 @@ class _ViewCustomersState extends State<ViewCustomers> {
     }
   }
 
+  // void OpenCustomerLocation(double latitude, double longitude) async {
+  //   if (latitude != 0 && longitude != 0) {
+  //     final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
+  //     final bool canLaunchResult = await canLaunchUrl(url);
+  //     print('canLaunchResult: $canLaunchResult');
+  //     if (canLaunchResult) {
+  //       await launchUrl(url, mode: LaunchMode.externalApplication);
+  //     } else {
+  //       Get.snackbar('خطأ', 'لا يمكن فتح الرابط: $url',
+  //           backgroundColor: Colors.redAccent, colorText: Colors.white);
+  //     }
+  //   } else {
+  //     Get.snackbar('خطأ', 'الإحداثيات غير صالحة',
+  //         backgroundColor: Colors.redAccent, colorText: Colors.white);
+  //   }
+  // }
+
+
   void OpenCustomerLocation(double latitude, double longitude) async {
     if(latitude!=0 || longitude!=0){
     final url = 'https://www.google.com/maps?q=$latitude,$longitude';

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../Services/ApiService.dart';
 import '../../Setting/models/eco_var.dart';
 import '../../Setting/models/acc_acc.dart';
 import '../../Setting/models/acc_ban.dart';
@@ -123,6 +124,15 @@ import '../models/tax_per_m.dart';
 
 class ApiProvider {
   final SyncController controller = Get.find();
+
+  var params3 = ApiService().createParams(
+    STMID: STMID,
+    TAB_N: TAB_N,
+    SOID_V: SOID_V,
+    PAR_V: PAR_V,
+    F_ROW_V: '0',
+    T_ROW_V: '0',
+  );
 
   late var params = {
     "STMID_CO_V": STMID,

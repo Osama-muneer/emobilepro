@@ -1,3 +1,4 @@
+import 'package:emobilepro/Widgets/config.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Operation/models/acc_mov_m.dart';
 import '../Operation/models/bif_cou_c.dart';
@@ -2604,7 +2605,7 @@ async {
   SCIDsql =" " : SCIDsql="  AND M.SCID BETWEEN '$GETSCID_F' AND '$GETSCID_T'";
 
   (GETPKID_F.isEmpty || GETPKID_F=='null') && (GETPKID_T.isEmpty || GETPKID_T=='null')?
-  PKIDsql =" " : PKIDsql="  AND M.PKID BETWEEN '$GETSCID_F' AND '$GETSCID_T'";
+  PKIDsql =" " : PKIDsql="  AND M.PKID BETWEEN '$GETPKID_F' AND '$GETPKID_T'";
 
   (GETBMMST_F.isEmpty || GETBMMST_F=='null') && (GETBMMST_T.isEmpty || GETBMMST_T=='null')?
   BMKSTsql =" " : BMKSTsql="  AND M.BMMST BETWEEN '$GETBMMST_F' AND '$GETBMMST_T'";
@@ -2886,7 +2887,8 @@ async {
       GROUP BY  M.SCID,D.MGNO,D.MINO,D.MUID
   """;
 
-  // printLongText(TYPE==101?sql2:sql);
+
+  printLongText(TYPE==101?sql2:sql);
   final rows = await dbClient!.rawQuery(TYPE==101?sql2:sql);
   // printLongText(rows.toString());
   return rows.map((m) => Bil_Mov_M_Local.fromMap(m)).toList();

@@ -622,59 +622,59 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                               ),
                               SizedBox(height: mediaQuery.size.height * 0.010,),
-                              // SizedBox(
-                              //   width: double.infinity,
-                              //   height: mediaQuery.size.height * 0.059,
-                              //   child: OutlinedButton.icon(
-                              //     // icon: Icon(Icons.refresh, color: Colors.red[800]),
-                              //     label: Text('StringDisplay_Version'.tr,
-                              //         style: TextStyle(color: Colors.red[800],
-                              //           fontSize: mediaQuery.size.width * 0.04,)),
-                              //     style: OutlinedButton.styleFrom(
-                              //       padding: const EdgeInsets.symmetric(vertical: 15),
-                              //       side: BorderSide(color: Colors.red[800]!),
-                              //       shape: RoundedRectangleBorder(
-                              //         borderRadius: BorderRadius.circular(25),
-                              //       ),
-                              //     ),
-                              //     onPressed:() {
-                              //       EasyLoading.instance
-                              //         ..displayDuration = const Duration(milliseconds: 2000)
-                              //         ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-                              //         ..loadingStyle = EasyLoadingStyle.custom
-                              //         ..indicatorSize = 45.0
-                              //         ..radius = 10.0
-                              //         ..progressColor = Colors.white
-                              //         ..backgroundColor = Colors.green
-                              //         ..indicatorColor = Colors.white
-                              //         ..textColor = Colors.white
-                              //         ..maskColor = Colors.blue.withOpacity(0.5)
-                              //         ..userInteractions = false
-                              //         ..dismissOnTap = false;
-                              //       EasyLoading.show(status: 'StringShow_Connent'.tr);
-                              //        controller.getIP();
-                              //      //controller.IPSERERController.text=5389;
-                              //      //controller.PORTController.text='5389';
-                              //       StringIP = '144.76.153.210';
-                              //       StringPort = '5389';
-                              //       print(StringIP);
-                              //       print(StringPort);
-                              //       controller.update();
-                              //       LoginController().SET_P('baseApi','http://$StringIP:$StringPort');
-                              //       LoginController().SET_P('API','http://$StringIP:$StringPort');
-                              //       LoginController().SET_P('IP','144.76.153.210');
-                              //       LoginController().SET_P('PORT','5389');
-                              //       UpdateMOB_VAR(8,'144.76.153.210');
-                              //       UpdateMOB_VAR(9,'5389');
-                              //       UpdateMOB_VAR(10,'http://$StringIP:$StringPort');
-                              //       controller.update();
-                              //       LoginController().SET_N_P('experimentalcopy',1);
-                              //       LoginController().SET_P('DeviceName', '123456');
-                              //       ApiProviderLogin().Socket_IP('144.76.153.210',5389);
-                              //       // ApiProviderLogin().TEST_API();
-                              //     },
-                              //   ),
-                              // ),
+                              SizedBox(
+                                width: double.infinity,
+                                height: mediaQuery.size.height * 0.059,
+                                child: OutlinedButton.icon(
+                                  // icon: Icon(Icons.refresh, color: Colors.red[800]),
+                                  label: Text('StringDisplay_Version'.tr,
+                                      style: TextStyle(color: Colors.red[800],
+                                        fontSize: mediaQuery.size.width * 0.04,)),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 15),
+                                    side: BorderSide(color: Colors.red[800]!),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                  onPressed:() {
+                                    EasyLoading.instance
+                                      ..displayDuration = const Duration(milliseconds: 2000)
+                                      ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+                                      ..loadingStyle = EasyLoadingStyle.custom
+                                      ..indicatorSize = 45.0
+                                      ..radius = 10.0
+                                      ..progressColor = Colors.white
+                                      ..backgroundColor = Colors.green
+                                      ..indicatorColor = Colors.white
+                                      ..textColor = Colors.white
+                                      ..maskColor = Colors.blue.withOpacity(0.5)
+                                      ..userInteractions = false
+                                      ..dismissOnTap = false;
+                                    EasyLoading.show(status: 'StringShow_Connent'.tr);
+                                     controller.getIP();
+                                   //controller.IPSERERController.text=5389;
+                                   //controller.PORTController.text='5389';
+                                    StringIP = '144.76.153.210';
+                                    StringPort = '5000';
+                                    print(StringIP);
+                                    print(StringPort);
+                                    controller.update();
+                                    LoginController().SET_P('baseApi','http://$StringIP:$StringPort');
+                                    LoginController().SET_P('API','http://$StringIP:$StringPort');
+                                  //  LoginController().SET_P('IP','144.76.153.210');
+                                  //  LoginController().SET_P('PORT','5389');
+                                  //  UpdateMOB_VAR(8,'144.76.153.210');
+                                  //  UpdateMOB_VAR(9,'5000');
+                                   // UpdateMOB_VAR(10,'http://$StringIP:$StringPort');
+                                    controller.update();
+                                    LoginController().SET_N_P('experimentalcopy',1);
+                                   // LoginController().SET_P('DeviceName', '123456');
+                                    ApiProviderLogin().Socket_IP('144.76.153.210',5000);
+                                    // ApiProviderLogin().TEST_API();
+                                  },
+                                ),
+                              ),
                             ],
                           )),
                     ],

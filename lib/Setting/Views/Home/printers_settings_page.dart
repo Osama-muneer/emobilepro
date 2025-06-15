@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import '../../../Widgets/colors.dart';
+import '../../../Widgets/theme_helper.dart';
 import '../../../database/setting_db.dart';
 import '../../controllers/login_controller.dart';
 import '../../controllers/setting_controller.dart';
@@ -30,12 +32,12 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
         title: Text("StrinSelect_Printer".tr,style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.redAccent,
         iconTheme: IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _showPrinterForm(),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.add),
+        //     onPressed: () => _showPrinterForm(),
+        //   ),
+        // ],
       ),
       body: GetBuilder<StteingController>(
           builder: (controller) {
@@ -86,6 +88,17 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
           },
         );
       }),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.MainColor,
+        onPressed: () {
+          _showPrinterForm();
+        },
+        label: Text(
+          'StringAdd'.tr,
+          style: ThemeHelper().buildTextStyle(context, Colors.white,'M'),
+        ),
+        icon: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
 
@@ -177,47 +190,46 @@ class _PrintersSettingsPageState extends State<PrintersSettingsPage> {
   }
                     },
                   ),
+                SizedBox(height: 10),
+                 Divider(height: 1, thickness: 1, color: Colors.grey),
+                SizedBox(height: 10),// Separator
+                            Text('طابعة : ${controller.selectedPrinter?.deviceName ?? "غير محدد"}'),
+                SizedBox(height: 10),
+                Divider(height: 1, thickness: 1, color: Colors.grey),
+                Row(
+                  children: [
+                    OutlinedButton(
+                                    onPressed: controller.selectedPrinter == null
+                                        ? null
+                                        : () async {
 
-                 Divider(height: 10, thickness: 3, color: const Color.fromARGB(255, 218, 218, 218)), // Separator
-                            Row(
-                children: [
-                  Text('طابعة : ${controller.selectedPrinter?.deviceName ?? "غير محدد"}'),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
+                                           // _printReceiveTest();
+                                            try {
+                                             controller.printTestTicket();
+                                            } catch (e) {
+                                              print(e);
+                                            }
+                                          },
+                                    child:  Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 18),
+                                      child: Text("StringTest".tr, textAlign: TextAlign.center,style:TextStyle(color: Colors.black)),
+                                    ),
+                                  ),
+                    SizedBox(width: 10),
+                    OutlinedButton(
                       onPressed: controller.defaultPrinterType == 'null'
                           ? null
                           : () {
-              controller.scan();
-              _showDeviceDialog();
-                          } ,
-                      child: Text('StringSEARCH'.tr,style:TextStyle(color: Colors.black)),
-                    ),
-                  ),
-                ],
-              ),
-             Divider(height: 10, thickness: 1, color: const Color.fromARGB(255, 218, 218, 218)), // Separator
-                OutlinedButton(
-                                onPressed: controller.selectedPrinter == null
-                                    ? null
-                                    : () async {
-
-                                       // _printReceiveTest();
-                                        try {
-                                         controller.printTestTicket();
-                                        } catch (e) {
-                                          print(e);
-                                        }
-                                      },
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 18),
-                                  child: Text("Print Test", textAlign: TextAlign.center,style:TextStyle(color: Colors.black)),
-                                ),
-                              )
-                // TextField(
-                //   controller: paperSizeController,
-                //   decoration: InputDecoration(labelText: 'عرض الورقة'),
-                // ),
+                        controller.scan();
+                        _showDeviceDialog();
+                      } ,
+                                    child:  Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 18),
+                                      child: Text("StringSEARCH".tr, textAlign: TextAlign.center,style:TextStyle(color: Colors.black)),
+                                    ),
+                                  ),
+                  ],
+                )
               ],
             ),
           ),
