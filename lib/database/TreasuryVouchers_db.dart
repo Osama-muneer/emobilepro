@@ -189,6 +189,7 @@ Future<int> UpdateACC_MOV_D(
 Future<int> UpdateACC_MOV_M(
     int GetAMKID,
     int GetAMMID,
+    int GetAMMST,
     String GetAMMDO,
     String GetPKID,
     int? GetACID,
@@ -207,6 +208,7 @@ Future<int> UpdateACC_MOV_M(
   var dbClient = await conn.database;
 
   final data = {
+    'AMMST': GetAMMST,
     'AMMDO': GetAMMDO,
     'PKID': GetPKID,
     'ACID': GetACID,
@@ -605,7 +607,7 @@ Future<int> UpdateStateACC_MOV_M(String TypeSync, String GETAMKID,
   String value = '';
   String SQL = '';
   if (TypeSync == 'SyncAll') {
-    value = GETAMKID != '0' ? 'AMMST!=1 AND AMKID=$GETAMKID' : 'AMMST!=1';
+    value = GETAMKID != '0' ? 'AMMST=2 AND AMKID=$GETAMKID' : 'AMMST=2';
     SQL = "UPDATE ACC_MOV_M SET AMMST=1 where $value";
   } else if (TypeSync == 'SyncOnly') {
     value = 'AMMST!=1 and AMMID=$GETAMMID';

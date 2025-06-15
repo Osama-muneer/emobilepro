@@ -625,7 +625,7 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                   ? 'StringNotfinal'.tr
                                                   : '${controller.ACC_MOV_M_List[index].AMMST}'
                                                   .toString() ==
-                                                  '3'
+                                                  '4'
                                                   ? 'StringPending'.tr
                                                   : 'Stringfinal'.tr,
                                               style: '${controller.ACC_MOV_M_List[index].AMMST}'
@@ -634,7 +634,7 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                   ? ThemeHelper().buildTextStyle(context, Colors.red,'M')
                                                   : '${controller.ACC_MOV_M_List[index].AMMST}'
                                                   .toString() ==
-                                                  '3'
+                                                  '4'
                                                   ? ThemeHelper().buildTextStyle(context, Colors.blueAccent,'M')
                                                   : ThemeHelper().buildTextStyle(context, Colors.green,'M')
                                           ),
@@ -737,16 +737,17 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                     Expanded(
                                       child: Column(
                                         children: [
-                                          '${controller.ACC_MOV_M_List[index].AMMST}' !=
-                                              '1'
+                                          '${controller.ACC_MOV_M_List[index].AMMST}' != '1'
                                               ? Expanded(
                                             child: IconButton(
                                               onPressed: () async {
                                                 if (controller
                                                     .ACC_MOV_M_List[index]
                                                     .AMMST
-                                                    .toString() ==
-                                                    '2') {
+                                                    .toString() == '2' ||controller
+                                                    .ACC_MOV_M_List[index]
+                                                    .AMMST
+                                                    .toString() == '4' ) {
                                                   controller.EditTreasury(
                                                       controller.ACC_MOV_M_List[
                                                       index]);
@@ -1051,8 +1052,8 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                             )
                                                 : Container(),
                                           ),
-                                          '${controller.ACC_MOV_M_List[index].AMMST}' !=
-                                              '1'
+                                          '${controller.ACC_MOV_M_List[index].AMMST}' ==
+                                              '2'
                                               ? Expanded(
                                             child: IconButton(
                                                 icon: Icon(
@@ -1089,7 +1090,9 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                   );
                                                 }),
                                           )
-                                              : Expanded(
+                                              : '${controller.ACC_MOV_M_List[index].AMMST}' == '4'
+                                              ? Expanded(child: Container()) :
+                                               Expanded(
                                             child: Padding(
                                               padding: EdgeInsets.only(
                                                   top: 0.002 * height),

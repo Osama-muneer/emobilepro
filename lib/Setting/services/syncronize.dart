@@ -2139,12 +2139,10 @@ class SyncronizationData {
     final dbClient = await conn.database;
     List<Acc_Mov_D_Local> ACC_MOV_DList = [];
     String SQLBIID_L = LoginController().BIID_ALL_V == '1'
-        ? " AND  BIID_L=${LoginController().BIID}" :  '';
-    String SQLBIID_L2 = LoginController().BIID_ALL_V == '1'
         ? " AND  A.BIID_L=${LoginController().BIID}" :  '';
 
-    String SQL2 = ''' AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} 
-                  AND CIID_L=${LoginController().CIID} $SQLBIID_L''';
+    String SQL2 = ''' AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} 
+                  AND A.CIID_L=${LoginController().CIID} $SQLBIID_L''';
     String sqlAMKID='';
     if(GETAMKID=='1' || GETAMKID=='2' || GETAMKID=='3'){
       sqlAMKID=" AMKID=$GETAMKID  AND ";
@@ -2157,13 +2155,15 @@ class SyncronizationData {
     }
     try {
       if (TypeSync == "SyncAll") {
-        final maps = await dbClient!.query('ACC_MOV_D', where: '$sqlAMKID SYST_L=2 $SQL2');
+        final maps = await dbClient!.query('ACC_MOV_D A', where: '$sqlAMKID SYST_L=2 '
+            ' AND EXISTS(SELECT 1 FROM ACC_MOV_M B WHERE B.AMMST!=4  AND B.AMMID=A.AMMID) $SQL2');
         for (var item in maps) {
           ACC_MOV_DList.add(Acc_Mov_D_Local.fromMap(item));
         }
       }
       else if (TypeSync == "SyncOnly") {
-        final maps = await dbClient!.query('ACC_MOV_D', where: '  AMMID=$GETAMMID');
+        final maps = await dbClient!.query('ACC_MOV_D A', where: '  A.AMMID=$GETAMMID '
+            ' AND EXISTS(SELECT 1 FROM ACC_MOV_M B WHERE B.AMMST!=4  AND B.AMMID=A.AMMID) $SQL2');
         print('maps');
         print(maps);
         for (var item in maps) {
@@ -2176,9 +2176,7 @@ class SyncronizationData {
         " EXISTS(SELECT 1 FROM ACC_MOV_M B WHERE "
             " strftime('%Y-%m-%d', substr(B.AMMDOR, 7, 4) || '-' || substr(B.AMMDOR, 4, 2) || '-' || substr(B.AMMDOR, 1, 2))"
             " BETWEEN '$GetFromDate' AND '$GetToDate' AND B.AMMST=$GETAMMST "
-            " and B.AMMID=A.AMMID) AND "
-            " A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} "
-            " AND A.CIID_L=${LoginController().CIID} $SQLBIID_L2 ";
+            " and B.AMMID=A.AMMID)  $SQL2 ";
         final maps = await dbClient!.query('ACC_MOV_D A', where: whereByDate);
         for (var item in maps) {
           ACC_MOV_DList.add(Acc_Mov_D_Local.fromMap(item));
@@ -2343,8 +2341,6 @@ class SyncronizationData {
     List<Acc_Mov_M_Local> ACC_MOV_MList = [];
     String SQLBIID_L = LoginController().BIID_ALL_V == '1'
         ? " AND  BIID_L=${LoginController().BIID}" :  '';
-    String SQLBIID_L2 = LoginController().BIID_ALL_V == '1'
-        ? " AND  A.BIID_L=${LoginController().BIID}" :  '';
 
     String SQL2 = ''' AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} 
                   AND CIID_L=${LoginController().CIID} $SQLBIID_L''';
@@ -2360,13 +2356,13 @@ class SyncronizationData {
     }
     try {
       if (TypeSync == "SyncAll") {
-        final maps = await dbClient!.query('ACC_MOV_M', where: '$sqlAMKID  AMMST!=1 $SQL2');
+        final maps = await dbClient!.query('ACC_MOV_M', where: '$sqlAMKID  AMMST=2 $SQL2');
         for (var item in maps) {
           ACC_MOV_MList.add(Acc_Mov_M_Local.fromMap(item));
         }
       }
       else if (TypeSync == "SyncOnly") {
-        final maps = await dbClient!.query('ACC_MOV_M', where: ' AMMID=$GETAMMID');
+        final maps = await dbClient!.query('ACC_MOV_M', where: ' AMMID=$GETAMMID  $SQL2');
         for (var item in maps) {
           ACC_MOV_MList.add(Acc_Mov_M_Local.fromMap(item));
         }
@@ -2391,6 +2387,7 @@ class SyncronizationData {
       bool TypeAuto,GETAMMST,GetFromDate, GetToDate)
   async {
     for (var i = 0; i < Acc_Mov_MList.length; i++) {
+      print('SyncACC_MOV_MToSystem');
       var data = {
         "AMKID": Acc_Mov_MList[i].AMKID.toString()=='3'?'1':Acc_Mov_MList[i].AMKID.toString(),
         "AMMID": Acc_Mov_MList[i].AMMID.toString(),
