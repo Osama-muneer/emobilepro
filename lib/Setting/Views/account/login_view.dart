@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../Services/ApiService.dart';
 import '../../../Widgets/colors.dart';
 import '../../controllers/login_controller.dart';
 import '../../controllers/setting_controller.dart';
@@ -217,7 +218,17 @@ class _LoginViewState extends State<LoginView> {
                   LoginController().SET_P('IP',controller.IPSERERController.text);
                   LoginController().SET_P('PORT',controller.PORTController.text);
                 });
-                ApiProviderLogin().Socket_IP(controller.IPSERERController.text,int.parse(controller.PORTController.text));
+                await ApiService().connectSocket(controller.IPSERERController.text
+                    ,int.parse(controller.PORTController.text),onSuccess: () {
+                  // العمليات التي تتم بعد نجاح الاتصال
+                  print("Connection to Socket successful!");
+                  print("Success");
+                  ApiProviderLogin().TEST_API();
+                  //getImge();
+                  LoginController().SET_B_P('InstallData',false);
+                });
+                ApiProviderLogin().Socket_IP(controller.IPSERERController.text
+                    ,int.parse(controller.PORTController.text));
                 // ApiProviderLogin().TEST_API();
               },
             ),

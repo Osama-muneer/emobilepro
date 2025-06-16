@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/get_utils.dart';
+import '../Widgets/snack_bar.dart';
 import 'enums_networking.dart';
 
 class ApiResult {
@@ -53,9 +54,9 @@ class ApiResult {
       if (error != null) {
         error(this);
       } else {
-        // CustomSnackBar.showCustomErrorSnackBar(
-        //   message: message,
-        // );
+        CustomSnackBar.showCustomErrorSnackBar(
+          message: message,
+        );
       }
     }
   }

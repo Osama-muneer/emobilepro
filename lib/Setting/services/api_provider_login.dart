@@ -272,6 +272,7 @@ class ApiProviderLogin {
       print("Exception on Socket "+error.toString());
     });
   }
+
   //TEST API
   Future<dynamic> TEST_API() async {
     var url = "${LoginController().baseApi}/ESAPI/ESINF";
@@ -351,8 +352,6 @@ class ApiProviderLogin {
       return Future.error("DioError: ${e.message}");
     }
   }
-
-
 
   Future<dynamic> TEST_API_CONN() async {
     var url = "${LoginController().baseApi}/ESAPI/ESINF";
@@ -907,7 +906,6 @@ class ApiProviderLogin {
     }
   }
 
-
   //التحكم بالوصول
   Future<dynamic> getAllCON_ACC_M() async {
     var url = "${LoginController().baseApi}/ESAPI/ESGET";
@@ -955,7 +953,6 @@ class ApiProviderLogin {
       return Future.error("DioError: ${e.message}");
     }
   }
-
 
   ////القراءات
   Future<dynamic> getAllCOU_RED_M() async {

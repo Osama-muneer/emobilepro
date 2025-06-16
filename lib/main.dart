@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'Services/GlobalErrorHandler.dart';
 import 'Setting/controllers/login_controller.dart';
 import 'Setting/controllers/setting_controller.dart';
 import 'Widgets/config.dart';
@@ -18,6 +19,7 @@ void main() async {
   //await FlutterBackgroundService.initialize(onStart);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
   await dep.init();
+ // GlobalErrorHandler.init();
    runApp(MainApp());
 }
 

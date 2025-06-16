@@ -6,7 +6,6 @@ import 'LogMobService.dart';
 class ToastService {
   ToastService._(); // Private constructor
 
-
   /// Show a toast and record the event in the database.
   static Future<void> show(
       String message, {
@@ -63,4 +62,5 @@ class ToastService {
       type: LogType.ERR,
     );
   }
+
 }
