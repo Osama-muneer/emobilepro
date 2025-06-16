@@ -1538,6 +1538,7 @@ SaveBIF_GRO(Bif_Gro_Local BIF_GRO) async {
   final res = await dbClient!.insert('BIF_GRO_TMP', BIF_GRO.toMap());
   return res;
 }
+
 SaveBIF_GRO2(Bif_Gro2_Local BIF_GRO2) async {
   var dbClient = await conn.database;
   final res = await dbClient!.insert('BIF_GRO2_TMP', BIF_GRO2.toMap());
@@ -1714,6 +1715,12 @@ SaveCOU_RED(Cou_Red_Local COU_RED) async {
 SaveCOU_RED_M(Cou_Red_Local COU_RED) async {
   var dbClient = await conn.database;
   final res = await dbClient!.insert('COU_RED', COU_RED.toMap());
+  return res;
+}
+
+SaveDate(T,TAB_N) async {
+  var dbClient = await conn.database;
+  final res = await dbClient!.insert(TAB_N, T.toMap());
   return res;
 }
 

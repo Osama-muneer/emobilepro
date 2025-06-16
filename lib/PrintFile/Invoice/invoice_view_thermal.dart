@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
+import '../../Widgets/Tafqeet.dart';
 import '../invoice_controller.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
@@ -595,7 +596,7 @@ taxTikcetReportThermal({
                             padding: const EdgeInsets.only(right: 1, left: 1),
                            // decoration: const BoxDecoration(color: PdfColors.grey200),
                             child: SimplePdf.text(
-                              "${Tafqeet.convert(item.BMMMT.toString())} ${item.SCNA_D.toString()}",
+                              "${Tafqeet2.convert(item.BMMMT.toString(),currency: item.SCSY.toString())} ${item.SCNA_D.toString()}",
                               ttf, fontSize: FontSize, color: PdfColors.black,
                             ),
                           ),

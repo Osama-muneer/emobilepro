@@ -75,7 +75,7 @@ class MobLogDatabase {
     );
     await insertMobLog(entry);
     final formatted = DateFormat('dd-MM-yyyy HH:mm').format(timestamp);
-    await type.showToast('[$formatted] $detail');
+   // await type.showToast('[$formatted] $detail');
   }
 
   /// جلب جميع السجلات

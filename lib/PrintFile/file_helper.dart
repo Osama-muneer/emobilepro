@@ -99,7 +99,6 @@ class FileHelper {
     }
   }
 
-
   /// يحول الصفحة الأولى من ملف PDF إلى صورة PNG ويعيد بايتاتها
   static Future<Uint8List?> _pdfPageToPngBytes(String pdfPath) async {
     final pdf = PdfImageRenderer(path: pdfPath);
@@ -189,7 +188,7 @@ class FileHelper {
   }
 
   // 3) إعادة استخدام دوال تحويل PDF إلى صور
-  static Future<void> _renderAndPrintPdfViaBluetooth(String path) async {
+  static Future<void> _renderAndPrintPdfViaBluetooth2(String path) async {
     final pdf = PdfImageRenderer(path: path);
     await pdf.open();
 
@@ -227,6 +226,106 @@ class FileHelper {
     }
 
     await pdf.close();
+  }
+  static Future<void> _renderAndPrintPdfViaBluetooth(String path) async {
+    try {
+      final pdf = PdfImageRenderer(path: path);
+      await pdf.open();
+
+      const int pageIndex = 0;
+      await pdf.openPage(pageIndex: pageIndex);
+      final size = await pdf.getPageSize(pageIndex: pageIndex);
+
+      // نرسم كامل الصفحة كصورة واحدة عالية الدقة
+      final Uint8List? img = await pdf.renderPage(
+        pageIndex: pageIndex,
+        x: 0,
+        y: 0,
+        width: size.width,
+        height: size.height,
+        scale: 2.5,
+      );
+
+      if (img != null) {
+        final decodedImg = im.decodeImage(img);
+        if (decodedImg != null) {
+          final tempDir = await getTemporaryDirectory();
+          final tempImagePath = '${tempDir.path}/full_page.png';
+
+          await File(tempImagePath).writeAsBytes(im.encodePng(decodedImg));
+
+          // طباعة الصورة
+          await bluetooth.printImage(tempImagePath);
+          await Future.delayed(const Duration(milliseconds: 500)); // تأخير بسيط
+        } else {
+          _showToast("فشل في تحليل الصورة", success: false);
+        }
+      } else {
+        _showToast("لم يتمكن من تحويل PDF إلى صورة", success: false);
+      }
+
+      await pdf.close();
+    } catch (e, st) {
+      printLongText('Error _renderAndPrintPdfViaBluetooth: $e');
+      _showErrorToast(e, st);
+    }
+  }
+  static Future<void> _renderAndPrintPdfViaBluetooth3(String path) async {
+    try {
+      final pdf = PdfImageRenderer(path: path);
+      await pdf.open();
+
+      const pageIndex = 0;
+      await pdf.openPage(pageIndex: pageIndex);
+      final size = await pdf.getPageSize(pageIndex: pageIndex);
+
+      final Uint8List? img = await pdf.renderPage(
+        pageIndex: pageIndex,
+        x: 0,
+        y: 0,
+        width: size.width,
+        height: size.height,
+        scale: 2.5,
+      );
+
+      if (img != null) {
+        final fullImage = im.decodeImage(img);
+        if (fullImage == null) {
+          _showToast("فشل في تحليل الصورة", success: false);
+          return;
+        }
+
+        const int sliceHeight = 300; // يمكنك زيادتها حسب قدرة الطابعة
+        int y = 0;
+        int sliceIndex = 0;
+
+        while (y < fullImage.height) {
+          int height = (y + sliceHeight > fullImage.height)
+              ? fullImage.height - y
+              : sliceHeight;
+
+          final slice = im.copyCrop(fullImage, 0, y, fullImage.width, height);
+
+          final tempDir = await getTemporaryDirectory();
+          final tempImagePath = '${tempDir.path}/slice_$sliceIndex.png';
+          await File(tempImagePath).writeAsBytes(im.encodePng(slice));
+          await bluetooth.printImage(tempImagePath);
+          await Future.delayed(const Duration(milliseconds: 300));
+
+          y += sliceHeight;
+          sliceIndex++;
+        }
+
+        _showToast("تمت الطباعة بنجاح!", success: true);
+      } else {
+        _showToast("لم يتمكن من تحويل PDF إلى صورة", success: false);
+      }
+
+      await pdf.close();
+    } catch (e, st) {
+      printLongText('Error _renderAndPrintPdfViaBluetooth: $e');
+      _showErrorToast(e, st);
+    }
   }
 
 

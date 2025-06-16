@@ -10,12 +10,13 @@ class ToastService {
   static Future<void> show(
       String message, {
         ToastGravity gravity = ToastGravity.BOTTOM,
-        Toast toastLength = Toast.LENGTH_SHORT,
+        Toast toastLength = Toast.LENGTH_LONG,
         Color? backgroundColor,
         Color? textColor,
         int timeInSecForIosWeb = 2,
         LogType type = LogType.INF,
       }) async {
+   // await Fluttertoast.cancel();
     // Display the toast
     await Fluttertoast.showToast(
       msg: message,
@@ -52,7 +53,7 @@ class ToastService {
   static Future<void> showError(
       String message, {
         ToastGravity gravity = ToastGravity.BOTTOM,
-        Toast toastLength = Toast.LENGTH_SHORT,
+        Toast toastLength = Toast.LENGTH_LONG,
       }) {
     return show(
       message,

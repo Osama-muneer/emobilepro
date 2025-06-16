@@ -867,11 +867,7 @@ class _LoginViewState extends State<LoginView> {
       _isFingerprintEnabled = prefs.getBool('fingerprint') ?? false;
     });
   }
-
-
-
 }
-
 
 class LoginView3 extends StatelessWidget {
 

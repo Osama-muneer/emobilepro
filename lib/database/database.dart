@@ -4,6 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../Services/ErrorHandlerService.dart';
+import '../Services/ToastService.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/controllers/setting_controller.dart';
 import '../Widgets/config.dart';
@@ -1042,7 +1044,6 @@ CREATE TABLE CON_ACC_M (
     ''');
     }
   }
-
 
   Future onCreate(Database db, int dbversion) async {
 
@@ -6781,7 +6782,7 @@ CREATE TABLE SYS_REP(
   }
 
   Future onUpgrade(Database db, int oldversion,int newversion)async{
-    try{
+    await ErrorHandlerService.run(() async {
       var batch = db.batch();
 
       if (oldversion == 1) {
@@ -12263,15 +12264,15 @@ TTLID     INTEGER,
 
 
       await batch.commit();
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "onUpgrade Database from ${oldversion} to ${newversion} -${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("onUpgrade Database from ${oldversion} to ${newversion} -${e.toString()}");
-      return false;
-    }
+
+
+
+      },Err: 'onUpgrade Database from ${oldversion} to ${newversion} -');
+    // } catch (e) {
+    //   await ToastService.showError("onUpgrade Database from ${oldversion} to ${newversion} -${e.toString()}");
+    //   print("onUpgrade Database from ${oldversion} to ${newversion} -${e.toString()}");
+    //   return false;
+    // }
   }
 
   Future OnUpgradeV446 (Database db) async{
