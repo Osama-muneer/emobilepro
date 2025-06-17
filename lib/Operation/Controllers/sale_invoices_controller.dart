@@ -4774,12 +4774,8 @@ class Sale_Invoices_Controller extends GetxController {
           if (((BMKID == 11 || BMKID == 12) && BPPR == 1) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
                   BMKID == 10) && BCPR == 1)) {
-            if (MAT_PRI
-                .elementAt(0)
-                .MPS1! > 0) {
-              MPS1 = MAT_PRI
-                  .elementAt(0)
-                  .MPS1;
+            if (MAT_PRI.elementAt(0).MPS1! > 0) {
+              MPS1 = MAT_PRI.elementAt(0).MPS1;
               BMDAMController.text = MAT_PRI
                   .elementAt(0)
                   .MPS1
