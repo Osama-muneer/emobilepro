@@ -15,7 +15,7 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper.internal();
   factory DatabaseHelper() => instance;
   final  dbname = DBNAME;
-  final dbversion = 17;
+  final dbversion = 18;
 
   Future<Database?> get database async {
     if (_database != null) {
