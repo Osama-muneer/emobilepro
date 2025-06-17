@@ -6549,7 +6549,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
-
   Future<InventoryDataGridSource> getInventoryDataSource() async {
     var InvoicesList = await GET_BIL_MOV_D(
         BMKID==11 || BMKID==12?'BIF_MOV_D':'BIL_MOV_D',
@@ -7228,7 +7227,6 @@ class Sale_Invoices_Controller extends GetxController {
     }
     return true;
   }
-
 
   //اضافة الاصناف التابعة والمرتبطة
   Future ADD_MAT_FOL_TO_MOV_D(String GETBIID, String GETMGNO, String GETMINO, int GETBMDID) async {
