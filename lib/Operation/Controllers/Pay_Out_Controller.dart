@@ -1836,319 +1836,321 @@ class Pay_Out_Controller extends GetxController {
         double height = MediaQuery.of(context).size.height;
         return GetBuilder<Pay_Out_Controller>(
             init: Pay_Out_Controller(),
-            builder: ((controller) =>Form(
-              key: ADD_EDformKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  //mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(0.02*height),
-                          topLeft: Radius.circular(0.02*height),
-                        ),
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(0.02*height),
-                                topLeft: Radius.circular(0.02*height),
-                              ),
-                              color: Colors.grey,
-                            ),
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 0.01 * height),
-                            child: Center(
-                              child: Text(titleAddScreen,
-                                  style: ThemeHelper().buildTextStyle(context, Colors.white,'L')),
-                            ),
+            builder: ((controller) => SafeArea(
+              child: Form(
+                key: ADD_EDformKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    //mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(0.02*height),
+                            topLeft: Radius.circular(0.02*height),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(right: 0.05 * width,left:0.05 * width),
-                            child: Column(
-                              children: [
-                                if(AMKID==15)
-                                  Card(
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(0.02*width),
-                                    ),
-                                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                                    child: Container(
-                                        width: double.infinity,
-                                        color: Colors.white,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                          children: <Widget>[
-                                            Row(children: [
-                                              Switch(
-                                                value: Debit,
-                                                activeColor: AppColors.MainColor,
-                                                onChanged: (value) {
-                                                  Repeatingedit!=true ?
-                                                  setState(() {
-                                                    Debit=value;
-                                                    if(value==true){
-                                                      Credit=false;
-                                                    }
-                                                    else{
-                                                      Credit=true;
-                                                    }
-                                                  }):
-                                                  false;
-                                                },
-                                              ),
-                                              ThemeHelper().buildText(context,'StringAMDMD', Colors.black,'M'),
-                                            ],),
-                                            Row(children: [
-                                              Switch(
-                                                value: Credit,
-                                                activeColor: AppColors.MainColor,
-                                                onChanged: (value) {
-                                                  Repeatingedit!=true ?
-                                                  setState(() {
-                                                    Credit=value;
-                                                    if(value==true){
-                                                      Debit=false;
-                                                    }
-                                                    else{
-                                                      Debit=true;
-                                                    }
-                                                  }):false;
-                                                },
-                                              ),
-                                              ThemeHelper().buildText(context,'StringAMDDA', Colors.black,'M'),
-                                            ],),
-                                          ],
-                                        )
-                                    ),
-                                  ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Autocomplete<Acc_Acc_Local>(
-                                        optionsBuilder: (TextEditingValue textEditingValue) {
-                                          return autoCompleteData
-                                              .where((Acc_Acc_Local county) =>
-                                              county.AANA_D.toString().toLowerCase().contains(textEditingValue.text.toLowerCase())).toList();
-                                        },  displayStringForOption:
-                                          (Acc_Acc_Local option) =>
-                                      AANAController.text == '' ? '' : option.AANA_D.toString(),
-                                        fieldViewBuilder: (BuildContext context,
-                                            textEditingController,
-                                            FocusNode myFocus,
-                                            VoidCallback onFieldSubmitted) {
-                                          _autocompleteFocusNode = myFocus;
-                                          return AANAController.text ==
-                                              '' ? TextFormField(
-                                            controller: textEditingController,
-                                            focusNode: myFocus,
-                                            validator: (v) {
-                                              return validateAANO(v!);
-                                            },
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                            textAlign: TextAlign.center,
-                                            decoration:  InputDecoration(
-                                              labelText: 'StringAccount'.tr,
-                                            ),
-                                          )
-                                              : TextFormField(
-                                            controller:
-                                            AANAController,
-                                            validator: (v) {
-                                              return validateAANO(v!);
-                                            },
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                            textAlign: TextAlign.center,
-                                            decoration: InputDecoration(
-                                              suffixIcon: IconButton(
-                                                icon: const Icon(
-                                                  Icons.clear,
-                                                  color: Colors.black,
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(0.02*height),
+                                  topLeft: Radius.circular(0.02*height),
+                                ),
+                                color: Colors.grey,
+                              ),
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 0.01 * height),
+                              child: Center(
+                                child: Text(titleAddScreen,
+                                    style: ThemeHelper().buildTextStyle(context, Colors.white,'L')),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 0.05 * width,left:0.05 * width),
+                              child: Column(
+                                children: [
+                                  if(AMKID==15)
+                                    Card(
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(0.02*width),
+                                      ),
+                                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                                      child: Container(
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: <Widget>[
+                                              Row(children: [
+                                                Switch(
+                                                  value: Debit,
+                                                  activeColor: AppColors.MainColor,
+                                                  onChanged: (value) {
+                                                    Repeatingedit!=true ?
                                                     setState(() {
-                                                      textEditingController.text = "";
-                                                      AANAController.clear();
-                                                      SelectDataAANO='';
-                                                      myFocus.requestFocus();
-                                                    });
-                                                  });
-                                                },
-                                              ),
-                                              icon: IconButton(
-                                                icon: const Icon(
-                                                  Icons.error,
-                                                  color: Colors.black,
+                                                      Debit=value;
+                                                      if(value==true){
+                                                        Credit=false;
+                                                      }
+                                                      else{
+                                                        Credit=true;
+                                                      }
+                                                    }):
+                                                    false;
+                                                  },
                                                 ),
-                                                onPressed: () async{
-
-                                                  GET_BIL_ACC_C_P(SelectDataAANO.toString(),'','',SelectDataSCID.toString());
-                                                  await Future.delayed(const Duration(milliseconds: 100));
-                                                  buildShowBIL_ACC_C(context);
-                                                },
-                                              ),
-                                              labelText: 'StringAccount'.tr,
-                                            ),
-                                          );
-                                        },
-                                        onSelected: (Acc_Acc_Local selection) {
-                                          setState(() {
-                                            AANAController.text=selection.AANA_D.toString();
-                                            SelectDataAANO=selection.AANO.toString();
-                                            SelectDataAANO=selection.AANO.toString();
-                                            AACT=int.parse(selection.AACT.toString());
-                                            SCID_C=selection.SCID;
-                                            BIID_D=selection.BIID.toString();
-                                            SelectDataACNO_D=SelectDataACNO;
-                                            GETAANOCOUNT_P();
-                                            GET_AKID_P();
-                                            GET_BAL_P(AMMID.toString(),
-                                                selection.AANO.toString(),
-                                                SelectDataSCID.toString());
-                                            myFocusNode.requestFocus();
-                                          });
-                                        },
-                                        optionsViewBuilder: (BuildContext context,AutocompleteOnSelected<Acc_Acc_Local>
-                                        onSelected, Iterable<Acc_Acc_Local> options) {
-                                          return Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Container(
-                                              width: double.infinity,
-                                              height: (options.length * 100.0).clamp(150.0, 0.4 * MediaQuery.of(context).size.height),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                border: Border.all(color: Colors.grey),
-                                                borderRadius: BorderRadius.circular(8.0),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey.withOpacity(0.5),
-                                                    spreadRadius: 1,
-                                                    blurRadius: 5,
-                                                    offset: Offset(0, 3),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: ListView.builder(
-                                                itemCount: options.length,
-                                                itemBuilder:
-                                                    (BuildContext context, int index) {
-                                                  final Acc_Acc_Local option = options.elementAt(index);
-                                                  return GestureDetector(
-                                                    onTap: () {
-                                                      onSelected(option);
-                                                    },
-                                                    child: Center(
-                                                        child: Padding(
-                                                          padding: EdgeInsets.all(0.009 * height),
-                                                          child: Text(option.AANA_D.toString(),
-                                                              textAlign:
-                                                              TextAlign.center,
-                                                              style: const TextStyle(
-                                                                  color: Colors.black,
-                                                                  fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                        )),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                                ThemeHelper().buildText(context,'StringAMDMD', Colors.black,'M'),
+                                              ],),
+                                              Row(children: [
+                                                Switch(
+                                                  value: Credit,
+                                                  activeColor: AppColors.MainColor,
+                                                  onChanged: (value) {
+                                                    Repeatingedit!=true ?
+                                                    setState(() {
+                                                      Credit=value;
+                                                      if(value==true){
+                                                        Debit=false;
+                                                      }
+                                                      else{
+                                                        Debit=true;
+                                                      }
+                                                    }):false;
+                                                  },
+                                                ),
+                                                ThemeHelper().buildText(context,'StringAMDDA', Colors.black,'M'),
+                                              ],),
+                                            ],
+                                          )
                                       ),
                                     ),
-                                  ],
-                                ),
-                                TextFormField(
-                                  controller: AMDINController,
-                                  textAlign: TextAlign.center,
-                                  decoration: InputDecoration(
-                                      suffixIcon: IconButton(icon: Icon(Icons.error_outline),onPressed: (){
-                                        if(controller.GET_AMDIN.isNotEmpty){
-                                          buildShowDialogGET_AMDIN(context);
-                                        }
-                                      }),
-                                      labelText: 'StringDetails'.tr,
-                                      hintStyle: const TextStyle(
-                                          color: Colors.blue)),
-                                ),
-                                SizedBox(height: 0.02 * height),
-                                if( ValueAMMCC ||( Multi_CUR=='1' && AMKID==15))
-                                  Column(
+                                  Row(
                                     children: [
-                                      DropdownSYS_CUR2Builder(),
-                                      SizedBox(height: 0.02 * height),
-                                      // Padding(
-                                      //   padding:  EdgeInsets.only(right: 0.02 * height,left:0.02 * height,bottom:0.02 * height ),
-                                      //   child: Row(
-                                      //     crossAxisAlignment: CrossAxisAlignment.start,
-                                      //     children: [
-                                      //     Text("${'Stringexchangerate'.tr}    ${SCEX2}",
-                                      //               style: TextStyle(fontSize: 0.01 * height)),
-                                      //     ],
-                                      //   ),
-                                      // ),
+                                      Expanded(
+                                        child: Autocomplete<Acc_Acc_Local>(
+                                          optionsBuilder: (TextEditingValue textEditingValue) {
+                                            return autoCompleteData
+                                                .where((Acc_Acc_Local county) =>
+                                                county.AANA_D.toString().toLowerCase().contains(textEditingValue.text.toLowerCase())).toList();
+                                          },  displayStringForOption:
+                                            (Acc_Acc_Local option) =>
+                                        AANAController.text == '' ? '' : option.AANA_D.toString(),
+                                          fieldViewBuilder: (BuildContext context,
+                                              textEditingController,
+                                              FocusNode myFocus,
+                                              VoidCallback onFieldSubmitted) {
+                                            _autocompleteFocusNode = myFocus;
+                                            return AANAController.text ==
+                                                '' ? TextFormField(
+                                              controller: textEditingController,
+                                              focusNode: myFocus,
+                                              validator: (v) {
+                                                return validateAANO(v!);
+                                              },
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.center,
+                                              decoration:  InputDecoration(
+                                                labelText: 'StringAccount'.tr,
+                                              ),
+                                            )
+                                                : TextFormField(
+                                              controller:
+                                              AANAController,
+                                              validator: (v) {
+                                                return validateAANO(v!);
+                                              },
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.center,
+                                              decoration: InputDecoration(
+                                                suffixIcon: IconButton(
+                                                  icon: const Icon(
+                                                    Icons.clear,
+                                                    color: Colors.black,
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      setState(() {
+                                                        textEditingController.text = "";
+                                                        AANAController.clear();
+                                                        SelectDataAANO='';
+                                                        myFocus.requestFocus();
+                                                      });
+                                                    });
+                                                  },
+                                                ),
+                                                icon: IconButton(
+                                                  icon: const Icon(
+                                                    Icons.error,
+                                                    color: Colors.black,
+                                                  ),
+                                                  onPressed: () async{
+              
+                                                    GET_BIL_ACC_C_P(SelectDataAANO.toString(),'','',SelectDataSCID.toString());
+                                                    await Future.delayed(const Duration(milliseconds: 100));
+                                                    buildShowBIL_ACC_C(context);
+                                                  },
+                                                ),
+                                                labelText: 'StringAccount'.tr,
+                                              ),
+                                            );
+                                          },
+                                          onSelected: (Acc_Acc_Local selection) {
+                                            setState(() {
+                                              AANAController.text=selection.AANA_D.toString();
+                                              SelectDataAANO=selection.AANO.toString();
+                                              SelectDataAANO=selection.AANO.toString();
+                                              AACT=int.parse(selection.AACT.toString());
+                                              SCID_C=selection.SCID;
+                                              BIID_D=selection.BIID.toString();
+                                              SelectDataACNO_D=SelectDataACNO;
+                                              GETAANOCOUNT_P();
+                                              GET_AKID_P();
+                                              GET_BAL_P(AMMID.toString(),
+                                                  selection.AANO.toString(),
+                                                  SelectDataSCID.toString());
+                                              myFocusNode.requestFocus();
+                                            });
+                                          },
+                                          optionsViewBuilder: (BuildContext context,AutocompleteOnSelected<Acc_Acc_Local>
+                                          onSelected, Iterable<Acc_Acc_Local> options) {
+                                            return Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Container(
+                                                width: double.infinity,
+                                                height: (options.length * 100.0).clamp(150.0, 0.4 * MediaQuery.of(context).size.height),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  border: Border.all(color: Colors.grey),
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey.withOpacity(0.5),
+                                                      spreadRadius: 1,
+                                                      blurRadius: 5,
+                                                      offset: Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: ListView.builder(
+                                                  itemCount: options.length,
+                                                  itemBuilder:
+                                                      (BuildContext context, int index) {
+                                                    final Acc_Acc_Local option = options.elementAt(index);
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        onSelected(option);
+                                                      },
+                                                      child: Center(
+                                                          child: Padding(
+                                                            padding: EdgeInsets.all(0.009 * height),
+                                                            child: Text(option.AANA_D.toString(),
+                                                                textAlign:
+                                                                TextAlign.center,
+                                                                style: const TextStyle(
+                                                                    color: Colors.black,
+                                                                    fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                          )),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                P_COSM!='1' || ((P_COS1 =='4' ||   P_COS1 =='5') && (P_COS2 =='4' ||   P_COS2 =='5'))
-                                    ? Container() :  DropdownACC_COS_DBuilder(),
-                                AMKID==15?  Row(
-                                  children: [
-                                    ExpandedAMDMO(),
-                                    SizedBox(width: 0.08* width),
-                                    Expanded(
-                                        child: TextFormField(
-                                          controller: AMDEQSController,
-                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                          textAlign: TextAlign.center,
-                                          inputFormatters: [
-                                            //  FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
-                                            ThousandsSeparatorInputFormatter(),
-                                          ],
-                                          onChanged: (v){
-                                            if(v.isNotEmpty){
-                                              String sanitizedValue = v.replaceAll(',', '');
-                                              AMDEQController.text=sanitizedValue.toString();
-                                              if(AMKID==15 ){
-                                                SelectDataSCID2.toString()!='1'?
-                                                SCEX2=double.parse(AMDEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
-                                                update();
+                                  TextFormField(
+                                    controller: AMDINController,
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                        suffixIcon: IconButton(icon: Icon(Icons.error_outline),onPressed: (){
+                                          if(controller.GET_AMDIN.isNotEmpty){
+                                            buildShowDialogGET_AMDIN(context);
+                                          }
+                                        }),
+                                        labelText: 'StringDetails'.tr,
+                                        hintStyle: const TextStyle(
+                                            color: Colors.blue)),
+                                  ),
+                                  SizedBox(height: 0.02 * height),
+                                  if( ValueAMMCC ||( Multi_CUR=='1' && AMKID==15))
+                                    Column(
+                                      children: [
+                                        DropdownSYS_CUR2Builder(),
+                                        SizedBox(height: 0.02 * height),
+                                        // Padding(
+                                        //   padding:  EdgeInsets.only(right: 0.02 * height,left:0.02 * height,bottom:0.02 * height ),
+                                        //   child: Row(
+                                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                                        //     children: [
+                                        //     Text("${'Stringexchangerate'.tr}    ${SCEX2}",
+                                        //               style: TextStyle(fontSize: 0.01 * height)),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  P_COSM!='1' || ((P_COS1 =='4' ||   P_COS1 =='5') && (P_COS2 =='4' ||   P_COS2 =='5'))
+                                      ? Container() :  DropdownACC_COS_DBuilder(),
+                                  AMKID==15?  Row(
+                                    children: [
+                                      ExpandedAMDMO(),
+                                      SizedBox(width: 0.08* width),
+                                      Expanded(
+                                          child: TextFormField(
+                                            controller: AMDEQSController,
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            textAlign: TextAlign.center,
+                                            inputFormatters: [
+                                              //  FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
+                                              ThousandsSeparatorInputFormatter(),
+                                            ],
+                                            onChanged: (v){
+                                              if(v.isNotEmpty){
+                                                String sanitizedValue = v.replaceAll(',', '');
+                                                AMDEQController.text=sanitizedValue.toString();
+                                                if(AMKID==15 ){
+                                                  SelectDataSCID2.toString()!='1'?
+                                                  SCEX2=double.parse(AMDEQController.text)/double.parse(AMDMOController.text): SCEX2=1;
+                                                  update();
+                                                }
                                               }
-                                            }
-                                          },
-                                          decoration: InputDecoration(
-                                              hintText: AMDMOHintController.text.toString().replaceAll(regex, ''),
-                                              labelText: 'StringTotalequivalent'.tr,
-                                              hintStyle: const TextStyle(
-                                                  color: Colors.blue)),
-                                        )),
-                                  ],
-                                ): Row(
-                                  children: [
-                                    ExpandedAMDMO(),
-                                    SizedBox(width: 0.08* width),
-                                    ContainerSave(context, width, height, setState),
-                                  ],
-                                ),
-                                AMKID==15?ContainerSave(context, width, height, setState):Container(),
-
-                                SizedBox(height: 0.02* height),
-                              ],
+                                            },
+                                            decoration: InputDecoration(
+                                                hintText: AMDMOHintController.text.toString().replaceAll(regex, ''),
+                                                labelText: 'StringTotalequivalent'.tr,
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.blue)),
+                                          )),
+                                    ],
+                                  ): Row(
+                                    children: [
+                                      ExpandedAMDMO(),
+                                      SizedBox(width: 0.08* width),
+                                      ContainerSave(context, width, height, setState),
+                                    ],
+                                  ),
+                                  AMKID==15?ContainerSave(context, width, height, setState):Container(),
+              
+                                  SizedBox(height: 0.02* height),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             )));

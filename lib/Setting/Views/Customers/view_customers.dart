@@ -144,89 +144,91 @@ class _ViewCustomersState extends State<ViewCustomers> {
   void showCustomerActionsSheet(item) {
     Get.bottomSheet(
       Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              item.BCNA_D.toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black,'L')
-            ),
-            SizedBox(height: 10),
-            Divider(),
-
-            _buildActionItem(Icons.edit, "StringEdit_Client".tr, () {
-              Get.back();
-              controller.EditCustomer(item);
-              // TODO: تنفيذ تعديل العميل
-            //  Get.back();
-             // Navigator.of(context).pop(false);
-
-            }),
-            if(item.BCDL_L!=1)
-            _buildActionItem(Icons.delete, "StringDelete_Client".tr, () async {
-              Get.back();
-              await controller.CHECK_DELETE_BCID_P(item.AANO,item.BCID);
-              Get.defaultDialog(
-                title: 'StringMestitle'.tr,
-                middleText: 'StringDeleteMessage'.tr,
-                backgroundColor: Colors.white,
-                radius: 40,
-                textCancel: 'StringNo'.tr,
-                cancelTextColor: Colors.red,
-                textConfirm: 'StringYes'.tr,
-                confirmTextColor:
-                Colors.white,
-                onConfirm: () async {
-                  bool isValid =await controller.Delete_BIL_CUS_P(item.BCID, item.AANO);
-                  if (isValid) {
-                    controller.GET_BIL_CUS_P("DateNow");
-                  }
-                  Navigator.of(context).pop(false);
-                },
-                // barrierDismissible: false,
-              );
-              // TODO: تنفيذ حذف العميل
-            }),
-            _buildActionItem(Icons.receipt_long, "StringCustomer_account_statement".tr, () {
-              // TODO: تنفيذ كشف الحساب
-              Get.back();
-              Get.toNamed(Routes.Account_Statement, arguments: {
-                'TYPE': '2', // تمرير رقم الحساب
-                'AANA': item.BCNA_D, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
-                'AANO': item.AANO, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
-                'GUID': item.GUID, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
-                'BCTL': item.BCTL, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
-                'BCAD': item.BCAD, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
-              });
-            }),
-            _buildActionItem(Icons.file_copy, "StringAdd_customer_invoice".tr, () {
-              // TODO: تنفيذ فاتورة العميل
-              Get.back();
-              Get.toNamed(Routes.Sale_Invoices, arguments: {
-                'TYPE': '2', // تمرير رقم الحساب
-                'BCID': item.BCID.toString(), // تمرير رقم الحساب
-                'BCID2': "${item.BCID.toString()} +++ ${item.BCNA_D.toString()}", // تمرير رقم الحساب
-                'item': item, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
-              });
-
-            }),
-            _buildActionItem(Icons.call, "StringContact_the_customer".tr, () {
-              item.BCMO=item.BCMO==null?'0':item.BCMO.toString();
-              _callCustomer(item.BCMO); // استدعاء دالة الاتصال
-            }),
-            _buildActionItem(Icons.location_on, "StringCustomerLocation".tr, () {
-              item.BCLAT=item.BCLAT==null?'0':item.BCLAT.toString();
-              item.BCLON=item.BCLON==null?'0':item.BCLON.toString();
-              OpenCustomerLocation(double.parse(item.BCLAT),double.parse(item.BCLON));
-              // _callCustomer(item.BCMO); // استدعاء دالة الاتصال
-            }),
-
-          ],
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                item.BCNA_D.toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black,'L')
+              ),
+              SizedBox(height: 10),
+              Divider(),
+          
+              _buildActionItem(Icons.edit, "StringEdit_Client".tr, () {
+                Get.back();
+                controller.EditCustomer(item);
+                // TODO: تنفيذ تعديل العميل
+              //  Get.back();
+               // Navigator.of(context).pop(false);
+          
+              }),
+              if(item.BCDL_L!=1)
+              _buildActionItem(Icons.delete, "StringDelete_Client".tr, () async {
+                Get.back();
+                await controller.CHECK_DELETE_BCID_P(item.AANO,item.BCID);
+                Get.defaultDialog(
+                  title: 'StringMestitle'.tr,
+                  middleText: 'StringDeleteMessage'.tr,
+                  backgroundColor: Colors.white,
+                  radius: 40,
+                  textCancel: 'StringNo'.tr,
+                  cancelTextColor: Colors.red,
+                  textConfirm: 'StringYes'.tr,
+                  confirmTextColor:
+                  Colors.white,
+                  onConfirm: () async {
+                    bool isValid =await controller.Delete_BIL_CUS_P(item.BCID, item.AANO);
+                    if (isValid) {
+                      controller.GET_BIL_CUS_P("DateNow");
+                    }
+                    Navigator.of(context).pop(false);
+                  },
+                  // barrierDismissible: false,
+                );
+                // TODO: تنفيذ حذف العميل
+              }),
+              _buildActionItem(Icons.receipt_long, "StringCustomer_account_statement".tr, () {
+                // TODO: تنفيذ كشف الحساب
+                Get.back();
+                Get.toNamed(Routes.Account_Statement, arguments: {
+                  'TYPE': '2', // تمرير رقم الحساب
+                  'AANA': item.BCNA_D, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
+                  'AANO': item.AANO, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
+                  'GUID': item.GUID, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
+                  'BCTL': item.BCTL, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
+                  'BCAD': item.BCAD, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
+                });
+              }),
+              _buildActionItem(Icons.file_copy, "StringAdd_customer_invoice".tr, () {
+                // TODO: تنفيذ فاتورة العميل
+                Get.back();
+                Get.toNamed(Routes.Sale_Invoices, arguments: {
+                  'TYPE': '2', // تمرير رقم الحساب
+                  'BCID': item.BCID.toString(), // تمرير رقم الحساب
+                  'BCID2': "${item.BCID.toString()} +++ ${item.BCNA_D.toString()}", // تمرير رقم الحساب
+                  'item': item, // يمكنك تمرير اسم العميل أيضاً إن كنت بحاجة
+                });
+          
+              }),
+              _buildActionItem(Icons.call, "StringContact_the_customer".tr, () {
+                item.BCMO=item.BCMO==null?'0':item.BCMO.toString();
+                _callCustomer(item.BCMO); // استدعاء دالة الاتصال
+              }),
+              _buildActionItem(Icons.location_on, "StringCustomerLocation".tr, () {
+                item.BCLAT=item.BCLAT==null?'0':item.BCLAT.toString();
+                item.BCLON=item.BCLON==null?'0':item.BCLON.toString();
+                OpenCustomerLocation(double.parse(item.BCLAT),double.parse(item.BCLON));
+                // _callCustomer(item.BCMO); // استدعاء دالة الاتصال
+              }),
+          
+            ],
+          ),
         ),
       ),
     );

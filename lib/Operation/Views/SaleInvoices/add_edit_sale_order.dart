@@ -85,12 +85,12 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
   @override
   void initState() {
     // TODO: implement initState
-    if(controller.isTablet){
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    }
+    // if(controller.isTablet){
+    //   SystemChrome.setPreferredOrientations([
+    //     DeviceOrientation.landscapeLeft,
+    //     DeviceOrientation.landscapeRight,
+    //   ]);
+    // }
     SearchBarDemoHomeState();
     super.initState();
   }
@@ -340,7 +340,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                         controller.GET_MAT_INF_DATE(controller.MAT_GRO[index].MGNO.toString(),
                                             controller.SelectDataSCID.toString(),controller.SelectDataBIID.toString(),controller.BCPR!);
                                         controller.update();
-
+              
                                       },
                                       style:  controller.MAT_GRO[index].MGNO.toString()==controller.SelectDataMGNO?
                                       TextButton.styleFrom(
@@ -476,7 +476,7 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                                                   ,controller.MAT_INF_DATE[index].MGNO.toString(),
                                                   controller.MAT_INF_DATE[index].MINO.toString(),
                                                   controller.MAT_INF_DATE[index].MUID!),
-
+              
                                               builder: (BuildContext context, AsyncSnapshot<List<Bil_Mov_D_Local>> snapshot) {
                                                 if (!snapshot.hasData || snapshot.data!.length==0 ) {
                                                   return Container();
@@ -523,18 +523,20 @@ class _Add_Edit_Sale_InvoiceState extends State<Add_Edit_Sale_order> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        "${'StrinCount_SMDFN'.tr}  ${controller.BMMAMController.text.isEmpty ? controller.BMMAMController.text = '0' : controller.formatter.format(double.parse(controller.BMMAMController.text))}",
-                        style: ThemeHelper().buildTextStyle(context, Colors.red, 'M'),
-                      ),
-                      Text(
-                        "${'StringNet_Amount'.tr}  ${controller.BMMAMTOTController.text.isEmpty ? controller.BMMAMTOTController.text = '0' : controller.formatter.format(double.parse(controller.BMMAMTOTController.text))}",
-                        style: ThemeHelper().buildTextStyle(context, Colors.red, 'M'),
-                      ),
-                    ],
+                  child: SafeArea(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          "${'StrinCount_SMDFN'.tr}  ${controller.BMMAMController.text.isEmpty ? controller.BMMAMController.text = '0' : controller.formatter.format(double.parse(controller.BMMAMController.text))}",
+                          style: ThemeHelper().buildTextStyle(context, Colors.red, 'M'),
+                        ),
+                        Text(
+                          "${'StringNet_Amount'.tr}  ${controller.BMMAMTOTController.text.isEmpty ? controller.BMMAMTOTController.text = '0' : controller.formatter.format(double.parse(controller.BMMAMTOTController.text))}",
+                          style: ThemeHelper().buildTextStyle(context, Colors.red, 'M'),
+                        ),
+                      ],
+                    ),
                   ),
                 )),
               )

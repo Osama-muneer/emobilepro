@@ -153,57 +153,59 @@ class _SyncViewState extends State<SyncView> {
           ),
           body: GetBuilder<SyncController>(
               init: SyncController(),
-              builder: ((value) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(padding: EdgeInsets.only(top: 0.02 * height),
-                                  child: Column(
-                                    children: [
-                                      Stack(
-                                        alignment: AlignmentDirectional.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 0.3 * width,
-                                            height:  0.15 * height,
-                                            child: CircularProgressIndicator(
-                                              backgroundColor: Colors.grey,
-                                              color: Colors.green,
-                                              strokeWidth: 6,
-                                              value: controller.cireclValue,
+              builder: ((value) => SafeArea(
+                child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(padding: EdgeInsets.only(top: 0.02 * height),
+                                    child: Column(
+                                      children: [
+                                        Stack(
+                                          alignment: AlignmentDirectional.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 0.3 * width,
+                                              height:  0.15 * height,
+                                              child: CircularProgressIndicator(
+                                                backgroundColor: Colors.grey,
+                                                color: Colors.green,
+                                                strokeWidth: 6,
+                                                value: controller.cireclValue,
+                                              ),
                                             ),
-                                          ),
-                                          Center(child: buildMainProgress(context))
-                                        ],
-                                      ),
-                                      SizedBox(height:  0.01 * height),
-                                      Obx(() {
-                                        if (controller.loading.value == true) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                        return controller.PercentValue == 100
-                                            ? Text('StringSuccessfullySync'.tr, style:
-                                            ThemeHelper().buildTextStyle(context, Colors.green,'L'))
-                                            : controller.TypeSync == 0
-                                                ?  Text('${controller.LastSyncDate} ${'StringlastSync'.tr} ')
-                                                : controller.CheckSync == false
-                                                    ? ThemeHelper().buildText(context,'StringStopSync', Colors.red,'L')
-                                                    : ThemeHelper().buildText(context,'StringWeAreSync', Colors.black,'L');
-                                      })
-                                    ],
+                                            Center(child: buildMainProgress(context))
+                                          ],
+                                        ),
+                                        SizedBox(height:  0.01 * height),
+                                        Obx(() {
+                                          if (controller.loading.value == true) {
+                                            return const Center(
+                                              child: CircularProgressIndicator(),
+                                            );
+                                          }
+                                          return controller.PercentValue == 100
+                                              ? Text('StringSuccessfullySync'.tr, style:
+                                              ThemeHelper().buildTextStyle(context, Colors.green,'L'))
+                                              : controller.TypeSync == 0
+                                                  ?  Text('${controller.LastSyncDate} ${'StringlastSync'.tr} ')
+                                                  : controller.CheckSync == false
+                                                      ? ThemeHelper().buildText(context,'StringStopSync', Colors.red,'L')
+                                                      : ThemeHelper().buildText(context,'StringWeAreSync', Colors.black,'L');
+                                        })
+                                      ],
+                                    ),
                                   ),
-                                ),
-                        ],
-                      ),
-                      Expanded(
-                          child:
-                              SingleChildScrollView(child: buildSyncListView())),
-                    ],
-                  ))),
+                          ],
+                        ),
+                        Expanded(
+                            child:
+                                SingleChildScrollView(child: buildSyncListView())),
+                      ],
+                    ),
+              ))),
         ),
       ),
     );

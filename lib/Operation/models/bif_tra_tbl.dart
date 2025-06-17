@@ -1,6 +1,6 @@
 import '../../Setting/controllers/login_controller.dart';
 
-class BIF_TRA_TBL_Local {
+class BIF_TRA_TAB_Local {
   int? BTTID;
   int? RSIDO;
   String? RTIDO;
@@ -18,8 +18,8 @@ class BIF_TRA_TBL_Local {
   int? BIID_L;
   int? SYID_L;
   String? CIID_L;
-  
-  BIF_TRA_TBL_Local({this.BTTID,this.RSIDO,this.RTIDO,this.RSIDN,this.RTIDN,this.GUIDF,this.GUID,
+
+  BIF_TRA_TAB_Local({this.BTTID,this.RSIDO,this.RTIDO,this.RSIDN,this.RTIDN,this.GUIDF,this.GUID,
      this.STMIDI,this.SOMIDI ,this.SUID,this.BTTST,this.DATEI,this.DEVI,
     this.JTID_L,this.SYID_L,this.BIID_L,this.CIID_L});
 
@@ -47,7 +47,7 @@ class BIF_TRA_TBL_Local {
     return map;
   }
 
-  BIF_TRA_TBL_Local.fromMap(Map<dynamic, dynamic> map) {
+  BIF_TRA_TAB_Local.fromMap(Map<dynamic, dynamic> map) {
     BTTID = map['BTTID'];
     RSIDO = map['RSIDO'];
     RTIDO = map['RTIDO'];
