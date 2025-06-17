@@ -377,7 +377,8 @@ class Sale_Invoices_Controller extends GetxController {
       BACLBD='',
       BACBNFN='0',
       BACLU='',
-      LastBAL_ACC_C='';
+      LastBAL_ACC_C='',
+      BPPRV='';
   int
   ADD_T = 1,
       SCSFL = 2,
@@ -449,6 +450,7 @@ class Sale_Invoices_Controller extends GetxController {
       BCPR2 = 1,
       BCCSP = 1,
       BPPR = 1,
+      BPPRT = 0,
       MIFR = 2,
       UPIN_BMDNF = 1,
       UPIN_Allow_give_Free_Pay_Cash = 1,
@@ -3510,6 +3512,8 @@ class Sale_Invoices_Controller extends GetxController {
     if (BOL_POI.isNotEmpty) {
       SelectDataBPID = BOL_POI.elementAt(0).BPID.toString();
       BPPR = BOL_POI.elementAt(0).BPPR;
+      BPPRT = BOL_POI.elementAt(0).BPPRT;
+      BPPRV = BOL_POI.elementAt(0).BPPRV.toString();
       BCPR = BOL_POI.elementAt(0).BPPR;
       PKIDL = BOL_POI.elementAt(0).PKIDL;
       update();
@@ -4770,73 +4774,49 @@ class Sale_Invoices_Controller extends GetxController {
         BMDAMController.text = '0';
       } else {
         if (BMKID != 1 && BMKID != 2) {
+
           //جلب سعر البيع حسب العميل عن طريق حقل السعر من جدول العميل
-          if (((BMKID == 11 || BMKID == 12) && BPPR == 1) ||
-              ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
-                  BMKID == 10) && BCPR == 1)) {
+          if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 1  || BPPRT==1 && BPPRV.contains('<1>'))) ||
+              ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10) && BCPR == 1)) {
             if (MAT_PRI.elementAt(0).MPS1! > 0) {
               MPS1 = MAT_PRI.elementAt(0).MPS1;
-              BMDAMController.text = MAT_PRI
-                  .elementAt(0)
-                  .MPS1
-                  .toString();
+              BMDAMController.text = MAT_PRI.elementAt(0).MPS1.toString();
               update();
             } else {
               if (SelectDataSCID != SCID2) {
                 GET_MPS_P(GETMGNO, GETMINO, GETMUID);
               }
             }
-          } else if (((BMKID == 11 || BMKID == 12) && BPPR == 2) ||
+          } else if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 2  || BPPRT==1 && BPPRV.contains('<2>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
                   BMKID == 10) && BCPR == 2)) {
-            if (MAT_PRI
-                .elementAt(0)
-                .MPS2! > 0) {
-              MPS1 = MAT_PRI
-                  .elementAt(0)
-                  .MPS2;
-              BMDAMController.text = MAT_PRI
-                  .elementAt(0)
-                  .MPS2
-                  .toString();
+            if (MAT_PRI.elementAt(0).MPS2! > 0) {
+              MPS1 = MAT_PRI.elementAt(0).MPS2;
+              BMDAMController.text = MAT_PRI.elementAt(0).MPS2.toString();
               update();
             } else {
               if (SelectDataSCID != SCID2) {
                 GET_MPS_P(GETMGNO, GETMINO, GETMUID);
               }
             }
-          } else if (((BMKID == 11 || BMKID == 12) && BPPR == 3) ||
+          } else if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 3  || BPPRT==1 && BPPRV.contains('<3>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
                   BMKID == 10) && BCPR == 3)) {
-            if (MAT_PRI
-                .elementAt(0)
-                .MPS3! > 0) {
-              MPS1 = MAT_PRI
-                  .elementAt(0)
-                  .MPS3;
-              BMDAMController.text = MAT_PRI
-                  .elementAt(0)
-                  .MPS3
-                  .toString();
+            if (MAT_PRI.elementAt(0).MPS3! > 0) {
+              MPS1 = MAT_PRI.elementAt(0).MPS3;
+              BMDAMController.text = MAT_PRI.elementAt(0).MPS3.toString();
               update();
             } else {
               if (SelectDataSCID != SCID2) {
                 GET_MPS_P(GETMGNO, GETMINO, GETMUID);
               }
             }
-          } else if (((BMKID == 11 || BMKID == 12) && BPPR == 4) ||
+          } else if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 4  || BPPRT==1 && BPPRV.contains('<4>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
                   BMKID == 10) && BCPR == 4)) {
-            if (MAT_PRI
-                .elementAt(0)
-                .MPS4! > 0) {
-              MPS1 = MAT_PRI
-                  .elementAt(0)
-                  .MPS4;
-              BMDAMController.text = MAT_PRI
-                  .elementAt(0)
-                  .MPS4
-                  .toString();
+            if (MAT_PRI.elementAt(0).MPS4! > 0) {
+              MPS1 = MAT_PRI.elementAt(0).MPS4;
+              BMDAMController.text = MAT_PRI.elementAt(0).MPS4.toString();
               update();
             } else {
               if (SelectDataSCID != SCID2) {
@@ -4854,46 +4834,18 @@ class Sale_Invoices_Controller extends GetxController {
       }
       update();
       //احتساب اقل سعر
-     ( BMKID == 1 || BMKID==2) ? MPLP = 0 : MAT_PRI
-          .elementAt(0)
-          .MPLT == 1 && MAT_PRI
-          .elementAt(0)
-          .MPLP! > 0
-          ? MPLP = roundDouble(MPS1! - (MPS1! * (MAT_PRI
-          .elementAt(0)
-          .MPLP! / 100)), 6)
-          : MPLP = MAT_PRI
-          .elementAt(0)
-          .MPLP;
+     ( BMKID == 1 || BMKID==2) ? MPLP = 0 : MAT_PRI.elementAt(0).MPLT == 1 && MAT_PRI.elementAt(0).MPLP! > 0
+          ? MPLP = roundDouble(MPS1! - (MPS1! * (MAT_PRI.elementAt(0).MPLP! / 100)), 6)
+          : MPLP = MAT_PRI.elementAt(0).MPLP;
       //احتساب اعلى سعر
-      (BMKID == 1 || BMKID==2) ? MPHP = 0 : MAT_PRI
-          .elementAt(0)
-          .MPHT == 1 && MAT_PRI
-          .elementAt(0)
-          .MPHP! > 0
-          ? MPHP = roundDouble(MPS1! + (MPS1! * (MAT_PRI
-          .elementAt(0)
-          .MPHP! / 100)), 6)
-          : MPHP = MAT_PRI
-          .elementAt(0)
-          .MPHP;
+      (BMKID == 1 || BMKID==2) ? MPHP = 0 : MAT_PRI.elementAt(0).MPHT == 1 && MAT_PRI.elementAt(0).MPHP! > 0
+          ? MPHP = roundDouble(MPS1! + (MPS1! * (MAT_PRI.elementAt(0).MPHP! / 100)), 6)
+          : MPHP = MAT_PRI.elementAt(0).MPHP;
       //سعر بيع1و2و3و4
-      MPS1Controller.text = MAT_PRI
-          .elementAt(0)
-          .MPS1
-          .toString();
-      MPS2Controller.text = MAT_PRI
-          .elementAt(0)
-          .MPS2
-          .toString();
-      MPS3Controller.text = MAT_PRI
-          .elementAt(0)
-          .MPS3
-          .toString();
-      MPS4Controller.text = MAT_PRI
-          .elementAt(0)
-          .MPS4
-          .toString();
+      MPS1Controller.text = MAT_PRI.elementAt(0).MPS1.toString();
+      MPS2Controller.text = MAT_PRI.elementAt(0).MPS2.toString();
+      MPS3Controller.text = MAT_PRI.elementAt(0).MPS3.toString();
+      MPS4Controller.text = MAT_PRI.elementAt(0).MPS4.toString();
       update();
     } else {
       if (SelectDataSCID != SCID2) {
@@ -4904,8 +4856,7 @@ class Sale_Invoices_Controller extends GetxController {
 
   //جلب   سعر البيع بعملة المخزون
   Future GET_MPS_P(String GETMGNO, String GETMINO, int GETMUID) async {
-    MAT_PRI = await GET_MPCO(
-        int.parse(SelectDataBIID.toString()), GETMGNO, GETMINO, GETMUID,
+    MAT_PRI = await GET_MPCO(int.parse(SelectDataBIID.toString()), GETMGNO, GETMINO, GETMUID,
         int.parse(SCID2.toString()));
     if (MAT_PRI.isNotEmpty) {
       //اذا كان الصنف مجاني فيتم تعبئة سعر بسعر صفر
@@ -4915,90 +4866,37 @@ class Sale_Invoices_Controller extends GetxController {
       } else {
         if (BMKID != 1 && BMKID != 2) {
           //جلب سعر البيع حسب العميل عن طريق حقل السعر من جدول العميل
-          if (((BMKID == 11 || BMKID == 12) && BPPR == 1) ||
+          if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 1  || BPPRT==1 && BPPRV.contains('<1>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
                   BMKID == 10) && BCPR == 1) &&
-                  MAT_PRI
-                      .elementAt(0)
-                      .MPS1! > 0) {
-            print(MAT_PRI
-                .elementAt(0)
-                .MPS1_D);
-            MPS1 = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS1! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6);
+                  MAT_PRI.elementAt(0).MPS1! > 0) {
+            MPS1 = roundDouble((MAT_PRI.elementAt(0).MPS1! * SCEXS!) / double.parse(SCEXController.text), 6);
             BMDAMController.text = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS1! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6)
-                .toString();
+                (MAT_PRI.elementAt(0).MPS1! * SCEXS!) / double.parse(SCEXController.text), 6).toString();
             print(MPS1);
             print(BMDAMController.text);
             update();
-          } else if (((BMKID == 11 || BMKID == 12) && BPPR == 2) ||
+          } else if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 2  || BPPRT==1 && BPPRV.contains('<2>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
-                  BMKID == 10) && BCPR == 2) &&
-                  MAT_PRI
-                      .elementAt(0)
-                      .MPS2! > 0) {
-            MPS1 = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS2! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6);
+                  BMKID == 10) && BCPR == 2) && MAT_PRI.elementAt(0).MPS2! > 0) {
+            MPS1 = roundDouble((MAT_PRI.elementAt(0).MPS2! * SCEXS!) / double.parse(SCEXController.text), 6);
             BMDAMController.text = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS2! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6)
-                .toString();
+                (MAT_PRI.elementAt(0).MPS2! * SCEXS!) / double.parse(SCEXController.text), 6).toString();
             update();
-          } else if (((BMKID == 11 || BMKID == 12) && BPPR == 3) ||
+          } else if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 4  || BPPRT==1 && BPPRV.contains('<4>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
-                  BMKID == 10) && BCPR == 3) &&
-                  MAT_PRI
-                      .elementAt(0)
-                      .MPS3! > 0) {
-            MPS1 = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS3! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6);
+                  BMKID == 10) && BCPR == 3) && MAT_PRI.elementAt(0).MPS3! > 0) {
+            MPS1 = roundDouble((MAT_PRI.elementAt(0).MPS3! * SCEXS!) / double.parse(SCEXController.text), 6);
             BMDAMController.text = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS3! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6)
-                .toString();
+                (MAT_PRI.elementAt(0).MPS3! * SCEXS!) / double.parse(SCEXController.text), 6).toString();
             update();
-          } else if (((BMKID == 11 || BMKID == 12) && BPPR == 4) ||
+          } else if (((BMKID == 11 || BMKID == 12) && (BPPRT==0 && BPPR == 4  || BPPRT==1 && BPPRV.contains('<4>'))) ||
               ((BMKID == 3 || BMKID == 4 || BMKID == 5 || BMKID == 7 ||
-                  BMKID == 10) && BCPR == 4) &&
-                  MAT_PRI
-                      .elementAt(0)
-                      .MPS4! > 0) {
+                  BMKID == 10) && BCPR == 4) && MAT_PRI.elementAt(0).MPS4! > 0) {
             MPS1 = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS4! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6);
+                (MAT_PRI.elementAt(0).MPS4! * SCEXS!) / double.parse(SCEXController.text), 6);
             BMDAMController.text = roundDouble(
-                (MAT_PRI
-                    .elementAt(0)
-                    .MPS4! * SCEXS!) /
-                    double.parse(SCEXController.text),
-                6)
-                .toString();
+                (MAT_PRI.elementAt(0).MPS4! * SCEXS!) / double.parse(SCEXController.text), 6).toString();
             update();
           } else {
             MPS1 = 0;
@@ -5013,39 +4911,19 @@ class Sale_Invoices_Controller extends GetxController {
       update();
       //احتساب اقل سعر
       (BMKID == 1 || BMKID == 2)
-          ? MPLP = 0
-          : MAT_PRI
-          .elementAt(0)
-          .MPLT == 1 && MAT_PRI
-          .elementAt(0)
-          .MPLP! > 0
+          ? MPLP = 0 : MAT_PRI.elementAt(0).MPLT == 1 && MAT_PRI.elementAt(0).MPLP! > 0
           ? MPLP = roundDouble(
-          MPS1! - (MPS1! * (MAT_PRI
-              .elementAt(0)
-              .MPLP! / 100)), 6)
-          : MPLP = MAT_PRI
-          .elementAt(0)
-          .MPLP;
+          MPS1! - (MPS1! * (MAT_PRI.elementAt(0).MPLP! / 100)), 6)
+          : MPLP = MAT_PRI.elementAt(0).MPLP;
       //احتساب اعلى سعر
      ( BMKID == 1 || BMKID == 2)
           ? MPHP = 0
-          : MAT_PRI
-          .elementAt(0)
-          .MPHT == 1 && MAT_PRI
-          .elementAt(0)
-          .MPHP! > 0
+          : MAT_PRI.elementAt(0).MPHT == 1 && MAT_PRI.elementAt(0).MPHP! > 0
           ? MPHP = roundDouble(
-          MPS1! + (MPS1! * (MAT_PRI
-              .elementAt(0)
-              .MPHP! / 100)), 6)
-          : MPHP = MAT_PRI
-          .elementAt(0)
-          .MPHP;
+          MPS1! + (MPS1! * (MAT_PRI.elementAt(0).MPHP! / 100)), 6)
+          : MPHP = MAT_PRI.elementAt(0).MPHP;
       //سعر بيع1و2و3و4
-      MPS1Controller.text = MAT_PRI
-          .elementAt(0)
-          .MPS1_D
-          .toString();
+      MPS1Controller.text = MAT_PRI.elementAt(0).MPS1_D.toString();
       MPS2Controller.text = MAT_PRI
           .elementAt(0)
           .MPS2_D
