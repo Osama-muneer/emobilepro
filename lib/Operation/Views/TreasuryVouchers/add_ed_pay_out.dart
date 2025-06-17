@@ -605,54 +605,56 @@ class _Add_Ed_Pay_OutState extends State<Add_Ed_Pay_Out> {
             )),
           ),
         ),
-        bottomNavigationBar:  GetBuilder<Pay_Out_Controller>(
-          init: Pay_Out_Controller(),
-            builder: ((value) => Container(
-           // decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-            child:controller.AMKID==15 ?
-            Container(
-              color: Colors.grey[100],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildBottomColumn(context,
-                      title: "${'StringAMDMD'.tr}",
-                      value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
-                      controller.formatter.format(double.parse(controller.AMMAMController.text))}",
-                      value2: "${controller.formatter.format(controller.SUMAMDEQ_MD)}"),
-                  _buildBottomColumn(context,
-                      title: "${'StringAMDDA'.tr}",
-                      value: "${controller.SUMAMDAController.text.isEmpty?controller.SUMAMDAController.text='0':
-                      controller.formatter.format(double.parse(controller.SUMAMDAController.text))}",
-                      value2: "${controller.formatter.format(controller.SUMAMDEQ_DA)}"),
-                  _buildBottomColumn(context,
-                      title: "${'StringDefernt'.tr}",
-                      value: "${controller.SUMAMDAController.text.isEmpty?
-                      '0': controller.formatter.format(double.parse(
-                          controller.AMMAMController.text)-double.parse(
-                          controller.SUMAMDAController.text))}",
-                      value2: "${controller.formatter.format(controller.Difference_AMDEQ_MD_DA)}"),
-                 ],
-              ),
-            )
-            :
-            Container(
-              color: Colors.grey[100],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildBottomColumn(context,
-                      title: "${controller.AMKID==2 || controller.AMKID==15 ? 'StringAMDMD'.tr:'StringAMDDA'.tr}",
-                      value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
-                      controller.formatter.format(double.parse(controller.AMMAMController.text))}"),
-                  _buildBottomColumn(context,
-                      title: "${'StringTotalequivalent'.tr}",
-                      value: "${controller.AMDEQController.text.isEmpty?controller.AMDEQController.text='0':
-                      controller.formatter.format(double.parse(controller.AMDEQController.text))}"),
-                ],
-              ),
-            )
-          )),
+        bottomNavigationBar:  SafeArea(
+          child: GetBuilder<Pay_Out_Controller>(
+            init: Pay_Out_Controller(),
+              builder: ((value) => Container(
+             // decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+              child:controller.AMKID==15 ?
+              Container(
+                color: Colors.grey[100],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildBottomColumn(context,
+                        title: "${'StringAMDMD'.tr}",
+                        value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
+                        controller.formatter.format(double.parse(controller.AMMAMController.text))}",
+                        value2: "${controller.formatter.format(controller.SUMAMDEQ_MD)}"),
+                    _buildBottomColumn(context,
+                        title: "${'StringAMDDA'.tr}",
+                        value: "${controller.SUMAMDAController.text.isEmpty?controller.SUMAMDAController.text='0':
+                        controller.formatter.format(double.parse(controller.SUMAMDAController.text))}",
+                        value2: "${controller.formatter.format(controller.SUMAMDEQ_DA)}"),
+                    _buildBottomColumn(context,
+                        title: "${'StringDefernt'.tr}",
+                        value: "${controller.SUMAMDAController.text.isEmpty?
+                        '0': controller.formatter.format(double.parse(
+                            controller.AMMAMController.text)-double.parse(
+                            controller.SUMAMDAController.text))}",
+                        value2: "${controller.formatter.format(controller.Difference_AMDEQ_MD_DA)}"),
+                   ],
+                ),
+              )
+              :
+              Container(
+                color: Colors.grey[100],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildBottomColumn(context,
+                        title: "${controller.AMKID==2 || controller.AMKID==15 ? 'StringAMDMD'.tr:'StringAMDDA'.tr}",
+                        value: "${controller.AMMAMController.text.isEmpty?controller.AMMAMController.text='0':
+                        controller.formatter.format(double.parse(controller.AMMAMController.text))}"),
+                    _buildBottomColumn(context,
+                        title: "${'StringTotalequivalent'.tr}",
+                        value: "${controller.AMDEQController.text.isEmpty?controller.AMDEQController.text='0':
+                        controller.formatter.format(double.parse(controller.AMDEQController.text))}"),
+                  ],
+                ),
+              )
+            )),
+          ),
         ),
       ),
     );

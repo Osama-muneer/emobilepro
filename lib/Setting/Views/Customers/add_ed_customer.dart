@@ -749,21 +749,23 @@ class _Add_Ed_CustomerState extends State<Add_Ed_Customer> {
                 ),
               )),
         ),
-      bottomNavigationBar:  MaterialButton(
-        onPressed: () async {
-          CheckSave();
-        },
-        child: Container(
-          height:  0.05 * height,
-          width: double.infinity,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              color: AppColors.MainColor,
-              borderRadius:
-              BorderRadius.circular(0.02 * height)),
-          child: Text(
-            'StringSave'.tr,
-            style: ThemeHelper().buildTextStyle(context, Colors.white,'L')
+      bottomNavigationBar:  SafeArea(
+        child: MaterialButton(
+          onPressed: () async {
+            CheckSave();
+          },
+          child: Container(
+            height:  0.05 * height,
+            width: double.infinity,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: AppColors.MainColor,
+                borderRadius:
+                BorderRadius.circular(0.02 * height)),
+            child: Text(
+              'StringSave'.tr,
+              style: ThemeHelper().buildTextStyle(context, Colors.white,'L')
+            ),
           ),
         ),
       ),

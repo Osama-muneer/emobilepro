@@ -600,9 +600,9 @@ Future<Bif_Mov_A_Local> Save_BIF_MOV_A(Bif_Mov_A_Local data) async {
   return data;
 }
 
-Future<BIF_TRA_TBL_Local> Save_BIF_TRA_TBL(BIF_TRA_TBL_Local data) async {
+Future<BIF_TRA_TAB_Local> Save_BIF_TRA_TAB(BIF_TRA_TAB_Local data) async {
   var dbClient = await conn.database;
-  data.BTTID = await dbClient!.insert('BIF_TRA_TBL', data.toMap());
+  data.BTTID = await dbClient!.insert('BIF_TRA_TAB', data.toMap());
   return data;
 }
 

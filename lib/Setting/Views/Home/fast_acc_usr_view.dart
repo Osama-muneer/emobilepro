@@ -60,159 +60,161 @@ class _FAS_ACC_USR_ViewState extends State<FAS_ACC_USR_View> {
         appBar: ThemeHelper().MainAppBar('StringSCR_FAS_ACC'.tr),
         body: GetBuilder<HomeController>(
             init: HomeController(),
-            builder: ((value) =>  SingleChildScrollView(
-                  child:  Column(
-                    children: [
-                     Text('StringSCR_SYS'.tr,style:
-                     ThemeHelper().buildTextStyle(context, AppColors.MainColor,'L')),
-                      Container(
-                      //  height: 345,
-                        child: ListView.builder(
-                            itemCount: controller.FAS_ACC_USR.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.red[700],
-                                  child: Icon(Icons.screenshot_monitor_sharp,
-                                    color: Colors.white,),
-                                ),
-                                title: Text(controller.FAS_ACC_USR[index].SSDA_D.toString(),
-                                  style: ThemeHelper().buildTextStyle(context, AppColors.black,'M'),),
-                                trailing: controller.FAS_ACC_USR[index].FAUST2==1 ?Icon(Icons.check_circle,color: Colors.red[700]):
-                                Icon(Icons.check_circle_outline,color: Colors.grey,),
-                                onTap: () async {
-                                  controller.SSID=controller.FAS_ACC_USR[index].SSID;
-                                  if(controller.FAS_ACC_USR[index].FAUST2==1){
-                                    UpdateFAS_ACC_USR(controller.FAS_ACC_USR[index].SSID!,2);
-                                    await Future.delayed(const Duration(milliseconds: 100));
-                                    controller.update();
-                                    controller.GET_SYS_SCR_FAS_P();
-                                    controller.update();
-                                  }else{
-                                    UpdateFAS_ACC_USR(controller.FAS_ACC_USR[index].SSID!,1);
-                                    await Future.delayed(const Duration(milliseconds: 100));
-                                    controller.update();
-                                    controller.GET_SYS_SCR_FAS_P();
-                                    controller.update();
-                                  }
-                                  //controller.SYS_SCR[index].SSST2==1?isSelected=true?isSelected=false;
-                                },
-                              );
-                            }),
-                      ),
-                      controller.FAS_ACC_USR2.length>=4?Container():MaterialButton(
-                        onPressed: () async {
-                          UpdateFAS_ACC_USR_FAUST(controller.SSID!,1,2,controller.FAS_ACC_USR2.length+1);
-                          await Future.delayed(const Duration(milliseconds: 100));
-                          controller.GET_SYS_SCR_FAS_P2();
-                          controller.update();
-                          controller.GET_SYS_SCR_FAS_P();
-                          controller.FAUST=1;
-                          controller.update();
-                        },
-                        child: Container(
-                          height: height * 0.05,
-                          width: width * 0.9,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: AppColors.MainColor,
-                              borderRadius: BorderRadius.circular(5 * width)),
-                          child: Text(
-                            'StringAdd'.tr,
-                            style: ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')
+            builder: ((value) =>  SafeArea(
+              child: SingleChildScrollView(
+                    child:  Column(
+                      children: [
+                       Text('StringSCR_SYS'.tr,style:
+                       ThemeHelper().buildTextStyle(context, AppColors.MainColor,'L')),
+                        Container(
+                        //  height: 345,
+                          child: ListView.builder(
+                              itemCount: controller.FAS_ACC_USR.length,
+                              shrinkWrap: true,
+                              itemBuilder: (BuildContext context, int index) {
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.red[700],
+                                    child: Icon(Icons.screenshot_monitor_sharp,
+                                      color: Colors.white,),
+                                  ),
+                                  title: Text(controller.FAS_ACC_USR[index].SSDA_D.toString(),
+                                    style: ThemeHelper().buildTextStyle(context, AppColors.black,'M'),),
+                                  trailing: controller.FAS_ACC_USR[index].FAUST2==1 ?Icon(Icons.check_circle,color: Colors.red[700]):
+                                  Icon(Icons.check_circle_outline,color: Colors.grey,),
+                                  onTap: () async {
+                                    controller.SSID=controller.FAS_ACC_USR[index].SSID;
+                                    if(controller.FAS_ACC_USR[index].FAUST2==1){
+                                      UpdateFAS_ACC_USR(controller.FAS_ACC_USR[index].SSID!,2);
+                                      await Future.delayed(const Duration(milliseconds: 100));
+                                      controller.update();
+                                      controller.GET_SYS_SCR_FAS_P();
+                                      controller.update();
+                                    }else{
+                                      UpdateFAS_ACC_USR(controller.FAS_ACC_USR[index].SSID!,1);
+                                      await Future.delayed(const Duration(milliseconds: 100));
+                                      controller.update();
+                                      controller.GET_SYS_SCR_FAS_P();
+                                      controller.update();
+                                    }
+                                    //controller.SYS_SCR[index].SSST2==1?isSelected=true?isSelected=false;
+                                  },
+                                );
+                              }),
+                        ),
+                        controller.FAS_ACC_USR2.length>=4?Container():MaterialButton(
+                          onPressed: () async {
+                            UpdateFAS_ACC_USR_FAUST(controller.SSID!,1,2,controller.FAS_ACC_USR2.length+1);
+                            await Future.delayed(const Duration(milliseconds: 100));
+                            controller.GET_SYS_SCR_FAS_P2();
+                            controller.update();
+                            controller.GET_SYS_SCR_FAS_P();
+                            controller.FAUST=1;
+                            controller.update();
+                          },
+                          child: Container(
+                            height: height * 0.05,
+                            width: width * 0.9,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: AppColors.MainColor,
+                                borderRadius: BorderRadius.circular(5 * width)),
+                            child: Text(
+                              'StringAdd'.tr,
+                              style: ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')
+                            ),
                           ),
                         ),
-                      ),
-                      Divider(height: 1,color: Colors.black,),
-                      Text('StringSCR_FAS'.tr,style:
-                      ThemeHelper().buildTextStyle(context, AppColors.MainColor,'L')),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //   children: [
-                      //     Text('StringSCR_FAS'.tr,style: TextStyle(fontSize: 16.sp, color: AppColors.MainColor, fontWeight: FontWeight.bold)),
-                      //     IconButton(
-                      //       icon: const Icon(Icons.upload),
-                      //       tooltip: 'ترتيب الى اعلى',
-                      //       onPressed: () {
-                      //
-                      //       },
-                      //     ),
-                      //     IconButton(
-                      //       icon: const Icon(Icons.download),
-                      //       tooltip: 'ترتيب الى اسفل',
-                      //       onPressed: () {
-                      //       },
-                      //     )
-                      //   ],
-                      // ),
-                      Container(
-                       // height: 215,
-                        child: ListView.builder(
-                           shrinkWrap: true,
-                            itemCount: controller.FAS_ACC_USR2.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return   ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.red[700],
-                                  child: Icon(Icons.screenshot_monitor_sharp,
-                                    color: Colors.white,),
-                                ),
-                                title: Text(controller.FAS_ACC_USR2[index].SSDA_D.toString(),
-                                  style: ThemeHelper().buildTextStyle(context, AppColors.black,'M')),
-                                trailing: controller.FAS_ACC_USR2[index].FAUST2==1 ?Icon(Icons.check_circle,color: Colors.red[700]):
-                                Icon(Icons.check_circle_outline,color: Colors.grey,),
-                                onTap: () async {
-                                  controller.FAUST=controller.FAS_ACC_USR2[index].FAUST2;
-                                  controller.SSID=controller.FAS_ACC_USR2[index].SSID;
-                                  if(controller.FAS_ACC_USR2[index].FAUST2==1){
-                                    UpdateFAS_ACC_USR_Single(controller.FAS_ACC_USR2[index].SSID!,2);
-                                    await Future.delayed(const Duration(milliseconds: 100));
-                                    controller.update();
-                                    controller.GET_SYS_SCR_FAS_P2();
-                                    controller.update();
-                                  }else{
-                                    UpdateFAS_ACC_USR_Single(controller.FAS_ACC_USR2[index].SSID!,1);
-                                    await Future.delayed(const Duration(milliseconds: 100));
-                                    controller.update();
-                                    controller.GET_SYS_SCR_FAS_P2();
-                                    controller.update();
-                                  }
-                                  //controller.SYS_SCR[index].SSST2==1?isSelected=true?isSelected=false;
-                                },
-                              );
-                            }),
-                      ),
-                      controller.FAUST==2 ?
-                      MaterialButton(
-                        onPressed: () async {
-                          UpdateFAS_ACC_USR_FAUST(controller.SSID!,2,1,0);
-                          await Future.delayed(const Duration(milliseconds: 100));
-                          controller.GET_SYS_SCR_FAS_P2();
-                          controller.update();
-                          controller.GET_SYS_SCR_FAS_P();
-                          controller.FAUST=1;
-                          controller.update();
-                        },
-                        child: Container(
-                          height: height * 0.05,
-                          width: width * 0.9,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: AppColors.MainColor,
-                              borderRadius:
-                              BorderRadius.circular(5 * width)),
-                          child: Text(
-                            'StringDeleteAppBar'.tr,
-                            style:
-                            ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')
-                          ),
+                        Divider(height: 1,color: Colors.black,),
+                        Text('StringSCR_FAS'.tr,style:
+                        ThemeHelper().buildTextStyle(context, AppColors.MainColor,'L')),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //   children: [
+                        //     Text('StringSCR_FAS'.tr,style: TextStyle(fontSize: 16.sp, color: AppColors.MainColor, fontWeight: FontWeight.bold)),
+                        //     IconButton(
+                        //       icon: const Icon(Icons.upload),
+                        //       tooltip: 'ترتيب الى اعلى',
+                        //       onPressed: () {
+                        //
+                        //       },
+                        //     ),
+                        //     IconButton(
+                        //       icon: const Icon(Icons.download),
+                        //       tooltip: 'ترتيب الى اسفل',
+                        //       onPressed: () {
+                        //       },
+                        //     )
+                        //   ],
+                        // ),
+                        Container(
+                         // height: 215,
+                          child: ListView.builder(
+                             shrinkWrap: true,
+                              itemCount: controller.FAS_ACC_USR2.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return   ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.red[700],
+                                    child: Icon(Icons.screenshot_monitor_sharp,
+                                      color: Colors.white,),
+                                  ),
+                                  title: Text(controller.FAS_ACC_USR2[index].SSDA_D.toString(),
+                                    style: ThemeHelper().buildTextStyle(context, AppColors.black,'M')),
+                                  trailing: controller.FAS_ACC_USR2[index].FAUST2==1 ?Icon(Icons.check_circle,color: Colors.red[700]):
+                                  Icon(Icons.check_circle_outline,color: Colors.grey,),
+                                  onTap: () async {
+                                    controller.FAUST=controller.FAS_ACC_USR2[index].FAUST2;
+                                    controller.SSID=controller.FAS_ACC_USR2[index].SSID;
+                                    if(controller.FAS_ACC_USR2[index].FAUST2==1){
+                                      UpdateFAS_ACC_USR_Single(controller.FAS_ACC_USR2[index].SSID!,2);
+                                      await Future.delayed(const Duration(milliseconds: 100));
+                                      controller.update();
+                                      controller.GET_SYS_SCR_FAS_P2();
+                                      controller.update();
+                                    }else{
+                                      UpdateFAS_ACC_USR_Single(controller.FAS_ACC_USR2[index].SSID!,1);
+                                      await Future.delayed(const Duration(milliseconds: 100));
+                                      controller.update();
+                                      controller.GET_SYS_SCR_FAS_P2();
+                                      controller.update();
+                                    }
+                                    //controller.SYS_SCR[index].SSST2==1?isSelected=true?isSelected=false;
+                                  },
+                                );
+                              }),
                         ),
-                      )
-                          :Container(),
-                    ],
+                        controller.FAUST==2 ?
+                        MaterialButton(
+                          onPressed: () async {
+                            UpdateFAS_ACC_USR_FAUST(controller.SSID!,2,1,0);
+                            await Future.delayed(const Duration(milliseconds: 100));
+                            controller.GET_SYS_SCR_FAS_P2();
+                            controller.update();
+                            controller.GET_SYS_SCR_FAS_P();
+                            controller.FAUST=1;
+                            controller.update();
+                          },
+                          child: Container(
+                            height: height * 0.05,
+                            width: width * 0.9,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: AppColors.MainColor,
+                                borderRadius:
+                                BorderRadius.circular(5 * width)),
+                            child: Text(
+                              'StringDeleteAppBar'.tr,
+                              style:
+                              ThemeHelper().buildTextStyle(context, AppColors.textColor,'L')
+                            ),
+                          ),
+                        )
+                            :Container(),
+                      ],
+                    ),
                   ),
-                ))),
+            ))),
       ),
     );
   }

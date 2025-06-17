@@ -1273,258 +1273,260 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
         GetBuilder<Sale_Invoices_Controller>(
           init: Sale_Invoices_Controller(),
           builder: (controller) {
-            return Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Stack(
-                    children: [
-                      ClipPath(
-                        clipper: BottomClipper(),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(30),
-                              bottomRight: Radius.circular(30),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.close,
+            return SafeArea(
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      children: [
+                        ClipPath(
+                          clipper: BottomClipper(),
+                          child: Container(
+                            decoration: BoxDecoration(
                               color: Colors.black,
-                            ),
-                          ),
-                          Text('StringRES_TAB'.tr,
-                              style: ThemeHelper().buildTextStyle(context,AppColors.black,'L')
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      if(controller.RES_SEC.length>0)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'StrinRSID'.tr,
-                              style:ThemeHelper().buildTextStyle(context,AppColors.black,'L'),
-                            ),
-                          ],
-                        ).fadeAnimation(0 * 0.1),
-                      if(controller.SelectDataGETTYPE=='1' )
-                        SizedBox(
-                          height:  height * 0.05,
-                          child: ListView.builder(
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: controller.RES_SEC.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return   Padding(
-                                padding:EdgeInsets.only(left: 0.01 * width, right: 0.01 * width),
-                                child: TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      controller.SelectDataRSID=controller.RES_SEC[index].RSID.toString();
-                                      controller.SelectDataRTID=null;
-                                      controller.SelectDataREID=null;
-                                      controller.GET_RES_TAB_P(controller.RES_SEC[index].RSID.toString());
-                                      controller.GET_RES_EMP_P(controller.RES_SEC[index].RSID.toString());
-                                      controller.update();
-                                    });
-                                  },
-                                  style:
-                                  TextButton.styleFrom(
-                                    side:  BorderSide(color:controller.RES_SEC[index].RSID.toString()==controller.SelectDataRSID?
-                                    Colors.red:Colors.black45),
-                                    //foregroundColor: Colors.black,
-                                    // backgroundColor: Colors.grey[400],
-                                    shape:RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(0.01 * height), // <-- Radius
-                                    ),
-                                  ),
-                                  child: Text(
-                                      controller.RES_SEC[index].RSNA_D.toString(),
-                                      style:ThemeHelper().buildTextStyle(context, controller.RES_SEC[index].RSID.toString()==controller.SelectDataRSID?
-                                      Colors.red:Colors.black,'M')
-                                  ),
-                                ).fadeAnimation(index * 0.6),
-                              );
-                            },
-                          ),
-                        ),
-                      SizedBox(height: 0.02 * height),
-                      if(controller.SelectDataGETTYPE=='1'  && controller.RES_TAB.length>0 )
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'StringRES_TAB'.tr,
-                              style:ThemeHelper().buildTextStyle(context,AppColors.black,'L'),
-                            ),
-                          ],
-                        ).fadeAnimation(1 * 0.1),
-                      if(controller.SelectDataGETTYPE=='1')
-                        SizedBox(
-                          height: height * 0.1,
-                          child:  GridView.builder(
-                            shrinkWrap: true,
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: controller.RES_TAB.length,
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // عدد الصفوف
-                              crossAxisSpacing: 2.0,
-                              mainAxisSpacing: 2.0,
-                              mainAxisExtent: 100, // تناسب العرض مع الطول (اضبط حسب الحاجة)
-                            ),
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: EdgeInsets.only(left: 0.01 * width, right: 0.01 * width),
-                                child: TextButton(
-                                  onPressed: () {
-                                      if(controller.RES_TAB[index].RTID==controller.SelectDataRTID){
-                                        controller.SelectDataRTID=null;
-                                      }else{
-                                        controller.SelectDataRTID=controller.RES_TAB[index].RTID.toString();
-                                        controller.SelectDataRTNA=controller.RES_TAB[index].RTNA_D.toString();
-                                      }
-                                      controller.update();
-                                  },
-                                  style:
-                                  TextButton.styleFrom(
-                                    side:  BorderSide(color:controller.RES_TAB[index].RTID.toString()==controller.SelectDataRTID?
-                                    Colors.red:Colors.black45),
-                                    shape:RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular( 0.01 * height), // <-- Radius
-                                    ),
-                                  ),
-                                  child:
-                                  Text(
-                                      "${controller.RES_TAB[index].RTID.toString()}-${controller.RES_TAB[index].RTNA_D.toString()}",
-                                      style: ThemeHelper().buildTextStyle(context, controller.RES_TAB[index].RTID.toString()==controller.SelectDataRTID?
-                                      Colors.red:Colors.black,'M')
-                                  ),
-                                ).fadeAnimation(index * 0.6),
-                              );
-                            },
-                          )
-                          ,),
-                      SizedBox(height: 0.02 * height),
-                      Type == 'ADD'
-                          ? Column(
-                        children: [
-                          if (controller.SelectDataGETTYPE == '1' && controller.RES_EMP.length > 0)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'StringRES_EMP'.tr,
-                                  style: ThemeHelper().buildTextStyle(context, AppColors.black, 'L'),
-                                ),
-                              ],
-                            ).fadeAnimation(2 * 0.1),
-                          if (controller.SelectDataGETTYPE == '1')
-                            SizedBox(
-                              height: height / 23,
-                              child: ListView.builder(
-                                physics: BouncingScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                itemCount: controller.RES_EMP.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(left: 0.01 * width, right: 0.01 * width),
-                                    child: TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          if (controller.RES_EMP[index].REID == controller.SelectDataREID) {
-                                            controller.SelectDataREID = null;
-                                          } else {
-                                            controller.SelectDataREID = controller.RES_EMP[index].REID.toString();
-                                          }
-                                          controller.update();
-                                        });
-                                      },
-                                      style: TextButton.styleFrom(
-                                        side: BorderSide(
-                                          color: controller.RES_EMP[index].REID.toString() == controller.SelectDataREID
-                                              ? Colors.red
-                                              : Colors.black45,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(0.01 * height),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "${controller.RES_EMP[index].RENA_D.toString()}",
-                                        style: ThemeHelper().buildTextStyle(
-                                          context,
-                                          controller.RES_EMP[index].REID.toString() == controller.SelectDataREID
-                                              ? Colors.red
-                                              : Colors.black,
-                                          'M',
-                                        ),
-                                      ),
-                                    ).fadeAnimation(index * 0.6),
-                                  );
-                                },
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
                               ),
                             ),
-                        ],
-                      )
-                          : SizedBox.shrink(),// ترجع Widget فارغ في حالة الشرط غير متحقق
-                    ],
-                  ),
-                  SizedBox(height: height * 0.026),
-                  SizedBox(
-                    width: double.infinity,
-                    height: height * 0.06,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.red,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text('StringRES_TAB'.tr,
+                                style: ThemeHelper().buildTextStyle(context,AppColors.black,'L')
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        if(controller.RES_SEC.length>0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'StrinRSID'.tr,
+                                style:ThemeHelper().buildTextStyle(context,AppColors.black,'L'),
+                              ),
+                            ],
+                          ).fadeAnimation(0 * 0.1),
+                        if(controller.SelectDataGETTYPE=='1' )
+                          SizedBox(
+                            height:  height * 0.05,
+                            child: ListView.builder(
+                              physics: BouncingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: controller.RES_SEC.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return   Padding(
+                                  padding:EdgeInsets.only(left: 0.01 * width, right: 0.01 * width),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        controller.SelectDataRSID=controller.RES_SEC[index].RSID.toString();
+                                        controller.SelectDataRTID=null;
+                                        controller.SelectDataREID=null;
+                                        controller.GET_RES_TAB_P(controller.RES_SEC[index].RSID.toString());
+                                        controller.GET_RES_EMP_P(controller.RES_SEC[index].RSID.toString());
+                                        controller.update();
+                                      });
+                                    },
+                                    style:
+                                    TextButton.styleFrom(
+                                      side:  BorderSide(color:controller.RES_SEC[index].RSID.toString()==controller.SelectDataRSID?
+                                      Colors.red:Colors.black45),
+                                      //foregroundColor: Colors.black,
+                                      // backgroundColor: Colors.grey[400],
+                                      shape:RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(0.01 * height), // <-- Radius
+                                      ),
+                                    ),
+                                    child: Text(
+                                        controller.RES_SEC[index].RSNA_D.toString(),
+                                        style:ThemeHelper().buildTextStyle(context, controller.RES_SEC[index].RSID.toString()==controller.SelectDataRSID?
+                                        Colors.red:Colors.black,'M')
+                                    ),
+                                  ).fadeAnimation(index * 0.6),
+                                );
+                              },
+                            ),
+                          ),
+                        SizedBox(height: 0.02 * height),
+                        if(controller.SelectDataGETTYPE=='1'  && controller.RES_TAB.length>0 )
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'StringRES_TAB'.tr,
+                                style:ThemeHelper().buildTextStyle(context,AppColors.black,'L'),
+                              ),
+                            ],
+                          ).fadeAnimation(1 * 0.1),
+                        if(controller.SelectDataGETTYPE=='1')
+                          SizedBox(
+                            height: height * 0.1,
+                            child:  GridView.builder(
+                              shrinkWrap: true,
+                              physics: BouncingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: controller.RES_TAB.length,
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2, // عدد الصفوف
+                                crossAxisSpacing: 2.0,
+                                mainAxisSpacing: 2.0,
+                                mainAxisExtent: 100, // تناسب العرض مع الطول (اضبط حسب الحاجة)
+                              ),
+                              itemBuilder: (BuildContext context, int index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(left: 0.01 * width, right: 0.01 * width),
+                                  child: TextButton(
+                                    onPressed: () {
+                                        if(controller.RES_TAB[index].RTID==controller.SelectDataRTID){
+                                          controller.SelectDataRTID=null;
+                                        }else{
+                                          controller.SelectDataRTID=controller.RES_TAB[index].RTID.toString();
+                                          controller.SelectDataRTNA=controller.RES_TAB[index].RTNA_D.toString();
+                                        }
+                                        controller.update();
+                                    },
+                                    style:
+                                    TextButton.styleFrom(
+                                      side:  BorderSide(color:controller.RES_TAB[index].RTID.toString()==controller.SelectDataRTID?
+                                      Colors.red:Colors.black45),
+                                      shape:RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular( 0.01 * height), // <-- Radius
+                                      ),
+                                    ),
+                                    child:
+                                    Text(
+                                        "${controller.RES_TAB[index].RTID.toString()}-${controller.RES_TAB[index].RTNA_D.toString()}",
+                                        style: ThemeHelper().buildTextStyle(context, controller.RES_TAB[index].RTID.toString()==controller.SelectDataRTID?
+                                        Colors.red:Colors.black,'M')
+                                    ),
+                                  ).fadeAnimation(index * 0.6),
+                                );
+                              },
+                            )
+                            ,),
+                        SizedBox(height: 0.02 * height),
+                        Type == 'ADD'
+                            ? Column(
+                          children: [
+                            if (controller.SelectDataGETTYPE == '1' && controller.RES_EMP.length > 0)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'StringRES_EMP'.tr,
+                                    style: ThemeHelper().buildTextStyle(context, AppColors.black, 'L'),
+                                  ),
+                                ],
+                              ).fadeAnimation(2 * 0.1),
+                            if (controller.SelectDataGETTYPE == '1')
+                              SizedBox(
+                                height: height / 23,
+                                child: ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: controller.RES_EMP.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(left: 0.01 * width, right: 0.01 * width),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (controller.RES_EMP[index].REID == controller.SelectDataREID) {
+                                              controller.SelectDataREID = null;
+                                            } else {
+                                              controller.SelectDataREID = controller.RES_EMP[index].REID.toString();
+                                            }
+                                            controller.update();
+                                          });
+                                        },
+                                        style: TextButton.styleFrom(
+                                          side: BorderSide(
+                                            color: controller.RES_EMP[index].REID.toString() == controller.SelectDataREID
+                                                ? Colors.red
+                                                : Colors.black45,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(0.01 * height),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "${controller.RES_EMP[index].RENA_D.toString()}",
+                                          style: ThemeHelper().buildTextStyle(
+                                            context,
+                                            controller.RES_EMP[index].REID.toString() == controller.SelectDataREID
+                                                ? Colors.red
+                                                : Colors.black,
+                                            'M',
+                                          ),
+                                        ),
+                                      ).fadeAnimation(index * 0.6),
+                                    );
+                                  },
+                                ),
+                              ),
+                          ],
+                        )
+                            : SizedBox.shrink(),// ترجع Widget فارغ في حالة الشرط غير متحقق
+                      ],
+                    ),
+                    SizedBox(height: height * 0.026),
+                    SizedBox(
+                      width: double.infinity,
+                      height: height * 0.06,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.red,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Type=='ED' ?
+                          {
+                            if (controller.SelectDataRTIDO!=controller.SelectDataRTID){
+                            controller.Save_BIF_TRA_TBL_P(GETGUID),
+                            Get.back(),
+                          }
+                            else{
+                            Fluttertoast.showToast(
+                                msg: "Save_BIF_TRA_TBL",
+                                toastLength: Toast.LENGTH_LONG,
+                                textColor: Colors.white,
+                                backgroundColor: Colors.redAccent)
+                          }
+                          } : controller.AddSale_Invoices();
+                        },
+                        child: Text(
+                          Type=='ED'?'StringEdit'.tr:'StringContinue'.tr,
+                          style: ThemeHelper().buildTextStyle(context, Colors.white, 'M'),
                         ),
                       ),
-                      onPressed: () {
-                        Type=='ED' ?
-                        {
-                          if (controller.SelectDataRTIDO!=controller.SelectDataRTID){
-                          controller.Save_BIF_TRA_TBL_P(GETGUID),
-                          Get.back(),
-                        }
-                          else{
-                          Fluttertoast.showToast(
-                              msg: "Save_BIF_TRA_TBL",
-                              toastLength: Toast.LENGTH_LONG,
-                              textColor: Colors.white,
-                              backgroundColor: Colors.redAccent)
-                        }
-                        } : controller.AddSale_Invoices();
-                      },
-                      child: Text(
-                        Type=='ED'?'StringEdit'.tr:'StringContinue'.tr,
-                        style: ThemeHelper().buildTextStyle(context, Colors.white, 'M'),
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },

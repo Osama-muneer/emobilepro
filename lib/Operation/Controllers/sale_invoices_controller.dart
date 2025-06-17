@@ -8213,7 +8213,7 @@ class Sale_Invoices_Controller extends GetxController {
             backgroundColor: Colors.redAccent);
       }
       else{
-        BIF_TRA_TBL_Local e = BIF_TRA_TBL_Local(
+        BIF_TRA_TAB_Local e = BIF_TRA_TAB_Local(
           RSIDO: int.parse(SelectDataRSIDO!) ,
           RTIDO: SelectDataRTIDO ,
           RSIDN: int.parse(SelectDataRSID!) ,
@@ -8231,7 +8231,7 @@ class Sale_Invoices_Controller extends GetxController {
           SYID_L: LoginController().SYID,
           CIID_L: LoginController().CIID,
         );
-        Save_BIF_TRA_TBL(e);
+        Save_BIF_TRA_TAB(e);
         UpdateBIL_MOV_A(
             BMKID!,
             BMMID!,
@@ -8249,7 +8249,7 @@ class Sale_Invoices_Controller extends GetxController {
             toastLength: Toast.LENGTH_LONG,
             textColor: Colors.white,
             backgroundColor: Colors.green);
-        await Socket_IP_Connect_BIF_TRA_TBL(GUID_TBL);
+        await Socket_IP_Connect_BIF_TRA_TAB(GUID_TBL);
         GET_BIL_MOV_M_P('DateNow');
       }
         return true;
@@ -8897,7 +8897,7 @@ class Sale_Invoices_Controller extends GetxController {
   }
 
 //الطاولات------------------------------
-  Future<void> Socket_IP_Connect_BIF_TRA_TBL(GetGUID) async {
+  Future<void> Socket_IP_Connect_BIF_TRA_TAB(GetGUID) async {
     try {
       final socket = await Socket.connect(
         LoginController().IP,
@@ -8905,19 +8905,19 @@ class Sale_Invoices_Controller extends GetxController {
         timeout: const Duration(seconds: 5),
       );
       print("Socket Connection Successful");
-      await SyncBIF_TRA_TBL_P(GetGUID);
+      await SyncBIF_TRA_TAB_P(GetGUID);
       socket.destroy();
     } catch (error) {
       print("Socket Connection Failed: $error");
     }
   }
 
-  Future<void> SyncBIF_TRA_TBL_P( String GetGUID) async {
-    var listD = await SyncronizationData().FetchBIF_TRA_TBL(GetGUID);
+  Future<void> SyncBIF_TRA_TAB_P( String GetGUID) async {
+    var listD = await SyncronizationData().FetchBIF_TRA_TAB(GetGUID);
     print(listD);
     print('listD');
     if (listD.isNotEmpty) {
-      await SyncronizationData().SyncBIF_TRA_TBLToSystem(listD);
+      await SyncronizationData().SyncBIF_TRA_TABToSystem(listD);
     }
   }
 //الطاولات------------------------------

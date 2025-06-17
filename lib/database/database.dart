@@ -1,11 +1,8 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../Services/ErrorHandlerService.dart';
-import '../Services/ToastService.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/controllers/setting_controller.dart';
 import '../Widgets/config.dart';
@@ -602,8 +599,8 @@ CREATE TABLE CON_ACC_M (
          )  ;
 ''';
 
-  String CreateBIF_TRA_TBL = '''
-     CREATE TABLE BIF_TRA_TBL (
+  String CreateBIF_TRA_TAB = '''
+     CREATE TABLE BIF_TRA_TAB (
          BTTID   INTEGER primary key autoincrement,
          RSIDO   INTEGER ,
          RTIDO   TEXT,
@@ -6459,7 +6456,7 @@ CREATE TABLE SYS_REP(
     await db.execute(CreateECO_ACC);
     await db.execute(CreateECO_MSG_ACC);
     await db.execute(CreateBK_INF);
-    await db.execute(CreateBIF_TRA_TBL);
+    await db.execute(CreateBIF_TRA_TAB);
     await db.execute(CreateAppPrinterDevice);
     await db.execute(CreateMOB_LOG);
 
@@ -8010,7 +8007,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
-
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -9159,7 +9156,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
-
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -10272,7 +10269,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
-
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -11335,7 +11332,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
-
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -12119,7 +12116,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
-
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -12140,6 +12137,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -12156,6 +12154,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion");
@@ -12172,6 +12171,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion8");
@@ -12187,6 +12187,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion9");
@@ -12201,6 +12202,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion10");
@@ -12213,6 +12215,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion11");
@@ -12224,6 +12227,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion12");
@@ -12234,6 +12238,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion13");
@@ -12243,6 +12248,7 @@ TTLID     INTEGER,
         await OnUpgradeV449_15(db);
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion14");
@@ -12251,15 +12257,23 @@ TTLID     INTEGER,
       else  if (oldversion == 15){
         await OnUpgradeV449_16(db);
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion15");
       }
       else  if (oldversion == 16){
         await OnUpgradeV449_17(db);
+        await OnUpgradeV449_18(db);
         print(oldversion);
         print(newversion);
         print("oldversion15");
+      }
+      else  if (oldversion == 17){
+        await OnUpgradeV449_18(db);
+        print(oldversion);
+        print(newversion);
+        print("oldversion17");
       }
 
 
@@ -14564,12 +14578,17 @@ CREATE TABLE SYS_REP(
   }
 
   Future OnUpgradeV449_17 (Database db) async{
-    await db.execute(CreateBIF_TRA_TBL);
+    await db.execute(CreateBIF_TRA_TAB);
     await db.execute(CreateAppPrinterDevice);
     await db.execute(CreateMOB_LOG);
     await db.execute('''ALTER TABLE BIF_MOV_M ADD COLUMN ACNO2 TEXT''');
     await db.execute('''ALTER TABLE BIL_CUS ADD COLUMN BCCR2 REAL DEFAULT 0''');
     await db.execute('''ALTER TABLE BIL_CUS_TMP ADD COLUMN BCCR2 REAL DEFAULT 0''');
+  }
+
+  Future OnUpgradeV449_18 (Database db) async{
+    await db.execute(CreateBIF_TRA_TAB);
+    await db.execute('''DROP TABLE BIF_TRA_TBL''');
   }
 
   Future<List<Map<String, dynamic>>> query(String sql, [List<dynamic>? arguments]) async {

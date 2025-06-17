@@ -2014,16 +2014,16 @@ class SyncronizationData {
 
 //الطاولات------------------------------
 
-  Future<List<BIF_TRA_TBL_Local>> FetchBIF_TRA_TBL(String GETGUID) async {
+  Future<List<BIF_TRA_TAB_Local>> FetchBIF_TRA_TAB(String GETGUID) async {
     final dbClient = await conn.database;
-    List<BIF_TRA_TBL_Local> List_D = [];
+    List<BIF_TRA_TAB_Local> List_D = [];
     String SQLBIID_L = LoginController().BIID_ALL_V == '1' ? " AND  BIID_L=${LoginController().BIID}" :  '';
     String SQL2 = ''' AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} 
                   AND CIID_L=${LoginController().CIID} $SQLBIID_L''';
     try {
-      final maps = await dbClient!.query('BIF_TRA_TBL', where: "GUID='$GETGUID' $SQL2");
+      final maps = await dbClient!.query('BIF_TRA_TAB', where: "GUID='$GETGUID' $SQL2");
       for (var item in maps) {
-        List_D.add(BIF_TRA_TBL_Local.fromMap(item));
+        List_D.add(BIF_TRA_TAB_Local.fromMap(item));
       }
     } catch (e) {
       print(e.toString());
@@ -2031,7 +2031,7 @@ class SyncronizationData {
     return List_D;
   }
 
-  Future SyncBIF_TRA_TBLToSystem(List<BIF_TRA_TBL_Local> contactList)
+  Future SyncBIF_TRA_TABToSystem(List<BIF_TRA_TAB_Local> contactList)
   async {
     for (var i = 0; i < contactList.length; i++) {
       print('SyncBIF_TRA_TBLToSystem');
