@@ -2405,8 +2405,16 @@ class Additem {
       if(controller.BMKID==1){
         controller.BMDAMController.text ='0';
       }else{
-        controller.BMDAMController.text = controller.BCPR == 2 ? selection.MPS2.toString() :
-        controller.BCPR == 3 ? selection.MPS3.toString() : controller.BCPR == 4
+        controller.BMDAMController.text = (((controller.BMKID == 11 || controller.BMKID == 12) &&
+            (controller.BPPRT==0 && controller.BPPR == 2  ||controller. BPPRT==1
+                && controller.BPPRV.contains('<2>'))) || controller.BCPR == 2) ? selection.MPS2.toString() :
+        (((controller.BMKID == 11 || controller.BMKID == 12) &&
+            (controller.BPPRT==0 && controller.BPPR == 3  ||controller. BPPRT==1
+                && controller.BPPRV.contains('<3>'))) || controller.BCPR == 3)
+            ? selection.MPS3.toString() :
+        (((controller.BMKID == 11 || controller.BMKID == 12) &&
+            (controller.BPPRT==0 && controller.BPPR == 4  ||controller. BPPRT==1
+                && controller.BPPRV.contains('<4>'))) ||  controller.BCPR == 4)
             ? selection.MPS4.toString()
             : selection.MPS1.toString();
       }
@@ -2555,9 +2563,18 @@ class Additem {
                                       ),
                                       Text(
                                         "${'StringPrice'.tr}: ${controller.formatter.format(
-                                            controller.BCPR == 2 ? option.MPS2 : controller.BCPR == 3
+                                            (((controller.BMKID == 11 || controller.BMKID == 12) &&
+                                                (controller.BPPRT==0 && controller.BPPR == 2  ||controller. BPPRT==1
+                                                    && controller.BPPRV.contains('<2>'))) ||
+                                            controller.BCPR == 2) ? option.MPS2 :
+                                            (((controller.BMKID == 11 || controller.BMKID == 12) &&
+                                                (controller.BPPRT==0 && controller.BPPR == 3  ||controller. BPPRT==1
+                                                    && controller.BPPRV.contains('<3>'))) ||
+                                                controller.BCPR == 3)
                                                 ? option.MPS3
-                                                : controller.BCPR == 4
+                                                :   (((controller.BMKID == 11 || controller.BMKID == 12) &&
+                                                (controller.BPPRT==0 && controller.BPPR == 4  ||controller. BPPRT==1
+                                                    && controller.BPPRV.contains('<4>'))) ||  controller.BCPR == 4)
                                                 ? option.MPS4
                                                 : option.MPS1).toString()}",
                                         // استبدل `price` بالمفتاح الصحيح للسعر
@@ -2622,8 +2639,20 @@ class Additem {
                                   Padding(
                                     padding: const EdgeInsets.all(6.0),
                                     child: Text("${controller.formatter.format(
-                                        controller.BCPR == 2 ? option.MPS2 : controller.BCPR == 3 ? option.MPS3
-                                            : controller.BCPR == 4 ? option.MPS4 : option.MPS1).toString()}",
+                                        (((controller.BMKID == 11 || controller.BMKID == 12) &&
+                                            (controller.BPPRT==0 && controller.BPPR == 2  ||controller. BPPRT==1
+                                                && controller.BPPRV.contains('<2>'))) ||
+                                            controller.BCPR == 2) ? option.MPS2 :
+                                        (((controller.BMKID == 11 || controller.BMKID == 12) &&
+                                            (controller.BPPRT==0 && controller.BPPR == 3  ||controller. BPPRT==1
+                                                && controller.BPPRV.contains('<3>'))) ||
+                                            controller.BCPR == 3)
+                                            ? option.MPS3
+                                            :   (((controller.BMKID == 11 || controller.BMKID == 12) &&
+                                            (controller.BPPRT==0 && controller.BPPR == 4  ||controller. BPPRT==1
+                                                && controller.BPPRV.contains('<4>'))) ||  controller.BCPR == 4)
+                                            ? option.MPS4
+                                            : option.MPS1).toString()}",
                                         style: TextStyle(color: Colors.red)),
                                   ),
                                 ],

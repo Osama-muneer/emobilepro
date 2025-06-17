@@ -18,7 +18,7 @@ class ValidationService {
 
   static String? validateField(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return '$fieldName مطلوب';
+      return '$fieldName مطلوب ';
     }
     return null;
   }

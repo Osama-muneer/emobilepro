@@ -19,7 +19,7 @@ void main() async {
   //await FlutterBackgroundService.initialize(onStart);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
   await dep.init();
-  GlobalErrorHandler.init();
+ // GlobalErrorHandler.init();
    runApp(MainApp());
 }
 

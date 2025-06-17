@@ -105,6 +105,7 @@ dependencies:
   sqflite_common_ffi_web:
   flutter_spinkit:
   logger:
+  getwidget:
 
 
 dev_dependencies:
