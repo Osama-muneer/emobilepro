@@ -272,9 +272,9 @@ Future<List<Gen_Var_Local>> GET_GEN_VAR(String GETDES) async {
 
   sql = " SELECT  * FROM GEN_VAR WHERE  DES='$GETDES' AND $WhereSql $SQLBIID LIMIT 1";
   var result = await dbClient!.rawQuery(sql);
-  // print(sql);
-  // print(result);
-  // print('GET_GEN_VAR');
+  print(sql);
+  print(result);
+  print('GET_GEN_VAR');
   List<Gen_Var_Local> list = result.map((item) {
     return Gen_Var_Local.fromMap(item);
   }).toList();

@@ -292,6 +292,7 @@ class ApiProvider {
         List<dynamic> arr = response.data['result'];
         controller.arrlength=arr.length;
         print('${arr}');
+        await DeleteGEN_VAR_ALL();
         return (response.data)['result'].map((data) {
           SaveGEN_VAR(Gen_Var_Local.fromMap(data));
           INSERT_SYN_LOG('GEN_VAR', '${controller.SLIN}', 'D');

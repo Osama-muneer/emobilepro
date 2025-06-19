@@ -515,10 +515,8 @@ class Additem {
                                                                 controller: controller
                                                                     .BMDNOController,
                                                                 keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                                textAlign: TextAlign
-                                                                    .center,
+                                                                TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
+                                                                textAlign: TextAlign.center,
                                                                 focusNode: controller
                                                                     .myFocusNode,
                                                                 textInputAction: TextInputAction.go,
@@ -573,8 +571,7 @@ class Additem {
                                                                     .black, 'M'),
                                                                 controller: controller
                                                                     .BMDNFController,
-                                                                keyboardType: TextInputType
-                                                                    .number,
+                                                                keyboardType: TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                 textAlign: TextAlign
                                                                     .center,
                                                                 onChanged: (v) {
@@ -617,8 +614,7 @@ class Additem {
                                                                     'M'),
                                                                 controller: controller
                                                                     .BMDNFController,
-                                                                keyboardType: TextInputType
-                                                                    .number,
+                                                                keyboardType:TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                 textAlign: TextAlign
                                                                     .center,
                                                                 onChanged: (v) {
@@ -720,8 +716,7 @@ class Additem {
                                                                 controller
                                                                     .BMDAMTXController,
                                                                 keyboardType:
-                                                                TextInputType
-                                                                    .number,
+                                                                TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                 textAlign:
                                                                 TextAlign
                                                                     .center,
@@ -775,7 +770,7 @@ class Additem {
                                                                 child: TextFormField(
                                                                   style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                                                                   controller: controller.BMDAMController,
-                                                                  keyboardType: TextInputType.number,
+                                                                  keyboardType: TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                   textAlign: TextAlign.center,
                                                                   focusNode: controller.myFocusBMMAM,
                                                                   enabled: (controller.BMKID == 1 ||
@@ -885,8 +880,7 @@ class Additem {
                                                                 controller: controller
                                                                     .BMDNOController,
                                                                 keyboardType:
-                                                                TextInputType
-                                                                    .number,
+                                                                TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                 textAlign: TextAlign
                                                                     .center,
                                                                 focusNode: controller
@@ -964,8 +958,7 @@ class Additem {
                                                                     .black, 'M'),
                                                                 controller: controller
                                                                     .BMDAMTXController,
-                                                                keyboardType: TextInputType
-                                                                    .number,
+                                                                keyboardType: TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                 textAlign: TextAlign
                                                                     .center,
                                                                 enabled: false,
@@ -1014,7 +1007,7 @@ class Additem {
                                                                 child: TextFormField(
                                                                   style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
                                                                   controller: controller.BMDAMController,
-                                                                  keyboardType: TextInputType.number,
+                                                                  keyboardType: TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                   textAlign: TextAlign.center,
                                                                   focusNode: controller.myFocusBMMAM,
                                                                   enabled: (controller.BMKID == 1 || controller.BMKID == 2) ||
@@ -1173,8 +1166,7 @@ class Additem {
                                                                         controller
                                                                             .BMDDIRController,
                                                                         keyboardType:
-                                                                        TextInputType
-                                                                            .number,
+                                                                        TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                         textAlign:
                                                                         TextAlign
                                                                             .center,
@@ -1251,8 +1243,7 @@ class Additem {
                                                                         controller
                                                                             .BMDDIController,
                                                                         keyboardType:
-                                                                        TextInputType
-                                                                            .number,
+                                                                        TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                         textAlign:
                                                                         TextAlign
                                                                             .center,
@@ -1390,8 +1381,7 @@ class Additem {
                                                                         controller
                                                                             .BMDDIRController,
                                                                         keyboardType:
-                                                                        TextInputType
-                                                                            .number,
+                                                                        TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                         textAlign:
                                                                         TextAlign
                                                                             .center,
@@ -1468,8 +1458,7 @@ class Additem {
                                                                         controller
                                                                             .BMDDIController,
                                                                         keyboardType:
-                                                                        TextInputType
-                                                                            .number,
+                                                                        TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                         textAlign:
                                                                         TextAlign
                                                                             .center,
@@ -1602,8 +1591,7 @@ class Additem {
                                                                         controller
                                                                             .BMDDIRController,
                                                                         keyboardType:
-                                                                        TextInputType
-                                                                            .number,
+                                                                        TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                         textAlign:
                                                                         TextAlign
                                                                             .center,
@@ -1676,7 +1664,7 @@ class Additem {
                                                                             Colors
                                                                                 .black, 'M'),
                                                                         controller: controller.BMDDIController,
-                                                                        keyboardType: TextInputType.number,
+                                                                        keyboardType: TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                                         textAlign: TextAlign.center,
                                                                         onChanged: (v) {
                                                                           if (v.isNotEmpty && double.parse(v) >= 0) {
@@ -1763,7 +1751,7 @@ class Additem {
                                                     controller:
                                                     controller.BMDTXAController,
                                                     keyboardType:
-                                                    TextInputType.number,
+                                                    TYPEPHONE=='ANDROID'? TextInputType.number:TextInputType.text,
                                                     textAlign: TextAlign.center,
                                                     enabled: false,
                                                     decoration:
