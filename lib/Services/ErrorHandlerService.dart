@@ -11,10 +11,14 @@ class ErrorHandlerService {
     try {
       return await action(); // ✅ هذا هو المطلوب
     } catch (e, st) {
-      printLongText("⚠️ Error: $e\nStackTrace: $st");
+      printLongText("⚠️ Error: $e \n StackTrace: $st");
 
       if (showToast) {
-        await ToastService.showError("$Err ${e.toString()}");
+        try {
+          await ToastService.showError("$Err ${e.toString()}");
+        } catch (toastError) {
+          printLongText("⚠️ Error showing toast: $toastError");
+        }
       }
 
       if (onError != null) {

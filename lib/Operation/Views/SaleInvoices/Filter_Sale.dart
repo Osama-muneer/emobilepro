@@ -142,9 +142,7 @@ class Fliter_Sales {
                       ),
                     ),
                     onPressed: () async {
-                      controller.TYPE_SER=1;
-                      await controller.GET_BIL_MOV_M_P("DateNow");
-                      await controller.get_RETURN_SALE("DateNow");
+                      await controller.onFilterChanged(1);
                     },
                   ),
                   // ElevatedButton.icon(
@@ -228,16 +226,12 @@ class Fliter_Sales {
       controller.SelectDataPKID_S = null;
       controller.FromDaysController.text = controller.SER_DA;
       controller.ToDaysController.text = controller.SER_DA;
-    controller.TYPE_SER=2;
-    controller.update();
-    await controller.GET_BIL_MOV_M_P("DateNow");
-    await controller.get_RETURN_SALE("DateNow");
+      controller.update();
+      await controller.onFilterChanged(2);
   }
 
   Future<void> _applyFilters(BuildContext context) async {
-    controller.TYPE_SER=2;
-    await controller.GET_BIL_MOV_M_P("DateNow");
-    await controller.get_RETURN_SALE("DateNow");
+    await controller.onFilterChanged(2);
     Navigator.pop(context);
     // تطبيق الفلاتر هنا
   }

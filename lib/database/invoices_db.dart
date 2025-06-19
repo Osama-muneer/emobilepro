@@ -429,7 +429,8 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
 
 Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYPE,String GETDateNow,
     int GETBMKID2,int GETBMMST,String BIID_F,String BIID_T,String BMMDO_F,String BMMDO_T,String SCID_V,
-    String PKID_V,int REUTEN_T,int TYPE_SER) async {
+    String PKID_V,int REUTEN_T,int TYPE_SER,
+    {int? pageIndex=1, int? pageSize=20}) async {
   var dbClient = await conn.database;
   String sql;
   String sql2='';
@@ -571,11 +572,12 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
       " AND D.SYID_L=A.SYID_L AND D.CIID_L=A.CIID_L $Wheresql4 "
       " AND S.SIID=A.SIID AND S.JTID_L=A.JTID_L "
       " AND S.SYID_L=A.SYID_L AND S.CIID_L=A.CIID_L $Wheresql7"
-      " $SqlORD ORDER BY A.BMMID DESC";
+    //  " $SqlORD ORDER BY A.BMMID DESC LIMIT $pageSize OFFSET ${(pageIndex! - 1) * pageSize!}";
+      " $SqlORD ORDER BY A.BMMID DESC ";
 
   var result = await dbClient!.rawQuery(sql);
-   // printLongText(sql);
-  //  print(result);
+    printLongText(sql);
+   // print(result);
   // print(GETBMKID.toString());
   List<Bil_Mov_M_Local> list = result.map((item) {return Bil_Mov_M_Local.fromMap(item);
   }).toList();

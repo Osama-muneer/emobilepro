@@ -371,8 +371,12 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
               }
               return ListView.builder(
                   itemCount: controller.BIL_MOV_M_List.length,
+                //  controller: controller.scrollController,
                   itemBuilder: (BuildContext context, int index) {
                     var item =  controller.BIL_MOV_M_List[index];
+                    if (index == controller.BIL_MOV_M_List.length) {
+                      return Center(child: CircularProgressIndicator());
+                    }
                     return  InkWell(
                       onTap: () async {
                         controller.BIL_MOV_D_SHOW.clear();

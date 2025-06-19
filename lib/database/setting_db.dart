@@ -2901,10 +2901,9 @@ SELECT C.AANO,Ifnull (CAST (C.SCID AS INTEGER), A.SCID) AS SCID,
 WHERE (A.CIID_L='${LoginController().CIID}' AND A.JTID_L= ${LoginController().JTID}
 AND A.SYID_L=${LoginController().SYID} ) AND A.AANO='$AANO' AND A.SCID=$SCID  ) AS A1 ''';
 
-  var result = await dbClient!.rawQuery(sql,);
+  var result = await dbClient!.rawQuery(sql);
    print('SUM_BAL');
    printLongText('SQL: $sql');
-  // print('Args: [$lastSyncIso]');
    print('Result: $result');
   List<Bil_Mov_M_Local> list = result.map((item) {
     return Bil_Mov_M_Local.fromMap(item);

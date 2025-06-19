@@ -458,7 +458,7 @@ class Account_Statement_Controller extends GetxController {
   void Socket_IP(String IP,int Port) async {
     // final service = FlutterBackgroundService();
     // service.invoke("stopService");
-    Socket.connect(IP, Port, timeout: const Duration(seconds: 30)).then((socket) async {
+    Socket.connect(IP, Port, timeout: const Duration(seconds: 15)).then((socket) async {
       print("Success connect");
       GUID = uuid.v4();
       PAR_V="[AANO{${TYPY==3?SelectDataACNO_F:SelectDataAANO}}][AAMST{2}][BIID_F{$SelectDataFromBIID}][BIID_T{$SelectDataToBIID}]"
