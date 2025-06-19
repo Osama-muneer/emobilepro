@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import '../Operation/models/inventory.dart';
 import '../Operation/models/sto_mov_m.dart';
+import '../Services/ErrorHandlerService.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/controllers/setting_controller.dart';
 import '../Setting/models/acc_acc.dart';
@@ -18,397 +19,442 @@ import 'database.dart';
 final conn = DatabaseHelper.instance;
 
 Future<List<STO_MOV_M_Local>> GET_SMMID() async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
-  sql = "SELECT ifnull(MAX(SMMID),0)+1 AS SMMID FROM STO_MOV_M where"
-      "  JTID_L=${LoginController().JTID} "
-      " AND SYID_L=${LoginController().SYID} AND CIID_L='${LoginController().CIID}' $Wheresql";
-  var result = await dbClient!.rawQuery(sql);
-  List<STO_MOV_M_Local> list = result.map((item) {
-    return STO_MOV_M_Local.fromMap(item);
-  }).toList();
-  return list;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+    sql = "SELECT ifnull(MAX(SMMID),0)+1 AS SMMID FROM STO_MOV_M where"
+        "  JTID_L=${LoginController().JTID} "
+        " AND SYID_L=${LoginController().SYID} AND CIID_L='${LoginController().CIID}' $Wheresql";
+    var result = await dbClient!.rawQuery(sql);
+    List<STO_MOV_M_Local> list = result.map((item) {
+      return STO_MOV_M_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'GET_SMMID');
 }
 
 Future<List<STO_MOV_M_Local>> GET_SMMNO(int GETSMKID) async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
-  String sql2='';
-  String sql3='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
+    String sql2='';
+    String sql3='';
 
-  GETSMKID==0?sql2=' AND BKID=-1  AND BMMID=-1 ':sql2=' AND BKID is null  AND BMMID is null ';
-  if(GETSMKID==131){
-    sql3=' AND BIID!=BIIDT ';
-  }else{
-    sql3=' AND BIIDT is null ';
-  };
+    GETSMKID==0?sql2=' AND BKID=-1  AND BMMID=-1 ':sql2=' AND BKID is null  AND BMMID is null ';
+    if(GETSMKID==131){
+      sql3=' AND BIID!=BIIDT ';
+    }else{
+      sql3=' AND BIIDT is null ';
+    };
 
-  GETSMKID==0?GETSMKID=1:GETSMKID==131?GETSMKID=13:GETSMKID;
+    GETSMKID==0?GETSMKID=1:GETSMKID==131?GETSMKID=13:GETSMKID;
 
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
-  sql = "SELECT ifnull(MAX(SMMNO),0)+1 AS SMMNO FROM STO_MOV_M  WHERE SMKID=$GETSMKID $sql2 $sql3 AND SUID='${LoginController().SUID}' AND "
-      " JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID}  AND CIID_L='${LoginController().CIID}' $Wheresql ";
-  var result = await dbClient!.rawQuery(sql);
-  List<STO_MOV_M_Local> list = result.map((item) {
-    return STO_MOV_M_Local.fromMap(item);
-  }).toList();
-  return list;
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+    sql = "SELECT ifnull(MAX(SMMNO),0)+1 AS SMMNO FROM STO_MOV_M  WHERE SMKID=$GETSMKID $sql2 $sql3 AND SUID='${LoginController().SUID}' AND "
+        " JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID}  AND CIID_L='${LoginController().CIID}' $Wheresql ";
+    var result = await dbClient!.rawQuery(sql);
+    List<STO_MOV_M_Local> list = result.map((item) {
+      return STO_MOV_M_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'GET_SMMNO');
 }
 
 Future<List<Sto_Mov_D_Local>> GET_SMDID(int GETSMMID) async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
-  sql = "SELECT ifnull(MAX(SMDID),0)+1 AS SMDID FROM STO_MOV_D  WHERE  SMMID=$GETSMMID ";
-  var result = await dbClient!.rawQuery(sql);
-  List<Sto_Mov_D_Local> list = result.map((item) {
-    return Sto_Mov_D_Local.fromMap(item);
-  }).toList();
-  return list;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+    sql = "SELECT ifnull(MAX(SMDID),0)+1 AS SMDID FROM STO_MOV_D  WHERE  SMMID=$GETSMMID ";
+    var result = await dbClient!.rawQuery(sql);
+    List<Sto_Mov_D_Local> list = result.map((item) {
+      return Sto_Mov_D_Local.fromMap(item);
+    }).toList();
+    return list;
+    },Err: 'GET_SMDID');
 }
 
 
 Future<STO_MOV_M_Local> SaveSto_Mov_M(STO_MOV_M_Local data) async {
-  var dbClient = await conn.database;
-  data.SMMID = await dbClient!.insert('STO_MOV_M', data.toMap());
-  return data;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    data.SMMID = await dbClient!.insert('STO_MOV_M', data.toMap());
+    return data;
+  },Err: 'SaveSto_Mov_M');
 }
 
 Future<Sto_Mov_D_Local> SaveSto_Mov_D(Sto_Mov_D_Local data) async {
-  var dbClient = await conn.database;
-  data.SMDID = await dbClient!.insert('STO_MOV_D', data.toMap());
-  print('SaveSto_Mov_D');
-  print(data.toMap());
-  return data;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    data.SMDID = await dbClient!.insert('STO_MOV_D', data.toMap());
+    return data;
+  },Err: 'SaveSto_Mov_D');
 }
 
 Future<int> DeleteSTO_MOV_D(int id) async {
-  var dbClient = await conn.database;
-  return await dbClient!.delete(
-      'STO_MOV_D', where: 'SMMID=?', whereArgs: [id]);
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    return await dbClient!.delete('STO_MOV_D', where: 'SMMID=?', whereArgs: [id]);
+  },Err: 'DeleteSTO_MOV_D');
 }
 
 Future<int> DeleteSTO_MOV_M(int id) async {
-  var dbClient = await conn.database;
-  return await dbClient!.delete(
-      'STO_MOV_M', where: 'SMMID=?', whereArgs: [id]);
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    return await dbClient!.delete('STO_MOV_M', where: 'SMMID=?', whereArgs: [id]);
+  },Err: 'DeleteSTO_MOV_M');
 }
 
 
 Future<List<Mat_Inf_Local>> Get_MAT_INF(int GetSMKID,String GetSIID,String GetSIID_T,String GetMGNO) async {
-  var dbClient = await conn.database;
-  String sql='';
-  String MGNOsql='';
-  String sqlSIID='';
-  String sql3='';
-  String Wheresql='';
-  String Wheresql2='';
-  String Wheresql3='';
-  String Wheresql4='';
-  String Wheresql5='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND C.BIID_L=${LoginController().BIID}":Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql2= " AND A.BIID_L=${LoginController().BIID}":Wheresql2='';
-  LoginController().BIID_ALL_V=='1'? Wheresql3= " AND B.BIID_L=${LoginController().BIID}":Wheresql3='';
-  LoginController().BIID_ALL_V=='1'? Wheresql4= " AND D.BIID_L=${LoginController().BIID}":Wheresql4='';
-  LoginController().BIID_ALL_V=='1'? Wheresql5= " AND E.BIID_L=${LoginController().BIID}":Wheresql5='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql='';
+    String MGNOsql='';
+    String sqlSIID='';
+    String sql3='';
+    String Wheresql='';
+    String Wheresql2='';
+    String Wheresql3='';
+    String Wheresql4='';
+    String Wheresql5='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND C.BIID_L=${LoginController().BIID}":Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql2= " AND A.BIID_L=${LoginController().BIID}":Wheresql2='';
+    LoginController().BIID_ALL_V=='1'? Wheresql3= " AND B.BIID_L=${LoginController().BIID}":Wheresql3='';
+    LoginController().BIID_ALL_V=='1'? Wheresql4= " AND D.BIID_L=${LoginController().BIID}":Wheresql4='';
+    LoginController().BIID_ALL_V=='1'? Wheresql5= " AND E.BIID_L=${LoginController().BIID}":Wheresql5='';
 
-  if(StteingController().isSwitchUse_Gro==true && GetMGNO.isNotEmpty){
-    MGNOsql=" A.MGNO='$GetMGNO' AND  ";
-  }
+    if(StteingController().isSwitchUse_Gro==true && GetMGNO.isNotEmpty){
+      MGNOsql=" A.MGNO='$GetMGNO' AND  ";
+    }
 
-  GetSMKID==13 || GetSMKID==11 || GetSMKID==131?sqlSIID=' C.SIID BETWEEN $GetSIID AND $GetSIID_T ':sqlSIID=' C.SIID=$GetSIID ';
+    GetSMKID==13 || GetSMKID==11 || GetSMKID==131?sqlSIID=' C.SIID BETWEEN $GetSIID AND $GetSIID_T ':sqlSIID=' C.SIID=$GetSIID ';
 
-  if(StteingController().isShow_Mat_No_SNNO==false){
-    sql3=" AND EXISTS(SELECT 1 FROM STO_NUM C WHERE  $sqlSIID AND (C.MGNO=A.MGNO AND C.MINO=A.MINO)"
-        "AND C.JTID_L=${LoginController().JTID} AND C.SYID_L=${LoginController().SYID} "
-        " AND C.CIID_L=${LoginController().CIID} $Wheresql) ";
-  }
+    if(StteingController().isShow_Mat_No_SNNO==false){
+      sql3=" AND EXISTS(SELECT 1 FROM STO_NUM C WHERE  $sqlSIID AND (C.MGNO=A.MGNO AND C.MINO=A.MINO)"
+          "AND C.JTID_L=${LoginController().JTID} AND C.SYID_L=${LoginController().SYID} "
+          " AND C.CIID_L=${LoginController().CIID} $Wheresql) ";
+    }
 
-  if(StteingController().Type_Serach==2){
-    sql = " SELECT CASE WHEN ${LoginController().LAN}=2 AND A.MINE IS NOT NULL THEN A.MINE ELSE A.MINA END  MINA_D,"
-        " A.MINA,A.MINO,A.MGNO,D.MUCBC,A.MIED FROM MAT_INF A,MAT_GRO B,MAT_UNI_B D WHERE  "
-        " A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} "
-        " AND A.CIID_L=${LoginController().CIID} $Wheresql2 AND A.MGNO=B.MGNO"
-        " AND B.MGTY=2 AND B.MGKI=1 AND B.JTID_L=${LoginController().JTID} AND B.SYID_L=${LoginController().SYID} "
-        " AND B.CIID_L=${LoginController().CIID} $Wheresql3"
-        " AND (D.MGNO=A.MGNO AND D.MINO=A.MINO) AND D.MUCBC IS NOT NULL AND $MGNOsql "
-        " D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
-        " AND D.CIID_L=${LoginController().CIID} $Wheresql4 AND "
-        " EXISTS(SELECT 1 FROM GRO_USR E WHERE E.MGNO=A.MGNO AND E.SUID='${LoginController().SUID}'"
-        " AND E.JTID_L=${LoginController().JTID} AND E.SYID_L=${LoginController().SYID} "
-        " AND E.CIID_L=${LoginController().CIID} $Wheresql5)"
-        " $sql3  ORDER BY A.MGNO,A.MINO ";
-  }
-  else{
-    sql = "SELECT A.MINA,A.MINO,A.MGNO,A.MIED,CASE WHEN ${LoginController().LAN}=2 AND A.MINE IS NOT NULL THEN A.MINE ELSE A.MINA END  MINA_D"
-        " FROM MAT_INF A,MAT_GRO B WHERE A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} "
-        " AND A.CIID_L=${LoginController().CIID} $Wheresql2 AND A.MGNO=B.MGNO AND B.MGTY=2 AND B.MGKI=1 "
-        " AND B.JTID_L=${LoginController().JTID} AND B.SYID_L=${LoginController().SYID} "
-        " AND B.CIID_L=${LoginController().CIID} $Wheresql3"
-        " AND $MGNOsql  EXISTS(SELECT 1 FROM GRO_USR D WHERE D.MGNO=A.MGNO AND D.SUID='${LoginController().SUID}'"
-        " AND D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
-        " AND D.CIID_L=${LoginController().CIID} $Wheresql4)"
-        " $sql3  ORDER BY A.MGNO,A.MINO ";
-  }
+    if(StteingController().Type_Serach==2){
+      sql = " SELECT CASE WHEN ${LoginController().LAN}=2 AND A.MINE IS NOT NULL THEN A.MINE ELSE A.MINA END  MINA_D,"
+          " A.MINA,A.MINO,A.MGNO,D.MUCBC,A.MIED FROM MAT_INF A,MAT_GRO B,MAT_UNI_B D WHERE  "
+          " A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} "
+          " AND A.CIID_L=${LoginController().CIID} $Wheresql2 AND A.MGNO=B.MGNO"
+          " AND B.MGTY=2 AND B.MGKI=1 AND B.JTID_L=${LoginController().JTID} AND B.SYID_L=${LoginController().SYID} "
+          " AND B.CIID_L=${LoginController().CIID} $Wheresql3"
+          " AND (D.MGNO=A.MGNO AND D.MINO=A.MINO) AND D.MUCBC IS NOT NULL AND $MGNOsql "
+          " D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
+          " AND D.CIID_L=${LoginController().CIID} $Wheresql4 AND "
+          " EXISTS(SELECT 1 FROM GRO_USR E WHERE E.MGNO=A.MGNO AND E.SUID='${LoginController().SUID}'"
+          " AND E.JTID_L=${LoginController().JTID} AND E.SYID_L=${LoginController().SYID} "
+          " AND E.CIID_L=${LoginController().CIID} $Wheresql5)"
+          " $sql3  ORDER BY A.MGNO,A.MINO ";
+    }
+    else{
+      sql = "SELECT A.MINA,A.MINO,A.MGNO,A.MIED,CASE WHEN ${LoginController().LAN}=2 AND A.MINE IS NOT NULL THEN A.MINE ELSE A.MINA END  MINA_D"
+          " FROM MAT_INF A,MAT_GRO B WHERE A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} "
+          " AND A.CIID_L=${LoginController().CIID} $Wheresql2 AND A.MGNO=B.MGNO AND B.MGTY=2 AND B.MGKI=1 "
+          " AND B.JTID_L=${LoginController().JTID} AND B.SYID_L=${LoginController().SYID} "
+          " AND B.CIID_L=${LoginController().CIID} $Wheresql3"
+          " AND $MGNOsql  EXISTS(SELECT 1 FROM GRO_USR D WHERE D.MGNO=A.MGNO AND D.SUID='${LoginController().SUID}'"
+          " AND D.JTID_L=${LoginController().JTID} AND D.SYID_L=${LoginController().SYID} "
+          " AND D.CIID_L=${LoginController().CIID} $Wheresql4)"
+          " $sql3  ORDER BY A.MGNO,A.MINO ";
+    }
 
-  var result = await dbClient!.rawQuery(sql);
-  //if (result.length == 0) return null;
-  List<Mat_Inf_Local> list = result.map((item) {
-    return Mat_Inf_Local.fromMap(item);
-  }).toList();
-  print(sql);
-  print(result);
-  return list;
+    var result = await dbClient!.rawQuery(sql);
+    //if (result.length == 0) return null;
+    List<Mat_Inf_Local> list = result.map((item) {
+      return Mat_Inf_Local.fromMap(item);
+    }).toList();
+    print(sql);
+    print(result);
+    return list;
+  },Err: 'Get_MAT_INF');
 }
 
 Future<int> UpdateStateSto_Mov_M(String TypeSync,int GTSMKID,String GetSMMID,int GetSMMST) async {
-  var dbClient = await conn.database;
-  String value='';
-  if(TypeSync=='SyncAll'){
-    value='SMMST=2 AND SMKID=$GTSMKID';
-  }
-  else if(TypeSync=='SyncOnly'){
-    value='SMMST=2 and SMMID=$GetSMMID';
-  }
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String value='';
+    if(TypeSync=='SyncAll'){
+      value='SMMST=2 AND SMKID=$GTSMKID';
+    }
+    else if(TypeSync=='SyncOnly'){
+      value='SMMST=2 and SMMID=$GetSMMID';
+    }
 
-  final data = {'SMMST':GetSMMST};
-  final result = await dbClient!.update('STO_MOV_M', data, where: value);
-  return result;
+    final data = {'SMMST':GetSMMST};
+    final result = await dbClient!.update('STO_MOV_M', data, where: value);
+    return result;
+  },Err: 'UpdateStateSto_Mov_M');
 }
 
 Future<int> UPADTE_SIID(int GetSMMID,String GetSIID) async {
-  var dbClient = await conn.database;
-  final data = {'SIID':GetSIID};
-  final result = await dbClient!.update('STO_MOV_D', data, where: "SMMID=$GetSMMID");
-  return result;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    final data = {'SIID':GetSIID};
+    final result = await dbClient!.update('STO_MOV_D', data, where: "SMMID=$GetSMMID");
+    return result;
+  },Err: 'UPADTE_SIID');
 }
 
 Future<int> UpdateStateSto_Mov_D(String TypeSync,int GTSMKID,String GetSMMID,int GetSYST) async {
-  var dbClient = await conn.database;
-  String value='';
-  if(TypeSync=='SyncAll'){
-    value='SYST=2 AND SMKID=$GTSMKID';
-  }
-  else if(TypeSync=='SyncOnly'){
-    value='SYST=2 and SMMID=$GetSMMID';
-  }
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String value='';
+    if(TypeSync=='SyncAll'){
+      value='SYST=2 AND SMKID=$GTSMKID';
+    }
+    else if(TypeSync=='SyncOnly'){
+      value='SYST=2 and SMMID=$GetSMMID';
+    }
 
-  final data = {'SYST':GetSYST};
-  final result = await dbClient!.update('STO_MOV_D', data, where: value);
-  return result;
+    final data = {'SYST':GetSYST};
+    final result = await dbClient!.update('STO_MOV_D', data, where: value);
+    return result;
+  },Err: 'UpdateStateSto_Mov_D');
 }
 
 Future<int?> Get_Count_D(int GetSMMID,String GetMGNO,String GetMINO,int GETMUID,String USESMDE,String GETSMDDE) async {
-  var dbClient = await conn.database;
-  String sql;
-  String SqlUSESMDE='';
-  String Wheresql='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String SqlUSESMDE='';
+    String Wheresql='';
 
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
-  if(USESMDE=='1'){
-    SqlUSESMDE=" AND SMDED='$GETSMDDE'";
-  }
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+    if(USESMDE=='1'){
+      SqlUSESMDE=" AND SMDED='$GETSMDDE'";
+    }
 
-  sql = "SELECT count(*)  FROM STO_MOV_D where SMMID=$GetSMMID AND MGNO='$GetMGNO' AND MINO='$GetMINO' AND MUID=$GETMUID"
-      "  $SqlUSESMDE   AND  JTID_L=${LoginController().JTID} "
-  " AND SYID_L=${LoginController().SYID} AND CIID_L='${LoginController().CIID}' $Wheresql";
-  var x = await dbClient!.rawQuery(sql);
-  int? Count = Sqflite.firstIntValue(x);
-  return Count;
+    sql = "SELECT count(*)  FROM STO_MOV_D where SMMID=$GetSMMID AND MGNO='$GetMGNO' AND MINO='$GetMINO' AND MUID=$GETMUID"
+        "  $SqlUSESMDE   AND  JTID_L=${LoginController().JTID} "
+        " AND SYID_L=${LoginController().SYID} AND CIID_L='${LoginController().CIID}' $Wheresql";
+    var x = await dbClient!.rawQuery(sql);
+    int? Count = Sqflite.firstIntValue(x);
+    return Count;
+  },Err: 'Get_Count_D');
 }
 
 Future<int> UpdateSMDNF(int GetSMKID,int GetSMMID,String GetMGNO,String GetMINO,int GETMUID,
     double GetSMDNF,String USESMDE,String GETSMDDE,double GetSMDAM) async {
-  var dbClient = await conn.database;
-  String SQLUPDATE;
-  String SqlUSESMDE='';
-  String SqlUSEGetSMKID='';
-  if(USESMDE=='1'){
-    SqlUSESMDE=" AND SMDED='$GETSMDDE'";
-  }
-  if(GetSMKID==17){
-    SqlUSEGetSMKID=" SMDDF=SMDDF+$GetSMDNF,SMDNF=SMDNF+$GetSMDNF";
-  }else if (GetSMKID==1){
-    SqlUSEGetSMKID=" SMDNO=SMDNO+$GetSMDNF , SMDAM=$GetSMDAM , SMDEQ=$GetSMDAM";
-  }
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String SQLUPDATE;
+    String SqlUSESMDE='';
+    String SqlUSEGetSMKID='';
+    if(USESMDE=='1'){
+      SqlUSESMDE=" AND SMDED='$GETSMDDE'";
+    }
+    if(GetSMKID==17){
+      SqlUSEGetSMKID=" SMDDF=SMDDF+$GetSMDNF,SMDNF=SMDNF+$GetSMDNF";
+    }else if (GetSMKID==1){
+      SqlUSEGetSMKID=" SMDNO=SMDNO+$GetSMDNF , SMDAM=$GetSMDAM , SMDEQ=$GetSMDAM";
+    }
 
-  SQLUPDATE = "update sto_mov_d set  $SqlUSEGetSMKID "
-      " where SMMID=$GetSMMID AND MGNO='$GetMGNO' AND MINO='$GetMINO' AND MUID=$GETMUID  $SqlUSESMDE";
-  final result = await dbClient!.rawUpdate(SQLUPDATE);
-  return result;
+    SQLUPDATE = "update sto_mov_d set  $SqlUSEGetSMKID "
+        " where SMMID=$GetSMMID AND MGNO='$GetMGNO' AND MINO='$GetMINO' AND MUID=$GETMUID  $SqlUSESMDE";
+    final result = await dbClient!.rawUpdate(SQLUPDATE);
+    return result;
+  },Err: 'UpdateSMDNF');
 }
 
 Future<int> UpdateSto_Mov_D(int GetSMKID,int GetSMMID,int GetSMDID,String GetMGNO,String GetMINO,
     int GETMUID,double GetSMDNF,double GetSMDDF,String GETSMDDE,double GetSMDAM,double GetSMDEQ,double GetSMDEQC,
     double GetSMDAMR,double GetSMDAMRE,double GetSMDAMT,double GetSMDAMTF) async {
-  var dbClient = await conn.database;
-  final data = {'MGNO':GetMGNO,'MINO':GetMINO,
-    'MUID':GETMUID, 'SMDNF':GetSMDNF
-    ,'SMDDF':GetSMDDF,'SMDED':GETSMDDE};
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    final data = {'MGNO':GetMGNO,'MINO':GetMINO,
+      'MUID':GETMUID, 'SMDNF':GetSMDNF
+      ,'SMDDF':GetSMDDF,'SMDED':GETSMDDE};
 
-  final data2={'MGNO':GetMGNO,'MINO':GetMINO,
-              'MUID':GETMUID, 'SMDNO':GetSMDNF,'SMDNF':GetSMDDF,'SMDAM':GetSMDAM,'SMDEQ':GetSMDAM,
-              'SMDED':GETSMDDE,'SMDEQC':GetSMDEQC,'SMDAMR':GetSMDAMR,'SMDAMRE':GetSMDAMRE,'SMDAMT':GetSMDAMT,
-              'SMDAMTF':GetSMDAMTF,'SUCH':LoginController().SUID};
-  final result = await dbClient!.update('STO_MOV_D', GetSMKID==17?data:data2, where: 'SMMID=$GetSMMID AND '
-      'SMDID=$GetSMDID');
-  return result;
+    final data2={'MGNO':GetMGNO,'MINO':GetMINO,
+      'MUID':GETMUID, 'SMDNO':GetSMDNF,'SMDNF':GetSMDDF,'SMDAM':GetSMDAM,'SMDEQ':GetSMDAM,
+      'SMDED':GETSMDDE,'SMDEQC':GetSMDEQC,'SMDAMR':GetSMDAMR,'SMDAMRE':GetSMDAMRE,'SMDAMT':GetSMDAMT,
+      'SMDAMTF':GetSMDAMTF,'SUCH':LoginController().SUID};
+    final result = await dbClient!.update('STO_MOV_D', GetSMKID==17?data:data2, where: 'SMMID=$GetSMMID AND '
+        'SMDID=$GetSMDID');
+    return result;
+  },Err: 'UpdateSto_Mov_D');
 }
 
 
 Future<List<Mat_Inf_Local>> Get_MUIDS_D(String GetMGNO,String GetMINO) async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
+  return await ErrorHandlerService.run(() async {
 
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
 
-  sql = "SELECT * FROM MAT_INF where MGNO='$GetMGNO' AND MINO='$GetMINO' AND "
-      "JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} AND "
-      "CIID_L=${LoginController().CIID} $Wheresql ";
-  var result = await dbClient!.rawQuery(sql);
-  //if (result.length == 0) return null;
-  List<Mat_Inf_Local> list = result.map((item) {
-    return Mat_Inf_Local.fromMap(item);
-  }).toList();
-  return list;
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+
+    sql = "SELECT * FROM MAT_INF where MGNO='$GetMGNO' AND MINO='$GetMINO' AND "
+        "JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} AND "
+        "CIID_L=${LoginController().CIID} $Wheresql ";
+    var result = await dbClient!.rawQuery(sql);
+    //if (result.length == 0) return null;
+    List<Mat_Inf_Local> list = result.map((item) {
+      return Mat_Inf_Local.fromMap(item);
+    }).toList();
+    return list;
+
+  },Err: 'Get_MUIDS_D');
 }
 
 
 Future<List<Mat_Uni_B_Local>> Get_BRO(String GetSIID,String Getbarcod) async {
-  var dbClient = await conn.database;
-  String sql;
-  String sql3='';
-  String Wheresql='';
-  String Wheresql2='';
-  String Wheresql3='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  A.BIID_L=${LoginController().BIID}":Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql2= " AND  C.BIID_L=${LoginController().BIID}":Wheresql2='';
-  LoginController().BIID_ALL_V=='1'? Wheresql3= " AND  B.BIID_L=${LoginController().BIID}":Wheresql3='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String sql3='';
+    String Wheresql='';
+    String Wheresql2='';
+    String Wheresql3='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  A.BIID_L=${LoginController().BIID}":Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql2= " AND  C.BIID_L=${LoginController().BIID}":Wheresql2='';
+    LoginController().BIID_ALL_V=='1'? Wheresql3= " AND  B.BIID_L=${LoginController().BIID}":Wheresql3='';
 
-  sql =" SELECT A.*,C.MINA,C.MITSK,B.MGKI FROM MAT_UNI_B A,MAT_INF C,MAT_GRO B WHERE  A.MUCBC='$Getbarcod'  "
-      " AND B.MGNO=A.MGNO AND (C.MINO=A.MINO AND C.MGNO=A.MGNO) AND EXISTS(SELECT 1 FROM GRO_USR D WHERE D.MGNO=A.MGNO "
-      " AND D.SUID=${LoginController().SUID})"
-      " AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} AND "
-      " A.CIID_L=${LoginController().CIID} $Wheresql AND "
-      " C.JTID_L=${LoginController().JTID} AND C.SYID_L=${LoginController().SYID} AND "
-      " C.CIID_L=${LoginController().CIID} $Wheresql2  AND"
-      " B.JTID_L=${LoginController().JTID} AND B.SYID_L=${LoginController().SYID} AND "
-      " B.CIID_L=${LoginController().CIID} $Wheresql3 "
-      " ORDER BY A.MGNO,A.MINO LIMIT 1 ";
-  var result = await dbClient!.rawQuery(sql);
-  List<Mat_Uni_B_Local> list = result.map((item) {
-    return Mat_Uni_B_Local.fromMap(item);
-  }).toList();
-  return list;
+    sql =" SELECT A.*,C.MINA,C.MITSK,B.MGKI FROM MAT_UNI_B A,MAT_INF C,MAT_GRO B WHERE  A.MUCBC='$Getbarcod'  "
+        " AND B.MGNO=A.MGNO AND (C.MINO=A.MINO AND C.MGNO=A.MGNO) AND EXISTS(SELECT 1 FROM GRO_USR D WHERE D.MGNO=A.MGNO "
+        " AND D.SUID=${LoginController().SUID})"
+        " AND A.JTID_L=${LoginController().JTID} AND A.SYID_L=${LoginController().SYID} AND "
+        " A.CIID_L=${LoginController().CIID} $Wheresql AND "
+        " C.JTID_L=${LoginController().JTID} AND C.SYID_L=${LoginController().SYID} AND "
+        " C.CIID_L=${LoginController().CIID} $Wheresql2  AND"
+        " B.JTID_L=${LoginController().JTID} AND B.SYID_L=${LoginController().SYID} AND "
+        " B.CIID_L=${LoginController().CIID} $Wheresql3 "
+        " ORDER BY A.MGNO,A.MINO LIMIT 1 ";
+    var result = await dbClient!.rawQuery(sql);
+    List<Mat_Uni_B_Local> list = result.map((item) {
+      return Mat_Uni_B_Local.fromMap(item);
+    }).toList();
+    return list;
+
+  },Err: 'Get_BRO');
 }
 
 
 Future<List<Sto_Mov_D_Local>> CountSMDNF(int GetSMMID,int TYPE) async {
-  var dbClient = await conn.database;
-  String sql;
-  String sql2='';
-  TYPE==11 || TYPE==1 || TYPE==0 || TYPE==3 || TYPE==13 || TYPE==131 ? sql2='SMDNO':sql2='SMDNF';
-  sql = "select ifnull(sum($sql2),0.0) AS SUM from STO_MOV_D where SMMID=$GetSMMID";
-  var result = await dbClient!.rawQuery(sql);
-  List<Sto_Mov_D_Local> list = result.map((item) {
-    return Sto_Mov_D_Local.fromMapSum(item);
-  }).toList();
-  return list;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String sql2='';
+    TYPE==11 || TYPE==1 || TYPE==0 || TYPE==3 || TYPE==13 || TYPE==131 ? sql2='SMDNO':sql2='SMDNF';
+    sql = "select ifnull(sum($sql2),0.0) AS SUM from STO_MOV_D where SMMID=$GetSMMID";
+    var result = await dbClient!.rawQuery(sql);
+    List<Sto_Mov_D_Local> list = result.map((item) {
+      return Sto_Mov_D_Local.fromMapSum(item);
+    }).toList();
+    return list;
+  },Err: 'CountSMDNF');
 }
 
 
 
 Future<List<Sto_Num_Local>> GET_SMDED(String GETMGNO,String GETMINO,String GETSIID,String GETMUID,GETSMKID) async {
-  var dbClient = await conn.database;
-  String sql;
-  String sql2=GETSMKID=='3' ?  ' and SNNO>0 ':'';
-  String Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String sql2=GETSMKID=='3' ?  ' and SNNO>0 ':'';
+    String Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
 
-  sql = "SELECT * FROM STO_NUM WHERE SIID=$GETSIID AND  MGNO='$GETMGNO' AND MINO='$GETMINO' AND MUID=$GETMUID  $sql2"
-      " AND JTID_L=${LoginController().JTID} "
-      " AND SYID_L=${LoginController().SYID} AND CIID_L=${LoginController().CIID} $Wheresql";
-  var result = await dbClient!.rawQuery(sql);
-  //if (result.length == 0) return null;
-  List<Sto_Num_Local> list = result.map((item) {
-    return Sto_Num_Local.fromMap(item);
-  }).toList();
-  return list;
+    sql = "SELECT * FROM STO_NUM WHERE SIID=$GETSIID AND  MGNO='$GETMGNO' AND MINO='$GETMINO' AND MUID=$GETMUID  $sql2"
+        " AND JTID_L=${LoginController().JTID} "
+        " AND SYID_L=${LoginController().SYID} AND CIID_L=${LoginController().CIID} $Wheresql";
+    var result = await dbClient!.rawQuery(sql);
+    List<Sto_Num_Local> list = result.map((item) {
+      return Sto_Num_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'GET_SMDED');
 }
 
 Future<List<Sto_Num_Local>> Get_SNDE_ONE(String GETMGNO,String GETMINO,String GETSIID,String GETMUID) async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
 
-  sql = "SELECT * FROM STO_NUM WHERE  SIID=$GETSIID AND  MGNO='$GETMGNO' AND MINO='$GETMINO' AND MUID=$GETMUID"
-      " AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
-      " AND CIID_L=${LoginController().CIID} $Wheresql ORDER BY SIID DESC LIMIT 1";
-  var result = await dbClient!.rawQuery(sql);
-  List<Sto_Num_Local> list = result.map((item) {
-    return Sto_Num_Local.fromMap(item);
-  }).toList();
-  return list;
+    sql = "SELECT * FROM STO_NUM WHERE  SIID=$GETSIID AND  MGNO='$GETMGNO' AND MINO='$GETMINO' AND MUID=$GETMUID"
+        " AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
+        " AND CIID_L=${LoginController().CIID} $Wheresql ORDER BY SIID DESC LIMIT 1";
+    var result = await dbClient!.rawQuery(sql);
+    List<Sto_Num_Local> list = result.map((item) {
+      return Sto_Num_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'Get_SNDE_ONE');
 }
 
 
 Future<List<Sto_Mov_D_Local>> CountRecode(int GetSMMID) async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
-  sql = "select ifnull(count(1),0) AS COU from STO_MOV_D where SMMID=$GetSMMID "
-       " AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
-       " AND CIID_L=${LoginController().CIID} $Wheresql";
-  var result = await dbClient!.rawQuery(sql);
-  //if (result.length == 0) return null;
-  List<Sto_Mov_D_Local> list = result.map((item) {
-    return Sto_Mov_D_Local.fromMapCou(item);
-  }).toList();
-  return list;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND  BIID_L=${LoginController().BIID}":Wheresql='';
+    sql = "select ifnull(count(1),0) AS COU from STO_MOV_D where SMMID=$GetSMMID "
+        " AND JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
+        " AND CIID_L=${LoginController().CIID} $Wheresql";
+    var result = await dbClient!.rawQuery(sql);
+    //if (result.length == 0) return null;
+    List<Sto_Mov_D_Local> list = result.map((item) {
+      return Sto_Mov_D_Local.fromMapCou(item);
+    }).toList();
+    return list;
+  },Err: 'CountRecode');
+
 }
 
 
 Future<List<Sys_Yea_Local>> GET_SYS_YEA(int GetSYID) async {
-  var dbClient = await conn.database;
-  String sql;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
 
-  sql = " SELECT *  FROM  SYS_YEA_ACC WHERE  SYID=$GetSYID  ORDER BY SYID  LIMIT 1";
-  var result = await dbClient!.rawQuery(sql);
-  //if (result.length == 0) return null;
-  List<Sys_Yea_Local> list = result.map((item) {
-    return Sys_Yea_Local.fromMap(item);
-  }).toList();
-  return list;
+    sql = " SELECT *  FROM  SYS_YEA_ACC WHERE  SYID=$GetSYID  ORDER BY SYID  LIMIT 1";
+    var result = await dbClient!.rawQuery(sql);
+    //if (result.length == 0) return null;
+    List<Sys_Yea_Local> list = result.map((item) {
+      return Sys_Yea_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'GET_SYS_YEA');
 }
 
 Future<int> UpdateSMMNR(int GetSMMNR,int? GetSMMID) async {
-  var dbClient = await conn.database;
-  final data = {'SMMNR':GetSMMNR};
-  final result = await dbClient!.update('STO_MOV_M', data, where: 'SMMID=$GetSMMID');
-  return result;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    final data = {'SMMNR':GetSMMNR};
+    final result = await dbClient!.update('STO_MOV_M', data, where: 'SMMID=$GetSMMID');
+    return result;
+  },Err: 'UpdateSMMNR');
 }
 
 Future<List<Mat_Gro_Local>> GET_MGNA(String GetMGNO) async {
-  var dbClient = await conn.database;
-  String sql;
-  String Wheresql='';
-  LoginController().BIID_ALL_V=='1'? Wheresql= " AND BIID_L=${LoginController().BIID}":Wheresql='';
-  sql = " SELECT *,CASE WHEN ${LoginController().LAN}=2 AND MGNE IS NOT NULL THEN MGNE ELSE MGNA END  MGNA_D"
-      " FROM MAT_GRO WHERE MGNO='$GetMGNO' AND JTID_L=${LoginController().JTID} "
-      " AND SYID_L=${LoginController().SYID} "
-      " AND CIID_L=${LoginController().CIID} $Wheresql";
-  var result = await dbClient!.rawQuery(sql);
-  List<Mat_Gro_Local> list = result.map((item) {
-    return Mat_Gro_Local.fromMap(item);
-  }).toList();
-  return list;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String Wheresql='';
+    LoginController().BIID_ALL_V=='1'? Wheresql= " AND BIID_L=${LoginController().BIID}":Wheresql='';
+    sql = " SELECT *,CASE WHEN ${LoginController().LAN}=2 AND MGNE IS NOT NULL THEN MGNE ELSE MGNA END  MGNA_D"
+        " FROM MAT_GRO WHERE MGNO='$GetMGNO' AND JTID_L=${LoginController().JTID} "
+        " AND SYID_L=${LoginController().SYID} "
+        " AND CIID_L=${LoginController().CIID} $Wheresql";
+    var result = await dbClient!.rawQuery(sql);
+    List<Mat_Gro_Local> list = result.map((item) {
+      return Mat_Gro_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'GET_MGNA');
 }
 
 

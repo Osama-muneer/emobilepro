@@ -744,7 +744,12 @@ class Sale_Invoices_Controller extends GetxController {
   late List<Eco_Acc_Local> ECO_ACC;
   List<String> selectedDetails = [];
   late Bil_Cus_Local item;
-
+  RxList<Bil_Mov_M_Local> invoices = <Bil_Mov_M_Local>[].obs;
+  RxBool isLoading = false.obs;
+  RxBool hasMoreData = true.obs;
+  int currentPage = 1;
+  int pageSize = 20;
+  final ScrollController scrollController = ScrollController();
   void updateDetailsField() {
     detailsField = selectedDetails.map((detail) => '< $detail >').join(' ');
     update(); // تحديث واجهة المستخدم
@@ -878,6 +883,13 @@ class Sale_Invoices_Controller extends GetxController {
     SyncBIL_MOV_D_P('SyncOnly', '-1', false, 2);
     GET_BIL_MOV_M_P("DateNow");
     get_RETURN_SALE("DateNow");
+    // // إضافة listener للتمرير عند الوصول إلى أسفل القائمة
+    // scrollController.addListener(() {
+    //   if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+    //     GET_BIL_MOV_M_P("DateNow");
+    //   }
+    // });
+
     await ES_FAT_PKG.GET_P();
     UpdateDataGUID_P();
     USE_SMDED_P();
@@ -2607,9 +2619,7 @@ class Sale_Invoices_Controller extends GetxController {
 
   //ضرورة تحديد المندوب/الموزع عند ادخال فاتورة مبيعات
   Future GET_SHOW_BDID() async {
-    GET_SYS_VAR(
-        BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 692 : (BMKID == 1 || BMKID == 2)
-            ? 691 : BMKID == 5 ? 693 : 737).then((data) {
+    GET_SYS_VAR(BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10 ? 692 : (BMKID == 1 || BMKID == 2) ? 691 : BMKID == 5 ? 693 : 737).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
         SHOW_BDID = SYS_VAR.elementAt(0).SVVL;
@@ -2622,9 +2632,7 @@ class Sale_Invoices_Controller extends GetxController {
     GET_SYS_VAR(5032).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        calculating_discount = SYS_VAR
-            .elementAt(0)
-            .SVVL;
+        calculating_discount = SYS_VAR.elementAt(0).SVVL;
       }
     });
   }
@@ -2634,19 +2642,13 @@ class Sale_Invoices_Controller extends GetxController {
     GET_SYS_VAR(5041).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        lARGEST_VALUE_QUANTITY = int.parse(SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString());
+        lARGEST_VALUE_QUANTITY = int.parse(SYS_VAR.elementAt(0).SVVL.toString());
       }
     });
     GET_SYS_VAR(5043).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        lARGEST_VALUE_QUANTITY2 = int.parse(SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString());
+        lARGEST_VALUE_QUANTITY2 = int.parse(SYS_VAR.elementAt(0).SVVL.toString());
       }
     });
   }
@@ -2677,13 +2679,10 @@ class Sale_Invoices_Controller extends GetxController {
 
   //بيان عرض السعر
   Future GET_Statement_Quotation() async {
-    GET_SYS_VAR(667).then((data) {
+  await GET_SYS_VAR(667).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        Statement_Quotation = SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString();
+        Statement_Quotation = SYS_VAR.elementAt(0).SVVL.toString();
       } else {
         Statement_Quotation = '';
       }
@@ -2747,21 +2746,13 @@ class Sale_Invoices_Controller extends GetxController {
     await GET_SYS_VAR(352).then((data) {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
-        P_COS1 = SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString();
-        if (SYS_VAR
-            .elementAt(0)
-            .SVVL
-            .toString() == '4') {
+        P_COS1 = SYS_VAR.elementAt(0).SVVL.toString();
+        if (SYS_VAR.elementAt(0).SVVL.toString() == '4') {
           //تحديد/عدم تحديد مركز التكلفه لحسابات القوائم الماليه في الحركه
           PRIVLAGE(LoginController().SUID, 57).then((data) {
             USR_PRI = data;
             if (USR_PRI.isNotEmpty) {
-              UPIN_USE_COS1 = USR_PRI
-                  .elementAt(0)
-                  .UPIN;
+              UPIN_USE_COS1 = USR_PRI.elementAt(0).UPIN;
             } else {
               UPIN_USE_COS1 = 2;
             }
@@ -5066,10 +5057,7 @@ class Sale_Invoices_Controller extends GetxController {
   Future GET_BROCODE_P(String GetMGNO, String GetMINO, String GETMUID) async {
     MAT_UNI_B = await Get_BROCODE(GetMGNO, GetMINO, GETMUID);
     if (MAT_UNI_B.isNotEmpty) {
-      MUCBCController.text = MAT_UNI_B
-          .elementAt(0)
-          .MUCBC
-          .toString();
+      MUCBCController.text = MAT_UNI_B.elementAt(0).MUCBC.toString();
     }
   }
 
@@ -5083,6 +5071,57 @@ class Sale_Invoices_Controller extends GetxController {
     });
   }
 
+
+
+  Future<void> GET_BIL_MOV_M_P2(String type) async {
+    if (!isLoading.value && hasMoreData.value) {
+      isLoading.value = true;
+      update(); // تحديث الشاشة
+
+      // جلب البيانات
+      List<Bil_Mov_M_Local> newInvoices = await GET_BIL_MOV_M(
+        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+        BMKID!,
+        TYPE_SHOW,
+        TYPE_SHOW == "DateNow"
+            ? DateFormat('dd-MM-yyyy').format(DateTime.now())
+            : TYPE_SHOW == "FromDate"
+            ? SelectNumberOfDays
+            : '',
+        BMKID!,
+        currentIndex,
+        selectedBranchFrom.toString(),
+        selectedBranchTo.toString(),
+        FromDaysController.text,
+        ToDaysController.text,
+        SelectDataSCID_S.toString(),
+        SelectDataPKID_S.toString(),
+        2,
+        TYPE_SER!,
+        pageIndex: currentPage,
+        pageSize: pageSize,
+      );
+
+      if (newInvoices.isNotEmpty) {
+        if (newInvoices.length < pageSize) {
+          hasMoreData.value = false; // لا توجد المزيد من البيانات
+        }
+
+        // إضافة البيانات فقط إذا كانت جديدة
+        BIL_MOV_M_List.addAll(newInvoices); // إضافة البيانات
+        currentPage++; // تحديث الصفحة
+      } else {
+        // في حالة عدم وجود بيانات جديدة
+        hasMoreData.value = false;
+      }
+
+      isLoading.value = false;
+      update(); // تحديث الشاشة بعد التحديثات
+    }
+  }
+
+
+
   //اظهار البيانات +البحث
   GET_BIL_MOV_M_P(String type) async {
     BIL_MOV_M_List = await GET_BIL_MOV_M(
@@ -5090,9 +5129,12 @@ class Sale_Invoices_Controller extends GetxController {
         TYPE_SHOW == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
         TYPE_SHOW == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
         selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
-        ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),2,TYPE_SER!);
+        ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),2,TYPE_SER!,
+      pageIndex: currentPage,
+      pageSize: pageSize);
     update();
   }
+
 
 
   //اظهار البيانات +البحث
@@ -5109,572 +5151,580 @@ class Sale_Invoices_Controller extends GetxController {
     update();
   }
 
-  //جلب الباركود
-  Future FetchBarcodData(String barcod) async {
-    if (barcod == '-1') {
-      ClearBil_Mov_D_Data();
-      Fluttertoast.showToast(
-          msg: "error -1",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      ClearBil_Mov_D_Data();
-    } else {
-      barcodData = await Get_BRO(SelectDataSIID!, barcod);
-      if (barcodData.isEmpty) {
+
+  onFilterChanged(int type) async {
+    TYPE_SER=type;
+    currentPage = 1;
+    GET_BIL_MOV_M_P("DateNow");
+    get_RETURN_SALE("DateNow");
+  }
+
+    //جلب الباركود
+    Future FetchBarcodData(String barcod) async {
+      if (barcod == '-1') {
+        ClearBil_Mov_D_Data();
         Fluttertoast.showToast(
-            msg: "لا يوجد صنف بهذا الباركود",
+            msg: "error -1",
             toastLength: Toast.LENGTH_LONG,
             textColor: Colors.white,
             backgroundColor: Colors.redAccent);
         ClearBil_Mov_D_Data();
       } else {
-        MGNOController.text = barcodData
-            .elementAt(0)
-            .MGNO
-            .toString();
-        MITSK = barcodData
-            .elementAt(0)
-            .MITSK;
-        SelectDataMINO = barcodData
-            .elementAt(0)
-            .MINO
-            .toString();
-        MINAController.text = barcodData
-            .elementAt(0)
-            .MINA
-            .toString();
-        SelectDataMUID = barcodData
-            .elementAt(0)
-            .MUID
-            .toString();
-        SIID_V2 = SelectDataSIID.toString();
-        MUCBCController.text = barcodData
-            .elementAt(0)
-            .MUCBC
-            .toString();
-        MITSK = barcodData
-            .elementAt(0)
-            .MITSK;
-        MGKI = barcodData
-            .elementAt(0)
-            .MGKI;
-        update();
-        MIED = barcodData.elementAt(0).MIED;
-        await GETSNDE_ONE();
-        await GET_COUNT_MINO_P();
-        BMDNOController.text = '0';
-        BMDNO_V = 0;
-        BMDNFController.text = '0';
-        SUMBMDAMController.text = '0';
-        BMDDIRController.text = '0';
-        BMDDIController.text = '0';
-        if (TTID1 != null) {
-          await GET_TAX_LIN_P('MAT', barcodData.elementAt(0).MGNO.toString(),
-              barcodData.elementAt(0).MINO.toString());
+        barcodData = await Get_BRO(SelectDataSIID!, barcod);
+        if (barcodData.isEmpty) {
+          Fluttertoast.showToast(
+              msg: "لا يوجد صنف بهذا الباركود",
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          ClearBil_Mov_D_Data();
+        } else {
+          MGNOController.text = barcodData
+              .elementAt(0)
+              .MGNO
+              .toString();
+          MITSK = barcodData
+              .elementAt(0)
+              .MITSK;
+          SelectDataMINO = barcodData
+              .elementAt(0)
+              .MINO
+              .toString();
+          MINAController.text = barcodData
+              .elementAt(0)
+              .MINA
+              .toString();
+          SelectDataMUID = barcodData
+              .elementAt(0)
+              .MUID
+              .toString();
+          SIID_V2 = SelectDataSIID.toString();
+          MUCBCController.text = barcodData
+              .elementAt(0)
+              .MUCBC
+              .toString();
+          MITSK = barcodData
+              .elementAt(0)
+              .MITSK;
+          MGKI = barcodData
+              .elementAt(0)
+              .MGKI;
+          update();
+          MIED = barcodData.elementAt(0).MIED;
+          await GETSNDE_ONE();
+          await GET_COUNT_MINO_P();
+          BMDNOController.text = '0';
+          BMDNO_V = 0;
+          BMDNFController.text = '0';
+          SUMBMDAMController.text = '0';
+          BMDDIRController.text = '0';
+          BMDDIController.text = '0';
+          if (TTID1 != null) {
+            await GET_TAX_LIN_P('MAT', barcodData.elementAt(0).MGNO.toString(),
+                barcodData.elementAt(0).MINO.toString());
+          }
+          update();
+          myFocusNode.requestFocus();
         }
-        update();
-        myFocusNode.requestFocus();
       }
     }
-  }
 
-  //جلب بيانات العميل-المورد مثل العنوان و الاسم والرقم الضريبي
-  Future GET_BIL_CUS_IMP_INF_P(String GETBCID) async {
-    if (BMKID == 1 || BMKID == 2) {
-      BIL_IMP = await GET_BIL_IMP_INF(GETBCID);
-      if (BIL_IMP.isNotEmpty) {
-        //الاسم
-        BCNA = BIL_IMP.elementAt(0).BINA.toString();
-        //رقم البنايه
-        BCBN = BIL_IMP.elementAt(0).BIBN == null
-            ? '' : BIL_IMP.elementAt(0).BIBN.toString();
-        //رقم الشارع
-        BCSN = BIL_IMP
-            .elementAt(0)
-            .BISND == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BISND
-            .toString();
-        //الحي/المنطقه
-        BCQND = BIL_IMP
-            .elementAt(0)
-            .BIQND == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BIQND
-            .toString();
-        //الرمز البريدي
-        BCPC = BIL_IMP
-            .elementAt(0)
-            .BIPC == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BIPC
-            .toString();
-        //رقم اضافي للعنوان
-        BCAD2 = BIL_IMP
-            .elementAt(0)
-            .BIAD2 == null ? '' : BIL_IMP
-            .elementAt(0)
-            .BIAD2
-            .toString();
-        //رقم تسجيل ضريبة القيمه المضافه
-        await GET_TAX_LIN_CUS_IMP_P('IMP', BIL_IMP
-            .elementAt(0)
-            .AANO
-            .toString(), GETBCID);
-        BCTX == 'null' || BCTX
-            .toString()
-            .isEmpty ?
-        BCTX = BIL_IMP
-            .elementAt(0)
-            .BITX == null ? '' : BIL_IMP
-            .elementAt(0)
-            .BITX
-            .toString() : '';
-        update();
-        //هاتف
-        BCTL = BIL_IMP
-            .elementAt(0)
-            .BIMO == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BIMO
-            .toString();
+    //جلب بيانات العميل-المورد مثل العنوان و الاسم والرقم الضريبي
+    Future GET_BIL_CUS_IMP_INF_P(String GETBCID) async {
+      if (BMKID == 1 || BMKID == 2) {
+        BIL_IMP = await GET_BIL_IMP_INF(GETBCID);
+        if (BIL_IMP.isNotEmpty) {
+          //الاسم
+          BCNA = BIL_IMP.elementAt(0).BINA.toString();
+          //رقم البنايه
+          BCBN = BIL_IMP.elementAt(0).BIBN == null
+              ? '' : BIL_IMP.elementAt(0).BIBN.toString();
+          //رقم الشارع
+          BCSN = BIL_IMP
+              .elementAt(0)
+              .BISND == null
+              ? ''
+              : BIL_IMP
+              .elementAt(0)
+              .BISND
+              .toString();
+          //الحي/المنطقه
+          BCQND = BIL_IMP
+              .elementAt(0)
+              .BIQND == null
+              ? ''
+              : BIL_IMP
+              .elementAt(0)
+              .BIQND
+              .toString();
+          //الرمز البريدي
+          BCPC = BIL_IMP
+              .elementAt(0)
+              .BIPC == null
+              ? ''
+              : BIL_IMP
+              .elementAt(0)
+              .BIPC
+              .toString();
+          //رقم اضافي للعنوان
+          BCAD2 = BIL_IMP
+              .elementAt(0)
+              .BIAD2 == null ? '' : BIL_IMP
+              .elementAt(0)
+              .BIAD2
+              .toString();
+          //رقم تسجيل ضريبة القيمه المضافه
+          await GET_TAX_LIN_CUS_IMP_P('IMP', BIL_IMP
+              .elementAt(0)
+              .AANO
+              .toString(), GETBCID);
+          BCTX == 'null' || BCTX
+              .toString()
+              .isEmpty ?
+          BCTX = BIL_IMP
+              .elementAt(0)
+              .BITX == null ? '' : BIL_IMP
+              .elementAt(0)
+              .BITX
+              .toString() : '';
+          update();
+          //هاتف
+          BCTL = BIL_IMP
+              .elementAt(0)
+              .BIMO == null
+              ? ''
+              : BIL_IMP
+              .elementAt(0)
+              .BIMO
+              .toString();
 
-        //رقم السجل التجاري
-        BCC1 = BIL_IMP
-            .elementAt(0)
-            .BIC1 == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BIC1
-            .toString();
-        //العنوان
-        BCAD = BIL_IMP
-            .elementAt(0)
-            .BIAD == null
-            ? ''
-            : BIL_IMP
-            .elementAt(0)
-            .BIAD
-            .toString();
-        GET_COU_WRD_SAL(BIL_IMP
-            .elementAt(0)
-            .CWID
-            .toString()).then((data) {
-          COU_WRD = data;
-          if (COU_WRD.isNotEmpty) {
-            //الدولة
-            CWNA = COU_WRD
-                .elementAt(0)
-                .CWNA
-                .toString();
-          }
-        });
-        GET_COU_TOW_SAL(BIL_IMP
-            .elementAt(0)
-            .CWID
-            .toString(), BIL_IMP
-            .elementAt(0)
-            .CTID
-            .toString()).then((data) {
-          COU_TOW = data;
-          if (COU_TOW.isNotEmpty) {
-            //المدينه
-            CTNA = COU_TOW
-                .elementAt(0)
-                .CTNA
-                .toString();
-          }
-        });
-        update();
-      }
-    } else {
-      BIL_CUS = await GET_BIL_CUS_INF(GETBCID);
-      if (BIL_CUS.isNotEmpty) {
-        //الاسم
-        BCNA = BIL_CUS.elementAt(0).BCNA.toString();
-        //رقم البنايه
-        BCBN = BIL_CUS.elementAt(0).BCBN == null ? '' : BIL_CUS.elementAt(0).BCBN.toString();
-        //رقم الشارع
-        BCSN = BIL_CUS.elementAt(0).BCSN == null
-            ? '' : BIL_CUS.elementAt(0).BCSND.toString();
-        //الحي/المنطقه
-        BCQND = BIL_CUS.elementAt(0).BCQND == null
-            ? '' : BIL_CUS.elementAt(0).BCQND.toString();
-        //الرمز البريدي
-        BCPC = BIL_CUS
-            .elementAt(0)
-            .BCPC == null
-            ? ''
-            : BIL_CUS
-            .elementAt(0)
-            .BCPC
-            .toString();
-        //رقم اضافي للعنوان
-        BCAD2 = BIL_CUS
-            .elementAt(0)
-            .BCAD2 == null
-            ? ''
-            : BIL_CUS
-            .elementAt(0)
-            .BCAD2
-            .toString();
-        //رقم تسجيل ضريبة القيمه المضافه
-        await GET_TAX_LIN_CUS_IMP_P('CUS', BIL_CUS
-            .elementAt(0)
-            .AANO
-            .toString(), GETBCID);
-        print('BCTX1111');
-        print(BCTX);
-        BCTX == 'null' || BCTX
-            .toString()
-            .isEmpty ?
-        BCTX = BIL_CUS
-            .elementAt(0)
-            .BCTX == null ? '' : BIL_CUS
-            .elementAt(0)
-            .BCTX
-            .toString() : null;
-        update();
-        //هاتف
-        BCTL = BIL_CUS
-            .elementAt(0)
-            .BCMO == null
-            ? ''
-            : BIL_CUS
-            .elementAt(0)
-            .BCMO
-            .toString();
-        print(BCTL);
-        print('BCTL');
-        //رقم السجل التجاري
-        BCC1 = BIL_CUS
-            .elementAt(0)
-            .BCC1 == null
-            ? ''
-            : BIL_CUS
-            .elementAt(0)
-            .BCC1
-            .toString();
-        //العنوان
-        BCAD = BIL_CUS
-            .elementAt(0)
-            .BCAD == null
-            ? ''
-            : BIL_CUS
-            .elementAt(0)
-            .BCAD
-            .toString();
-        print('BCAD2');
-        print(BCAD2);
-        print(BIL_CUS
-            .elementAt(0)
-            .BCAD2);
-        GET_COU_WRD_SAL(BIL_CUS
-            .elementAt(0)
-            .CWID
-            .toString()).then((data) {
-          COU_WRD = data;
-          if (COU_WRD.isNotEmpty) {
-            //الدولة
-            CWNA = BIL_CUS
-                .elementAt(0)
-                .CWID == null
-                ? ''
-                : COU_WRD
-                .elementAt(0)
-                .CWNA
-                .toString();
-          }
-        });
-        GET_COU_TOW_SAL(BIL_CUS
-            .elementAt(0)
-            .CWID
-            .toString(),
-            BIL_CUS
-                .elementAt(0)
-                .CTID
-                .toString())
-            .then((data) {
-          COU_TOW = data;
-          if (COU_TOW.isNotEmpty) {
-            //المدينه
-            CTNA = COU_TOW
-                .elementAt(0)
-                .CTID == null
-                ? ''
-                : COU_TOW
-                .elementAt(0)
-                .CTNA
-                .toString();
-          }
-        });
-        update();
+          //رقم السجل التجاري
+          BCC1 = BIL_IMP
+              .elementAt(0)
+              .BIC1 == null
+              ? ''
+              : BIL_IMP
+              .elementAt(0)
+              .BIC1
+              .toString();
+          //العنوان
+          BCAD = BIL_IMP
+              .elementAt(0)
+              .BIAD == null
+              ? ''
+              : BIL_IMP
+              .elementAt(0)
+              .BIAD
+              .toString();
+          GET_COU_WRD_SAL(BIL_IMP
+              .elementAt(0)
+              .CWID
+              .toString()).then((data) {
+            COU_WRD = data;
+            if (COU_WRD.isNotEmpty) {
+              //الدولة
+              CWNA = COU_WRD
+                  .elementAt(0)
+                  .CWNA
+                  .toString();
+            }
+          });
+          GET_COU_TOW_SAL(BIL_IMP
+              .elementAt(0)
+              .CWID
+              .toString(), BIL_IMP
+              .elementAt(0)
+              .CTID
+              .toString()).then((data) {
+            COU_TOW = data;
+            if (COU_TOW.isNotEmpty) {
+              //المدينه
+              CTNA = COU_TOW
+                  .elementAt(0)
+                  .CTNA
+                  .toString();
+            }
+          });
+          update();
+        }
+      } else {
+        BIL_CUS = await GET_BIL_CUS_INF(GETBCID);
+        if (BIL_CUS.isNotEmpty) {
+          //الاسم
+          BCNA = BIL_CUS.elementAt(0).BCNA.toString();
+          //رقم البنايه
+          BCBN = BIL_CUS.elementAt(0).BCBN == null ? '' : BIL_CUS.elementAt(0).BCBN.toString();
+          //رقم الشارع
+          BCSN = BIL_CUS.elementAt(0).BCSN == null
+              ? '' : BIL_CUS.elementAt(0).BCSND.toString();
+          //الحي/المنطقه
+          BCQND = BIL_CUS.elementAt(0).BCQND == null
+              ? '' : BIL_CUS.elementAt(0).BCQND.toString();
+          //الرمز البريدي
+          BCPC = BIL_CUS
+              .elementAt(0)
+              .BCPC == null
+              ? ''
+              : BIL_CUS
+              .elementAt(0)
+              .BCPC
+              .toString();
+          //رقم اضافي للعنوان
+          BCAD2 = BIL_CUS
+              .elementAt(0)
+              .BCAD2 == null
+              ? ''
+              : BIL_CUS
+              .elementAt(0)
+              .BCAD2
+              .toString();
+          //رقم تسجيل ضريبة القيمه المضافه
+          await GET_TAX_LIN_CUS_IMP_P('CUS', BIL_CUS
+              .elementAt(0)
+              .AANO
+              .toString(), GETBCID);
+          print('BCTX1111');
+          print(BCTX);
+          BCTX == 'null' || BCTX
+              .toString()
+              .isEmpty ?
+          BCTX = BIL_CUS
+              .elementAt(0)
+              .BCTX == null ? '' : BIL_CUS
+              .elementAt(0)
+              .BCTX
+              .toString() : null;
+          update();
+          //هاتف
+          BCTL = BIL_CUS
+              .elementAt(0)
+              .BCMO == null
+              ? ''
+              : BIL_CUS
+              .elementAt(0)
+              .BCMO
+              .toString();
+          print(BCTL);
+          print('BCTL');
+          //رقم السجل التجاري
+          BCC1 = BIL_CUS
+              .elementAt(0)
+              .BCC1 == null
+              ? ''
+              : BIL_CUS
+              .elementAt(0)
+              .BCC1
+              .toString();
+          //العنوان
+          BCAD = BIL_CUS
+              .elementAt(0)
+              .BCAD == null
+              ? ''
+              : BIL_CUS
+              .elementAt(0)
+              .BCAD
+              .toString();
+          print('BCAD2');
+          print(BCAD2);
+          print(BIL_CUS
+              .elementAt(0)
+              .BCAD2);
+          GET_COU_WRD_SAL(BIL_CUS
+              .elementAt(0)
+              .CWID
+              .toString()).then((data) {
+            COU_WRD = data;
+            if (COU_WRD.isNotEmpty) {
+              //الدولة
+              CWNA = BIL_CUS
+                  .elementAt(0)
+                  .CWID == null
+                  ? ''
+                  : COU_WRD
+                  .elementAt(0)
+                  .CWNA
+                  .toString();
+            }
+          });
+          GET_COU_TOW_SAL(BIL_CUS
+              .elementAt(0)
+              .CWID
+              .toString(),
+              BIL_CUS
+                  .elementAt(0)
+                  .CTID
+                  .toString())
+              .then((data) {
+            COU_TOW = data;
+            if (COU_TOW.isNotEmpty) {
+              //المدينه
+              CTNA = COU_TOW
+                  .elementAt(0)
+                  .CTID == null
+                  ? ''
+                  : COU_TOW
+                  .elementAt(0)
+                  .CTNA
+                  .toString();
+            }
+          });
+          update();
+        }
       }
     }
-  }
 
-  //دالة التقريب
-  double roundDouble(double value, int places) {
-    num mod = pow(10.0, places);
-    return ((value * mod).round().toDouble() / mod);
-  }
-
-  //تنطيف Bil_Mov_D
-  ClearBil_Mov_D_Data() {
-    MINAController.clear();
-    BMDNFController.clear();
-    BMDNOController.clear();
-    MGNOController.clear();
-    MGNOController.text = '';
-    SelectDataMUCNA = null;
-    SIID_V2 = null;
-    SelectDataMUCNA = '';
-    SelectDataMINO = '';
-    SelectDataSNED = '';
-    SelectDataSNED = null;
-    // SelectDataRTID = null;
-    // SelectDataMGNO = null;
-    BMDAMController.clear();
-    BMDINController.clear();
-    BMDEDController.clear();
-    SUMBMDAMController.clear();
-    SUMBMDAMController.clear();
-    MPCOController.clear();
-    MPCO_VController.clear();
-    BMDTXAController.clear();
-    BMDNOController.text = '0';
-    BMDNO_V = 0;
-    BMDNFController.text = '0';
-    BMDAMController.text = '0';
-    BMDAMTXController.text = '0';
-    SUMBMDAMController.text = '0';
-    BMDDIRController.text = '0';
-    BMDDIController.text = '0';
-    BMDTXAController.text = '0';
-    MPCOController.text = '0';
-    MPCO_VController.text = '0';
-    SUMBMDAMTController.text = '0';
-    TOTSUMBMDAM = 0;
-    SUM_Totle_BMDDI = 0;
-    SUMBMDDI = 0;
-    SUMBMDDIR = 0;
-    SUMBMDAM = 0;
-    SUM_BMDAM = 0;
-    BMDAM1 = 0;
-    SUM_BMDAM2 = 0;
-    BMDAM2 = 0;
-    MPS1 = 0;
-    BDNO_F = 0.0;
-    BDNO_F2 = 0.0;
-    BMDDIR = 0;
-    BMDTXT1 = 0;
-    BMDTXT2 = 0;
-    BMDTXT3 = 0;
-    BMDIDController.clear();
-    BMDTXTController.text = '0';
-    SUMBMDAMTFController.text = '0';
-    BMDDITController.text = '0';
-    MPS1Controller.text = '0';
-    MPS2Controller.text = '0';
-    MPS3Controller.text = '0';
-    MPS4Controller.text = '0';
-    CHIN_NO = 1;
-    MPCO_V = 0;
-    MPCO = 0;
-    BMDNO = 0;
-    V_FROM = 0;
-    V_TO = 0;
-    V_KIN = 0;
-    V_N1 = 0;
-    MITSK = 0;
-    SUM_STRING_NUMBER = '';
-    titleAddScreen = 'StringAdd'.tr;
-    TextButton_title = 'StringAdd'.tr;
-    print('STP-7');
-  }
-
-  //جلب رقم الحركة
-  Future GET_BMMNO_P() async {
-    BIL_MOV_M = await GET_BMMNO(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMKID.toString());
-    if (BIL_MOV_M.isNotEmpty) {
-      print(BIL_MOV_M.elementAt(0).BMMNO);
-      BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID1 :
-      BMMNO = BIL_MOV_M.elementAt(0).BMMNO.toString();
-      print(BIL_MOV_M.elementAt(0).BMMNO.toString());
-      print(LoginController().PKID1);
-      print(BMMNO);
-      print('GET_BMMNO_P');
+    //دالة التقريب
+    double roundDouble(double value, int places) {
+      num mod = pow(10.0, places);
+      return ((value * mod).round().toDouble() / mod);
     }
-  }
 
-  //جلب رقم الحركة
-  Future GET_BMMNO_P_COU() async {
-    String ToDate = '';
-    P_ZERO.toString() == '1' ?
-    ToDate = DateFormat('yyyy').format(DateTime.now()) : P_ZERO.toString() ==
-        '2' ?
-    ToDate = DateFormat('MM').format(DateTime.now()) : ToDate =
-        DateFormat('dd').format(DateTime.now());
-    await GET_BMMNO_COU(
-        P_ZERO.toString(), SVVL_NO.toString(), SelectDataPKID.toString(),
-        ToDate).then((data) {
-      BIL_MOV_M = data;
-      print(BIL_MOV_M.elementAt(0).BMMNO.toString());
-      print('BMMNO');
+    //تنطيف Bil_Mov_D
+    ClearBil_Mov_D_Data() {
+      MINAController.clear();
+      BMDNFController.clear();
+      BMDNOController.clear();
+      MGNOController.clear();
+      MGNOController.text = '';
+      SelectDataMUCNA = null;
+      SIID_V2 = null;
+      SelectDataMUCNA = '';
+      SelectDataMINO = '';
+      SelectDataSNED = '';
+      SelectDataSNED = null;
+      // SelectDataRTID = null;
+      // SelectDataMGNO = null;
+      BMDAMController.clear();
+      BMDINController.clear();
+      BMDEDController.clear();
+      SUMBMDAMController.clear();
+      SUMBMDAMController.clear();
+      MPCOController.clear();
+      MPCO_VController.clear();
+      BMDTXAController.clear();
+      BMDNOController.text = '0';
+      BMDNO_V = 0;
+      BMDNFController.text = '0';
+      BMDAMController.text = '0';
+      BMDAMTXController.text = '0';
+      SUMBMDAMController.text = '0';
+      BMDDIRController.text = '0';
+      BMDDIController.text = '0';
+      BMDTXAController.text = '0';
+      MPCOController.text = '0';
+      MPCO_VController.text = '0';
+      SUMBMDAMTController.text = '0';
+      TOTSUMBMDAM = 0;
+      SUM_Totle_BMDDI = 0;
+      SUMBMDDI = 0;
+      SUMBMDDIR = 0;
+      SUMBMDAM = 0;
+      SUM_BMDAM = 0;
+      BMDAM1 = 0;
+      SUM_BMDAM2 = 0;
+      BMDAM2 = 0;
+      MPS1 = 0;
+      BDNO_F = 0.0;
+      BDNO_F2 = 0.0;
+      BMDDIR = 0;
+      BMDTXT1 = 0;
+      BMDTXT2 = 0;
+      BMDTXT3 = 0;
+      BMDIDController.clear();
+      BMDTXTController.text = '0';
+      SUMBMDAMTFController.text = '0';
+      BMDDITController.text = '0';
+      MPS1Controller.text = '0';
+      MPS2Controller.text = '0';
+      MPS3Controller.text = '0';
+      MPS4Controller.text = '0';
+      CHIN_NO = 1;
+      MPCO_V = 0;
+      MPCO = 0;
+      BMDNO = 0;
+      V_FROM = 0;
+      V_TO = 0;
+      V_KIN = 0;
+      V_N1 = 0;
+      MITSK = 0;
+      SUM_STRING_NUMBER = '';
+      titleAddScreen = 'StringAdd'.tr;
+      TextButton_title = 'StringAdd'.tr;
+      print('STP-7');
+    }
+
+    //جلب رقم الحركة
+    Future GET_BMMNO_P() async {
+      BIL_MOV_M = await GET_BMMNO(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMKID.toString());
       if (BIL_MOV_M.isNotEmpty) {
-        if (SVVL_NO == '1') {
-          print('BMMNO1');
-          if (SelectDataPKID.toString() == '1' || SelectDataPKID.toString() == '8') {
-            print('BMMNO2');
-            BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID1 : BMMNO =
-                BIL_MOV_M.elementAt(0).BMMNO.toString();
-          } else if (SelectDataPKID.toString() == '3') {
-            print('BMMNO3');
-            BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID2 : BMMNO =
-                BIL_MOV_M.elementAt(0).BMMNO.toString();
+        print(BIL_MOV_M.elementAt(0).BMMNO);
+        BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID1 :
+        BMMNO = BIL_MOV_M.elementAt(0).BMMNO.toString();
+        print(BIL_MOV_M.elementAt(0).BMMNO.toString());
+        print(LoginController().PKID1);
+        print(BMMNO);
+        print('GET_BMMNO_P');
+      }
+    }
+
+    //جلب رقم الحركة
+    Future GET_BMMNO_P_COU() async {
+      String ToDate = '';
+      P_ZERO.toString() == '1' ?
+      ToDate = DateFormat('yyyy').format(DateTime.now()) : P_ZERO.toString() ==
+          '2' ?
+      ToDate = DateFormat('MM').format(DateTime.now()) : ToDate =
+          DateFormat('dd').format(DateTime.now());
+      await GET_BMMNO_COU(
+          P_ZERO.toString(), SVVL_NO.toString(), SelectDataPKID.toString(),
+          ToDate).then((data) {
+        BIL_MOV_M = data;
+        print(BIL_MOV_M.elementAt(0).BMMNO.toString());
+        print('BMMNO');
+        if (BIL_MOV_M.isNotEmpty) {
+          if (SVVL_NO == '1') {
+            print('BMMNO1');
+            if (SelectDataPKID.toString() == '1' || SelectDataPKID.toString() == '8') {
+              print('BMMNO2');
+              BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID1 : BMMNO =
+                  BIL_MOV_M.elementAt(0).BMMNO.toString();
+            } else if (SelectDataPKID.toString() == '3') {
+              print('BMMNO3');
+              BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ? BMMNO = LoginController().PKID2 : BMMNO =
+                  BIL_MOV_M.elementAt(0).BMMNO.toString();
+            }
+          }
+          else {
+            print(LoginController().PKID1);
+            print('LoginController().PKID1');
+            BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ?
+            BMMNO = LoginController().PKID1.toString() :
+            BMMNO = BIL_MOV_M.elementAt(0).BMMNO.toString();
+            print(LoginController().PKID1);
+            print('BMMNO');
           }
         }
-        else {
-          print(LoginController().PKID1);
-          print('LoginController().PKID1');
-          BIL_MOV_M.elementAt(0).BMMNO.toString().length <= 1 ?
-          BMMNO = LoginController().PKID1.toString() :
-          BMMNO = BIL_MOV_M.elementAt(0).BMMNO.toString();
-          print(LoginController().PKID1);
-          print('BMMNO');
-        }
+      });
+    }
+
+    //جلب رقم الحركة
+    Future GET_BMMID_P() async {
+      BIL_MOV_M =
+      await GET_BMMID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M');
+      if (BIL_MOV_M.isNotEmpty) {
+        BMMID = BIL_MOV_M.elementAt(0).BMMID;
+        update();
+        LoginController().SET_N_P('BMMID', BIL_MOV_M.elementAt(0).BMMID!);
       }
-    });
-  }
-
-  //جلب رقم الحركة
-  Future GET_BMMID_P() async {
-    BIL_MOV_M =
-    await GET_BMMID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M');
-    if (BIL_MOV_M.isNotEmpty) {
-      BMMID = BIL_MOV_M.elementAt(0).BMMID;
-      update();
-      LoginController().SET_N_P('BMMID', BIL_MOV_M.elementAt(0).BMMID!);
-    }
-    update();
-  }
-
-  setSelectedPay_Kin(int V) {
-    PKID = V;
-    SelectDataPKID = PKID.toString();
-    update();
-    loading(false);
-  }
-
-  GET_SUMBIL_P() async {
-    SUM_TOT = await SUM_BIL(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-    if (SUM_TOT.isEmpty) {
-      SUMBMDTXA = 0.0;
-      SUMBMDTXT = 0.0;
-      SUMBMDTXT1 = 0.0;
-      SUMBMDTXT2 = 0.0;
-      SUMBMDTXT3 = 0.0;
-      SUMBMDTXTController.text = '0';
-      SUMBMMDIF = 0.0;
-      SUMBMMDIFController.text = '0';
-      SUMBMMDI = 0.0;
-      BMMAMController.text = '0.0';
-      BMMAMTOTController.text = '0.0';
-      COUNTBMDNO = 0;
-      COUNTBMDNOController.text = '0';
-      SUM_AM_TXT_DI_V = 0;
-      BMMAM_TX = 0;
-      BMMDI_TX = 0;
-      TCAM = 0;
-      update();
-    } else {
-      SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
-      SUMBMDTXT = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL);
-      SUMBMDTXT1 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT1!, SCSFL);
-      SUMBMDTXT2 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT2!, SCSFL);
-      SUMBMDTXT3 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT3!, SCSFL);
-      SUMBMDTXTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL).toString();
-      SUMBMMDIF = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL);
-      SUMBMMDIFController.text = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL).toString();
-      SUMBMMDI = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL);
-      SelectDataBMMDN == '1' ?
-      BMMDIController.text = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL).toString() : '';
-      BMMAMController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDAM!, SCSFL).toString();
-      BMMAMTOTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_TOTBMDAM!, SCSFL).toString();
-      COUNTBMDNOController.text = SUM_TOT.elementAt(0).COUNT_BMDNO.toString();
-      SUM_AM_TXT_DI_V = SUM_TOT.elementAt(0).SUM_AM_TXT_DI;
-      BMMAM_TX = SUM_TOT.elementAt(0).BMDAM_TX;
-      BMMDI_TX = SUM_TOT.elementAt(0).BMDDI_TX;
-      TCAM = SUM_TOT.elementAt(0).TCAMT;
       update();
     }
-  }
 
-  // جلب  اجمالي الضريبه
-  // GET_SUMBMDTXA() async {
-  //   SUM_TOT = await COUNT_BMDTXA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (SUM_TOT.isEmpty) {
-  //     SUMBMDTXA = 0.0;
-  //   } else {
-  //     SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
-  //   }
-  // }
+    setSelectedPay_Kin(int V) {
+      PKID = V;
+      SelectDataPKID = PKID.toString();
+      update();
+      loading(false);
+    }
 
-  //BMDTXA*BMDNO جلب  اجمالي الضريبه
-  // GET_SUMBMDTXT() async {
-  //   SUM_TOT = await SUM_BMDTXT(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (SUM_TOT.isEmpty) {
-  //     SUMBMDTXT = 0.0;
-  //     SUMBMDTXT1 = 0.0;
-  //     SUMBMDTXT2 = 0.0;
-  //     SUMBMDTXT3 = 0.0;
-  //     SUMBMDTXTController.text = '0';
-  //   } else {
-  //     SUMBMDTXT = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL);
-  //     SUMBMDTXT1 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT1!, SCSFL);
-  //     SUMBMDTXT2 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT2!, SCSFL);
-  //     SUMBMDTXT3 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT3!, SCSFL);
-  //     SUMBMDTXTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL).toString();
-  //     update();
-  //   }
-  // }
+    GET_SUMBIL_P() async {
+      SUM_TOT = await SUM_BIL(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+      if (SUM_TOT.isEmpty) {
+        SUMBMDTXA = 0.0;
+        SUMBMDTXT = 0.0;
+        SUMBMDTXT1 = 0.0;
+        SUMBMDTXT2 = 0.0;
+        SUMBMDTXT3 = 0.0;
+        SUMBMDTXTController.text = '0';
+        SUMBMMDIF = 0.0;
+        SUMBMMDIFController.text = '0';
+        SUMBMMDI = 0.0;
+        BMMAMController.text = '0.0';
+        BMMAMTOTController.text = '0.0';
+        COUNTBMDNO = 0;
+        COUNTBMDNOController.text = '0';
+        SUM_AM_TXT_DI_V = 0;
+        BMMAM_TX = 0;
+        BMMDI_TX = 0;
+        TCAM = 0;
+        update();
+      } else {
+        SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
+        SUMBMDTXT = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL);
+        SUMBMDTXT1 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT1!, SCSFL);
+        SUMBMDTXT2 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT2!, SCSFL);
+        SUMBMDTXT3 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT3!, SCSFL);
+        SUMBMDTXTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL).toString();
+        SUMBMMDIF = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL);
+        SUMBMMDIFController.text = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL).toString();
+        SUMBMMDI = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL);
+        SelectDataBMMDN == '1' ?
+        BMMDIController.text = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL).toString() : '';
+        BMMAMController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDAM!, SCSFL).toString();
+        BMMAMTOTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_TOTBMDAM!, SCSFL).toString();
+        COUNTBMDNOController.text = SUM_TOT.elementAt(0).COUNT_BMDNO.toString();
+        SUM_AM_TXT_DI_V = SUM_TOT.elementAt(0).SUM_AM_TXT_DI;
+        BMMAM_TX = SUM_TOT.elementAt(0).BMDAM_TX;
+        BMMDI_TX = SUM_TOT.elementAt(0).BMDDI_TX;
+        TCAM = SUM_TOT.elementAt(0).TCAMT;
+        update();
+      }
+    }
 
-  // جلب اجمالي المجاني
-  // GET_SUMBMMDIF() async {
-  //   SUM_TOT = await SUM_BMMDIF(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (SUM_TOT.isEmpty) {
-  //     SUMBMMDIF = 0.0;
-  //     SUMBMMDIFController.text = '0';
-  //   } else {
-  //     SUMBMMDIF = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL);
-  //     SUMBMMDIFController.text = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL).toString();
-  //   }
-  // }
+    // جلب  اجمالي الضريبه
+    // GET_SUMBMDTXA() async {
+    //   SUM_TOT = await COUNT_BMDTXA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (SUM_TOT.isEmpty) {
+    //     SUMBMDTXA = 0.0;
+    //   } else {
+    //     SUMBMDTXA = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXA!, SCSFL);
+    //   }
+    // }
 
-  // جلب اجمالي التخفيض
-  // GET_SUMBMMDI() async {
-  //   SUM_TOT = await SUM_BMMDI(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (SUM_TOT.isEmpty) {
-  //     SUMBMMDI = 0.0;
-  //   } else {
-  //     SUMBMMDI = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL);
-  //     SelectDataBMMDN == '1' ?
-  //     BMMDIController.text = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL).toString() : '';
-  //   }
-  // }
+    //BMDTXA*BMDNO جلب  اجمالي الضريبه
+    // GET_SUMBMDTXT() async {
+    //   SUM_TOT = await SUM_BMDTXT(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (SUM_TOT.isEmpty) {
+    //     SUMBMDTXT = 0.0;
+    //     SUMBMDTXT1 = 0.0;
+    //     SUMBMDTXT2 = 0.0;
+    //     SUMBMDTXT3 = 0.0;
+    //     SUMBMDTXTController.text = '0';
+    //   } else {
+    //     SUMBMDTXT = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL);
+    //     SUMBMDTXT1 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT1!, SCSFL);
+    //     SUMBMDTXT2 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT2!, SCSFL);
+    //     SUMBMDTXT3 = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT3!, SCSFL);
+    //     SUMBMDTXTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDTXT!, SCSFL).toString();
+    //     update();
+    //   }
+    // }
 
-  // جلب  اجمالي المبلغ
- // GET_SUMBMMAM() async {
+    // جلب اجمالي المجاني
+    // GET_SUMBMMDIF() async {
+    //   SUM_TOT = await SUM_BMMDIF(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (SUM_TOT.isEmpty) {
+    //     SUMBMMDIF = 0.0;
+    //     SUMBMMDIFController.text = '0';
+    //   } else {
+    //     SUMBMMDIF = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL);
+    //     SUMBMMDIFController.text = roundDouble(SUM_TOT.elementAt(0).BMMDIF!, SCSFL).toString();
+    //   }
+    // }
+
+    // جلب اجمالي التخفيض
+    // GET_SUMBMMDI() async {
+    //   SUM_TOT = await SUM_BMMDI(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (SUM_TOT.isEmpty) {
+    //     SUMBMMDI = 0.0;
+    //   } else {
+    //     SUMBMMDI = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL);
+    //     SelectDataBMMDN == '1' ?
+    //     BMMDIController.text = roundDouble(SUM_TOT.elementAt(0).BMMDI!, SCSFL).toString() : '';
+    //   }
+    // }
+
+    // جلب  اجمالي المبلغ
+    // GET_SUMBMMAM() async {
     // SUM_TOT = await SUM_BMMAM(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
     // if (SUM_TOT.isEmpty) {
     //   BMMAMController.text = '0.0';
@@ -5682,251 +5732,400 @@ class Sale_Invoices_Controller extends GetxController {
     //   BMMAMController.text = roundDouble(SUM_TOT.elementAt(0).SUM_BMDAM!, SCSFL).toString();
     //   update();
     // }
-  //   update();
-  //   await GET_BMMAM_TX();
-  //   await GET_BMMDI_TX();
-  //   await GET_TCAM();
-  // }
+    //   update();
+    //   await GET_BMMAM_TX();
+    //   await GET_BMMDI_TX();
+    //   await GET_TCAM();
+    // }
 
-  // جلب  صافي المبلغ
-  // GET_SUMBMMAM2() async {
-  //   SUM_TOT = await SUM_BMMAM2(
-  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (SUM_TOT.isEmpty) {
-  //     BMMAMTOTController.text = '0.0';
-  //   }
-  //   BMMAMTOTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_TOTBMDAM!, SCSFL).toString();
-  //   update();
-  // }
+    // جلب  صافي المبلغ
+    // GET_SUMBMMAM2() async {
+    //   SUM_TOT = await SUM_BMMAM2(
+    //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (SUM_TOT.isEmpty) {
+    //     BMMAMTOTController.text = '0.0';
+    //   }
+    //   BMMAMTOTController.text = roundDouble(SUM_TOT.elementAt(0).SUM_TOTBMDAM!, SCSFL).toString();
+    //   update();
+    // }
 
-  //جلب عدد  السجلات
-  GET_CountRecode(int GETBMMID) async {
-    COUNT_RECODE = await CountRecode(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID, 1);
-    if (COUNT_RECODE.isEmpty) {
-      CountRecodeController.text = '0';
-    } else {
-      CountRecodeController.text = COUNT_RECODE.elementAt(0).COU.toString();
-      await UpdateBMMNR(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-          COUNT_RECODE.elementAt(0).COU.toString(), GETBMMID);
-      update();
-    }
-    await CountRecode(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID, 2).then((data) {
-      if (data.isEmpty) {
-        COUNTRecode_ORD = 0;
+    //جلب عدد  السجلات
+    GET_CountRecode(int GETBMMID) async {
+      COUNT_RECODE = await CountRecode(
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID, 1);
+      if (COUNT_RECODE.isEmpty) {
+        CountRecodeController.text = '0';
       } else {
-        COUNTRecode_ORD = data.elementAt(0).COU!;
+        CountRecodeController.text = COUNT_RECODE.elementAt(0).COU.toString();
+        await UpdateBMMNR(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+            COUNT_RECODE.elementAt(0).COU.toString(), GETBMMID);
         update();
       }
-    });
-    update();
-  }
-
-  //جلب اجمالي القطع
-  GET_COUNT_BMDNO_P(int GETBMMID) async {
-    COUNT_RECODE = await GET_COUNT_BMDNO(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID);
-    if (COUNT_RECODE.isEmpty) {
-      COUNTBMDNO = 0;
-      COUNTBMDNOController.text = '0';
-    } else {
-      COUNTBMDNOController.text = COUNT_RECODE.elementAt(0).COUNT_BMDNO.toString();
+      await CountRecode(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID, 2).then((data) {
+        if (data.isEmpty) {
+          COUNTRecode_ORD = 0;
+        } else {
+          COUNTRecode_ORD = data.elementAt(0).COU!;
+          update();
+        }
+      });
       update();
     }
-    update();
-  }
 
-  //اجمالي المبلغ-خصومات+ضريبه
-  // GET_SUM_AM_TXT_DI() async {
-  //   COUNT_RECODE = await SUM_AM_TXT_DI(
-  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (COUNT_RECODE.isEmpty) {
-  //     SUM_AM_TXT_DI_V = 0;
-  //   } else {
-  //     SUM_AM_TXT_DI_V = COUNT_RECODE.elementAt(0).SUM_AM_TXT_DI;
-  //     update();
-  //   }
-  // }
+    //جلب اجمالي القطع
+    GET_COUNT_BMDNO_P(int GETBMMID) async {
+      COUNT_RECODE = await GET_COUNT_BMDNO(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GETBMMID);
+      if (COUNT_RECODE.isEmpty) {
+        COUNTBMDNO = 0;
+        COUNTBMDNOController.text = '0';
+      } else {
+        COUNTBMDNOController.text = COUNT_RECODE.elementAt(0).COUNT_BMDNO.toString();
+        update();
+      }
+      update();
+    }
 
-  // اجمالي BMDAM_TX
-  // GET_BMMAM_TX() async {
-  //   COUNT_RECODE = await SUM_BMDAM_TX(
-  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (COUNT_RECODE.isEmpty) {
-  //     BMMAM_TX = 0;
-  //   } else {
-  //     BMMAM_TX = COUNT_RECODE.elementAt(0).BMDAM_TX;
-  //     update();
-  //   }
-  // }
+    //اجمالي المبلغ-خصومات+ضريبه
+    // GET_SUM_AM_TXT_DI() async {
+    //   COUNT_RECODE = await SUM_AM_TXT_DI(
+    //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (COUNT_RECODE.isEmpty) {
+    //     SUM_AM_TXT_DI_V = 0;
+    //   } else {
+    //     SUM_AM_TXT_DI_V = COUNT_RECODE.elementAt(0).SUM_AM_TXT_DI;
+    //     update();
+    //   }
+    // }
 
-  // اجمالي BMDDI_TX
-  // GET_BMMDI_TX() async {
-  //   COUNT_RECODE = await SUM_BMDDI_TX(
-  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (COUNT_RECODE.isEmpty) {
-  //     BMMDI_TX = 0;
-  //   } else {
-  //     BMMDI_TX = COUNT_RECODE.elementAt(0).BMDDI_TX;
-  //     update();
-  //   }
-  // }
+    // اجمالي BMDAM_TX
+    // GET_BMMAM_TX() async {
+    //   COUNT_RECODE = await SUM_BMDAM_TX(
+    //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (COUNT_RECODE.isEmpty) {
+    //     BMMAM_TX = 0;
+    //   } else {
+    //     BMMAM_TX = COUNT_RECODE.elementAt(0).BMDAM_TX;
+    //     update();
+    //   }
+    // }
 
-  // اجمالي TCAM
-  // GET_TCAM() async {
-  //   COUNT_RECODE = await SUM_TCAMT(
-  //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-  //   if (COUNT_RECODE.isEmpty) {
-  //     TCAM = 0;
-  //   } else {
-  //     TCAM = COUNT_RECODE.elementAt(0).TCAMT;
-  //     update();
-  //   }
-  // }
+    // اجمالي BMDDI_TX
+    // GET_BMMDI_TX() async {
+    //   COUNT_RECODE = await SUM_BMDDI_TX(
+    //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (COUNT_RECODE.isEmpty) {
+    //     BMMDI_TX = 0;
+    //   } else {
+    //     BMMDI_TX = COUNT_RECODE.elementAt(0).BMDDI_TX;
+    //     update();
+    //   }
+    // }
+
+    // اجمالي TCAM
+    // GET_TCAM() async {
+    //   COUNT_RECODE = await SUM_TCAMT(
+    //       BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+    //   if (COUNT_RECODE.isEmpty) {
+    //     TCAM = 0;
+    //   } else {
+    //     TCAM = COUNT_RECODE.elementAt(0).TCAMT;
+    //     update();
+    //   }
+    // }
 
 
-  //جلب رصيد غير مرحل
-  GET_BAL_P(BMMID,AANO,SCID) async {
-    SUMBAL = 0.0;
-    await GET_LAS_ACC_BAL();
-    SUM_M = await SUM_BAL(1,1,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
-    if (SUM_M.isEmpty) {
+    //جلب رصيد غير مرحل
+    GET_BAL_P(BMMID,AANO,SCID) async {
       SUMBAL = 0.0;
-    } else {
-      SUMBAL = SUM_M.elementAt(0).SUM_BAL;
+      await GET_LAS_ACC_BAL();
+      SUM_M = await SUM_BAL(1,1,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+      if (SUM_M.isEmpty) {
+        SUMBAL = 0.0;
+      } else {
+        SUMBAL = SUM_M.elementAt(0).SUM_BAL;
+        update();
+      }
+      update();
+      GET_BAL_APP_P(BMMID,AANO,SCID);
       update();
     }
-    update();
-    GET_BAL_APP_P(BMMID,AANO,SCID);
-    update();
-  }
 
-  //جلب رصيد التطبيق على حسب اخر تزامن
-  GET_BAL_APP_P(BMMID,AANO,SCID) async {
-    SumBal = 0.0;
-    SUM_M = await SUM_BAL(1,2,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
-    if (SUM_M.isEmpty) {
+    //جلب رصيد التطبيق على حسب اخر تزامن
+    GET_BAL_APP_P(BMMID,AANO,SCID) async {
       SumBal = 0.0;
-    } else {
-      SumBal = SUM_M.elementAt(0).SUM_BAL;
+      SUM_M = await SUM_BAL(1,2,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
+      if (SUM_M.isEmpty) {
+        SumBal = 0.0;
+      } else {
+        SumBal = SUM_M.elementAt(0).SUM_BAL;
+        update();
+      }
+      update();
+      print('SumBal');
+      print(SumBal);
       update();
     }
-    update();
-    print('SumBal');
-    print(SumBal);
-    update();
-  }
 
 
-  Future GET_BIL_MOV_M_PRINT_P(int GETBMMID) async {
-    BIF_MOV_M_PRINT = await GET_BIL_MOV_M_PRINT(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-        GETBMMID.toString());
-    update();
-  }
-
-  //جلب السجلات الفرعية للفاتورة
-  Future GET_BIF_MOV_D_P(String GetBMMID, String GETTYPE_SHOW) async {
-    var data = await GET_BIL_MOV_D(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        GetBMMID, SER_MINA.toString(), RINT_RELATED_ITEMS_DETAIL.toString());
-    InvoiceList = data;
-    cartFood = data;
-    update();
-  }
-
-
-  Future GET_BIF_MOV_D_SHOW(String GetBMMID) async {
-    BIL_MOV_D_SHOW = await GET_BIL_MOV_D(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GetBMMID,
-        SER_MINA.toString(), '2');
-    update();
-  }
-
-  // احتساب المبلغ المتبقي
-  Calculate_BMMTC(String GETBMMCP, String GETSCID) async {
-    if (int.parse(GETSCID.toString()) == int.parse(SelectDataSCID.toString())) {
-      BMMTC = roundDouble(
-          double.parse(GETBMMCP) - double.parse(BMMAMTOTController.text), 6);
-      BMMTC_TOT = roundDouble(double.parse(GETBMMCP), 6);
-      BMMCP = double.parse(GETBMMCP);
-    } else {
-      await GET_SYS_CUR_BET_P(
-          SelectDataSCIDP.toString(), SelectDataSCID.toString(), GETBMMCP);
+    Future GET_BIL_MOV_M_PRINT_P(int GETBMMID) async {
+      BIF_MOV_M_PRINT = await GET_BIL_MOV_M_PRINT(
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+          GETBMMID.toString());
+      update();
     }
-    update();
-  }
+
+    //جلب السجلات الفرعية للفاتورة
+    Future GET_BIF_MOV_D_P(String GetBMMID, String GETTYPE_SHOW) async {
+      var data = await GET_BIL_MOV_D(
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+          GetBMMID, SER_MINA.toString(), RINT_RELATED_ITEMS_DETAIL.toString());
+      InvoiceList = data;
+      cartFood = data;
+      update();
+    }
 
 
-  // دوال مساعدة لتحويل النص إلى رقم وتجنب الاستثناء عند النص الفارغ
-  double parseOrZero(String text) => text.isEmpty ? 0.0 : double.parse(text);
+    Future GET_BIF_MOV_D_SHOW(String GetBMMID) async {
+      BIL_MOV_D_SHOW = await GET_BIL_MOV_D(
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GetBMMID,
+          SER_MINA.toString(), '2');
+      update();
+    }
+
+    // احتساب المبلغ المتبقي
+    Calculate_BMMTC(String GETBMMCP, String GETSCID) async {
+      if (int.parse(GETSCID.toString()) == int.parse(SelectDataSCID.toString())) {
+        BMMTC = roundDouble(
+            double.parse(GETBMMCP) - double.parse(BMMAMTOTController.text), 6);
+        BMMTC_TOT = roundDouble(double.parse(GETBMMCP), 6);
+        BMMCP = double.parse(GETBMMCP);
+      } else {
+        await GET_SYS_CUR_BET_P(
+            SelectDataSCIDP.toString(), SelectDataSCID.toString(), GETBMMCP);
+      }
+      update();
+    }
+
+
+    // دوال مساعدة لتحويل النص إلى رقم وتجنب الاستثناء عند النص الفارغ
+    double parseOrZero(String text) => text.isEmpty ? 0.0 : double.parse(text);
 
 // دالة مساعدة لإزالة الضريبة من السعر المشمول بها:
 //   - priceWithTax: السعر الذي يتضمن الضريبة
 //   - taxRatePct: نسبة الضريبة (مثلاً "5" يعني 5%)
 //   - multiplier: معامل TCVL (غالباً 1.0 أو قيمة أخرى حسب نوع الضريبة)
-  double removeTax(double priceWithTax, double taxRatePct, int multiplier) {
-    final effectiveRate = taxRatePct * multiplier;
-    return (priceWithTax * (100 / (100 + effectiveRate)));
-  }
+    double removeTax(double priceWithTax, double taxRatePct, int multiplier) {
+      final effectiveRate = taxRatePct * multiplier;
+      return (priceWithTax * (100 / (100 + effectiveRate)));
+    }
 
 // =========================
 // داخل كلاس الكونترولر Controller
 // =========================
 
-   Calculate_BMD_NO_AM2() {
-    // **1. قراءة متغيرات الكمية والمجاني وحساب الكمية الحقيقية**
-    final rawQty      = parseOrZero(BMDNOController.text);   // الكمية الكلية المدخلة
-    final rawFreeQty  = parseOrZero(BMDNFController.text);   // الكمية المجانية المُدخلة
-    final actualQty = (USE_BMDFN == '1')
-        ? rawQty
-        : (rawQty - rawFreeQty);
-    BMDNO_V = actualQty; // حفظ الكمية الحقيقية في الحقل
+    Calculate_BMD_NO_AM2() {
+      // **1. قراءة متغيرات الكمية والمجاني وحساب الكمية الحقيقية**
+      final rawQty      = parseOrZero(BMDNOController.text);   // الكمية الكلية المدخلة
+      final rawFreeQty  = parseOrZero(BMDNFController.text);   // الكمية المجانية المُدخلة
+      final actualQty = (USE_BMDFN == '1')
+          ? rawQty
+          : (rawQty - rawFreeQty);
+      BMDNO_V = actualQty; // حفظ الكمية الحقيقية في الحقل
 
-    // **2. قراءة سعر الوحدة الأصلي قبل أي تعديل**
-    final rawUnitPrice = parseOrZero(BMDAMController.text);
+      // **2. قراءة سعر الوحدة الأصلي قبل أي تعديل**
+      final rawUnitPrice = parseOrZero(BMDAMController.text);
 
-    double unitPrice;        // السعر الذي سيُستخدم لحساب الإجمالي
-    String unitPriceText;    // النص الذي سيُعرض في BMDAMTXController
+      double unitPrice;        // السعر الذي سيُستخدم لحساب الإجمالي
+      String unitPriceText;    // النص الذي سيُعرض في BMDAMTXController
 
-    // **3. هل نطبق منطق الضريبة (USING_TAX_SALES == '1') أو السعر شمل الضريبة (== '3' مع الشروط)؟**
-    final isTaxAlways       = (USING_TAX_SALES == '1');
-    final isTaxIncludedCase = (USING_TAX_SALES == '3' &&
-        UPIN_USING_TAX_SALES == 1 &&
-        Price_include_Tax == true);
+      // **3. هل نطبق منطق الضريبة (USING_TAX_SALES == '1') أو السعر شمل الضريبة (== '3' مع الشروط)؟**
+      final isTaxAlways       = (USING_TAX_SALES == '1');
+      final isTaxIncludedCase = (USING_TAX_SALES == '3' &&
+          UPIN_USING_TAX_SALES == 1 &&
+          Price_include_Tax == true);
 
-    if (isTaxAlways || isTaxIncludedCase) {
-      // قراءة نسب الضرائب ومعاملاتها
-      final tax1Pct   = parseOrZero(BMDTXController.text);   // نسبة الضريبة الأولى (%)
-      final tax2Pct   = parseOrZero(BMDTX2Controller.text);  // نسبة الضريبة الثانية (%)
-      final tax3Pct   = parseOrZero(BMDTX3Controller.text);  // نسبة الضريبة الثالثة (%)
-      final mult1     = (TCVL  ?? 1); // معامل الضريبة الأولى (غالبًا 1.0)
-      final mult2     = (TCVL2 ?? 1); // معامل الضريبة الثانية
-      final mult3     = (TCVL3 ?? 1); // معامل الضريبة الثالثة
+      if (isTaxAlways || isTaxIncludedCase) {
+        // قراءة نسب الضرائب ومعاملاتها
+        final tax1Pct   = parseOrZero(BMDTXController.text);   // نسبة الضريبة الأولى (%)
+        final tax2Pct   = parseOrZero(BMDTX2Controller.text);  // نسبة الضريبة الثانية (%)
+        final tax3Pct   = parseOrZero(BMDTX3Controller.text);  // نسبة الضريبة الثالثة (%)
+        final mult1     = (TCVL  ?? 1); // معامل الضريبة الأولى (غالبًا 1.0)
+        final mult2     = (TCVL2 ?? 1); // معامل الضريبة الثانية
+        final mult3     = (TCVL3 ?? 1); // معامل الضريبة الثالثة
 
-      // **3.1. حساب السعر قبل الضريبة الأولى (level 1) إذا كان السعر مشمولاً**
-      double basePriceLevel1;
-      if (isTaxIncludedCase) {
-        // السعر الأصلي (rawUnitPrice) يشمل ضريبة المستوى الأول
-        basePriceLevel1 = removeTax(rawUnitPrice, tax1Pct, mult1);
-      } else {
-        // إذا لم يكن السعر مشمول، نفترض بنية الحساب نفسها (العميل يريد فصل الضريبة)
-        basePriceLevel1 = removeTax(rawUnitPrice, tax1Pct, mult1);
+        // **3.1. حساب السعر قبل الضريبة الأولى (level 1) إذا كان السعر مشمولاً**
+        double basePriceLevel1;
+        if (isTaxIncludedCase) {
+          // السعر الأصلي (rawUnitPrice) يشمل ضريبة المستوى الأول
+          basePriceLevel1 = removeTax(rawUnitPrice, tax1Pct, mult1);
+        } else {
+          // إذا لم يكن السعر مشمول، نفترض بنية الحساب نفسها (العميل يريد فصل الضريبة)
+          basePriceLevel1 = removeTax(rawUnitPrice, tax1Pct, mult1);
+        }
+        BMDTXA_V = double.parse(roundDouble(basePriceLevel1, 6).toString());
+
+        // **3.2. حساب مبلغ الضريبة الثانية (level 2) بناءً على قاعدة TSDI2**
+        if (TTID2 != null) {
+          if (TSDI2 == 1) {
+            // تُحسب ضريبة المستوى الثاني على السعر بعد فصل ضريبة المستوى الأول
+            BMDTXA2 = roundDouble(
+              basePriceLevel1 * ((tax2Pct * mult2) / 100),
+              6,
+            );
+          } else {
+            // تُحسب ضريبة المستوى الثاني على السعر بعد الخصم (والخصم لم يُحسب بعد هنا)
+            // لكن بما أننا في هذه المرحلة لا يوجد خصم، نستخدم basePriceLevel1
+            BMDTXA2 = roundDouble(
+              (basePriceLevel1 - 0.0) * ((tax2Pct * mult2) / 100),
+              6,
+            );
+          }
+        } else {
+          BMDTXA2 = 0.0;
+        }
+
+        // **3.3. حساب مبلغ الضريبة الثالثة (level 3) بناءً على قاعدة TSDI3**
+        if (TTID3 != null) {
+          if (TSDI3 == 1) {
+            BMDTXA3 = roundDouble(
+              basePriceLevel1 * ((tax3Pct * mult3) / 100),
+              6,
+            );
+          } else {
+            BMDTXA3 = roundDouble(
+              (basePriceLevel1 - 0.0) * ((tax3Pct * mult3) / 100),
+              6,
+            );
+          }
+        } else {
+          BMDTXA3 = 0.0;
+        }
+
+        // **3.4. حساب مبلغ الضريبة الأولى (level 1) الفعلي بعد الأخذ في الاعتبار TTIDC1 ووجود ضريبة ثانية**
+        final ttid2Tag = '<${TTID2 ?? ''}>';
+        final isLayeredOnTTID1 = (TTIDC1 == ttid2Tag);
+
+        if (TSDI1 == 1) {
+          // الضريبة الأولى على السعر الأصلي (قبل الخصم)
+          if (isLayeredOnTTID1) {
+            BMDTXA = roundDouble(
+              (rawUnitPrice - basePriceLevel1) + (BMDTXA2! * (tax1Pct / 100)),
+              6,
+            );
+          } else {
+            BMDTXA = roundDouble(
+              rawUnitPrice * ((tax1Pct * mult1) / 100),
+              6,
+            );
+          }
+        } else {
+          // الضريبة الأولى تحسب بعد الخصم (الخصم لم يُطبَّق بعد هنا، لكن سنفترض 0)
+          if (isLayeredOnTTID1) {
+            BMDTXA = roundDouble(
+              (rawUnitPrice - 0.0 - basePriceLevel1 + BMDTXA2!) * ((tax1Pct * mult1) / 100),
+              6,
+            );
+          } else {
+            BMDTXA = roundDouble(
+              (rawUnitPrice - 0.0) * ((tax1Pct * mult1) / 100),
+              6,
+            );
+          }
+        }
+
+        // **3.5. حساب سعر الوحدة الشامل الضريبة لإظهار المستخدم**
+        if (isLayeredOnTTID1) {
+          // إذا كان هناك تدرُّج ضريبي، نأخذ مبلغ basePriceLevel1 مع الضريبة الأولى كعرض:
+          unitPrice = basePriceLevel1;
+        } else {
+          // السعر الشامل هو السعر الأصلي ناقص مجموع مبالغ الضرائب الثلاثة
+          unitPrice = rawUnitPrice - (BMDTXA! + BMDTXA2! + BMDTXA3!);
+        }
+        unitPrice = roundDouble(unitPrice, 6);
+        unitPriceText = unitPrice.toString();
+
+        BMDAMTXController.text = unitPriceText;
+        BMDAM1 = unitPrice;
+
+        // **3.6. حساب إجمالي مبلغ الكمية*(سعر الوحدة)**
+        SUMBMDAMController.text = roundDouble(unitPrice * actualQty, 6).toString();
       }
-      BMDTXA_V = double.parse(roundDouble(basePriceLevel1, 6).toString());
+      else {
+        // **4. الحالة التي لا يوجد فيها ضريبة على الإطلاق**
+        unitPrice = rawUnitPrice;
+        unitPriceText = unitPrice.toString();
+        BMDAMTXController.text = unitPriceText;
+        BMDAM1 = unitPrice;
 
-      // **3.2. حساب مبلغ الضريبة الثانية (level 2) بناءً على قاعدة TSDI2**
+        // إجمالي المبلغ = سعر الوحدة × الكمية الحقيقية
+        SUMBMDAMController.text = roundDouble(unitPrice * actualQty, 6).toString();
+      }
+
+      // **5. حساب إجمالي المبلغ المجاني (للكمية المجانية)**
+      final freeQty = rawFreeQty;
+      SUMBMDAMTFController.text = roundDouble(unitPrice * freeQty, 6).toString();
+
+      // **6. استدعاء دالة حساب الخصم بعد الإنتهاء من السعر والضرائب**
+      Calculate_BMDDI_IR();
+
+      // **7. في النهاية نحدّث واجهة المستخدم مرة واحدة فقط**
+      update();
+    }
+
+    Calculate_BMDDI_IR2() {
+      // **1. قراءة بيانات الخصم من الحقول وحمايتها من النص الفارغ**
+      final discountValPercent = parseOrZero(BMDDIController.text); // خصم ثابت للوحدة
+      final discountPercent    = parseOrZero(BMDDIRController.text); // نسبة خصم من السعر (%)
+      final unitPriceCurrent   = BMDAM1 ?? 0.0;                     // السعر الجاري لكل وحدة بعد الضريبة
+      final actualQty          = BMDNO_V ?? 0.0;                    // الكمية الحقيقية
+
+      // **2. حساب إجمالي مبلغ الخصم الثابت على مستوى الفاتورة**
+      SUMBMDDI = roundDouble(actualQty * discountValPercent, 6);
+
+      // **3. حساب إجمالي مبلغ الخصم النسبي (٪) على مستوى الفاتورة**
+      final sumBeforeTax = parseOrZero(SUMBMDAMController.text);
+      SUMBMDDIR = roundDouble(sumBeforeTax * (discountPercent / 100), 6);
+
+      // **4. حساب مبلغ الخصم الإجمالي على الوحدة (ثابت + نسبي)**
+      final unitTotalDiscount = roundDouble(
+        discountValPercent + ((discountPercent / 100) * unitPriceCurrent),
+        6,
+      );
+      BMDDITController.text = unitTotalDiscount.toString();
+
+      // **5. إجمالي الخصم الكلي للفواتير = قيمة الخصم على الوحدة × الكمية**
+      SUM_Totle_BMDDI = roundDouble(unitTotalDiscount * actualQty, 6);
+
+      // **6. بعد احتساب الخصم نجدد حساب الضريبة على القيمة الجديدة**
+      GET_USING_TAX_P();
+
+      // **7. تحديث واجهة المستخدم مرة واحدة**
+      update();
+    }
+
+    GET_USING_TAX_P2() {
+      // **1. تأكد من وجود السعر الحالي**
+      BMDAM1 = (BMDAM1 == null) ? 0.0 : BMDAM1;
+
+      // **2. قراءة نسب الضرائب ومعاملاتها وحماية النصوص الفارغة**
+      final tax1Pct   = parseOrZero(BMDTXController.text);
+      final tax2Pct   = parseOrZero(BMDTX2Controller.text);
+      final tax3Pct   = parseOrZero(BMDTX3Controller.text);
+      final mult1     = (TCVL  ?? 1.0);
+      final mult2     = (TCVL2 ?? 1.0);
+      final mult3     = (TCVL3 ?? 1.0);
+
+      // **3. حساب ضريبة المستوى الثاني بعد الخصم بحسب TSDI2**
       if (TTID2 != null) {
+        final unitDiscountTotal = parseOrZero(BMDDITController.text);
         if (TSDI2 == 1) {
-          // تُحسب ضريبة المستوى الثاني على السعر بعد فصل ضريبة المستوى الأول
           BMDTXA2 = roundDouble(
-            basePriceLevel1 * ((tax2Pct * mult2) / 100),
+            (BMDAM1!) * ((tax2Pct * mult2) / 100),
             6,
           );
         } else {
-          // تُحسب ضريبة المستوى الثاني على السعر بعد الخصم (والخصم لم يُحسب بعد هنا)
-          // لكن بما أننا في هذه المرحلة لا يوجد خصم، نستخدم basePriceLevel1
           BMDTXA2 = roundDouble(
-            (basePriceLevel1 - 0.0) * ((tax2Pct * mult2) / 100),
+            (BMDAM1! - unitDiscountTotal) * ((tax2Pct * mult2) / 100),
             6,
           );
         }
@@ -5934,16 +6133,17 @@ class Sale_Invoices_Controller extends GetxController {
         BMDTXA2 = 0.0;
       }
 
-      // **3.3. حساب مبلغ الضريبة الثالثة (level 3) بناءً على قاعدة TSDI3**
+      // **4. حساب ضريبة المستوى الثالث بعد الخصم بحسب TSDI3**
       if (TTID3 != null) {
+        final unitDiscountTotal = parseOrZero(BMDDITController.text);
         if (TSDI3 == 1) {
           BMDTXA3 = roundDouble(
-            basePriceLevel1 * ((tax3Pct * mult3) / 100),
+            (BMDAM1!) * ((tax3Pct * mult3) / 100),
             6,
           );
         } else {
           BMDTXA3 = roundDouble(
-            (basePriceLevel1 - 0.0) * ((tax3Pct * mult3) / 100),
+            (BMDAM1! - unitDiscountTotal) * ((tax3Pct * mult3) / 100),
             6,
           );
         }
@@ -5951,498 +6151,681 @@ class Sale_Invoices_Controller extends GetxController {
         BMDTXA3 = 0.0;
       }
 
-      // **3.4. حساب مبلغ الضريبة الأولى (level 1) الفعلي بعد الأخذ في الاعتبار TTIDC1 ووجود ضريبة ثانية**
+      // **5. حساب ضريبة المستوى الأول بعد الخصم بحسب TSDI1 ووجود ضريبة ثانية (TTID2)**
+      final unitDiscountTotal = parseOrZero(BMDDITController.text);
       final ttid2Tag = '<${TTID2 ?? ''}>';
       final isLayeredOnTTID1 = (TTIDC1 == ttid2Tag);
 
       if (TSDI1 == 1) {
-        // الضريبة الأولى على السعر الأصلي (قبل الخصم)
         if (isLayeredOnTTID1) {
           BMDTXA = roundDouble(
-            (rawUnitPrice - basePriceLevel1) + (BMDTXA2! * (tax1Pct / 100)),
+            (BMDAM1! + BMDTXA2!) * ((tax1Pct * mult1) / 100),
             6,
           );
         } else {
           BMDTXA = roundDouble(
-            rawUnitPrice * ((tax1Pct * mult1) / 100),
+            (BMDAM1!) * ((tax1Pct * mult1) / 100),
             6,
           );
         }
       } else {
-        // الضريبة الأولى تحسب بعد الخصم (الخصم لم يُطبَّق بعد هنا، لكن سنفترض 0)
         if (isLayeredOnTTID1) {
           BMDTXA = roundDouble(
-            (rawUnitPrice - 0.0 - basePriceLevel1 + BMDTXA2!) * ((tax1Pct * mult1) / 100),
+            (BMDAM1! - unitDiscountTotal + BMDTXA2!) * ((tax1Pct * mult1) / 100),
             6,
           );
         } else {
           BMDTXA = roundDouble(
-            (rawUnitPrice - 0.0) * ((tax1Pct * mult1) / 100),
+            (BMDAM1! - unitDiscountTotal) * ((tax1Pct * mult1) / 100),
             6,
           );
         }
       }
 
-      // **3.5. حساب سعر الوحدة الشامل الضريبة لإظهار المستخدم**
-      if (isLayeredOnTTID1) {
-        // إذا كان هناك تدرُّج ضريبي، نأخذ مبلغ basePriceLevel1 مع الضريبة الأولى كعرض:
-        unitPrice = basePriceLevel1;
-      } else {
-        // السعر الشامل هو السعر الأصلي ناقص مجموع مبالغ الضرائب الثلاثة
-        unitPrice = rawUnitPrice - (BMDTXA! + BMDTXA2! + BMDTXA3!);
-      }
-      unitPrice = roundDouble(unitPrice, 6);
-      unitPriceText = unitPrice.toString();
+      // **6. تجميع الضريبة الإجمالية لكل وحدة في الحقل المخصص**
+      BMDTXAController.text = (BMDTXA! + BMDTXA2! + BMDTXA3!).toString();
 
-      BMDAMTXController.text = unitPriceText;
-      BMDAM1 = unitPrice;
+      // **7. حساب إجمالي الضريبة على مستوى الكمية**
+      final actualQty = BMDNO_V ?? 0.0;
+      BMDTXT1 = roundDouble(BMDTXA! * actualQty, 6);
+      BMDTXT2 = roundDouble(BMDTXA2! * actualQty, 6);
+      BMDTXT3 = roundDouble(BMDTXA3! * actualQty, 6);
 
-      // **3.6. حساب إجمالي مبلغ الكمية*(سعر الوحدة)**
-      SUMBMDAMController.text = roundDouble(unitPrice * actualQty, 6).toString();
-    }
-    else {
-      // **4. الحالة التي لا يوجد فيها ضريبة على الإطلاق**
-      unitPrice = rawUnitPrice;
-      unitPriceText = unitPrice.toString();
-      BMDAMTXController.text = unitPriceText;
-      BMDAM1 = unitPrice;
+      BMDTXTController.text = roundDouble(
+        (BMDTXA! + BMDTXA2! + BMDTXA3!) * actualQty,
+        6,
+      ).toString();
 
-      // إجمالي المبلغ = سعر الوحدة × الكمية الحقيقية
-      SUMBMDAMController.text = roundDouble(unitPrice * actualQty, 6).toString();
-    }
+      // **8. حساب إجمالي الصنف (المبلغ قبل الضريبة + إجمالي الضريبة – إجمالي الخصم)**
+      final sumBeforeTax = parseOrZero(SUMBMDAMController.text);
+      final sumTaxAll   = parseOrZero(BMDTXTController.text);
+      final totalAfterDiscountAndTax = (sumBeforeTax + sumTaxAll) - SUM_Totle_BMDDI!;
+      SUMBMDAMTController.text = formatter.format(
+        roundDouble(totalAfterDiscountAndTax, SCSFL),
+      ).toString();
+      TOTSUMBMDAM = roundDouble(totalAfterDiscountAndTax, SCSFL);
 
-    // **5. حساب إجمالي المبلغ المجاني (للكمية المجانية)**
-    final freeQty = rawFreeQty;
-    SUMBMDAMTFController.text = roundDouble(unitPrice * freeQty, 6).toString();
-
-    // **6. استدعاء دالة حساب الخصم بعد الإنتهاء من السعر والضرائب**
-    Calculate_BMDDI_IR();
-
-    // **7. في النهاية نحدّث واجهة المستخدم مرة واحدة فقط**
-    update();
-  }
-
-   Calculate_BMDDI_IR2() {
-    // **1. قراءة بيانات الخصم من الحقول وحمايتها من النص الفارغ**
-    final discountValPercent = parseOrZero(BMDDIController.text); // خصم ثابت للوحدة
-    final discountPercent    = parseOrZero(BMDDIRController.text); // نسبة خصم من السعر (%)
-    final unitPriceCurrent   = BMDAM1 ?? 0.0;                     // السعر الجاري لكل وحدة بعد الضريبة
-    final actualQty          = BMDNO_V ?? 0.0;                    // الكمية الحقيقية
-
-    // **2. حساب إجمالي مبلغ الخصم الثابت على مستوى الفاتورة**
-    SUMBMDDI = roundDouble(actualQty * discountValPercent, 6);
-
-    // **3. حساب إجمالي مبلغ الخصم النسبي (٪) على مستوى الفاتورة**
-    final sumBeforeTax = parseOrZero(SUMBMDAMController.text);
-    SUMBMDDIR = roundDouble(sumBeforeTax * (discountPercent / 100), 6);
-
-    // **4. حساب مبلغ الخصم الإجمالي على الوحدة (ثابت + نسبي)**
-    final unitTotalDiscount = roundDouble(
-      discountValPercent + ((discountPercent / 100) * unitPriceCurrent),
-      6,
-    );
-    BMDDITController.text = unitTotalDiscount.toString();
-
-    // **5. إجمالي الخصم الكلي للفواتير = قيمة الخصم على الوحدة × الكمية**
-    SUM_Totle_BMDDI = roundDouble(unitTotalDiscount * actualQty, 6);
-
-    // **6. بعد احتساب الخصم نجدد حساب الضريبة على القيمة الجديدة**
-    GET_USING_TAX_P();
-
-    // **7. تحديث واجهة المستخدم مرة واحدة**
-    update();
-  }
-
-   GET_USING_TAX_P2() {
-    // **1. تأكد من وجود السعر الحالي**
-    BMDAM1 = (BMDAM1 == null) ? 0.0 : BMDAM1;
-
-    // **2. قراءة نسب الضرائب ومعاملاتها وحماية النصوص الفارغة**
-    final tax1Pct   = parseOrZero(BMDTXController.text);
-    final tax2Pct   = parseOrZero(BMDTX2Controller.text);
-    final tax3Pct   = parseOrZero(BMDTX3Controller.text);
-    final mult1     = (TCVL  ?? 1.0);
-    final mult2     = (TCVL2 ?? 1.0);
-    final mult3     = (TCVL3 ?? 1.0);
-
-    // **3. حساب ضريبة المستوى الثاني بعد الخصم بحسب TSDI2**
-    if (TTID2 != null) {
-      final unitDiscountTotal = parseOrZero(BMDDITController.text);
-      if (TSDI2 == 1) {
-        BMDTXA2 = roundDouble(
-          (BMDAM1!) * ((tax2Pct * mult2) / 100),
-          6,
-        );
-      } else {
-        BMDTXA2 = roundDouble(
-          (BMDAM1! - unitDiscountTotal) * ((tax2Pct * mult2) / 100),
-          6,
-        );
-      }
-    } else {
-      BMDTXA2 = 0.0;
+      // **9. تحديث واجهة المستخدم مرة واحدة**
+      update();
     }
 
-    // **4. حساب ضريبة المستوى الثالث بعد الخصم بحسب TSDI3**
-    if (TTID3 != null) {
-      final unitDiscountTotal = parseOrZero(BMDDITController.text);
-      if (TSDI3 == 1) {
-        BMDTXA3 = roundDouble(
-          (BMDAM1!) * ((tax3Pct * mult3) / 100),
-          6,
-        );
-      } else {
-        BMDTXA3 = roundDouble(
-          (BMDAM1! - unitDiscountTotal) * ((tax3Pct * mult3) / 100),
-          6,
-        );
+    Future<void> UPDATE_BMMDI2() async {
+      final selectedFlag = SelectDataBMMDN;
+      final percentText  = BMMDIRController.text;
+      final invoiceTotal = parseOrZero(BMMAMController.text);
+
+      // **1. إذا كانت حالة التحديد 0 و يوجد نسبة خصم صحيحة > 0**
+      if (selectedFlag == '0' && percentText.isNotEmpty && double.parse(percentText) > 0) {
+        // تأخير قصير إن احتجنا لانتظار UI، وإلا يمكن حذفه
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        final percent = double.parse(percentText);
+        // حساب مبلغ الخصم الثابت على مستوى الفاتورة
+        BMMDIController.text = roundDouble(invoiceTotal * (percent / 100), SCSFL).toString();
       }
-    } else {
-      BMDTXA3 = 0.0;
-    }
 
-    // **5. حساب ضريبة المستوى الأول بعد الخصم بحسب TSDI1 ووجود ضريبة ثانية (TTID2)**
-    final unitDiscountTotal = parseOrZero(BMDDITController.text);
-    final ttid2Tag = '<${TTID2 ?? ''}>';
-    final isLayeredOnTTID1 = (TTIDC1 == ttid2Tag);
-
-    if (TSDI1 == 1) {
-      if (isLayeredOnTTID1) {
-        BMDTXA = roundDouble(
-          (BMDAM1! + BMDTXA2!) * ((tax1Pct * mult1) / 100),
-          6,
-        );
-      } else {
-        BMDTXA = roundDouble(
-          (BMDAM1!) * ((tax1Pct * mult1) / 100),
-          6,
-        );
-      }
-    } else {
-      if (isLayeredOnTTID1) {
-        BMDTXA = roundDouble(
-          (BMDAM1! - unitDiscountTotal + BMDTXA2!) * ((tax1Pct * mult1) / 100),
-          6,
-        );
-      } else {
-        BMDTXA = roundDouble(
-          (BMDAM1! - unitDiscountTotal) * ((tax1Pct * mult1) / 100),
-          6,
-        );
-      }
-    }
-
-    // **6. تجميع الضريبة الإجمالية لكل وحدة في الحقل المخصص**
-    BMDTXAController.text = (BMDTXA! + BMDTXA2! + BMDTXA3!).toString();
-
-    // **7. حساب إجمالي الضريبة على مستوى الكمية**
-    final actualQty = BMDNO_V ?? 0.0;
-    BMDTXT1 = roundDouble(BMDTXA! * actualQty, 6);
-    BMDTXT2 = roundDouble(BMDTXA2! * actualQty, 6);
-    BMDTXT3 = roundDouble(BMDTXA3! * actualQty, 6);
-
-    BMDTXTController.text = roundDouble(
-      (BMDTXA! + BMDTXA2! + BMDTXA3!) * actualQty,
-      6,
-    ).toString();
-
-    // **8. حساب إجمالي الصنف (المبلغ قبل الضريبة + إجمالي الضريبة – إجمالي الخصم)**
-    final sumBeforeTax = parseOrZero(SUMBMDAMController.text);
-    final sumTaxAll   = parseOrZero(BMDTXTController.text);
-    final totalAfterDiscountAndTax = (sumBeforeTax + sumTaxAll) - SUM_Totle_BMDDI!;
-    SUMBMDAMTController.text = formatter.format(
-      roundDouble(totalAfterDiscountAndTax, SCSFL),
-    ).toString();
-    TOTSUMBMDAM = roundDouble(totalAfterDiscountAndTax, SCSFL);
-
-    // **9. تحديث واجهة المستخدم مرة واحدة**
-    update();
-  }
-
-  Future<void> UPDATE_BMMDI2() async {
-    final selectedFlag = SelectDataBMMDN;
-    final percentText  = BMMDIRController.text;
-    final invoiceTotal = parseOrZero(BMMAMController.text);
-
-    // **1. إذا كانت حالة التحديد 0 و يوجد نسبة خصم صحيحة > 0**
-    if (selectedFlag == '0' && percentText.isNotEmpty && double.parse(percentText) > 0) {
-      // تأخير قصير إن احتجنا لانتظار UI، وإلا يمكن حذفه
+      // **2. تأخير إضافي إن لزم لتنظيم التحديثات**
       await Future.delayed(const Duration(milliseconds: 300));
 
-      final percent = double.parse(percentText);
-      // حساب مبلغ الخصم الثابت على مستوى الفاتورة
-      BMMDIController.text = roundDouble(invoiceTotal * (percent / 100), SCSFL).toString();
+      // **3. تحديث السجل في قاعدة البيانات (إما BIF_MOV_D أو BIL_MOV_D حسب BMKID)**
+      final tableName = (BMKID == 11 || BMKID == 12) ? 'BIF_MOV_D' : 'BIL_MOV_D';
+      await updateBilMovRecords(
+        tableName: tableName,
+        bmmId: BMMID.toString(),
+        totalAmount: invoiceTotal,
+        deductedAmount: SUMBMMDIF! /* تأكد من أن هذه القيمة مُحاسبة */,
+        bmddiFactor: parseOrZero(BMMDIController.text),
+        bmddirValue: 0,
+      );
+
+      // **4. إعادة حساب المجموع الكلي بعد تعديل الخصم على الفاتورة**
+      await GET_SUMBIL_P();
+
+      // **5. تحديث واجهة المستخدم مرة واحدة في النهاية**
+      update();
     }
 
-    // **2. تأخير إضافي إن لزم لتنظيم التحديثات**
-    await Future.delayed(const Duration(milliseconds: 300));
 
-    // **3. تحديث السجل في قاعدة البيانات (إما BIF_MOV_D أو BIL_MOV_D حسب BMKID)**
-    final tableName = (BMKID == 11 || BMKID == 12) ? 'BIF_MOV_D' : 'BIL_MOV_D';
-    await updateBilMovRecords(
-      tableName: tableName,
-      bmmId: BMMID.toString(),
-      totalAmount: invoiceTotal,
-      deductedAmount: SUMBMMDIF! /* تأكد من أن هذه القيمة مُحاسبة */,
-      bmddiFactor: parseOrZero(BMMDIController.text),
-      bmddirValue: 0,
-    );
+    //وسعر الوحدة  دالة احتساب الكميه والمجاني
+    Calculate_BMD_NO_AM() {
+      // print('Calculate_BMD_NO_AM');
+      // print(USING_TAX_SALES);
+      // print(Price_include_Tax);
+      // print(UPIN_USING_TAX_SALES);
+      //الكميه الحقيقه
+      //التحقق من المتغير رقم 431 هل المجاني ضمن الكميه ام لا وعليه عندما يكون المتغير المجاني ضمن العدد يتم عند الحفظ انقاص المجاني من العدد وحفظه في حقل BMDNO
 
-    // **4. إعادة حساب المجموع الكلي بعد تعديل الخصم على الفاتورة**
-    await GET_SUMBIL_P();
+      USE_BMDFN == '1' ?
+      BMDNO_V = BMDNOController.text.isEmpty? 0: double.parse(BMDNOController.text)
+          : BMDNO_V =
+      ( BMDNOController.text.isEmpty?0:double.parse(BMDNOController.text) -
+          double.parse(BMDNFController.text));
+      BMDAM1 = BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
+      if (USING_TAX_SALES == '1' || (USING_TAX_SALES == '3'
+          && (UPIN_USING_TAX_SALES == 1 && Price_include_Tax == true))) {
+        // print('BMDAMController.text');
+        // print(BMDAMController.text);
 
-    // **5. تحديث واجهة المستخدم مرة واحدة في النهاية**
-    update();
-  }
+        BMDTXA_V = roundDouble(double.parse(BMDAMController.text) *
+            (100 / (100 + (double.parse(BMDTXController.text) * TCVL!))), 6);
+
+        //احتساب مبلغ الضريبه
+        if (TTID2 != null) {
+          BMDTXA2 = roundDouble((BMDTXA_V! *
+              ((double.parse(BMDTX2Controller.text) / 100) * TCVL2!)), 6);
+        }
+        else {
+          BMDTXA2 = 0;
+        }
+
+        ['<$TTID2>'].contains(TTIDC1) ? BMDTXA = roundDouble(
+            (double.parse(BMDAMController.text) - BMDTXA_V!) + (BMDTXA2! *
+                (double.parse(BMDTXController.text) / 100)), 6) :
+        BMDTXA = roundDouble((double.parse(BMDAMController.text) -
+            (double.parse(BMDAMController.text) *
+                (100 / (100 + (double.parse(BMDTXController.text) * TCVL!))))),
+            6);
 
 
-  //وسعر الوحدة  دالة احتساب الكميه والمجاني
-  Calculate_BMD_NO_AM() {
-    // print('Calculate_BMD_NO_AM');
-    // print(USING_TAX_SALES);
-    // print(Price_include_Tax);
-    // print(UPIN_USING_TAX_SALES);
-    //الكميه الحقيقه
-    //التحقق من المتغير رقم 431 هل المجاني ضمن الكميه ام لا وعليه عندما يكون المتغير المجاني ضمن العدد يتم عند الحفظ انقاص المجاني من العدد وحفظه في حقل BMDNO
+        if (TTID3 != null) {
+          BMDTXA3 = roundDouble((double.parse(BMDAMController.text) -
+              (double.parse(BMDAMController.text) *
+                  (100 /
+                      (100 + (double.parse(BMDTX3Controller.text) * TCVL3!))))),
+              6);
+        }
+        else {
+          BMDTXA3 = 0;
+        }
+        print(BMDAMTXController.text);
+        //احتساب سعر الوحدة مع سعر شامل الضريبه
+        ['<$TTID2>'].contains(TTIDC1) ? BMDAMTXController.text =
+            roundDouble(BMDTXA_V!, 8).toString() :
+        BMDAMTXController.text = roundDouble(double.parse(BMDAMController.text) -
+            (BMDTXA! + BMDTXA2! + BMDTXA3!), 6).toString();
 
-    USE_BMDFN == '1' ?
-    BMDNO_V = BMDNOController.text.isEmpty? 0: double.parse(BMDNOController.text)
-        : BMDNO_V =
-    ( BMDNOController.text.isEmpty?0:double.parse(BMDNOController.text) -
-        double.parse(BMDNFController.text));
-    BMDAM1 = BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
-    if (USING_TAX_SALES == '1' || (USING_TAX_SALES == '3'
-        && (UPIN_USING_TAX_SALES == 1 && Price_include_Tax == true))) {
-      // print('BMDAMController.text');
-      // print(BMDAMController.text);
+        print(BMDAMTXController.text);
+        print(BMDAMController.text.isEmpty);
+        print(BMDAMController.text);
+        print('BMDAMController.text444');
+        BMDAM1 = BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMTXController.text);
+        print('BMDAM1');
+        print(BMDAM1);
+        print(BMDAMTXController.text);
 
-      BMDTXA_V = roundDouble(double.parse(BMDAMController.text) *
-          (100 / (100 + (double.parse(BMDTXController.text) * TCVL!))), 6);
-
-      //احتساب مبلغ الضريبه
-      if (TTID2 != null) {
-        BMDTXA2 = roundDouble((BMDTXA_V! *
-            ((double.parse(BMDTX2Controller.text) / 100) * TCVL2!)), 6);
+        //اجمالي المبلغ الكميه في السعر
+        SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
+        update();
       }
       else {
+        BMDAM1 =
+        BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
+        //اجمالي المبلغ
+        SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
+      }
+
+      print('BMDAMTXController');
+      print(BMDAM1);
+      print(BMDNOController.text);
+      print(BMDAMController.text);
+      print(SUMBMDAMController.text);
+      //اجمالي المجاني
+      SUMBMDAMTFController.text =
+          roundDouble(BMDAM1! * double.parse(BMDNFController.text), 6).toString();
+      // دالة احتساب نسبه الخصم و مبلغ الخصم
+      Calculate_BMDDI_IR();
+    }
+
+    // دالة احتساب نسبه الخصم و مبلغ الخصم
+    Calculate_BMDDI_IR() {
+      //اجمالي مبلغ التخفيض
+      SUMBMDDI = roundDouble(BMDNO_V! * double.parse(BMDDIController.text), 6);
+      //اجمالي نسبه التخفيض
+      SUMBMDDIR = roundDouble((double.parse(SUMBMDAMController.text) *
+          (double.parse(BMDDIRController.text) / 100)), 6);
+      //مبلغ التخفيض على مستوي للصنف
+      BMDDITController.text = roundDouble(double.parse(BMDDIController.text) +
+          (((double.parse(BMDDIRController.text) / 100) * BMDAM1!)), 6).toString();
+      //الاجمالي المبلغ الكلي للتخفيض
+      SUM_Totle_BMDDI = roundDouble(double.parse(BMDDITController.text) * BMDNO_V!, 6);
+      GET_USING_TAX_P();
+      update();
+    }
+
+    //  `دالة احتساب الضريبه و الاجمالي
+    GET_USING_TAX_P() {
+      // if(MITSK==1){
+      (BMDAM1.isNull) ? BMDAM1 = 0 : BMDAM1 = BMDAM1;
+
+      if (TTID2 != null) {
+        if (TSDI2 == 1) {
+          BMDTXA2 = roundDouble((BMDAM1!) * ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100), 6);
+        } else {
+          BMDTXA2 = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
+              ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100), 6);
+        }
+      } else {
         BMDTXA2 = 0;
       }
 
-      ['<$TTID2>'].contains(TTIDC1) ? BMDTXA = roundDouble(
-          (double.parse(BMDAMController.text) - BMDTXA_V!) + (BMDTXA2! *
-              (double.parse(BMDTXController.text) / 100)), 6) :
-      BMDTXA = roundDouble((double.parse(BMDAMController.text) -
-          (double.parse(BMDAMController.text) *
-              (100 / (100 + (double.parse(BMDTXController.text) * TCVL!))))),
-          6);
+
+      // print(['<$TTID2>'].contains(TTIDC1));
+
+      if (TSDI1 == 1) {
+        //BMDTXA = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
+        BMDTXA = ['<$TTID2>'].contains(TTIDC1) ?
+        roundDouble((BMDAM1! + BMDTXA2!) *
+            ((double.parse(BMDTXController.text) * TCVL!) / 100), 6) :
+        roundDouble((BMDAM1!) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
+      } else {
+        //BMDTXA = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
+        BMDTXA = ['<$TTID2>'].contains(TTIDC1) ?
+        roundDouble((BMDAM1! - double.parse(BMDDITController.text) + BMDTXA2!) *
+            ((double.parse(BMDTXController.text) * TCVL!) / 100), 6) :
+        roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
+            ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
+      }
 
 
       if (TTID3 != null) {
-        BMDTXA3 = roundDouble((double.parse(BMDAMController.text) -
-            (double.parse(BMDAMController.text) *
-                (100 /
-                    (100 + (double.parse(BMDTX3Controller.text) * TCVL3!))))),
-            6);
-      }
-      else {
-        BMDTXA3 = 0;
-      }
-      print(BMDAMTXController.text);
-      //احتساب سعر الوحدة مع سعر شامل الضريبه
-      ['<$TTID2>'].contains(TTIDC1) ? BMDAMTXController.text =
-          roundDouble(BMDTXA_V!, 8).toString() :
-      BMDAMTXController.text = roundDouble(double.parse(BMDAMController.text) -
-          (BMDTXA! + BMDTXA2! + BMDTXA3!), 6).toString();
-
-      print(BMDAMTXController.text);
-      print(BMDAMController.text.isEmpty);
-      print(BMDAMController.text);
-      print('BMDAMController.text444');
-      BMDAM1 = BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMTXController.text);
-      print('BMDAM1');
-      print(BMDAM1);
-      print(BMDAMTXController.text);
-
-      //اجمالي المبلغ الكميه في السعر
-      SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
-      update();
-    }
-    else {
-      BMDAM1 =
-      BMDAMController.text.isEmpty ? 0 : double.parse(BMDAMController.text);
-      //اجمالي المبلغ
-      SUMBMDAMController.text = roundDouble(BMDAM1! * BMDNO_V!, 6).toString();
-    }
-
-    print('BMDAMTXController');
-    print(BMDAM1);
-    print(BMDNOController.text);
-    print(BMDAMController.text);
-    print(SUMBMDAMController.text);
-    //اجمالي المجاني
-    SUMBMDAMTFController.text =
-        roundDouble(BMDAM1! * double.parse(BMDNFController.text), 6).toString();
-    // دالة احتساب نسبه الخصم و مبلغ الخصم
-    Calculate_BMDDI_IR();
-  }
-
-  // دالة احتساب نسبه الخصم و مبلغ الخصم
-  Calculate_BMDDI_IR() {
-    //اجمالي مبلغ التخفيض
-    SUMBMDDI = roundDouble(BMDNO_V! * double.parse(BMDDIController.text), 6);
-    //اجمالي نسبه التخفيض
-    SUMBMDDIR = roundDouble((double.parse(SUMBMDAMController.text) *
-        (double.parse(BMDDIRController.text) / 100)), 6);
-    //مبلغ التخفيض على مستوي للصنف
-    BMDDITController.text = roundDouble(double.parse(BMDDIController.text) +
-        (((double.parse(BMDDIRController.text) / 100) * BMDAM1!)), 6).toString();
-    //الاجمالي المبلغ الكلي للتخفيض
-    SUM_Totle_BMDDI = roundDouble(double.parse(BMDDITController.text) * BMDNO_V!, 6);
-    GET_USING_TAX_P();
-    update();
-  }
-
-  //  `دالة احتساب الضريبه و الاجمالي
-  GET_USING_TAX_P() {
-    // if(MITSK==1){
-    (BMDAM1.isNull) ? BMDAM1 = 0 : BMDAM1 = BMDAM1;
-
-    if (TTID2 != null) {
-      if (TSDI2 == 1) {
-        BMDTXA2 = roundDouble((BMDAM1!) * ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100), 6);
-      } else {
-        BMDTXA2 = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
-            ((double.parse(BMDTX2Controller.text) * TCVL2!) / 100), 6);
-      }
-    } else {
-      BMDTXA2 = 0;
-    }
-
-
-    // print(['<$TTID2>'].contains(TTIDC1));
-
-    if (TSDI1 == 1) {
-      //BMDTXA = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
-      BMDTXA = ['<$TTID2>'].contains(TTIDC1) ?
-      roundDouble((BMDAM1! + BMDTXA2!) *
-          ((double.parse(BMDTXController.text) * TCVL!) / 100), 6) :
-      roundDouble((BMDAM1!) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
-    } else {
-      //BMDTXA = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) * ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
-      BMDTXA = ['<$TTID2>'].contains(TTIDC1) ?
-      roundDouble((BMDAM1! - double.parse(BMDDITController.text) + BMDTXA2!) *
-          ((double.parse(BMDTXController.text) * TCVL!) / 100), 6) :
-      roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
-          ((double.parse(BMDTXController.text) * TCVL!) / 100), 6);
-    }
-
-
-    if (TTID3 != null) {
-      if (TSDI3 == 1) {
-        BMDTXA3 = roundDouble((BMDAM1!) * ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
-      } else {
-        BMDTXA3 = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
-            ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
-      }
-    } else {
-      BMDTXA3 = 0;
-    }
-
-    // BMDTXA = roundDouble((double.parse(SUMBMDAMController.text) * (double.parse(BMDTXController.text) / 100)), 6);
-    BMDTXAController.text = (BMDTXA! + BMDTXA2! + BMDTXA3!).toString();
-    update();
-    // اجمالي الضريبه
-    BMDTXT1 = roundDouble(BMDTXA! * BMDNO_V!, 6);
-    BMDTXT2 = roundDouble(BMDTXA2! * BMDNO_V!, 6);
-    BMDTXT3 = roundDouble(BMDTXA3! * BMDNO_V!, 6);
-
-    BMDTXTController.text = roundDouble((BMDTXA! + BMDTXA2! + BMDTXA3!) * BMDNO_V!, 6).toString();
-
-    update();
-
-    //  احتساب الاجمالي الكلي على مستوى الصنف
-    SUMBMDAMTController.text = formatter.format(roundDouble(
-        (double.parse(SUMBMDAMController.text) +
-            double.parse(BMDTXTController.text)) -
-            SUM_Totle_BMDDI!, SCSFL)).toString();
-    TOTSUMBMDAM = roundDouble((double.parse(SUMBMDAMController.text) +
-        double.parse(BMDTXTController.text)) -
-        SUM_Totle_BMDDI!, SCSFL);
-    update();
-  }
-
-  //تعديل الخصم
-  Future UPDATE_BMMDI() async {
-    if (SelectDataBMMDN == '0' && BMMDIRController.text.isNotEmpty &&
-        double.parse(BMMDIRController.text) > 0) {
-      await Future.delayed(const Duration(milliseconds: 300));
-      // احتساب مبلغ التخفيض على مستوى الفاتورة
-      BMMDIController.text = roundDouble((double.parse(BMMAMController.text) *
-          (double.parse(BMMDIRController.text) / 100)), SCSFL).toString();
-    }
-    await Future.delayed(const Duration(milliseconds: 500));
-    await updateBilMovRecords(
-      tableName: BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        bmmId: BMMID.toString(),
-        totalAmount: double.parse(BMMAMController.text),
-        deductedAmount: SUMBMMDIF!,
-        bmddiFactor: double.parse(BMMDIController.text),
-        bmddirValue: 0);
-    update();
-    // await Future.delayed(const Duration(milliseconds: 800));
-    await GET_SUMBIL_P();
-    update();
-  }
-
-  //حالة الحفظ
-  editMode() async{
-
-    contentFocusNode.unfocus();
-    bool isValidate = true;
-    if (isValidate == false) {
-      isloadingvalidator(false);
-    } else {
-      STMID == 'MOB' ? await calculateDistanceBetweenLocations() : null;
-      print(Get.arguments);
-      if (Get.arguments == null && edit == false) {
-        if (CheckBack == 0 || CountRecodeController.text == '0') {
-          Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
-              backgroundColor: Colors.red,
-              icon: const Icon(Icons.error, color: Colors.white),
-              colorText: Colors.white,
-              isDismissible: true,
-              dismissDirection: DismissDirection.horizontal,
-              forwardAnimationCurve: Curves.easeOutBack);
+        if (TSDI3 == 1) {
+          BMDTXA3 = roundDouble((BMDAM1!) * ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
         } else {
-          Save_BIL_MOV_M(edit);
+          BMDTXA3 = roundDouble((BMDAM1! - double.parse(BMDDITController.text)) *
+              ((double.parse(BMDTX3Controller.text) * TCVL3!) / 100), 6);
         }
       } else {
-        Save_BIL_MOV_M(edit);
-        //  _updateItem(Get.arguments);
+        BMDTXA3 = 0;
+      }
+
+      // BMDTXA = roundDouble((double.parse(SUMBMDAMController.text) * (double.parse(BMDTXController.text) / 100)), 6);
+      BMDTXAController.text = (BMDTXA! + BMDTXA2! + BMDTXA3!).toString();
+      update();
+      // اجمالي الضريبه
+      BMDTXT1 = roundDouble(BMDTXA! * BMDNO_V!, 6);
+      BMDTXT2 = roundDouble(BMDTXA2! * BMDNO_V!, 6);
+      BMDTXT3 = roundDouble(BMDTXA3! * BMDNO_V!, 6);
+
+      BMDTXTController.text = roundDouble((BMDTXA! + BMDTXA2! + BMDTXA3!) * BMDNO_V!, 6).toString();
+
+      update();
+
+      //  احتساب الاجمالي الكلي على مستوى الصنف
+      SUMBMDAMTController.text = formatter.format(roundDouble(
+          (double.parse(SUMBMDAMController.text) +
+              double.parse(BMDTXTController.text)) -
+              SUM_Totle_BMDDI!, SCSFL)).toString();
+      TOTSUMBMDAM = roundDouble((double.parse(SUMBMDAMController.text) +
+          double.parse(BMDTXTController.text)) -
+          SUM_Totle_BMDDI!, SCSFL);
+      update();
+    }
+
+    //تعديل الخصم
+    Future UPDATE_BMMDI() async {
+      if (SelectDataBMMDN == '0' && BMMDIRController.text.isNotEmpty &&
+          double.parse(BMMDIRController.text) > 0) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        // احتساب مبلغ التخفيض على مستوى الفاتورة
+        BMMDIController.text = roundDouble((double.parse(BMMAMController.text) *
+            (double.parse(BMMDIRController.text) / 100)), SCSFL).toString();
+      }
+      await Future.delayed(const Duration(milliseconds: 500));
+      await updateBilMovRecords(
+          tableName: BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+          bmmId: BMMID.toString(),
+          totalAmount: double.parse(BMMAMController.text),
+          deductedAmount: SUMBMMDIF!,
+          bmddiFactor: double.parse(BMMDIController.text),
+          bmddirValue: 0);
+      update();
+      // await Future.delayed(const Duration(milliseconds: 800));
+      await GET_SUMBIL_P();
+      update();
+    }
+
+    //حالة الحفظ
+    editMode() async{
+
+      contentFocusNode.unfocus();
+      bool isValidate = true;
+      if (isValidate == false) {
+        isloadingvalidator(false);
+      } else {
+        STMID == 'MOB' ? await calculateDistanceBetweenLocations() : null;
+        print(Get.arguments);
+        if (Get.arguments == null && edit == false) {
+          if (CheckBack == 0 || CountRecodeController.text == '0') {
+            Get.snackbar('StringCHK_Save_Err'.tr, 'StringCHK_Save'.tr,
+                backgroundColor: Colors.red,
+                icon: const Icon(Icons.error, color: Colors.white),
+                colorText: Colors.white,
+                isDismissible: true,
+                dismissDirection: DismissDirection.horizontal,
+                forwardAnimationCurve: Curves.easeOutBack);
+          } else {
+            Save_BIL_MOV_M(edit);
+          }
+        } else {
+          Save_BIL_MOV_M(edit);
+          //  _updateItem(Get.arguments);
+        }
       }
     }
-  }
 
-  Future<InventoryDataGridSource> getInventoryDataSource() async {
-    var InvoicesList = await GET_BIL_MOV_D(
-        BMKID==11 || BMKID==12?'BIF_MOV_D':'BIL_MOV_D',
-        BMMID.toString(), SER_MINA.toString(),'2');
-    return InventoryDataGridSource(InvoicesList);
-  }
+    Future<InventoryDataGridSource> getInventoryDataSource() async {
+      var InvoicesList = await GET_BIL_MOV_D(
+          BMKID==11 || BMKID==12?'BIF_MOV_D':'BIL_MOV_D',
+          BMMID.toString(), SER_MINA.toString(),'2');
+      return InventoryDataGridSource(InvoicesList);
+    }
 
-  //حفظ فاتورة فرعي
-  Future<bool> Save_BIL_MOV_D_P() async {
-    try {
-      STB_N = 'S1';
-      await GET_BMDID_P();
-      GUIDD = uuid.v4();
-      BMDNFController.text.isEmpty
-          ? BMDNFController.text = '0'
-          : BMDNFController.text = BMDNFController.text;
-      bool isValidate = ADD_EDformKey.currentState!.validate();
-      if (isValidate == false) {
-        loading(true);
-      } else {
+    //حفظ فاتورة فرعي
+    Future<bool> Save_BIL_MOV_D_P() async {
+      try {
+        STB_N = 'S1';
+        await GET_BMDID_P();
+        GUIDD = uuid.v4();
+        BMDNFController.text.isEmpty
+            ? BMDNFController.text = '0'
+            : BMDNFController.text = BMDNFController.text;
+        bool isValidate = ADD_EDformKey.currentState!.validate();
+        if (isValidate == false) {
+          loading(true);
+        } else {
+          if ((SelectDataMINO == null || SelectDataMINO.toString().isEmpty) &&
+              (SelectDataMUID == null || SelectDataMUID.toString().isEmpty)) {
+            Fluttertoast.showToast(
+                msg: "يجب تعبئة جميع البيانات",
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S2';
+            return false;
+          }
+          else if (!BMDNOController.text.isNum) {
+            Fluttertoast.showToast(
+                msg: 'StrinReq_SMDFN_NUM'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S3';
+            return false;
+          }
+          else if (double.parse(BMDNOController.text) < 0.0) {
+            Fluttertoast.showToast(
+                msg: 'StrinReq_SMDFN'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S4';
+            return false;
+          }
+          else if (BMDAM1! <= 0.0 && double.parse(BMDNFController.text)<=0) {
+            Fluttertoast.showToast(
+                msg: 'StringReq_BMDAM'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S5';
+            return false;
+          }
+          // else if (BMDAM1! <= 0.0 && MIFR == 2) {
+          //   Fluttertoast.showToast(
+          //       msg: 'StrinReq_BMDAM_Vlaue'.tr,
+          //       toastLength: Toast.LENGTH_LONG,
+          //       textColor: Colors.white,
+          //       backgroundColor: Colors.redAccent);
+          //   STB_N = 'S5';
+          //   return false;
+          // }
+          else if (double.parse(BMDNFController.text) < 0.0) {
+            Fluttertoast.showToast(
+                msg: 'StrinReq_SMDFN'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S6';
+            return false;
+          }
+          // else if (TOTSUMBMDAM! <= 0.0 && MIFR == 2) {
+          //   Fluttertoast.showToast(
+          //       msg: 'StrinReq_SUMBMDAM'.tr,
+          //       toastLength: Toast.LENGTH_LONG,
+          //       textColor: Colors.white,
+          //       backgroundColor: Colors.redAccent);
+          //   STB_N = 'S6';
+          //   return false;
+          // }
+          else if (MGKI == 1 && lARGEST_VALUE_QUANTITY != 0 &&
+              double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY) {
+            Fluttertoast.showToast(
+                msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S8';
+            return false;
+          } else if (MGKI == 2 && lARGEST_VALUE_QUANTITY2 != 0 &&
+              double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY2) {
+            Fluttertoast.showToast(
+                msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S8';
+            return false;
+          } else if (MGKI == 1 && lARGEST_VALUE_PRICE != 0 &&
+              BMDAM1! > lARGEST_VALUE_PRICE) {
+            Fluttertoast.showToast(
+                msg: 'StrinlARGEST_VALUE_PRICE'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S9';
+            return false;
+          } else if (MGKI == 2 && lARGEST_VALUE_PRICE2 != 0 &&
+              BMDAM1! > lARGEST_VALUE_PRICE2) {
+            Fluttertoast.showToast(
+                msg: 'StrinlARGEST_VALUE_PRICE'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S9';
+            return false;
+          } else if (SelectDataBMMDN == '1' &&
+              double.parse(BMDDITController.text) > BMDAM1!) {
+            Fluttertoast.showToast(
+                msg: 'StringErr_SUM_BMDDI'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S10';
+            return false;
+          } else if (SelectDataBMMDN == '1' &&
+              double.parse(BMDDIRController.text) > 100) {
+            Fluttertoast.showToast(
+                msg: 'StringErr_SUM_BMDDI'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+            STB_N = 'S11';
+            return false;
+          } else if (MGKI == 1 && BMKID != 1 && BMKID != 2 && BMKID != 12 && BMKID != 4 &&
+              (Show_Items == '2' || Show_Items == '3' && Allow_Show_Items == 2) &&
+              (double.parse(BMDNOController.text) > BDNO_F)) {
+            Get.defaultDialog(
+              title: 'StringMestitle'.tr,
+              middleText: 'StringChk_BMDNO'.tr,
+              backgroundColor: Colors.white,
+              radius: 40,
+              textCancel: 'StringOK'.tr,
+              cancelTextColor: Colors.blueAccent,
+              barrierDismissible: false,
+            );
+            STB_N = 'S12';
+            return false;
+          } else {
+            BMDAM_TX = BMDAM1! + BMDTXA2!;
+
+            BMDNF =
+            BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text);
+
+            BMDDI_TX = (roundDouble(
+                (((double.parse(BMDDIController.text) + ((BMDAM1! + BMDTXA2!)
+                    * (0 / 100))) * BMDNO_V!) +
+                    (BMDNF! <= 0 ? 0 : BMDAM1! * BMDNF!)), SCSFL)) /
+                (BMDNO_V! + BMDNF!);
+
+            BMDAMT3 =
+                roundDouble((BMDAM_TX! - BMDDI_TX!) * (BMDNO_V! + BMDNF!), SCSFL);
+
+            if (BMDNO_V! > 0) {
+              TCAMT = roundDouble(
+                  (BMDAMT3! * (TCRA! / 100)) / BMDNO_V! * BMDNO_V!, SCSFL_TX);
+            } else {
+              TCAMT = 0;
+            }
+
+            if (BMDIDController.text.isNotEmpty) {
+              MES_ADD_EDIT = 'StringED'.tr;
+              STB_N = 'S13';
+              UpdateBil_Mov_D(
+                  BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+                  BMKID!,
+                  BMMID!,
+                  int.parse(BMDIDController.text.toString()),
+                  MGNOController.text,
+                  SelectDataMINO.toString(),
+                  int.parse(SelectDataMUID.toString()),
+                  SIID_V2,
+                  double.parse(BMDNFController.text),
+                  BMDNO_V!,
+                  SelectDataSNED.toString(),
+                  BMDAM1!,
+                  double.parse(BMDDIController.text),
+                  double.parse(BMDDIRController.text),
+                  roundDouble(BMDAM1! * double.parse(SCEXController.text), 6),
+                  double.parse(BMDTXController.text) +
+                      double.parse(BMDTX2Controller.text) +
+                      double.parse(BMDTX3Controller.text),
+                  BMDTXController.text.isEmpty ? 0 : double.parse(
+                      BMDTXController.text),
+                  BMDTX2Controller.text.isEmpty ? 0 : double.parse(
+                      BMDTX2Controller.text),
+                  BMDTX3Controller.text.isEmpty ? 0 : double.parse(
+                      BMDTX3Controller.text),
+                  BMDTXA!,
+                  BMDTXA2!,
+                  BMDTXA3!,
+                  BMDTXA! + BMDTXA2! + BMDTXA3!,
+                  BMDNFController.text.isEmpty ||
+                      double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1!,
+                  double.parse(SUMBMDAMController.text),
+                  double.parse(SUMBMDAMTFController.text),
+                  BMDTXT1!,
+                  BMDTXT2!,
+                  BMDTXT3!,
+                  double.parse(BMDTXTController.text),
+                  double.parse(BMDDITController.text),
+                  SUM_Totle_BMDDI!,
+                  BMDINController.text,
+                  BMDAM_TX,
+                  BMDDI_TX,
+                  BMDAMT3,
+                  TCAMT);
+            } else {
+              STB_N = 'S14';
+              Bil_Mov_D_Local e = Bil_Mov_D_Local(
+                BMMID: BMMID,
+                BMDID: BMDID,
+                BMKID: BMKID,
+                MGNO: MGNOController.text,
+                MINO: SelectDataMINO,
+                MUID: int.parse(SelectDataMUID.toString()),
+                BMDNO: BMDNO_V,
+                BMDNF: BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text),
+                BMDAM: BMDAM1,
+                BMDEQ: roundDouble(BMDAM1! * double.parse(SCEXController.text), 6),
+                BMDEQC: roundDouble((BMDAM1! * double.parse(SCEXController.text)) / SCEXS!, 6),
+                BMDTXA1: BMDTXA,
+                BMDTXA2: BMDTXA2,
+                BMDTXA3: BMDTXA3,
+                BMDTXA: BMDTXA! + BMDTXA2! + BMDTXA3!,
+                BMDTX: double.parse(BMDTXController.text) +
+                    double.parse(BMDTX2Controller.text) + double.parse(BMDTX3Controller.text),
+                BMDTX1: BMDTXController.text.isEmpty ? 0 : double.parse(BMDTXController.text),
+                BMDTX2: BMDTX2Controller.text.isEmpty ? 0 : double.parse(BMDTX2Controller.text),
+                BMDTX3: BMDTX3Controller.text.isEmpty ? 0 : double.parse(BMDTX3Controller.text),
+                BMDDI: double.parse(BMDDIController.text),
+                BMDDIR: double.parse(BMDDIRController.text),
+                SIID: int.parse(SIID_V2.toString()),
+                BIID: int.parse(SelectDataBIID.toString()),
+                MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
+                BMDED: BMKID == 1 || BMKID == 2 ? BMDEDController.text : SelectDataSNED.toString(),
+                BMDTY: 1,
+                BMDAMR: roundDouble(double.parse(MPCOController.text) / SCEXS!, 6),
+                BMDAMO: MPS1,
+                BMDAMRE: double.parse(MPCOController.text),
+                BMDDIF: BMDNFController.text.isEmpty || double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1,
+                BMDAMT: double.parse(SUMBMDAMController.text),
+                BMDAMTF: double.parse(SUMBMDAMTFController.text),
+                BMDTXT1: BMDTXT1,
+                BMDTXT2: BMDTXT2,
+                BMDTXT3: BMDTXT3,
+                BMDTXT: double.parse(BMDTXTController.text),
+                BMDDIT: double.parse(BMDDITController.text),
+                BMDDIM: SUM_Totle_BMDDI,
+                GUID: GUIDD.toString().toUpperCase(),
+                GUIDM: GUID.toString().toUpperCase(),
+                BMDIN: BMDINController.text,
+                MITSK: MITSK,
+                MGKI: MGKI,
+                GUIDMT: GUIDMT,
+                BMDDIA: 0,
+                SYST: 0,
+                TCRA: TCRA,
+                TCID: TCID_D,
+                TCSY: TCSY_D,
+                TCSDID: TCSDID,
+                TCSDSY: TCSDSY,
+                TCVL: TCVL,
+                BMDAM_TX: BMDAM_TX,
+                BMDDI_TX: BMDDI_TX,
+                BMDAMT3: BMDAMT3,
+                TCAMT: TCVL != 1 ? 0 : TCAMT,
+                JTID_L: LoginController().JTID,
+                BIID_L: LoginController().BIID,
+                SYID_L: LoginController().SYID,
+                CIID_L: LoginController().CIID,
+              );
+              await Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
+
+              // بعد الحفظ، تحديث البيانات في الـ controller
+              await getInventoryDataSource();
+              update();
+              MES_ADD_EDIT = 'StringAD'.tr;
+              STB_N = 'S15';
+
+            }
+            CheckBack = 1;
+            update();
+            Fluttertoast.showToast(
+                msg: MES_ADD_EDIT,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.green);
+            GET_SUMBIL_P();
+            GET_CountRecode(BMMID!);
+            update();
+            STB_N = 'S6';
+            //الخصم علي مستوى الفاتورة
+            if (SelectDataBMMDN == '0' &&
+                (double.parse(BMMDIController.text) > 0 ||
+                    double.parse(BMMDIRController.text) > 0)) {
+              await UPDATE_BMMDI();
+              update();
+            }
+
+            if (BMKID != 1 && BMKID != 2) {
+              //اضافة الاصناف التابعة والمرتبطة
+              await ADD_MAT_FOL_TO_MOV_D(
+                  SelectDataBIID.toString(), MGNOController.text,
+                  SelectDataMINO.toString(), BMDID!);
+              update();
+            }
+
+            if (autocompleteFocusNode != 'null') {
+              autocompleteFocusNode.requestFocus();
+            }
+            update();
+            return true;
+          }
+        }
+      } catch (e, stackTrace) {
+        print(' $e $stackTrace');
+        Fluttertoast.showToast(
+            msg: "$STB_N-${'StrinError_save_data'.tr}-${e.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        print("error-save_D ${e.toString()}");
+        return false;
+      }
+      return true;
+    }
+
+    //حفظ فاتورة فرعي مطاعم
+    Future<bool> Save_BIL_MOV_D_ORD_P() async {
+      try {
+        STB_N = 'S1';
+        GUIDD = uuid.v4();
+        await  GET_BMDID_P();
+        print('STP-2');
+        print(BMDIDController.text.toString());
+        BMDNFController.text.isEmpty
+            ? BMDNFController.text = '0'
+            : BMDNFController.text = BMDNFController.text;
         if ((SelectDataMINO == null || SelectDataMINO.toString().isEmpty) &&
             (SelectDataMUID == null || SelectDataMUID.toString().isEmpty)) {
           Fluttertoast.showToast(
@@ -6462,51 +6845,6 @@ class Sale_Invoices_Controller extends GetxController {
           STB_N = 'S3';
           return false;
         }
-        else if (double.parse(BMDNOController.text) < 0.0) {
-          Fluttertoast.showToast(
-              msg: 'StrinReq_SMDFN'.tr,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
-          STB_N = 'S4';
-          return false;
-        }
-        else if (BMDAM1! <= 0.0 && double.parse(BMDNFController.text)<=0) {
-          Fluttertoast.showToast(
-              msg: 'StringReq_BMDAM'.tr,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
-          STB_N = 'S5';
-          return false;
-        }
-        // else if (BMDAM1! <= 0.0 && MIFR == 2) {
-        //   Fluttertoast.showToast(
-        //       msg: 'StrinReq_BMDAM_Vlaue'.tr,
-        //       toastLength: Toast.LENGTH_LONG,
-        //       textColor: Colors.white,
-        //       backgroundColor: Colors.redAccent);
-        //   STB_N = 'S5';
-        //   return false;
-        // }
-        else if (double.parse(BMDNFController.text) < 0.0) {
-          Fluttertoast.showToast(
-              msg: 'StrinReq_SMDFN'.tr,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
-          STB_N = 'S6';
-          return false;
-        }
-        // else if (TOTSUMBMDAM! <= 0.0 && MIFR == 2) {
-        //   Fluttertoast.showToast(
-        //       msg: 'StrinReq_SUMBMDAM'.tr,
-        //       toastLength: Toast.LENGTH_LONG,
-        //       textColor: Colors.white,
-        //       backgroundColor: Colors.redAccent);
-        //   STB_N = 'S6';
-        //   return false;
-        // }
         else if (MGKI == 1 && lARGEST_VALUE_QUANTITY != 0 &&
             double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY) {
           Fluttertoast.showToast(
@@ -6516,7 +6854,8 @@ class Sale_Invoices_Controller extends GetxController {
               backgroundColor: Colors.redAccent);
           STB_N = 'S8';
           return false;
-        } else if (MGKI == 2 && lARGEST_VALUE_QUANTITY2 != 0 &&
+        }
+        else if (MGKI == 2 && lARGEST_VALUE_QUANTITY2 != 0 &&
             double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY2) {
           Fluttertoast.showToast(
               msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
@@ -6525,7 +6864,8 @@ class Sale_Invoices_Controller extends GetxController {
               backgroundColor: Colors.redAccent);
           STB_N = 'S8';
           return false;
-        } else if (MGKI == 1 && lARGEST_VALUE_PRICE != 0 &&
+        }
+        else if (MGKI == 1 && lARGEST_VALUE_PRICE != 0 &&
             BMDAM1! > lARGEST_VALUE_PRICE) {
           Fluttertoast.showToast(
               msg: 'StrinlARGEST_VALUE_PRICE'.tr,
@@ -6534,7 +6874,8 @@ class Sale_Invoices_Controller extends GetxController {
               backgroundColor: Colors.redAccent);
           STB_N = 'S9';
           return false;
-        } else if (MGKI == 2 && lARGEST_VALUE_PRICE2 != 0 &&
+        }
+        else if (MGKI == 2 && lARGEST_VALUE_PRICE2 != 0 &&
             BMDAM1! > lARGEST_VALUE_PRICE2) {
           Fluttertoast.showToast(
               msg: 'StrinlARGEST_VALUE_PRICE'.tr,
@@ -6543,43 +6884,11 @@ class Sale_Invoices_Controller extends GetxController {
               backgroundColor: Colors.redAccent);
           STB_N = 'S9';
           return false;
-        } else if (SelectDataBMMDN == '1' &&
-            double.parse(BMDDITController.text) > BMDAM1!) {
-          Fluttertoast.showToast(
-              msg: 'StringErr_SUM_BMDDI'.tr,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
-          STB_N = 'S10';
-          return false;
-        } else if (SelectDataBMMDN == '1' &&
-            double.parse(BMDDIRController.text) > 100) {
-          Fluttertoast.showToast(
-              msg: 'StringErr_SUM_BMDDI'.tr,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
-          STB_N = 'S11';
-          return false;
-        } else if (MGKI == 1 && BMKID != 1 && BMKID != 2 && BMKID != 12 && BMKID != 4 &&
-            (Show_Items == '2' || Show_Items == '3' && Allow_Show_Items == 2) &&
-            (double.parse(BMDNOController.text) > BDNO_F)) {
-          Get.defaultDialog(
-            title: 'StringMestitle'.tr,
-            middleText: 'StringChk_BMDNO'.tr,
-            backgroundColor: Colors.white,
-            radius: 40,
-            textCancel: 'StringOK'.tr,
-            cancelTextColor: Colors.blueAccent,
-            barrierDismissible: false,
-          );
-          STB_N = 'S12';
-          return false;
-        } else {
+        }
+        else {
           BMDAM_TX = BMDAM1! + BMDTXA2!;
 
-          BMDNF =
-          BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text);
+          BMDNF = BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text);
 
           BMDDI_TX = (roundDouble(
               (((double.parse(BMDDIController.text) + ((BMDAM1! + BMDTXA2!)
@@ -6587,17 +6896,16 @@ class Sale_Invoices_Controller extends GetxController {
                   (BMDNF! <= 0 ? 0 : BMDAM1! * BMDNF!)), SCSFL)) /
               (BMDNO_V! + BMDNF!);
 
-          BMDAMT3 =
-              roundDouble((BMDAM_TX! - BMDDI_TX!) * (BMDNO_V! + BMDNF!), SCSFL);
+          BMDAMT3 = roundDouble((BMDAM_TX! - BMDDI_TX!) * (BMDNO_V! + BMDNF!), SCSFL);
 
           if (BMDNO_V! > 0) {
-            TCAMT = roundDouble(
-                (BMDAMT3! * (TCRA! / 100)) / BMDNO_V! * BMDNO_V!, SCSFL_TX);
+            TCAMT = roundDouble((BMDAMT3! * (TCRA! / 100)) / BMDNO_V! * BMDNO_V!, SCSFL_TX);
           } else {
             TCAMT = 0;
           }
-
-          if (BMDIDController.text.isNotEmpty) {
+          if (COUNT_NO > 0) {
+            print('STP-3');
+            print(BMDIDController.text.toString());
             MES_ADD_EDIT = 'StringED'.tr;
             STB_N = 'S13';
             UpdateBil_Mov_D(
@@ -6608,7 +6916,7 @@ class Sale_Invoices_Controller extends GetxController {
                 MGNOController.text,
                 SelectDataMINO.toString(),
                 int.parse(SelectDataMUID.toString()),
-                SIID_V2,
+                SelectDataSIID.toString(),
                 double.parse(BMDNFController.text),
                 BMDNO_V!,
                 SelectDataSNED.toString(),
@@ -6616,21 +6924,16 @@ class Sale_Invoices_Controller extends GetxController {
                 double.parse(BMDDIController.text),
                 double.parse(BMDDIRController.text),
                 roundDouble(BMDAM1! * double.parse(SCEXController.text), 6),
-                double.parse(BMDTXController.text) +
-                    double.parse(BMDTX2Controller.text) +
+                double.parse(BMDTXController.text) + double.parse(BMDTX2Controller.text) +
                     double.parse(BMDTX3Controller.text),
-                BMDTXController.text.isEmpty ? 0 : double.parse(
-                    BMDTXController.text),
-                BMDTX2Controller.text.isEmpty ? 0 : double.parse(
-                    BMDTX2Controller.text),
-                BMDTX3Controller.text.isEmpty ? 0 : double.parse(
-                    BMDTX3Controller.text),
+                BMDTXController.text.isEmpty ? 0 : double.parse(BMDTXController.text),
+                BMDTX2Controller.text.isEmpty ? 0 : double.parse(BMDTX2Controller.text),
+                BMDTX3Controller.text.isEmpty ? 0 : double.parse(BMDTX3Controller.text),
                 BMDTXA!,
                 BMDTXA2!,
                 BMDTXA3!,
                 BMDTXA! + BMDTXA2! + BMDTXA3!,
-                BMDNFController.text.isEmpty ||
-                    double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1!,
+                BMDNFController.text.isEmpty || double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1!,
                 double.parse(SUMBMDAMController.text),
                 double.parse(SUMBMDAMTFController.text),
                 BMDTXT1!,
@@ -6643,9 +6946,18 @@ class Sale_Invoices_Controller extends GetxController {
                 BMDAM_TX,
                 BMDDI_TX,
                 BMDAMT3,
-                TCAMT);
-          } else {
+                TCAMT
+            );
+          }
+          else {
             STB_N = 'S14';
+            print('STP-4');
+            print(BMDAM1);
+            print(BMDTXA! + BMDTXA2! + BMDTXA3!);
+            print(BMDTXA2);
+            print(BMDTXA);
+            print(roundDouble(BMDAM1! * double.parse(SCEXController.text), 6));
+            print('MGNOController.text');
             Bil_Mov_D_Local e = Bil_Mov_D_Local(
               BMMID: BMMID,
               BMDID: BMDID,
@@ -6654,30 +6966,33 @@ class Sale_Invoices_Controller extends GetxController {
               MINO: SelectDataMINO,
               MUID: int.parse(SelectDataMUID.toString()),
               BMDNO: BMDNO_V,
-              BMDNF: BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text),
+              BMDNF: 0,
               BMDAM: BMDAM1,
               BMDEQ: roundDouble(BMDAM1! * double.parse(SCEXController.text), 6),
-              BMDEQC: roundDouble((BMDAM1! * double.parse(SCEXController.text)) / SCEXS!, 6),
+              BMDEQC: roundDouble(
+                  (BMDAM1! * double.parse(SCEXController.text)) / SCEXS!, 6),
               BMDTXA1: BMDTXA,
               BMDTXA2: BMDTXA2,
               BMDTXA3: BMDTXA3,
               BMDTXA: BMDTXA! + BMDTXA2! + BMDTXA3!,
               BMDTX: double.parse(BMDTXController.text) +
-                  double.parse(BMDTX2Controller.text) + double.parse(BMDTX3Controller.text),
-              BMDTX1: BMDTXController.text.isEmpty ? 0 : double.parse(BMDTXController.text),
-              BMDTX2: BMDTX2Controller.text.isEmpty ? 0 : double.parse(BMDTX2Controller.text),
-              BMDTX3: BMDTX3Controller.text.isEmpty ? 0 : double.parse(BMDTX3Controller.text),
+                  double.parse(BMDTX2Controller.text) +
+                  double.parse(BMDTX3Controller.text),
+              BMDTX1: BMDTXController.text.isEmpty ? 0 : double.parse(
+                  BMDTXController.text),
+              BMDTX2: BMDTX2Controller.text.isEmpty ? 0 : double.parse(
+                  BMDTX2Controller.text),
+              BMDTX3: BMDTX3Controller.text.isEmpty ? 0 : double.parse(
+                  BMDTX3Controller.text),
               BMDDI: double.parse(BMDDIController.text),
               BMDDIR: double.parse(BMDDIRController.text),
-              SIID: int.parse(SIID_V2.toString()),
+              SIID: int.parse(SelectDataSIID.toString()),
               BIID: int.parse(SelectDataBIID.toString()),
               MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
-              BMDED: BMKID == 1 || BMKID == 2 ? BMDEDController.text : SelectDataSNED.toString(),
+              BMDED: BMKID == 1 || BMKID == 2? BMDEDController.text : SelectDataSNED.toString(),
               BMDTY: 1,
-              BMDAMR: roundDouble(double.parse(MPCOController.text) / SCEXS!, 6),
-              BMDAMO: MPS1,
-              BMDAMRE: double.parse(MPCOController.text),
-              BMDDIF: BMDNFController.text.isEmpty || double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1,
+              BMDDIF: BMDNFController.text.isEmpty ||
+                  double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1,
               BMDAMT: double.parse(SUMBMDAMController.text),
               BMDAMTF: double.parse(SUMBMDAMTFController.text),
               BMDTXT1: BMDTXT1,
@@ -6685,13 +7000,13 @@ class Sale_Invoices_Controller extends GetxController {
               BMDTXT3: BMDTXT3,
               BMDTXT: double.parse(BMDTXTController.text),
               BMDDIT: double.parse(BMDDITController.text),
+              BMDAMO: MPS1,
               BMDDIM: SUM_Totle_BMDDI,
               GUID: GUIDD.toString().toUpperCase(),
               GUIDM: GUID.toString().toUpperCase(),
               BMDIN: BMDINController.text,
               MITSK: MITSK,
-              MGKI: MGKI,
-              GUIDMT: GUIDMT,
+              MGKI: 2,
               BMDDIA: 0,
               SYST: 0,
               TCRA: TCRA,
@@ -6709,1262 +7024,997 @@ class Sale_Invoices_Controller extends GetxController {
               SYID_L: LoginController().SYID,
               CIID_L: LoginController().CIID,
             );
-            await Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
-
-            // بعد الحفظ، تحديث البيانات في الـ controller
-            await getInventoryDataSource();
-            update();
+            Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
             MES_ADD_EDIT = 'StringAD'.tr;
-            STB_N = 'S15';
-
           }
+          STB_N = 'S15';
           CheckBack = 1;
           update();
-          Fluttertoast.showToast(
-              msg: MES_ADD_EDIT,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.green);
+          // Fluttertoast.showToast(msg: MES_ADD_EDIT,
+          //     toastLength: Toast.LENGTH_LONG,
+          //     textColor: Colors.white,
+          //      backgroundColor: Colors.green);
+          print('STP-5');
           GET_SUMBIL_P();
           GET_CountRecode(BMMID!);
-          update();
+          GET_BIF_MOV_D_P(BMMID.toString(), '2');
+          print('STP-6');
+          ClearBil_Mov_D_Data();
+          print('STP-8');
           STB_N = 'S6';
-          //الخصم علي مستوى الفاتورة
-          if (SelectDataBMMDN == '0' &&
-              (double.parse(BMMDIController.text) > 0 ||
-                  double.parse(BMMDIRController.text) > 0)) {
-            await UPDATE_BMMDI();
-            update();
-          }
-
-          if (BMKID != 1 && BMKID != 2) {
-            //اضافة الاصناف التابعة والمرتبطة
-            await ADD_MAT_FOL_TO_MOV_D(
-                SelectDataBIID.toString(), MGNOController.text,
-                SelectDataMINO.toString(), BMDID!);
-            update();
-          }
-
-          if (autocompleteFocusNode != 'null') {
-            autocompleteFocusNode.requestFocus();
-          }
           update();
           return true;
         }
+      } catch (e, stackTrace) {
+        print(' $e $stackTrace');
+        Fluttertoast.showToast(
+            msg: "$STB_N-${'StrinError_save_data'.tr}-${e.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        print("error-save_m ${e.toString()}");
+        return false;
       }
-    } catch (e, stackTrace) {
-      print(' $e $stackTrace');
-      Fluttertoast.showToast(
-          msg: "$STB_N-${'StrinError_save_data'.tr}-${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_D ${e.toString()}");
-      return false;
     }
-    return true;
-  }
 
-  //حفظ فاتورة فرعي مطاعم
-  Future<bool> Save_BIL_MOV_D_ORD_P() async {
-    try {
-      STB_N = 'S1';
-      GUIDD = uuid.v4();
-      await  GET_BMDID_P();
-      print('STP-2');
-      print(BMDIDController.text.toString());
-      BMDNFController.text.isEmpty
-          ? BMDNFController.text = '0'
-          : BMDNFController.text = BMDNFController.text;
-      if ((SelectDataMINO == null || SelectDataMINO.toString().isEmpty) &&
-          (SelectDataMUID == null || SelectDataMUID.toString().isEmpty)) {
-        Fluttertoast.showToast(
-            msg: "يجب تعبئة جميع البيانات",
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S2';
-        return false;
-      }
-      else if (!BMDNOController.text.isNum) {
-        Fluttertoast.showToast(
-            msg: 'StrinReq_SMDFN_NUM'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S3';
-        return false;
-      }
-      else if (MGKI == 1 && lARGEST_VALUE_QUANTITY != 0 &&
-          double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY) {
-        Fluttertoast.showToast(
-            msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S8';
-        return false;
-      }
-      else if (MGKI == 2 && lARGEST_VALUE_QUANTITY2 != 0 &&
-          double.parse(BMDNOController.text) > lARGEST_VALUE_QUANTITY2) {
-        Fluttertoast.showToast(
-            msg: 'StrinlARGEST_VALUE_QUANTITY'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S8';
-        return false;
-      }
-      else if (MGKI == 1 && lARGEST_VALUE_PRICE != 0 &&
-          BMDAM1! > lARGEST_VALUE_PRICE) {
-        Fluttertoast.showToast(
-            msg: 'StrinlARGEST_VALUE_PRICE'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S9';
-        return false;
-      }
-      else if (MGKI == 2 && lARGEST_VALUE_PRICE2 != 0 &&
-          BMDAM1! > lARGEST_VALUE_PRICE2) {
-        Fluttertoast.showToast(
-            msg: 'StrinlARGEST_VALUE_PRICE'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S9';
-        return false;
-      }
-      else {
-        BMDAM_TX = BMDAM1! + BMDTXA2!;
-
-        BMDNF = BMDNFController.text.isEmpty ? 0 : double.parse(BMDNFController.text);
-
-        BMDDI_TX = (roundDouble(
-            (((double.parse(BMDDIController.text) + ((BMDAM1! + BMDTXA2!)
-                * (0 / 100))) * BMDNO_V!) +
-                (BMDNF! <= 0 ? 0 : BMDAM1! * BMDNF!)), SCSFL)) /
-            (BMDNO_V! + BMDNF!);
-
-        BMDAMT3 = roundDouble((BMDAM_TX! - BMDDI_TX!) * (BMDNO_V! + BMDNF!), SCSFL);
-
-        if (BMDNO_V! > 0) {
-          TCAMT = roundDouble((BMDAMT3! * (TCRA! / 100)) / BMDNO_V! * BMDNO_V!, SCSFL_TX);
-        } else {
-          TCAMT = 0;
-        }
-        if (COUNT_NO > 0) {
-          print('STP-3');
-          print(BMDIDController.text.toString());
-          MES_ADD_EDIT = 'StringED'.tr;
-          STB_N = 'S13';
-          UpdateBil_Mov_D(
-              BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-              BMKID!,
-              BMMID!,
-              int.parse(BMDIDController.text.toString()),
-              MGNOController.text,
-              SelectDataMINO.toString(),
-              int.parse(SelectDataMUID.toString()),
-              SelectDataSIID.toString(),
-              double.parse(BMDNFController.text),
-              BMDNO_V!,
-              SelectDataSNED.toString(),
-              BMDAM1!,
-              double.parse(BMDDIController.text),
-              double.parse(BMDDIRController.text),
-              roundDouble(BMDAM1! * double.parse(SCEXController.text), 6),
-              double.parse(BMDTXController.text) + double.parse(BMDTX2Controller.text) +
-                  double.parse(BMDTX3Controller.text),
-              BMDTXController.text.isEmpty ? 0 : double.parse(BMDTXController.text),
-              BMDTX2Controller.text.isEmpty ? 0 : double.parse(BMDTX2Controller.text),
-              BMDTX3Controller.text.isEmpty ? 0 : double.parse(BMDTX3Controller.text),
-              BMDTXA!,
-              BMDTXA2!,
-              BMDTXA3!,
-              BMDTXA! + BMDTXA2! + BMDTXA3!,
-              BMDNFController.text.isEmpty || double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1!,
-              double.parse(SUMBMDAMController.text),
-              double.parse(SUMBMDAMTFController.text),
-              BMDTXT1!,
-              BMDTXT2!,
-              BMDTXT3!,
-              double.parse(BMDTXTController.text),
-              double.parse(BMDDITController.text),
-              SUM_Totle_BMDDI!,
-              BMDINController.text,
-              BMDAM_TX,
-              BMDDI_TX,
-              BMDAMT3,
-              TCAMT
-          );
-        }
-        else {
-          STB_N = 'S14';
-          print('STP-4');
-          print(BMDAM1);
-          print(BMDTXA! + BMDTXA2! + BMDTXA3!);
-          print(BMDTXA2);
-          print(BMDTXA);
-          print(roundDouble(BMDAM1! * double.parse(SCEXController.text), 6));
-          print('MGNOController.text');
+    //حفظ فاتورة فرعي
+    Future<bool> Save_BIF_MOV_D_P_COU() async {
+      try {
+        STB_N = 'S1';
+        await GET_BMDID_P();
+        if (COUNT <= 0) {
+          GUIDD = uuid.v4();
+          print('BMDTXController.text');
+          print(BMDTXController.text);
+          print(BMDTX2Controller.text);
+          print(BMDTX3Controller.text);
+          SCIDOController.text.contains('null')
+              ? SCIDOController.text = '0'
+              : SCIDOController.text = SCIDOController.text;
           Bil_Mov_D_Local e = Bil_Mov_D_Local(
             BMMID: BMMID,
             BMDID: BMDID,
-            BMKID: BMKID,
-            MGNO: MGNOController.text,
-            MINO: SelectDataMINO,
-            MUID: int.parse(SelectDataMUID.toString()),
-            BMDNO: BMDNO_V,
+            BMKID: 11,
+            BMDNO: 0,
             BMDNF: 0,
-            BMDAM: BMDAM1,
-            BMDEQ: roundDouble(BMDAM1! * double.parse(SCEXController.text), 6),
-            BMDEQC: roundDouble(
-                (BMDAM1! * double.parse(SCEXController.text)) / SCEXS!, 6),
-            BMDTXA1: BMDTXA,
-            BMDTXA2: BMDTXA2,
-            BMDTXA3: BMDTXA3,
-            BMDTXA: BMDTXA! + BMDTXA2! + BMDTXA3!,
-            BMDTX: double.parse(BMDTXController.text) +
-                double.parse(BMDTX2Controller.text) +
-                double.parse(BMDTX3Controller.text),
+            BMDAMT: 0,
+            BMDAM: double.parse(BMDAMController.text),
+            BMDAM1: BMDAM1,
+            BMDTXA: BMDTXA,
+            BMDTX: double.parse(BMDTXController.text),
+            SIID: int.parse(SIIDController.text),
+            MGNO: MGNOController.text,
+            MINO: MINOController.text,
+            MUID: int.parse(MUIDController.text),
+            MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
+            CTMID: int.parse(CTMIDController.text),
+            CIMID: int.parse(CIMIDController.text),
+            SCIDC: int.parse(SCIDOController.text),
+            BMDTY: 1,
+            GUID: GUIDD.toString().toUpperCase(),
+            GUIDM: GUID.toString().toUpperCase(),
+            SYST: 2,
+            BMDTXA1: 0,
+            BMDTXA2: 0,
+            BMDTXA3: 0,
             BMDTX1: BMDTXController.text.isEmpty ? 0 : double.parse(
                 BMDTXController.text),
             BMDTX2: BMDTX2Controller.text.isEmpty ? 0 : double.parse(
                 BMDTX2Controller.text),
             BMDTX3: BMDTX3Controller.text.isEmpty ? 0 : double.parse(
                 BMDTX3Controller.text),
-            BMDDI: double.parse(BMDDIController.text),
-            BMDDIR: double.parse(BMDDIRController.text),
-            SIID: int.parse(SelectDataSIID.toString()),
+            BMDDI: 0,
+            BMDDIR: 0,
             BIID: int.parse(SelectDataBIID.toString()),
-            MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
-            BMDED: BMKID == 1 || BMKID == 2? BMDEDController.text : SelectDataSNED.toString(),
-            BMDTY: 1,
-            BMDDIF: BMDNFController.text.isEmpty ||
-                double.parse(BMDNFController.text) <= 0 ? 0 : BMDAM1,
-            BMDAMT: double.parse(SUMBMDAMController.text),
-            BMDAMTF: double.parse(SUMBMDAMTFController.text),
-            BMDTXT1: BMDTXT1,
-            BMDTXT2: BMDTXT2,
-            BMDTXT3: BMDTXT3,
-            BMDTXT: double.parse(BMDTXTController.text),
-            BMDDIT: double.parse(BMDDITController.text),
+            BMDAMR: roundDouble(double.parse(MPCOController.text) / SCEXS!, 6),
             BMDAMO: MPS1,
-            BMDDIM: SUM_Totle_BMDDI,
-            GUID: GUIDD.toString().toUpperCase(),
-            GUIDM: GUID.toString().toUpperCase(),
-            BMDIN: BMDINController.text,
-            MITSK: MITSK,
-            MGKI: 2,
+            BMDAMRE: double.parse(MPCOController.text),
+            BMDDIF: 0,
+            BMDAMTF: 0,
+            BMDTXT1: 0,
+            BMDTXT2: 0,
+            BMDTXT3: 0,
+            BMDTXT: 0,
+            BMDDIT: 0,
+            BMDDIM: 0,
             BMDDIA: 0,
-            SYST: 0,
             TCRA: TCRA,
             TCID: TCID_D,
             TCSY: TCSY_D,
             TCSDID: TCSDID,
             TCSDSY: TCSDSY,
             TCVL: TCVL,
-            BMDAM_TX: BMDAM_TX,
-            BMDDI_TX: BMDDI_TX,
-            BMDAMT3: BMDAMT3,
-            TCAMT: TCVL != 1 ? 0 : TCAMT,
+            BMDAM_TX: 0,
+            BMDDI_TX: 0,
+            BMDAMT3: 0,
+            TCAMT: 0,
             JTID_L: LoginController().JTID,
             BIID_L: LoginController().BIID,
             SYID_L: LoginController().SYID,
             CIID_L: LoginController().CIID,
           );
-          Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
-          MES_ADD_EDIT = 'StringAD'.tr;
+          Save_BIF_MOV_D('BIF_MOV_D', e);
+          CheckBack = 1;
+          // CheckSave = 1;
+          update();
+          STB_N = 'S2';
+          return true;
         }
-        STB_N = 'S15';
-        CheckBack = 1;
-        update();
-        // Fluttertoast.showToast(msg: MES_ADD_EDIT,
-        //     toastLength: Toast.LENGTH_LONG,
-        //     textColor: Colors.white,
-        //      backgroundColor: Colors.green);
-         print('STP-5');
-         GET_SUMBIL_P();
-         GET_CountRecode(BMMID!);
-         GET_BIF_MOV_D_P(BMMID.toString(), '2');
-         print('STP-6');
-         ClearBil_Mov_D_Data();
-         print('STP-8');
-        STB_N = 'S6';
-        update();
-        return true;
+      } catch (e) {
+        Fluttertoast.showToast(
+            msg: "${STB_N}-${'StrinError_save_data'.tr}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        print("error-save_m ${e.toString()}");
+        return false;
       }
-    } catch (e, stackTrace) {
-      print(' $e $stackTrace');
-      Fluttertoast.showToast(
-          msg: "$STB_N-${'StrinError_save_data'.tr}-${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_m ${e.toString()}");
-      return false;
+      return true;
     }
-  }
 
-  //حفظ فاتورة فرعي
-  Future<bool> Save_BIF_MOV_D_P_COU() async {
-    try {
-      STB_N = 'S1';
-      await GET_BMDID_P();
-      if (COUNT <= 0) {
-        GUIDD = uuid.v4();
-        print('BMDTXController.text');
-        print(BMDTXController.text);
-        print(BMDTX2Controller.text);
-        print(BMDTX3Controller.text);
-        SCIDOController.text.contains('null')
-            ? SCIDOController.text = '0'
-            : SCIDOController.text = SCIDOController.text;
-        Bil_Mov_D_Local e = Bil_Mov_D_Local(
-          BMMID: BMMID,
-          BMDID: BMDID,
-          BMKID: 11,
-          BMDNO: 0,
-          BMDNF: 0,
-          BMDAMT: 0,
-          BMDAM: double.parse(BMDAMController.text),
-          BMDAM1: BMDAM1,
-          BMDTXA: BMDTXA,
-          BMDTX: double.parse(BMDTXController.text),
-          SIID: int.parse(SIIDController.text),
-          MGNO: MGNOController.text,
-          MINO: MINOController.text,
-          MUID: int.parse(MUIDController.text),
-          MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
-          CTMID: int.parse(CTMIDController.text),
-          CIMID: int.parse(CIMIDController.text),
-          SCIDC: int.parse(SCIDOController.text),
-          BMDTY: 1,
-          GUID: GUIDD.toString().toUpperCase(),
-          GUIDM: GUID.toString().toUpperCase(),
-          SYST: 2,
-          BMDTXA1: 0,
-          BMDTXA2: 0,
-          BMDTXA3: 0,
-          BMDTX1: BMDTXController.text.isEmpty ? 0 : double.parse(
-              BMDTXController.text),
-          BMDTX2: BMDTX2Controller.text.isEmpty ? 0 : double.parse(
-              BMDTX2Controller.text),
-          BMDTX3: BMDTX3Controller.text.isEmpty ? 0 : double.parse(
-              BMDTX3Controller.text),
-          BMDDI: 0,
-          BMDDIR: 0,
-          BIID: int.parse(SelectDataBIID.toString()),
-          BMDAMR: roundDouble(double.parse(MPCOController.text) / SCEXS!, 6),
-          BMDAMO: MPS1,
-          BMDAMRE: double.parse(MPCOController.text),
-          BMDDIF: 0,
-          BMDAMTF: 0,
-          BMDTXT1: 0,
-          BMDTXT2: 0,
-          BMDTXT3: 0,
-          BMDTXT: 0,
-          BMDDIT: 0,
-          BMDDIM: 0,
-          BMDDIA: 0,
-          TCRA: TCRA,
-          TCID: TCID_D,
-          TCSY: TCSY_D,
-          TCSDID: TCSDID,
-          TCSDSY: TCSDSY,
-          TCVL: TCVL,
-          BMDAM_TX: 0,
-          BMDDI_TX: 0,
-          BMDAMT3: 0,
-          TCAMT: 0,
-          JTID_L: LoginController().JTID,
-          BIID_L: LoginController().BIID,
-          SYID_L: LoginController().SYID,
-          CIID_L: LoginController().CIID,
-        );
-        Save_BIF_MOV_D('BIF_MOV_D', e);
-        CheckBack = 1;
-        // CheckSave = 1;
-        update();
-        STB_N = 'S2';
-        return true;
+    //اضافة الاصناف التابعة والمرتبطة
+    Future ADD_MAT_FOL_TO_MOV_D(String GETBIID, String GETMGNO, String GETMINO, int GETBMDID) async {
+      await GET_MAT_FOL(GETBIID, GETMGNO, GETMINO).then((userList) async {
+        if (userList.isNotEmpty) {
+          print('ADD_MAT_FOL_TO_MOV_D');
+          for (var i = 0; i < userList.length; i++) {
+            try {
+              await GET_BROCODE_P(
+                  userList[i].MGNOF.toString(), userList[i].MINOF.toString(),
+                  userList[i].MUIDF.toString());
+              var data = await GET_BMDID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
+              if (data.isNotEmpty) {
+                Bil_Mov_D_Local e = Bil_Mov_D_Local(
+                  BMMID: BMMID,
+                  BMDIDR: GETBMDID,
+                  BMDID: data.elementAt(0).BMDID,
+                  BMKID: BMKID,
+                  MGNO: userList[i].MGNOF,
+                  MINO: userList[i].MINOF,
+                  MUID: userList[i].MUIDF,
+                  BMDNO: 0,
+                  BMDNF: userList[i].MFNOF,
+                  BMDAM: 0,
+                  BMDED: '',
+                  BMDEQ: 0,
+                  BMDEQC: 0,
+                  BMDTXA: 0,
+                  BMDTXA1: 0,
+                  BMDTXA2: 0,
+                  BMDTXA3: 0,
+                  BMDTX: 0,
+                  BMDTX1: 0,
+                  BMDTX2: 0,
+                  BMDTX3: 0,
+                  BMDDI: 0,
+                  BMDDIR: 0,
+                  MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
+                  BMDTY: 2,
+                  BMDAMO: 0,
+                  BMDDIF: 0,
+                  BMDAMT: 0,
+                  BMDAMTF: 0,
+                  BMDTXT: 0,
+                  BMDTXT1: 0,
+                  BMDTXT2: 0,
+                  BMDTXT3: 0,
+                  BMDDIT: 0,
+                  BMDDIM: 0,
+                  GUID: uuid.v4().toUpperCase(),
+                  GUIDM: GUID.toUpperCase(),
+                  BMDDIA: 0,
+                  SYST: 0,
+                  JTID_L: userList[i].JTID_L,
+                  BIID_L: userList[i].BIID_L,
+                  SYID_L: userList[i].SYID_L,
+                  CIID_L: userList[i].CIID_L,
+                );
+                Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
+                print(e);
+              }
+            } catch (e) {
+              print(e.toString());
+              Fluttertoast.showToast(
+                  msg: "ADD_MAT_FOL_TO_MOV_D ${e.toString()}",
+                  textColor: Colors.white,
+                  backgroundColor: Colors.red);
+              return Future.error(e);
+            }
+          }
+        }
+      });
+    }
+
+    Future GET_BMDID_COUNT_P() async {
+      await GET_BMDID_COUNT(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+          BMMID.toString()).then((userList) async {
+        if (userList.isNotEmpty) {
+          print('GET_BMDID_COUNT_P');
+          for (var i = 0; i < userList.length; i++) {
+            try {
+              UpdateBMDID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+                  userList[i].BMMID.toString(), i + 1,
+                  userList[i].GUID.toString());
+            } catch (e) {
+              print(e.toString());
+              Fluttertoast.showToast(
+                  msg: "GET_BMDID_COUNT_P: ${e.toString()}",
+                  textColor: Colors.white,
+                  backgroundColor: Colors.red);
+              return Future.error(e);
+            }
+          }
+        }
+      });
+    }
+
+    //دالة تعديل الكميه المخزنيه
+    Future<List<Bil_Mov_D_Local>> fetchBMDNO(String GETBMMID) async {
+      final dbClient = await conn.database;
+      List<Bil_Mov_D_Local> contactList = [];
+      try {
+        final maps = await dbClient!.query(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+            where: "MGKI=1 AND BMMID='$GETBMMID' ");
+        for (var item in maps) {
+          contactList.add(Bil_Mov_D_Local.fromMap(item));
+        }
+      } catch (e) {
+        print(e.toString());
       }
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "${STB_N}-${'StrinError_save_data'.tr}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_m ${e.toString()}");
-      return false;
+      return contactList;
     }
-    return true;
-  }
 
-  //اضافة الاصناف التابعة والمرتبطة
-  Future ADD_MAT_FOL_TO_MOV_D(String GETBIID, String GETMGNO, String GETMINO, int GETBMDID) async {
-    await GET_MAT_FOL(GETBIID, GETMGNO, GETMINO).then((userList) async {
-      if (userList.isNotEmpty) {
-        print('ADD_MAT_FOL_TO_MOV_D');
-        for (var i = 0; i < userList.length; i++) {
-          try {
-            await GET_BROCODE_P(
-                userList[i].MGNOF.toString(), userList[i].MINOF.toString(),
-                userList[i].MUIDF.toString());
-            var data = await GET_BMDID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-            if (data.isNotEmpty) {
+    //دالة تعديل مردرد
+    Future<List<Bil_Mov_D_Local>> fetchBIL_MOV_D(String GETBMMID) async {
+      final dbClient = await conn.database;
+      List<Bil_Mov_D_Local> contactList = [];
+      try {
+        final maps = await dbClient!.query(
+            BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+            where: " BMMID='$GETBMMID' ");
+        for (var item in maps) {
+          contactList.add(Bil_Mov_D_Local.fromMap(item));
+        }
+      } catch (e) {
+        print(e.toString());
+      }
+      return contactList;
+    }
+
+    //تعديل المردود
+    Future UPDATE_BIL_MOV_D(String GetBMMID, int GetBMMID2,String GETGUID) async {
+      await fetchBIL_MOV_D(GetBMMID).then((userList) async {
+        if (userList.isNotEmpty) {
+          for (var i = 0; i < userList.length; i++) {
+            try {
               Bil_Mov_D_Local e = Bil_Mov_D_Local(
-                BMMID: BMMID,
-                BMDIDR: GETBMDID,
-                BMDID: data.elementAt(0).BMDID,
+                BMMID: GetBMMID2,
+                BMDIDR: userList[i].BMDID,
+                BMDID: userList[i].BMDID,
                 BMKID: BMKID,
-                MGNO: userList[i].MGNOF,
-                MINO: userList[i].MINOF,
-                MUID: userList[i].MUIDF,
-                BMDNO: 0,
-                BMDNF: userList[i].MFNOF,
-                BMDAM: 0,
-                BMDED: '',
-                BMDEQ: 0,
-                BMDEQC: 0,
-                BMDTXA: 0,
-                BMDTXA1: 0,
-                BMDTXA2: 0,
-                BMDTXA3: 0,
-                BMDTX: 0,
-                BMDTX1: 0,
-                BMDTX2: 0,
-                BMDTX3: 0,
-                BMDDI: 0,
-                BMDDIR: 0,
-                MUCBC: MUCBCController.text.isEmpty ? '' : MUCBCController.text,
-                BMDTY: 2,
-                BMDAMO: 0,
-                BMDDIF: 0,
-                BMDAMT: 0,
-                BMDAMTF: 0,
-                BMDTXT: 0,
-                BMDTXT1: 0,
-                BMDTXT2: 0,
-                BMDTXT3: 0,
-                BMDDIT: 0,
-                BMDDIM: 0,
+                MGNO: userList[i].MGNO,
+                MINO: userList[i].MINO,
+                MUID: userList[i].MUID,
+                BMDNO: userList[i].BMDNO,
+                BMDNF: userList[i].BMDNF,
+                BMDAM: userList[i].BMDAM,
+                BMDEQ: userList[i].BMDEQ,
+                BMDEQC: userList[i].BMDEQC,
+                BMDTXA: userList[i].BMDTXA,
+                BMDTXA1: userList[i].BMDTXA1,
+                BMDTXA2: userList[i].BMDTXA2,
+                BMDTXA3: userList[i].BMDTXA3,
+                BMDTX: userList[i].BMDTX,
+                BMDTX1: userList[i].BMDTX1,
+                BMDTX2: userList[i].BMDTX2,
+                BMDTX3: userList[i].BMDTX3,
+                BMDDI: userList[i].BMDDI,
+                BMDDIR: userList[i].BMDDIR,
+                SIID: userList[i].SIID,
+                BIID: userList[i].BIID,
+                MUCBC: userList[i].MUCBC,
+                BMDED: userList[i].BMDED,
+                BMDTY: userList[i].BMDTY,
+                BMDAMR: userList[i].BMDAMR,
+                BMDAMO: userList[i].BMDAMO,
+                BMDAMRE: userList[i].BMDAMRE,
+                BMDDIF: userList[i].BMDDIF,
+                BMDAMT: userList[i].BMDAMT,
+                BMDAMTF: userList[i].BMDAMTF,
+                BMDTXT1: userList[i].BMDTXT1,
+                BMDTXT2: userList[i].BMDTXT2,
+                BMDTXT3: userList[i].BMDTXT3,
+                BMDTXT: userList[i].BMDTXT,
+                BMDDIT: userList[i].BMDDIT,
+                BMDDIM: userList[i].BMDDIM,
                 GUID: uuid.v4().toUpperCase(),
-                GUIDM: GUID.toUpperCase(),
-                BMDDIA: 0,
+                GUIDM: GETGUID.toUpperCase(),
+                BMDIN: userList[i].BMDIN,
+                MITSK: userList[i].MITSK,
+                MGKI: userList[i].MGKI,
+                BMDDIA: userList[i].BMDDIA,
                 SYST: 0,
+                GUIDMT: userList[i].GUIDMT,
+                TCRA: userList[i].TCRA,
+                TCID: userList[i].TCID,
+                TCSY: userList[i].TCSY,
+                TCSDID: userList[i].TCSDID,
+                TCSDSY: userList[i].TCSDSY,
+                TCVL: userList[i].TCVL,
+                BMDAM_TX: userList[i].BMDAM_TX,
+                BMDDI_TX: userList[i].BMDDI_TX,
+                BMDAMT3: userList[i].BMDAMT3,
+                TCAMT: userList[i].TCAMT,
                 JTID_L: userList[i].JTID_L,
                 BIID_L: userList[i].BIID_L,
                 SYID_L: userList[i].SYID_L,
                 CIID_L: userList[i].CIID_L,
               );
               Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
-              print(e);
+            } catch (e) {
+              print(e.toString());
+              Fluttertoast.showToast(
+                  msg: "UPDATE_MOV_D: ${e.toString()}",
+                  textColor: Colors.white,
+                  backgroundColor: Colors.red);
+              return Future.error(e);
             }
-          } catch (e) {
-            print(e.toString());
-            Fluttertoast.showToast(
-                msg: "ADD_MAT_FOL_TO_MOV_D ${e.toString()}",
-                textColor: Colors.white,
-                backgroundColor: Colors.red);
-            return Future.error(e);
           }
         }
-      }
-    });
-  }
-
-  Future GET_BMDID_COUNT_P() async {
-    await GET_BMDID_COUNT(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        BMMID.toString()).then((userList) async {
-      if (userList.isNotEmpty) {
-        print('GET_BMDID_COUNT_P');
-        for (var i = 0; i < userList.length; i++) {
-          try {
-            UpdateBMDID(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-                userList[i].BMMID.toString(), i + 1,
-                userList[i].GUID.toString());
-          } catch (e) {
-            print(e.toString());
-            Fluttertoast.showToast(
-                msg: "GET_BMDID_COUNT_P: ${e.toString()}",
-                textColor: Colors.white,
-                backgroundColor: Colors.red);
-            return Future.error(e);
-          }
-        }
-      }
-    });
-  }
-
-  //دالة تعديل الكميه المخزنيه
-  Future<List<Bil_Mov_D_Local>> fetchBMDNO(String GETBMMID) async {
-    final dbClient = await conn.database;
-    List<Bil_Mov_D_Local> contactList = [];
-    try {
-      final maps = await dbClient!.query(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-          where: "MGKI=1 AND BMMID='$GETBMMID' ");
-      for (var item in maps) {
-        contactList.add(Bil_Mov_D_Local.fromMap(item));
-      }
-    } catch (e) {
-      print(e.toString());
+      });
     }
-    return contactList;
-  }
 
-  //دالة تعديل مردرد
-  Future<List<Bil_Mov_D_Local>> fetchBIL_MOV_D(String GETBMMID) async {
-    final dbClient = await conn.database;
-    List<Bil_Mov_D_Local> contactList = [];
-    try {
-      final maps = await dbClient!.query(
-          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-          where: " BMMID='$GETBMMID' ");
-      for (var item in maps) {
-        contactList.add(Bil_Mov_D_Local.fromMap(item));
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-    return contactList;
-  }
-
-  //تعديل المردود
-  Future UPDATE_BIL_MOV_D(String GetBMMID, int GetBMMID2,String GETGUID) async {
-    await fetchBIL_MOV_D(GetBMMID).then((userList) async {
-      if (userList.isNotEmpty) {
-        for (var i = 0; i < userList.length; i++) {
-          try {
-            Bil_Mov_D_Local e = Bil_Mov_D_Local(
-              BMMID: GetBMMID2,
-              BMDIDR: userList[i].BMDID,
-              BMDID: userList[i].BMDID,
-              BMKID: BMKID,
-              MGNO: userList[i].MGNO,
-              MINO: userList[i].MINO,
-              MUID: userList[i].MUID,
-              BMDNO: userList[i].BMDNO,
-              BMDNF: userList[i].BMDNF,
-              BMDAM: userList[i].BMDAM,
-              BMDEQ: userList[i].BMDEQ,
-              BMDEQC: userList[i].BMDEQC,
-              BMDTXA: userList[i].BMDTXA,
-              BMDTXA1: userList[i].BMDTXA1,
-              BMDTXA2: userList[i].BMDTXA2,
-              BMDTXA3: userList[i].BMDTXA3,
-              BMDTX: userList[i].BMDTX,
-              BMDTX1: userList[i].BMDTX1,
-              BMDTX2: userList[i].BMDTX2,
-              BMDTX3: userList[i].BMDTX3,
-              BMDDI: userList[i].BMDDI,
-              BMDDIR: userList[i].BMDDIR,
-              SIID: userList[i].SIID,
-              BIID: userList[i].BIID,
-              MUCBC: userList[i].MUCBC,
-              BMDED: userList[i].BMDED,
-              BMDTY: userList[i].BMDTY,
-              BMDAMR: userList[i].BMDAMR,
-              BMDAMO: userList[i].BMDAMO,
-              BMDAMRE: userList[i].BMDAMRE,
-              BMDDIF: userList[i].BMDDIF,
-              BMDAMT: userList[i].BMDAMT,
-              BMDAMTF: userList[i].BMDAMTF,
-              BMDTXT1: userList[i].BMDTXT1,
-              BMDTXT2: userList[i].BMDTXT2,
-              BMDTXT3: userList[i].BMDTXT3,
-              BMDTXT: userList[i].BMDTXT,
-              BMDDIT: userList[i].BMDDIT,
-              BMDDIM: userList[i].BMDDIM,
-              GUID: uuid.v4().toUpperCase(),
-              GUIDM: GETGUID.toUpperCase(),
-              BMDIN: userList[i].BMDIN,
-              MITSK: userList[i].MITSK,
-              MGKI: userList[i].MGKI,
-              BMDDIA: userList[i].BMDDIA,
-              SYST: 0,
-              GUIDMT: userList[i].GUIDMT,
-              TCRA: userList[i].TCRA,
-              TCID: userList[i].TCID,
-              TCSY: userList[i].TCSY,
-              TCSDID: userList[i].TCSDID,
-              TCSDSY: userList[i].TCSDSY,
-              TCVL: userList[i].TCVL,
-              BMDAM_TX: userList[i].BMDAM_TX,
-              BMDDI_TX: userList[i].BMDDI_TX,
-              BMDAMT3: userList[i].BMDAMT3,
-              TCAMT: userList[i].TCAMT,
-              JTID_L: userList[i].JTID_L,
-              BIID_L: userList[i].BIID_L,
-              SYID_L: userList[i].SYID_L,
-              CIID_L: userList[i].CIID_L,
-            );
-            Save_BIF_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', e);
-          } catch (e) {
-            print(e.toString());
-            Fluttertoast.showToast(
-                msg: "UPDATE_MOV_D: ${e.toString()}",
-                textColor: Colors.white,
-                backgroundColor: Colors.red);
-            return Future.error(e);
-          }
-        }
-      }
-    });
-  }
-
-  //تعديل الكمية
-  Future UPDATE_STO_NUM() async {
-    await fetchBMDNO(BMMID.toString()).then((userList) async {
-      if (userList.isNotEmpty) {
-        for (var i = 0; i < userList.length; i++) {
-          try {
-            if (userList[i].BMDNO! > 0) {
-              UpdateSNNO(
-                  BMKID!,
-                  userList[i].SIID.toString(),
-                  userList[i].MGNO.toString(),
-                  userList[i].MINO.toString(),
-                  userList[i].MUID.toString(),
-                  userList[i].BMDED.toString(),
-                  userList[i].BMDNO!);
+    //تعديل الكمية
+    Future UPDATE_STO_NUM() async {
+      await fetchBMDNO(BMMID.toString()).then((userList) async {
+        if (userList.isNotEmpty) {
+          for (var i = 0; i < userList.length; i++) {
+            try {
+              if (userList[i].BMDNO! > 0) {
+                UpdateSNNO(
+                    BMKID!,
+                    userList[i].SIID.toString(),
+                    userList[i].MGNO.toString(),
+                    userList[i].MINO.toString(),
+                    userList[i].MUID.toString(),
+                    userList[i].BMDED.toString(),
+                    userList[i].BMDNO!);
+              }
+            } catch (e) {
+              print(e.toString());
+              Fluttertoast.showToast(
+                  msg: "UPDATE_STO_NUM ${e.toString()}",
+                  textColor: Colors.white,
+                  backgroundColor: Colors.red);
+              return Future.error(e);
             }
-          } catch (e) {
-            print(e.toString());
-            Fluttertoast.showToast(
-                msg: "UPDATE_STO_NUM ${e.toString()}",
-                textColor: Colors.white,
-                backgroundColor: Colors.red);
-            return Future.error(e);
           }
         }
-      }
-    });
-  }
-
-  //جلب رقم الحركة
-  Future GET_AMMNO_P() async {
-    GET_AMMNO(BMKID == 1 ? 2 : 1).then((data) {
-      ACC_MOV_M_AMMNO = data;
-      if (ACC_MOV_M_AMMNO.isNotEmpty) {
-        AMMNO = ACC_MOV_M_AMMNO
-            .elementAt(0)
-            .AMMNO;
-      }
-    });
-  }
-
-  Future GET_AMMID_P() async {
-    GET_AMMID().then((data) {
-      ACC_MOV_M_AMMNO = data;
-      if (ACC_MOV_M_AMMNO.isNotEmpty) {
-        AMMID = ACC_MOV_M_AMMNO
-            .elementAt(0)
-            .AMMID;
-        update();
-      }
-    });
-  }
-
-  String generateTransactionDetails({
-    required double amount,
-    required double balance,
-    required String companyName,
-    required String currency,
-    required String dateString,
-    required String transactionType,  // معلمة نوع السند
-    List<String> fieldsOrder = const ["transactionType", "amount", "balance", "companyName", "currency", "date"],  // ترتيب الحقول
-    String transactionText = "",  // نص المعاملة (مثل سند قبض أو فاتورة مبيعات)
-    String amountLabel = "المبلغ",
-    String balanceLabel = "الرصيد",
-    String companyNameLabel = "اسم الشركة",
-    String currencyLabel = "العملة",
-    String dateLabel = "التاريخ",
-  }) {
-    // تحويل السلسلة النصية إلى كائن DateTime
-    DateTime date = DateTime.parse(dateString);
-
-    // تنسيق التاريخ لعرضه بشكل مناسب (يمكنك تخصيصه كما تريد)
-    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
-
-    // تنسيق الأرقام (إضافة الفواصل)
-    String formattedAmount = NumberFormat('#,##0.00', 'en_US').format(amount);
-    String formattedBalance = NumberFormat('#,##0.00', 'en_US').format(balance);
-
-    // تحديد النص الأساسي للمعاملة إذا لم يتم تحديده
-    String transactionDescription = transactionText.isNotEmpty
-        ? transactionText
-        : transactionType;
-
-    // إنشاء النص النهائي بناءً على ترتيب الحقول المرسل
-    String transactionDetails = "$transactionDescription\n";  // إضافة نص المعاملة في البداية
-
-    for (var field in fieldsOrder) {
-      switch (field) {
-        case "transactionType":
-          transactionDetails += " $transactionText\n";
-          break;
-        case "amount":
-          transactionDetails += "$amountLabel $formattedAmount $currency\n";
-          break;
-        case "balance":
-          transactionDetails += "$balanceLabel $formattedBalance $currency\n";
-          break;
-        case "companyName":
-          transactionDetails += "$companyNameLabel $companyName\n";
-          break;
-        case "currency":
-          transactionDetails += "$currencyLabel $currency\n";
-          break;
-        case "date":
-          transactionDetails += "$dateLabel $formattedDate\n";
-          break;
-        default:
-          break;
-      }
+      });
     }
 
-    return transactionDetails;
-  }
-
-
-  //حفظ فاتوره
-  Future<bool> Save_BIL_MOV_M(bool typesave) async {
-    try {
-
-      // print(GUID_LNK.toString().toUpperCase());
-      STB_N = 'S1';
-      String BMMMS = PKID == 1 ? "عليكم ف.مبيعات نقداً" : PKID == 3
-          ? "عليكم ف.مبيعات آجل"
-          : PKID == 8 ? "عليكم ف.مبيعات ائتمان"
-          : PKID == 9 ? "عليكم ف.مبيعات حواله" : "عليكم فاتورة مبيعات";
-
-      String BMMIN = BMKID != 1 ? " فاتورة مبيعات  ($STMID)-${BCNAController.text}" : " فاتورة مشتريات ($STMID)-${BCNAController.text}";
-
-      BMMTX_DAT = '[TTIDC1{<$TTIDC1>}][TSDI1{$TSDI1}][TSFR1{$TSFR1}][TSDI2{$TSDI1}][TSFR2{$TSFR1}]';
-      if (TTID1 != null) {
-        TTLID = await ES_FAT_PKG.GET_TTLID(BMKID!,
-            double.parse(BMMAMController.text) +
-                double.parse(SUMBMDTXTController.text),
-            double.parse(SCEXController.text), TTID1!, BCTX.toString());
-      }
-
-      if ((STMID != 'COU' && SelectDataSIID == null) ||
-          SelectDataBIID == null || PKID == null ||
-          SelectDataSCID == null || ((BMKID == 3 ||
-          BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10)
-          && SelectDataBCID == null ||
-          ((BMKID == 1 || BMKID == 2) && SelectDataBIID2 == null))) {
-        Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
-            backgroundColor: Colors.red,
-            icon: const Icon(Icons.error, color: Colors.white),
-            colorText: Colors.white,
-            isDismissible: true,
-            dismissDirection: DismissDirection.horizontal,
-            forwardAnimationCurve: Curves.easeOutBack);
-        return false;
-      } else
-      if (BMKID != 11 && BMKID != 12 && PKID == 1 && SelectDataACID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringChi_ACID'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if ((BMKID == 1 || BMKID == 2) && SelectDataBIID2 == null) {
-        Fluttertoast.showToast(
-            msg: 'StringChi_BIID'.tr,
-            textColor: Colors.white,
-            backgroundColor: Colors.red);
-        return false;
-      } else if ((BMKID == 3 || BMKID == 5 || BMKID == 7 || BMKID == 10) &&
-          SelectDataBCID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringvalidateBCNA'.tr,
-            textColor: Colors.white,
-            backgroundColor: Colors.red);
-        return false;
-      } else if (PKID == 8 && SelectDataBCCID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringChi_ACID'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if ((BMKID != 1 && BMKID != 2 ) && SelectDataPKID.toString() == '3' &&
-          SelectDataBCID == null) {
-        Fluttertoast.showToast(
-            msg: 'StrinError_BCID'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if (PKID == 9 && SelectDataABID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringvalidateABID'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if ((BMKID == 3 || BMKID == 5 || BMKID == 11) && PKID == 3
-          && SelectDataBCID != null && BCBL != 0 &&
-          (BACBA! + SumBal! + double.parse(BMMAMTOTController.text)) > BCBL!) {
-        Fluttertoast.showToast(
-            msg: 'StringBCBL'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if (BMKID != 11 && BMKID != 12 && SHOW_BDID == '3' && SelectDataBDID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringChi_BDID'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if (STMID == 'COU' &&
-          (BMDNOController.text.isEmpty || BMDNOController.text == '0' ||
-              BMDAM1 == 0)) {
-        Fluttertoast.showToast(
-            msg: 'StrinError_BMMNO_OR_BMDAM1'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else
-      if (STMID != 'COU' && (BMKID == 11 || BMKID == 12) && SHOW_BDID == '4' &&
-          SelectDataBDID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringChi_BDID'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if (STMID != 'COU' && SelectDataBMMDN == '0' &&
-          double.parse(BMMDIRController.text) > 100) {
-        Fluttertoast.showToast(
-            msg: 'StringErr_SUM_BMDDI'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      }
-      else if (STMID != 'COU' && SelectDataBMMDN == '0' &&
-          double.parse(BMMDIController.text) >
-              double.parse(BMMAMController.text)) {
-        Fluttertoast.showToast(
-            msg: 'StringErr_SUM_BMDDI'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      }
-      else if (STMID == 'MOB'  && (BMKID!=11 || BMKID!=12)  && (P_COS_SEQ == '1' || P_COSS == '1')
-          && SelectDataACNO == null) {
-        Fluttertoast.showToast(
-            msg: 'StringACNO_ERR'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      }
-      else if (STMID == 'MOB' &&  (BMKID!=11 || BMKID!=12) &&
-          ((P_COSS == '2' || P_COSS == '3') && SelectDataBCID != null &&
-              ((P_COS1 == '1' && AKID == 1) ||
-                  (P_COS2 == '1' && (AKID == 2 || AKID == 3))) &&
-              SelectDataACNO == null)) {
-        Fluttertoast.showToast(
-            msg: 'StringACNO_ERR'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      }
-      else if (STMID == 'MOB' && (BMKID!=11 || BMKID!=12)  && ((((P_COS1 == '3' && AKID == 1) ||
-          (P_COS2 == '3' && (AKID == 2 || AKID == 3))) && AACC == 1) &&
-          SelectDataACNO == null)) {
-        Fluttertoast.showToast(
-            msg: 'StringACNO_ERR'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      }
-      else if (STMID == 'MOB' && (BMKID!=11 || BMKID!=12) && (BMKID!=11 || BMKID!=12) &&
-      (P_COSS == '3' && AACC == 1 && SelectDataACNO == null)) {
-        Fluttertoast.showToast(
-            msg: 'StringACNO_ERR'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      }
-      else if (STMID == 'MOB' &&
-          (Must_Specify_Location_Invoice == '2' && distanceInMeters <= 0.0) ||
-          (Allow_Must_Specify_Location_Invoice == 2 && distanceInMeters <= 0.0)) {
-        Fluttertoast.showToast(
-            msg: "${'StringError_Location_of_Account'.tr} $distanceInMeters",
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S9';
-        determinePosition();
-        return false;
-      }
-      else if (STMID == 'MOB' && (Must_Specify_Location_Invoice == '2' ||
-          (Must_Specify_Location_Invoice == '4' && Allow_Must_Specify_Location_Invoice == 2)) &&
-          (double.parse(Allow_Issuance_Invoice_Distance_Meters.toString()) <
-              distanceInMeters)) {
-        Fluttertoast.showToast(
-            msg: "${'StringError_Location_Distance_Between'.tr} $distanceInMeters",
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        STB_N = 'S10';
-        determinePosition();
-        return false;
-      } else
-      if (STMID == 'EORD' && SelectDataGETTYPE == '3' && DELIVERY_VAR == '4' &&
-          SelectDataBDID == null) {
-        Fluttertoast.showToast(
-            msg: 'StringBCID_VAL'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if (STMID == 'EORD' && SelectDataGETTYPE == '3' &&
-          ADDRESS_CUS_REQUEST == '4' && BCDMOController.text.isEmpty) {
-        Fluttertoast.showToast(
-            msg: 'StringBCDMO_VAL'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-        return false;
-      } else if (STMID == 'MOB' && StteingController().Show_Inv_Pay == true &&
-          Show_Inv_Pay == true && BMKID != 4 && BMKID != 12 && BMKID != 2 &&
-          ((BMKID == 1 || BMKID == 3 || BMKID == 5) && PKID == 3 ||
-              BMKID == 11)) {
-        await GET_AMMID_P();
-        await GET_AMMNO_P();
-        GETDefaultDescription_Voucher();
-        if (edit == false) {
-          SelectDataSCIDP = SelectDataSCID.toString();
-          SCEXP = double.parse(SCEXController.text);
+    //جلب رقم الحركة
+    Future GET_AMMNO_P() async {
+      GET_AMMNO(BMKID == 1 ? 2 : 1).then((data) {
+        ACC_MOV_M_AMMNO = data;
+        if (ACC_MOV_M_AMMNO.isNotEmpty) {
+          AMMNO = ACC_MOV_M_AMMNO
+              .elementAt(0)
+              .AMMNO;
         }
-        Calculate_BMMTC(BMMCPController.text, SelectDataSCIDP.toString());
-        Get.dialog(
-          Sale_Invoice_Pay(),
-        );
-        return false;
-      } else {
-        if (typesave == false) {
-          Bil_Mov_M_Local e = Bil_Mov_M_Local(
-            BMKID: BMKID,
-            BMMID: BMMID,
-            BMMNO: BMMNO == null ? 1 : int.parse(BMMNO.toString()),
-            BIID2: int.parse(SelectDataBIID.toString()),
-            BIID: BMKID == 1 || BMKID == 2 ? int.parse(SelectDataBIID2.toString()) : BMKID ==
-                11 || BMKID == 12 ? int.parse(SelectDataBIID.toString()) : null,
-            SIID: int.parse(SelectDataSIID.toString()),
-            BPID: BMKID == 11 || BMKID == 12 ? int.parse(SelectDataBPID.toString()) : null,
-            BMMST: BMMST,
-            BMMST2: STMID == 'EORD' ? 4 : BMMST,
-            BMMFS: 10,
-            BMMFST: 10,
-            BMMIN: BMMINController.text.isEmpty ? BMMIN : BMMINController.text,
-            BMMDO: '$SelectDays  ${DateFormat('HH:mm').format(DateTime.now())}',
-            BMMDA: SelectDays,
-            AANO: AANOController.text.isEmpty ? '' : AANOController.text,
-            SCID: int.parse(SelectDataSCID.toString()),
-            //SCIDC: int.parse(SCIDOController.text),
-            PKID: PKID,
-            SCEX: double.parse(SCEXController.text),
-            ACID: BMKID != 11 && BMKID != 12 ? PKID == 1 ? int.parse(
-                SelectDataACID.toString()) : null : null,
-            ACNO: SelectDataACNO.toString(),
-            ACNO2: SelectDataACNO.toString(),
-            BCID: SelectDataBCID == null ? null : int.parse(
-                SelectDataBCID.toString()),
-            BCID2: SelectDataBCID2 == null ? null : SelectDataBCID2.toString(),
-            BIID3: SelectDataBIID3 == null ? null : SelectDataBIID3.toString(),
-            BDID: SelectDataBDID == null ? null : int.parse(
-                SelectDataBDID.toString()),
-            BCCID: PKID == 8 ? int.parse(SelectDataBCCID.toString()) : null,
-            CTMID: STMID == 'COU' ? int.parse(CTMIDController.text) : null,
-            CIMID: STMID == 'COU' ? int.parse(CIMIDController.text) : null,
-            BMMNA: BCNAController.text,
-            ABID: PKID == 9 ? int.parse(SelectDataABID.toString()) : null,
-            BMMCN: BMMCNController.text,
-            BMMRE: BMMREController.text.isEmpty || BMMREController.text == ''
-                ? BMMNO
-                : BMMREController.text,
-            BMMDR: STMID == 'COU' ? BMMDRController.text : BMKID == 7 ||
-                BMKID == 10 ? BMMDRController.text : BMMRE2Controller.text,
-            BCMO: BCMOController.text,
-            BMMMS: "$BMMMS ${BMMAMTOTController.text} ($SONA)",
-            BMMEQ: roundDouble((double.parse(BMMAMController.text) + double
-                .parse(SUMBMDTXTController.text)) * double.parse(SCEXController
-                .text), 2),
-            BMMTX1: SUMBMDTXT1,
-            BMMTX2: SUMBMDTXT2,
-            BMMTX3: SUMBMDTXT3,
-            BMMTX: SUMBMDTXT,
-            BMMDIF: SUMBMMDIF,
-            BMMAM: roundDouble(double.parse(BMMAMController.text) +
-                double.parse(SUMBMDTXTController.text), SCSFL),
-            BMMDN: STMID == 'COU' ? 0 : int.parse(SelectDataBMMDN.toString()),
-            BMMDI: SelectDataBMMDN == '1' ? SUMBMMDI : BMMDIController.text
-                .isNotEmpty ? double.parse(BMMDIController.text) : 0,
-            BMMDIA: 0,
-            SCEXS: SCEXS,
-            BMMDIR: BMMDIRController.text.isNotEmpty ? double.parse(
-                BMMDIRController.text) : 0,
-            BMMPT: USING_TAX_SALES == '2' ? 2 : Price_include_Tax == true ? 1 : 2,
-            BMMDT: 1,
-            BMMCD: (BMKID == 7 || BMKID == 10) ? BMMCDController.text : PKID == 3 ? BMMCDController.text : '',
-            BMMCR: 0,
-            BMMCA: 0,
-            BMMTXD: 0,
-            BMMLO: 0,
-            BMMCT: 1,
-            ATTID: 1,
-            TTID1: TTID1,
-            TTID2: TTID2,
-            TTID3: TTID3,
-            GUIDC: GUIDC,
-            BMMBR: int.parse(SelectDataBMMBR.toString()),
-            BMMDD: BMMDDController.text.isNotEmpty ? BMMDDController.text : _selectedDatesercher,
-            BMMDOR: BMMRD,
-            BMMRD: BMMRD,
-            BIIDB: SelectDataBMMBR == '1' ? BIIDB : int.parse(
-                SelectDataBIID.toString()),
-            BMMMT: double.parse(BMMAMTOTController.text),
-            AMMID: AMMID == null ? null : AMMID,
-            SCIDP: STMID == 'COU'
-                ? int.parse(SelectDataSCID.toString())
-                : SelectDataSCIDP == null
-                ? int.parse(SelectDataSCID.toString())
-                : int.parse(SelectDataSCIDP.toString()),
-            SCEXP: SCEXP == null ? double.parse(SCEXController.text) : SCEXP,
-            BMMAMP: BMMCPController.text.isEmpty ? 0 : double.parse(
-                BMMCPController.text),
-            BMMCP: BMMCPController.text.isEmpty ? 0 : BMMCP,
-            BMMTC: BMMTC == null ? 0 : BMMTC,
-            BMMGR: BMMGRController.text,
-            BMMDE: BMMDEController.text,
-            BCDMO: BCDMOController.text,
-            BCCNA: BCCNAController.text.isEmpty ? null : BCCNAController.text,
-            BMMCRT: BMMCRTController.text,
-            BMMTN: BMMTNController.text,
-            BMMPD: DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
-            BMMLON: BCLON,
-            BMMLAT: BCLAT,
-            BMMTX_DAT: BMMTX_DAT,
-            TTLID: BMKID == 1 || BMKID == 2 ? 0 : TTLID,
-            TCRA: TCRA_M,
-            TCSDID: TCSDID_M,
-            TCSDSY: TCSDSY_M,
-            TCID: TCID_M,
-            TCSY: TCSY_M,
-            BMMAM_TX: BMMAM_TX,
-            BMMDI_TX: BMMDI_TX,
-            TCAM: TCAM,
-            SUID: LoginController().SUID,
-            DATEI: DateFormat('dd-MM-yyyy hh:mm').format(DateTime.now()),
-            DEVI: LoginController().DeviceName,
-            GUID: GUID.toString().toUpperCase(),
-            GUID_LNK: GUID_LNK.toString().toUpperCase(),
-            BMMNOR: BMKID == 2 || BMKID == 4 || BMKID == 12 ? BMMNOR : null,
-            BMMIDR: BMKID == 2 || BMKID == 4 || BMKID == 12 ? BMMIDR : null,
-            BMMNR: STMID == 'COU' ? 1 : int.parse(CountRecodeController.text),
-            JTID_L: LoginController().JTID,
-            BIID_L: LoginController().BIID,
-            SYID_L: LoginController().SYID,
-            CIID_L: LoginController().CIID,
+      });
+    }
+
+    Future GET_AMMID_P() async {
+      GET_AMMID().then((data) {
+        ACC_MOV_M_AMMNO = data;
+        if (ACC_MOV_M_AMMNO.isNotEmpty) {
+          AMMID = ACC_MOV_M_AMMNO
+              .elementAt(0)
+              .AMMID;
+          update();
+        }
+      });
+    }
+
+    String generateTransactionDetails({
+      required double amount,
+      required double balance,
+      required String companyName,
+      required String currency,
+      required String dateString,
+      required String transactionType,  // معلمة نوع السند
+      List<String> fieldsOrder = const ["transactionType", "amount", "balance", "companyName", "currency", "date"],  // ترتيب الحقول
+      String transactionText = "",  // نص المعاملة (مثل سند قبض أو فاتورة مبيعات)
+      String amountLabel = "المبلغ",
+      String balanceLabel = "الرصيد",
+      String companyNameLabel = "اسم الشركة",
+      String currencyLabel = "العملة",
+      String dateLabel = "التاريخ",
+    }) {
+      // تحويل السلسلة النصية إلى كائن DateTime
+      DateTime date = DateTime.parse(dateString);
+
+      // تنسيق التاريخ لعرضه بشكل مناسب (يمكنك تخصيصه كما تريد)
+      String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
+      // تنسيق الأرقام (إضافة الفواصل)
+      String formattedAmount = NumberFormat('#,##0.00', 'en_US').format(amount);
+      String formattedBalance = NumberFormat('#,##0.00', 'en_US').format(balance);
+
+      // تحديد النص الأساسي للمعاملة إذا لم يتم تحديده
+      String transactionDescription = transactionText.isNotEmpty
+          ? transactionText
+          : transactionType;
+
+      // إنشاء النص النهائي بناءً على ترتيب الحقول المرسل
+      String transactionDetails = "$transactionDescription\n";  // إضافة نص المعاملة في البداية
+
+      for (var field in fieldsOrder) {
+        switch (field) {
+          case "transactionType":
+            transactionDetails += " $transactionText\n";
+            break;
+          case "amount":
+            transactionDetails += "$amountLabel $formattedAmount $currency\n";
+            break;
+          case "balance":
+            transactionDetails += "$balanceLabel $formattedBalance $currency\n";
+            break;
+          case "companyName":
+            transactionDetails += "$companyNameLabel $companyName\n";
+            break;
+          case "currency":
+            transactionDetails += "$currencyLabel $currency\n";
+            break;
+          case "date":
+            transactionDetails += "$dateLabel $formattedDate\n";
+            break;
+          default:
+            break;
+        }
+      }
+
+      return transactionDetails;
+    }
+
+
+    //حفظ فاتوره
+    Future<bool> Save_BIL_MOV_M(bool typesave) async {
+      try {
+
+        // print(GUID_LNK.toString().toUpperCase());
+        STB_N = 'S1';
+        String BMMMS = PKID == 1 ? "عليكم ف.مبيعات نقداً" : PKID == 3
+            ? "عليكم ف.مبيعات آجل"
+            : PKID == 8 ? "عليكم ف.مبيعات ائتمان"
+            : PKID == 9 ? "عليكم ف.مبيعات حواله" : "عليكم فاتورة مبيعات";
+
+        String BMMIN = BMKID != 1 ? " فاتورة مبيعات  ($STMID)-${BCNAController.text}" : " فاتورة مشتريات ($STMID)-${BCNAController.text}";
+
+        BMMTX_DAT = '[TTIDC1{<$TTIDC1>}][TSDI1{$TSDI1}][TSFR1{$TSFR1}][TSDI2{$TSDI1}][TSFR2{$TSFR1}]';
+        if (TTID1 != null) {
+          TTLID = await ES_FAT_PKG.GET_TTLID(BMKID!,
+              double.parse(BMMAMController.text) +
+                  double.parse(SUMBMDTXTController.text),
+              double.parse(SCEXController.text), TTID1!, BCTX.toString());
+        }
+
+        if ((STMID != 'COU' && SelectDataSIID == null) ||
+            SelectDataBIID == null || PKID == null ||
+            SelectDataSCID == null || ((BMKID == 3 ||
+            BMKID == 4 || BMKID == 5 || BMKID == 7 || BMKID == 10)
+            && SelectDataBCID == null ||
+            ((BMKID == 1 || BMKID == 2) && SelectDataBIID2 == null))) {
+          Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
+              backgroundColor: Colors.red,
+              icon: const Icon(Icons.error, color: Colors.white),
+              colorText: Colors.white,
+              isDismissible: true,
+              dismissDirection: DismissDirection.horizontal,
+              forwardAnimationCurve: Curves.easeOutBack);
+          return false;
+        } else
+        if (BMKID != 11 && BMKID != 12 && PKID == 1 && SelectDataACID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringChi_ACID'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if ((BMKID == 1 || BMKID == 2) && SelectDataBIID2 == null) {
+          Fluttertoast.showToast(
+              msg: 'StringChi_BIID'.tr,
+              textColor: Colors.white,
+              backgroundColor: Colors.red);
+          return false;
+        } else if ((BMKID == 3 || BMKID == 5 || BMKID == 7 || BMKID == 10) &&
+            SelectDataBCID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringvalidateBCNA'.tr,
+              textColor: Colors.white,
+              backgroundColor: Colors.red);
+          return false;
+        } else if (PKID == 8 && SelectDataBCCID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringChi_ACID'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if ((BMKID != 1 && BMKID != 2 ) && SelectDataPKID.toString() == '3' &&
+            SelectDataBCID == null) {
+          Fluttertoast.showToast(
+              msg: 'StrinError_BCID'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if (PKID == 9 && SelectDataABID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringvalidateABID'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if ((BMKID == 3 || BMKID == 5 || BMKID == 11) && PKID == 3
+            && SelectDataBCID != null && BCBL != 0 &&
+            (BACBA! + SumBal! + double.parse(BMMAMTOTController.text)) > BCBL!) {
+          Fluttertoast.showToast(
+              msg: 'StringBCBL'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if (BMKID != 11 && BMKID != 12 && SHOW_BDID == '3' && SelectDataBDID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringChi_BDID'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if (STMID == 'COU' &&
+            (BMDNOController.text.isEmpty || BMDNOController.text == '0' ||
+                BMDAM1 == 0)) {
+          Fluttertoast.showToast(
+              msg: 'StrinError_BMMNO_OR_BMDAM1'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else
+        if (STMID != 'COU' && (BMKID == 11 || BMKID == 12) && SHOW_BDID == '4' &&
+            SelectDataBDID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringChi_BDID'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if (STMID != 'COU' && SelectDataBMMDN == '0' &&
+            double.parse(BMMDIRController.text) > 100) {
+          Fluttertoast.showToast(
+              msg: 'StringErr_SUM_BMDDI'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        }
+        else if (STMID != 'COU' && SelectDataBMMDN == '0' &&
+            double.parse(BMMDIController.text) >
+                double.parse(BMMAMController.text)) {
+          Fluttertoast.showToast(
+              msg: 'StringErr_SUM_BMDDI'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        }
+        else if (STMID == 'MOB'  && (BMKID!=11 || BMKID!=12)  && (P_COS_SEQ == '1' || P_COSS == '1')
+            && SelectDataACNO == null) {
+          Fluttertoast.showToast(
+              msg: 'StringACNO_ERR'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        }
+        else if (STMID == 'MOB' &&  (BMKID!=11 || BMKID!=12) &&
+            ((P_COSS == '2' || P_COSS == '3') && SelectDataBCID != null &&
+                ((P_COS1 == '1' && AKID == 1) ||
+                    (P_COS2 == '1' && (AKID == 2 || AKID == 3))) &&
+                SelectDataACNO == null)) {
+          Fluttertoast.showToast(
+              msg: 'StringACNO_ERR'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        }
+        else if (STMID == 'MOB' && (BMKID!=11 || BMKID!=12)  && ((((P_COS1 == '3' && AKID == 1) ||
+            (P_COS2 == '3' && (AKID == 2 || AKID == 3))) && AACC == 1) &&
+            SelectDataACNO == null)) {
+          Fluttertoast.showToast(
+              msg: 'StringACNO_ERR'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        }
+        else if (STMID == 'MOB' && (BMKID!=11 || BMKID!=12) && (BMKID!=11 || BMKID!=12) &&
+            (P_COSS == '3' && AACC == 1 && SelectDataACNO == null)) {
+          Fluttertoast.showToast(
+              msg: 'StringACNO_ERR'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        }
+        else if (STMID == 'MOB' &&
+            (Must_Specify_Location_Invoice == '2' && distanceInMeters <= 0.0) ||
+            (Allow_Must_Specify_Location_Invoice == 2 && distanceInMeters <= 0.0)) {
+          Fluttertoast.showToast(
+              msg: "${'StringError_Location_of_Account'.tr} $distanceInMeters",
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          STB_N = 'S9';
+          determinePosition();
+          return false;
+        }
+        else if (STMID == 'MOB' && (Must_Specify_Location_Invoice == '2' ||
+            (Must_Specify_Location_Invoice == '4' && Allow_Must_Specify_Location_Invoice == 2)) &&
+            (double.parse(Allow_Issuance_Invoice_Distance_Meters.toString()) <
+                distanceInMeters)) {
+          Fluttertoast.showToast(
+              msg: "${'StringError_Location_Distance_Between'.tr} $distanceInMeters",
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          STB_N = 'S10';
+          determinePosition();
+          return false;
+        } else
+        if (STMID == 'EORD' && SelectDataGETTYPE == '3' && DELIVERY_VAR == '4' &&
+            SelectDataBDID == null) {
+          Fluttertoast.showToast(
+              msg: 'StringBCID_VAL'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if (STMID == 'EORD' && SelectDataGETTYPE == '3' &&
+            ADDRESS_CUS_REQUEST == '4' && BCDMOController.text.isEmpty) {
+          Fluttertoast.showToast(
+              msg: 'StringBCDMO_VAL'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+          return false;
+        } else if (STMID == 'MOB' && StteingController().Show_Inv_Pay == true &&
+            Show_Inv_Pay == true && BMKID != 4 && BMKID != 12 && BMKID != 2 &&
+            ((BMKID == 1 || BMKID == 3 || BMKID == 5) && PKID == 3 ||
+                BMKID == 11)) {
+          await GET_AMMID_P();
+          await GET_AMMNO_P();
+          GETDefaultDescription_Voucher();
+          if (edit == false) {
+            SelectDataSCIDP = SelectDataSCID.toString();
+            SCEXP = double.parse(SCEXController.text);
+          }
+          Calculate_BMMTC(BMMCPController.text, SelectDataSCIDP.toString());
+          Get.dialog(
+            Sale_Invoice_Pay(),
           );
-          STB_N = 'S2';
-          print('Save_BIF_MOV_M');
-          print(e);
-          await Save_BIF_MOV_M(
-              BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', e);
-        }
-        else {
-          await UpdateBIL_MOV_M(
-              BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-              BMKID!,
-              BMMID!,
-              '$SelectDays ${DateFormat('HH:mm').format(DateTime.now())}',
-              PKID.toString(),
-              roundDouble(
-                  double.parse(BMMAMController.text) +
-                      double.parse(SUMBMDTXTController.text),
-                  SCSFL),
-              SUMBMDTXT1!,
-              SUMBMDTXT2!,
-              SUMBMDTXT3!,
-              SUMBMDTXT!,
-              BMMREController.text,
-              SelectDataACNO.toString(),
-              SelectDataBCID.toString(),
-              SelectDataBCID2 == null ? null : SelectDataBCID2.toString(),
-              SelectDataBDID == null ? null : int.parse(
+          return false;
+        } else {
+          if (typesave == false) {
+            Bil_Mov_M_Local e = Bil_Mov_M_Local(
+              BMKID: BMKID,
+              BMMID: BMMID,
+              BMMNO: BMMNO == null ? 1 : int.parse(BMMNO.toString()),
+              BIID2: int.parse(SelectDataBIID.toString()),
+              BIID: BMKID == 1 || BMKID == 2 ? int.parse(SelectDataBIID2.toString()) : BMKID ==
+                  11 || BMKID == 12 ? int.parse(SelectDataBIID.toString()) : null,
+              SIID: int.parse(SelectDataSIID.toString()),
+              BPID: BMKID == 11 || BMKID == 12 ? int.parse(SelectDataBPID.toString()) : null,
+              BMMST: BMMST,
+              BMMST2: STMID == 'EORD' ? 4 : BMMST,
+              BMMFS: 10,
+              BMMFST: 10,
+              BMMIN: BMMINController.text.isEmpty ? BMMIN : BMMINController.text,
+              BMMDO: '$SelectDays  ${DateFormat('HH:mm').format(DateTime.now())}',
+              BMMDA: SelectDays,
+              AANO: AANOController.text.isEmpty ? '' : AANOController.text,
+              SCID: int.parse(SelectDataSCID.toString()),
+              //SCIDC: int.parse(SCIDOController.text),
+              PKID: PKID,
+              SCEX: double.parse(SCEXController.text),
+              ACID: BMKID != 11 && BMKID != 12 ? PKID == 1 ? int.parse(
+                  SelectDataACID.toString()) : null : null,
+              ACNO: SelectDataACNO.toString(),
+              ACNO2: SelectDataACNO.toString(),
+              BCID: SelectDataBCID == null ? null : int.parse(
+                  SelectDataBCID.toString()),
+              BCID2: SelectDataBCID2 == null ? null : SelectDataBCID2.toString(),
+              BIID3: SelectDataBIID3 == null ? null : SelectDataBIID3.toString(),
+              BDID: SelectDataBDID == null ? null : int.parse(
                   SelectDataBDID.toString()),
-              BMKID == 11 || BMKID == 12
-                  ? null
-                  : PKID == 1
-                  ? int.parse(SelectDataACID.toString())
-                  : null,
-              BMMINController.text,
-              SelectDays.toString(),
-              AANOController.text,
-              BCNAController.text,
-              BMMST,
-              BMMCNController.text,
-              PKID == 8 ? int.parse(SelectDataBCCID.toString()) : null,
-              PKID == 9 ? int.parse(SelectDataABID.toString()) : null,
-              int.parse(CountRecodeController.text),
-              roundDouble(
-                  (double.parse(BMMAMController.text) +
-                      double.parse(SUMBMDTXTController.text)) *
-                      double.parse(SCEXController.text),
-                  2).toString(),
-              SUMBMMDIF!,
-              SelectDataBMMDN.toString(),
-              SelectDataBMMDN == '1'
-                  ? SUMBMMDI!
-                  : BMMDIController.text.isNotEmpty
-                  ? double.parse(BMMDIController.text)
-                  : 0,
-              BMMDIRController.text.isNotEmpty
-                  ? double.parse(BMMDIRController.text)
-                  : 0,
-              PKID == 3 ? BMMCDController.text : '',
-              int.parse(SelectDataBMMBR.toString()),
-              BMMDDController.text.isNotEmpty
-                  ? BMMDDController.text
-                  : _selectedDatesercher,
-              BMMRD!,
-              double.parse(BMMAMTOTController.text),
-              SelectDataBIID3 == null ? null : SelectDataBIID3.toString(),
-              AMMID == null ? null : AMMID,
-              SelectDataSCIDP == null
+              BCCID: PKID == 8 ? int.parse(SelectDataBCCID.toString()) : null,
+              CTMID: STMID == 'COU' ? int.parse(CTMIDController.text) : null,
+              CIMID: STMID == 'COU' ? int.parse(CIMIDController.text) : null,
+              BMMNA: BCNAController.text,
+              ABID: PKID == 9 ? int.parse(SelectDataABID.toString()) : null,
+              BMMCN: BMMCNController.text,
+              BMMRE: BMMREController.text.isEmpty || BMMREController.text == ''
+                  ? BMMNO
+                  : BMMREController.text,
+              BMMDR: STMID == 'COU' ? BMMDRController.text : BMKID == 7 ||
+                  BMKID == 10 ? BMMDRController.text : BMMRE2Controller.text,
+              BCMO: BCMOController.text,
+              BMMMS: "$BMMMS ${BMMAMTOTController.text} ($SONA)",
+              BMMEQ: roundDouble((double.parse(BMMAMController.text) + double
+                  .parse(SUMBMDTXTController.text)) * double.parse(SCEXController
+                  .text), 2),
+              BMMTX1: SUMBMDTXT1,
+              BMMTX2: SUMBMDTXT2,
+              BMMTX3: SUMBMDTXT3,
+              BMMTX: SUMBMDTXT,
+              BMMDIF: SUMBMMDIF,
+              BMMAM: roundDouble(double.parse(BMMAMController.text) +
+                  double.parse(SUMBMDTXTController.text), SCSFL),
+              BMMDN: STMID == 'COU' ? 0 : int.parse(SelectDataBMMDN.toString()),
+              BMMDI: SelectDataBMMDN == '1' ? SUMBMMDI : BMMDIController.text
+                  .isNotEmpty ? double.parse(BMMDIController.text) : 0,
+              BMMDIA: 0,
+              SCEXS: SCEXS,
+              BMMDIR: BMMDIRController.text.isNotEmpty ? double.parse(
+                  BMMDIRController.text) : 0,
+              BMMPT: USING_TAX_SALES == '2' ? 2 : Price_include_Tax == true ? 1 : 2,
+              BMMDT: 1,
+              BMMCD: (BMKID == 7 || BMKID == 10) ? BMMCDController.text : PKID == 3 ? BMMCDController.text : '',
+              BMMCR: 0,
+              BMMCA: 0,
+              BMMTXD: 0,
+              BMMLO: 0,
+              BMMCT: 1,
+              ATTID: 1,
+              TTID1: TTID1,
+              TTID2: TTID2,
+              TTID3: TTID3,
+              GUIDC: GUIDC,
+              BMMBR: int.parse(SelectDataBMMBR.toString()),
+              BMMDD: BMMDDController.text.isNotEmpty ? BMMDDController.text : _selectedDatesercher,
+              BMMDOR: BMMRD,
+              BMMRD: BMMRD,
+              BIIDB: SelectDataBMMBR == '1' ? BIIDB : int.parse(
+                  SelectDataBIID.toString()),
+              BMMMT: double.parse(BMMAMTOTController.text),
+              AMMID: AMMID == null ? null : AMMID,
+              SCIDP: STMID == 'COU'
+                  ? int.parse(SelectDataSCID.toString())
+                  : SelectDataSCIDP == null
                   ? int.parse(SelectDataSCID.toString())
                   : int.parse(SelectDataSCIDP.toString()),
-              SCEXP == null ? double.parse(SCEXController.text) : SCEXP,
-              BMMCPController.text.isEmpty
-                  ? 0
-                  : double.parse(BMMCPController.text),
-              BMMCPController.text.isEmpty
-                  ? 0
-                  : double.parse(BMMCPController.text),
-              BMMTC == null ? 0 : BMMTC,
-              SelectDataGETTYPE == '3' ? BCDID == 'null' ? null : BCDID
-                  .toString() : null,
-              SelectDataGETTYPE == '3' ? BCDMOController.text : null,
-              SelectDataGETTYPE == '3' ? GUIDC2 : null,
-              BMMGRController.text,
-              TTLID,
-              TCRA_M,
-              TCSDID_M,
-              TCSDSY_M,
-              TCID_M,
-              TCSY_M,
-              BMMAM_TX,
-              BMMDI_TX,
-              TCAM,
-              BMMCRTController.text,
-              BMMTNController.text,
-              BMMDRController.text
-          );
-        }
-
-        if (STMID == 'EORD') {
-          Save_BIL_MOV_A(typesave);
-          Save_BIF_EORD_M_P();
-        }
-
-        //تعديل الكميه المخزنية
-        if (BMMST != 4 && [1, 2, 3, 4].contains(BMKID)) {
-          await UPDATE_STO_NUM();
-        }
-
-        if (StteingController().Show_Inv_Pay == true &&
-            BMMCPController.text.isNotEmpty &&
-            double.parse(BMMCPController.text) > 0 &&
-            (BMKID == 1 || BMKID == 3 || BMKID == 5)) {
-          await Save_ACC_MOV_D_P();
-        }
-        if (BMKID != 11 && BMKID != 12) {
-          LoginController().SET_N_P(
-              'BIID_SALE', int.parse(SelectDataBIID.toString()));
-          LoginController().SET_N_P(
-              'SCID_SALE', int.parse(SelectDataSCID.toString()));
-          LoginController().SET_N_P('ACID_SALE', PKID == 1
-              ? int.parse(SelectDataACID.toString())
-              : LoginController().ACID_SALE);
-          LoginController().SET_N_P('ABID_SALE', PKID == 9 || PKID == 2
-              ? int.parse(SelectDataABID.toString())
-              : LoginController().ABID_SALE);
-          LoginController().SET_N_P('BCCID_SALE', PKID == 8 ? int.parse(SelectDataBCCID.toString())
-              : LoginController().BCCID_SALE);
-          LoginController().SET_N_P('SIID_SALE', int.parse(SelectDataSIID.toString()));
-          LoginController().SET_N_P('SCID_SALE', int.parse(SelectDataSCID.toString()));
-          LoginController().SET_N_P('PKID_SALE', PKID!);
-          LoginController().SET_D_P('SCEX_SALE', double.parse(SCEXController.text));
-          LoginController().SET_P('SCSY_SALE', SCSY);
-          LoginController().SET_N_P('SCSFL_SALE', SCSFL);
-          LoginController().SET_N_P('BDID_SALE', SelectDataBDID.toString() == 'null' ? 0 : int.parse(
-                  SelectDataBDID.toString()));
-          LoginController().SET_P('ACNO_SALE', SelectDataACNO.toString() == 'null' ? '0'
-              : SelectDataACNO.toString());
-        }
-        LoginController().SET_N_P('TIMER_POST', 0);
-        LoginController().SET_P('Return_Type', '1');
-        CheckBack = 0;
-        //save
-        Get.snackbar('StringMesSave'.tr, "${'StringMesSave'.tr}-$BMMID",
-            backgroundColor: Colors.green,
-            icon: const Icon(Icons.save, color: Colors.white),
-            colorText: Colors.white,
-            isDismissible: true,
-            dismissDirection: DismissDirection.horizontal,
-            forwardAnimationCurve: Curves.easeOutBack);
-        update();
-        loading(false);
-        Show_Inv_Pay = true;
-        update();
-        await UpdateStateBIL_MOV_D('SyncAll', BMKID.toString(), BMMID.toString(),
-            2, BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', '', '', '');
-        update();
-        STMID == 'EORD' ? Get.offNamed('/Home', arguments: 1) :
-        STMID == 'MOB' ? Get.offNamed('/Sale_Invoices'):false;
-        update();
-        await GET_CountRecode(BMMID!);
-        await GET_BIL_MOV_M_P("DateNow");
-        await GET_BIL_MOV_M_PRINT_P(BMMID!);
-        await GET_BIF_MOV_D_P(BMMID.toString(), RINT_RELATED_ITEMS_DETAIL.toString());
-        await GET_Sys_Own_P(SelectDataBIID.toString());
-        await GET_BIL_CUS_IMP_INF_P(BMKID == 1 || BMKID == 2? SelectDataBIID2.toString() : SelectDataBCID.toString());
-
-        if (LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1 && BMMST != 4 && STMID != 'EORD') {
-         print('BMMST');
-         print(BMMFS);
-         print(BMMST);
-          var FAT_CHK = await ES_FAT_PKG.MAIN_FAT_SND_INV(BMKID, BMMID,
-              SelectDataBIID.toString(),'$SelectDays ${DateFormat('HH:mm').format(DateTime.now())}',
-              GUID.toString().toUpperCase(), BMMST,
-              LoginController().SSID_N, BMMFS, LoginController().SIGN_N, ST_O_N, MSG_O);
-          if (await FAT_CHK) {
-            print(MSG_O);
-            print(ST_O_N);
-            print(FAT_CHK);
-            print('FAT_CHK');
+              SCEXP: SCEXP == null ? double.parse(SCEXController.text) : SCEXP,
+              BMMAMP: BMMCPController.text.isEmpty ? 0 : double.parse(
+                  BMMCPController.text),
+              BMMCP: BMMCPController.text.isEmpty ? 0 : BMMCP,
+              BMMTC: BMMTC == null ? 0 : BMMTC,
+              BMMGR: BMMGRController.text,
+              BMMDE: BMMDEController.text,
+              BCDMO: BCDMOController.text,
+              BCCNA: BCCNAController.text.isEmpty ? null : BCCNAController.text,
+              BMMCRT: BMMCRTController.text,
+              BMMTN: BMMTNController.text,
+              BMMPD: DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
+              BMMLON: BCLON,
+              BMMLAT: BCLAT,
+              BMMTX_DAT: BMMTX_DAT,
+              TTLID: BMKID == 1 || BMKID == 2 ? 0 : TTLID,
+              TCRA: TCRA_M,
+              TCSDID: TCSDID_M,
+              TCSDSY: TCSDSY_M,
+              TCID: TCID_M,
+              TCSY: TCSY_M,
+              BMMAM_TX: BMMAM_TX,
+              BMMDI_TX: BMMDI_TX,
+              TCAM: TCAM,
+              SUID: LoginController().SUID,
+              DATEI: DateFormat('dd-MM-yyyy hh:mm').format(DateTime.now()),
+              DEVI: LoginController().DeviceName,
+              GUID: GUID.toString().toUpperCase(),
+              GUID_LNK: GUID_LNK.toString().toUpperCase(),
+              BMMNOR: BMKID == 2 || BMKID == 4 || BMKID == 12 ? BMMNOR : null,
+              BMMIDR: BMKID == 2 || BMKID == 4 || BMKID == 12 ? BMMIDR : null,
+              BMMNR: STMID == 'COU' ? 1 : int.parse(CountRecodeController.text),
+              JTID_L: LoginController().JTID,
+              BIID_L: LoginController().BIID,
+              SYID_L: LoginController().SYID,
+              CIID_L: LoginController().CIID,
+            );
+            STB_N = 'S2';
+            print('Save_BIF_MOV_M');
+            print(e);
+            await Save_BIF_MOV_M(
+                BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', e);
           }
-        }
-        update();
+          else {
+            await UpdateBIL_MOV_M(
+                BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+                BMKID!,
+                BMMID!,
+                '$SelectDays ${DateFormat('HH:mm').format(DateTime.now())}',
+                PKID.toString(),
+                roundDouble(
+                    double.parse(BMMAMController.text) +
+                        double.parse(SUMBMDTXTController.text),
+                    SCSFL),
+                SUMBMDTXT1!,
+                SUMBMDTXT2!,
+                SUMBMDTXT3!,
+                SUMBMDTXT!,
+                BMMREController.text,
+                SelectDataACNO.toString(),
+                SelectDataBCID.toString(),
+                SelectDataBCID2 == null ? null : SelectDataBCID2.toString(),
+                SelectDataBDID == null ? null : int.parse(
+                    SelectDataBDID.toString()),
+                BMKID == 11 || BMKID == 12
+                    ? null
+                    : PKID == 1
+                    ? int.parse(SelectDataACID.toString())
+                    : null,
+                BMMINController.text,
+                SelectDays.toString(),
+                AANOController.text,
+                BCNAController.text,
+                BMMST,
+                BMMCNController.text,
+                PKID == 8 ? int.parse(SelectDataBCCID.toString()) : null,
+                PKID == 9 ? int.parse(SelectDataABID.toString()) : null,
+                int.parse(CountRecodeController.text),
+                roundDouble(
+                    (double.parse(BMMAMController.text) +
+                        double.parse(SUMBMDTXTController.text)) *
+                        double.parse(SCEXController.text),
+                    2).toString(),
+                SUMBMMDIF!,
+                SelectDataBMMDN.toString(),
+                SelectDataBMMDN == '1'
+                    ? SUMBMMDI!
+                    : BMMDIController.text.isNotEmpty
+                    ? double.parse(BMMDIController.text)
+                    : 0,
+                BMMDIRController.text.isNotEmpty
+                    ? double.parse(BMMDIRController.text)
+                    : 0,
+                PKID == 3 ? BMMCDController.text : '',
+                int.parse(SelectDataBMMBR.toString()),
+                BMMDDController.text.isNotEmpty
+                    ? BMMDDController.text
+                    : _selectedDatesercher,
+                BMMRD!,
+                double.parse(BMMAMTOTController.text),
+                SelectDataBIID3 == null ? null : SelectDataBIID3.toString(),
+                AMMID == null ? null : AMMID,
+                SelectDataSCIDP == null
+                    ? int.parse(SelectDataSCID.toString())
+                    : int.parse(SelectDataSCIDP.toString()),
+                SCEXP == null ? double.parse(SCEXController.text) : SCEXP,
+                BMMCPController.text.isEmpty
+                    ? 0
+                    : double.parse(BMMCPController.text),
+                BMMCPController.text.isEmpty
+                    ? 0
+                    : double.parse(BMMCPController.text),
+                BMMTC == null ? 0 : BMMTC,
+                SelectDataGETTYPE == '3' ? BCDID == 'null' ? null : BCDID
+                    .toString() : null,
+                SelectDataGETTYPE == '3' ? BCDMOController.text : null,
+                SelectDataGETTYPE == '3' ? GUIDC2 : null,
+                BMMGRController.text,
+                TTLID,
+                TCRA_M,
+                TCSDID_M,
+                TCSDSY_M,
+                TCID_M,
+                TCSY_M,
+                BMMAM_TX,
+                BMMDI_TX,
+                TCAM,
+                BMMCRTController.text,
+                BMMTNController.text,
+                BMMDRController.text
+            );
+          }
 
-        if (StteingController().isPrint == true && BMMST != 4 && PRINT_INV != '4') {
+          if (STMID == 'EORD') {
+            Save_BIL_MOV_A(typesave);
+            Save_BIF_EORD_M_P();
+          }
+
+          //تعديل الكميه المخزنية
+          if (BMMST != 4 && [1, 2, 3, 4].contains(BMKID)) {
+            await UPDATE_STO_NUM();
+          }
+
+          if (StteingController().Show_Inv_Pay == true &&
+              BMMCPController.text.isNotEmpty &&
+              double.parse(BMMCPController.text) > 0 &&
+              (BMKID == 1 || BMKID == 3 || BMKID == 5)) {
+            await Save_ACC_MOV_D_P();
+          }
+          if (BMKID != 11 && BMKID != 12) {
+            LoginController().SET_N_P(
+                'BIID_SALE', int.parse(SelectDataBIID.toString()));
+            LoginController().SET_N_P(
+                'SCID_SALE', int.parse(SelectDataSCID.toString()));
+            LoginController().SET_N_P('ACID_SALE', PKID == 1
+                ? int.parse(SelectDataACID.toString())
+                : LoginController().ACID_SALE);
+            LoginController().SET_N_P('ABID_SALE', PKID == 9 || PKID == 2
+                ? int.parse(SelectDataABID.toString())
+                : LoginController().ABID_SALE);
+            LoginController().SET_N_P('BCCID_SALE', PKID == 8 ? int.parse(SelectDataBCCID.toString())
+                : LoginController().BCCID_SALE);
+            LoginController().SET_N_P('SIID_SALE', int.parse(SelectDataSIID.toString()));
+            LoginController().SET_N_P('SCID_SALE', int.parse(SelectDataSCID.toString()));
+            LoginController().SET_N_P('PKID_SALE', PKID!);
+            LoginController().SET_D_P('SCEX_SALE', double.parse(SCEXController.text));
+            LoginController().SET_P('SCSY_SALE', SCSY);
+            LoginController().SET_N_P('SCSFL_SALE', SCSFL);
+            LoginController().SET_N_P('BDID_SALE', SelectDataBDID.toString() == 'null' ? 0 : int.parse(
+                SelectDataBDID.toString()));
+            LoginController().SET_P('ACNO_SALE', SelectDataACNO.toString() == 'null' ? '0'
+                : SelectDataACNO.toString());
+          }
+          LoginController().SET_N_P('TIMER_POST', 0);
+          LoginController().SET_P('Return_Type', '1');
+          CheckBack = 0;
+          //save
+          Get.snackbar('StringMesSave'.tr, "${'StringMesSave'.tr}-$BMMID",
+              backgroundColor: Colors.green,
+              icon: const Icon(Icons.save, color: Colors.white),
+              colorText: Colors.white,
+              isDismissible: true,
+              dismissDirection: DismissDirection.horizontal,
+              forwardAnimationCurve: Curves.easeOutBack);
+          update();
+          loading(false);
+          Show_Inv_Pay = true;
+          update();
+          await UpdateStateBIL_MOV_D('SyncAll', BMKID.toString(), BMMID.toString(),
+              2, BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', '', '', '');
+          update();
+          STMID == 'EORD' ? Get.offNamed('/Home', arguments: 1) :
+          STMID == 'MOB' ? Get.offNamed('/Sale_Invoices'):false;
+          update();
+          await GET_CountRecode(BMMID!);
+          await GET_BIL_MOV_M_P("DateNow");
+          await GET_BIL_MOV_M_PRINT_P(BMMID!);
+          await GET_BIF_MOV_D_P(BMMID.toString(), RINT_RELATED_ITEMS_DETAIL.toString());
+          await GET_Sys_Own_P(SelectDataBIID.toString());
+          await GET_BIL_CUS_IMP_INF_P(BMKID == 1 || BMKID == 2? SelectDataBIID2.toString() : SelectDataBCID.toString());
+
+          if (LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1 && BMMST != 4 && STMID != 'EORD') {
+            print('BMMST');
+            print(BMMFS);
+            print(BMMST);
+            var FAT_CHK = await ES_FAT_PKG.MAIN_FAT_SND_INV(BMKID, BMMID,
+                SelectDataBIID.toString(),'$SelectDays ${DateFormat('HH:mm').format(DateTime.now())}',
+                GUID.toString().toUpperCase(), BMMST,
+                LoginController().SSID_N, BMMFS, LoginController().SIGN_N, ST_O_N, MSG_O);
+            if (await FAT_CHK) {
+              print(MSG_O);
+              print(ST_O_N);
+              print(FAT_CHK);
+              print('FAT_CHK');
+            }
+          }
+          update();
+
+          if (StteingController().isPrint == true && BMMST != 4 && PRINT_INV != '4') {
             await Future.delayed(const Duration(seconds: 2));
             {
               await PRINT_BALANCE_P(
@@ -7981,224 +8031,209 @@ class Sale_Invoices_Controller extends GetxController {
               );
             }
 
+          }
+
+          await GET_BIL_MOV_M_P("DateNow");
+
+          if (BMMST != 4) {
+            StteingController().isActivateAutoMoveSync == true
+                ? await Socket_IP_Connect('SyncOnly', BMMID.toString(), false, 2)
+                : false;
+          }
+
+          if( STMID == 'COU'){
+            LoginController().InstallAddAfterSaving == true ?
+            AddSale_Invoices() : Get.offNamed('/Sale_Invoices');
+          }
+
+          await GET_BIL_MOV_M_P("DateNow");
+
+          // await SND_WS_P(GetBMKID: BMKID.toString(),
+          //   GetBMMDO: '$SelectDays  ${DateFormat('HH:mm').format(DateTime.now())}',
+          //   GetBMMNO: BMMNO.toString(), GetPKNA: PKNA.toString(),MSG_WS: 'تجربه',GetPHOEN: '');
+
+          update();
+          return true;
         }
-
-        await GET_BIL_MOV_M_P("DateNow");
-
-        if (BMMST != 4) {
-          StteingController().isActivateAutoMoveSync == true
-              ? await Socket_IP_Connect('SyncOnly', BMMID.toString(), false, 2)
-              : false;
-        }
-
-        if( STMID == 'COU'){
-          LoginController().InstallAddAfterSaving == true ?
-          AddSale_Invoices() : Get.offNamed('/Sale_Invoices');
-        }
-
-        await GET_BIL_MOV_M_P("DateNow");
-
-        // await SND_WS_P(GetBMKID: BMKID.toString(),
-        //   GetBMMDO: '$SelectDays  ${DateFormat('HH:mm').format(DateTime.now())}',
-        //   GetBMMNO: BMMNO.toString(), GetPKNA: PKNA.toString(),MSG_WS: 'تجربه',GetPHOEN: '');
-
-        update();
-        return true;
+      } catch (e, stackTrace) {
+        Show_Inv_Pay = true;
+        print('Save_BIL_MOV_M $e $stackTrace');
+        Fluttertoast.showToast(
+            msg: "${'StrinError_save_data'.tr}-${e.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        print("error-save_m ${e.toString()}");
+        return false;
       }
-    } catch (e, stackTrace) {
-      Show_Inv_Pay = true;
-      print('Save_BIL_MOV_M $e $stackTrace');
-      Fluttertoast.showToast(
-          msg: "${'StrinError_save_data'.tr}-${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_m ${e.toString()}");
-      return false;
     }
-  }
 
 
-  //حفظ  النوع وبيانات الاقسام الطاولات
-  Future<bool> Save_BIL_MOV_A(bool typesave) async {
-    try {
-      if (typesave == false) {
-        Bif_Mov_A_Local e = Bif_Mov_A_Local(
+    //حفظ  النوع وبيانات الاقسام الطاولات
+    Future<bool> Save_BIL_MOV_A(bool typesave) async {
+      try {
+        if (typesave == false) {
+          Bif_Mov_A_Local e = Bif_Mov_A_Local(
+            BMKID: BMKID,
+            BMMID: BMMID,
+            BMMNO: BMMNO == null ? 1 : int.parse(BMMNO!),
+            RSID: SelectDataGETTYPE == '1' ? SelectDataRSID == null || SelectDataRSID=='null' ? null :
+            int.parse(SelectDataRSID!) : null,
+            RTID: SelectDataGETTYPE == '1' ? SelectDataRTID == null || SelectDataRTID=='null' ? null
+                : SelectDataRTID : null,
+            REID: SelectDataGETTYPE == '1' ? SelectDataREID == null || SelectDataREID=='null' ? null :
+            int.parse(SelectDataREID.toString()) : null,
+            BMATY: SelectDataGETTYPE == null ? 1 : int.parse(
+                SelectDataGETTYPE.toString()),
+            BDID: SelectDataGETTYPE == '3' ? SelectDataBDID_ORD == null
+                ? null
+                : int.parse(SelectDataBDID_ORD.toString()) : null,
+            BMADD: BMADD.toString(),
+            BCDID: SelectDataGETTYPE == '3' ? BCDID == 'null' ? null : int.parse(
+                BCDID.toString()) : null,
+            GUIDR: SelectDataGETTYPE == '3' ? GUIDC2 : null,
+            GUID: GUID.toString().toUpperCase(),
+            JTID_L: LoginController().JTID,
+            BIID_L: LoginController().BIID,
+            SYID_L: LoginController().SYID,
+            CIID_L: LoginController().CIID,
+          );
+          Save_BIF_MOV_A(e);
+        }
+        else {
+          UpdateBIL_MOV_A(
+              BMKID!,
+              BMMID!,
+              SelectDataRSID == null ? null : SelectDataRSID.toString(),
+              SelectDataRTID == null ? null : SelectDataRTID,
+              SelectDataREID == null ? null : SelectDataREID.toString(),
+              SelectDataGETTYPE == null ? '1' : SelectDataGETTYPE.toString(),
+              SelectDataBDID_ORD == null ? null : SelectDataBDID_ORD.toString(),
+              SelectDataGETTYPE == '3'
+                  ? BCDID == 'null' ? null : BCDID.toString()
+                  : null,
+              SelectDataGETTYPE == '3' ? GUIDC2 : null);
+        }
+        return false;
+      } catch (e) {
+        Fluttertoast.showToast(
+            msg: "SAVE_BIL_MOV_A-${e.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        print("error-save_a ${e.toString()}");
+        return false;
+      }
+    }
+
+    // حفظ جدول نقل الطاولات
+    Future<bool> Save_BIF_TRA_TBL_P(GETGUID) async {
+      var GUID_TBL=uuid.v4().toUpperCase();
+      try {
+        if ( SelectDataGETTYPE == '1' && ( ( SelectDataRSIDO == null || SelectDataRSIDO=='null') ||
+            ( SelectDataRTIDO == null || SelectDataRTIDO =='null') ||
+            ( SelectDataRSID == null || SelectDataRSID =='null') ||
+            ( SelectDataRTID == null || SelectDataRTID =='null')) ) {
+          Fluttertoast.showToast(
+              msg: 'StringError_MESSAGE'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+        }
+        else{
+          BIF_TRA_TAB_Local e = BIF_TRA_TAB_Local(
+            RSIDO: int.parse(SelectDataRSIDO!) ,
+            RTIDO: SelectDataRTIDO ,
+            RSIDN: int.parse(SelectDataRSID!) ,
+            RTIDN: SelectDataRTID ,
+            GUIDF : GETGUID,
+            BTTST : 2,
+            STMIDI : STMID,
+            SOMIDI : int.parse(LoginController().SYDV_ID.toString()),
+            GUID: GUID_TBL,
+            SUID: LoginController().SUID.toString(),
+            DATEI: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+            DEVI: LoginController().DeviceName.toString(),
+            JTID_L: LoginController().JTID,
+            BIID_L: LoginController().BIID,
+            SYID_L: LoginController().SYID,
+            CIID_L: LoginController().CIID,
+          );
+          Save_BIF_TRA_TAB(e);
+          UpdateBIL_MOV_A(
+              BMKID!,
+              BMMID!,
+              SelectDataRSID == null ? null : SelectDataRSID.toString(),
+              SelectDataRTID == null ? null : SelectDataRTID,
+              SelectDataREID == null ? null : SelectDataREID.toString(),
+              SelectDataGETTYPE == null ? '1' : SelectDataGETTYPE.toString(),
+              SelectDataBDID_ORD == null ? null : SelectDataBDID_ORD.toString(),
+              SelectDataGETTYPE == '3'
+                  ? BCDID == 'null' ? null : BCDID.toString()
+                  : null,
+              SelectDataGETTYPE == '3' ? GUIDC2 : null);
+          Fluttertoast.showToast(
+              msg: 'StringED'.tr,
+              toastLength: Toast.LENGTH_LONG,
+              textColor: Colors.white,
+              backgroundColor: Colors.green);
+          await Socket_IP_Connect_BIF_TRA_TAB(GUID_TBL);
+          GET_BIL_MOV_M_P('DateNow');
+        }
+        return true;
+      } catch (e) {
+        Fluttertoast.showToast(
+            msg: "Save_BIF_TRA_TBL-${e.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        print("error-save_a ${e.toString()}");
+        return false;
+      }
+    }
+
+
+    //حفظ حالة الطلب
+    Future<bool> Save_BIF_EORD_M_P() async {
+      try {
+        Bif_Eord_M_Local e = Bif_Eord_M_Local(
           BMKID: BMKID,
           BMMID: BMMID,
-          BMMNO: BMMNO == null ? 1 : int.parse(BMMNO!),
-          RSID: SelectDataGETTYPE == '1' ? SelectDataRSID == null || SelectDataRSID=='null' ? null :
-          int.parse(SelectDataRSID!) : null,
-          RTID: SelectDataGETTYPE == '1' ? SelectDataRTID == null || SelectDataRTID=='null' ? null
-              : SelectDataRTID : null,
-          REID: SelectDataGETTYPE == '1' ? SelectDataREID == null || SelectDataREID=='null' ? null :
-          int.parse(SelectDataREID.toString()) : null,
-          BMATY: SelectDataGETTYPE == null ? 1 : int.parse(
-              SelectDataGETTYPE.toString()),
-          BDID: SelectDataGETTYPE == '3' ? SelectDataBDID_ORD == null
-              ? null
-              : int.parse(SelectDataBDID_ORD.toString()) : null,
-          BMADD: BMADD.toString(),
-          BCDID: SelectDataGETTYPE == '3' ? BCDID == 'null' ? null : int.parse(
-              BCDID.toString()) : null,
-          GUIDR: SelectDataGETTYPE == '3' ? GUIDC2 : null,
+          BEMPS: 1,
+          BEMPCS: 2,
+          BEMIPS: 1,
+          BEMBS: 2,
+          SUID: LoginController().SUID.toString(),
+          DATEI: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+          DEVI: LoginController().DeviceName.toString(),
           GUID: GUID.toString().toUpperCase(),
           JTID_L: LoginController().JTID,
           BIID_L: LoginController().BIID,
           SYID_L: LoginController().SYID,
           CIID_L: LoginController().CIID,
         );
-        Save_BIF_MOV_A(e);
-      }
-      else {
-        UpdateBIL_MOV_A(
-            BMKID!,
-            BMMID!,
-            SelectDataRSID == null ? null : SelectDataRSID.toString(),
-            SelectDataRTID == null ? null : SelectDataRTID,
-            SelectDataREID == null ? null : SelectDataREID.toString(),
-            SelectDataGETTYPE == null ? '1' : SelectDataGETTYPE.toString(),
-            SelectDataBDID_ORD == null ? null : SelectDataBDID_ORD.toString(),
-            SelectDataGETTYPE == '3'
-                ? BCDID == 'null' ? null : BCDID.toString()
-                : null,
-            SelectDataGETTYPE == '3' ? GUIDC2 : null);
-      }
-      return false;
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "SAVE_BIL_MOV_A-${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_a ${e.toString()}");
-      return false;
-    }
-  }
-
-  // حفظ جدول نقل الطاولات
-  Future<bool> Save_BIF_TRA_TBL_P(GETGUID) async {
-    var GUID_TBL=uuid.v4().toUpperCase();
-    try {
-      if ( SelectDataGETTYPE == '1' && ( ( SelectDataRSIDO == null || SelectDataRSIDO=='null') ||
-          ( SelectDataRTIDO == null || SelectDataRTIDO =='null') ||
-          ( SelectDataRSID == null || SelectDataRSID =='null') ||
-          ( SelectDataRTID == null || SelectDataRTID =='null')) ) {
+        Save_BIF_EORD_M(e);
+        return false;
+      } catch (e) {
         Fluttertoast.showToast(
-            msg: 'StringError_MESSAGE'.tr,
+            msg: "SAVE_BIF_EORD_M_P-${'StrinError_save_data'.tr}-${e.toString()}",
             toastLength: Toast.LENGTH_LONG,
             textColor: Colors.white,
             backgroundColor: Colors.redAccent);
+        print("error-save_a ${e.toString()}");
+        return false;
       }
-      else{
-        BIF_TRA_TAB_Local e = BIF_TRA_TAB_Local(
-          RSIDO: int.parse(SelectDataRSIDO!) ,
-          RTIDO: SelectDataRTIDO ,
-          RSIDN: int.parse(SelectDataRSID!) ,
-          RTIDN: SelectDataRTID ,
-          GUIDF : GETGUID,
-          BTTST : 2,
-          STMIDI : STMID,
-          SOMIDI : int.parse(LoginController().SYDV_ID.toString()),
-          GUID: GUID_TBL,
-          SUID: LoginController().SUID.toString(),
-          DATEI: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
-          DEVI: LoginController().DeviceName.toString(),
-          JTID_L: LoginController().JTID,
-          BIID_L: LoginController().BIID,
-          SYID_L: LoginController().SYID,
-          CIID_L: LoginController().CIID,
-        );
-        Save_BIF_TRA_TAB(e);
-        UpdateBIL_MOV_A(
-            BMKID!,
-            BMMID!,
-            SelectDataRSID == null ? null : SelectDataRSID.toString(),
-            SelectDataRTID == null ? null : SelectDataRTID,
-            SelectDataREID == null ? null : SelectDataREID.toString(),
-            SelectDataGETTYPE == null ? '1' : SelectDataGETTYPE.toString(),
-            SelectDataBDID_ORD == null ? null : SelectDataBDID_ORD.toString(),
-            SelectDataGETTYPE == '3'
-                ? BCDID == 'null' ? null : BCDID.toString()
-                : null,
-            SelectDataGETTYPE == '3' ? GUIDC2 : null);
-        Fluttertoast.showToast(
-            msg: 'StringED'.tr,
-            toastLength: Toast.LENGTH_LONG,
-            textColor: Colors.white,
-            backgroundColor: Colors.green);
-        await Socket_IP_Connect_BIF_TRA_TAB(GUID_TBL);
-        GET_BIL_MOV_M_P('DateNow');
-      }
-        return true;
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "Save_BIF_TRA_TBL-${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_a ${e.toString()}");
-      return false;
     }
-}
 
-
-  //حفظ حالة الطلب
-  Future<bool> Save_BIF_EORD_M_P() async {
-    try {
-      Bif_Eord_M_Local e = Bif_Eord_M_Local(
-        BMKID: BMKID,
-        BMMID: BMMID,
-        BEMPS: 1,
-        BEMPCS: 2,
-        BEMIPS: 1,
-        BEMBS: 2,
-        SUID: LoginController().SUID.toString(),
-        DATEI: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
-        DEVI: LoginController().DeviceName.toString(),
-        GUID: GUID.toString().toUpperCase(),
-        JTID_L: LoginController().JTID,
-        BIID_L: LoginController().BIID,
-        SYID_L: LoginController().SYID,
-        CIID_L: LoginController().CIID,
-      );
-      Save_BIF_EORD_M(e);
-      return false;
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "SAVE_BIF_EORD_M_P-${'StrinError_save_data'.tr}-${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      print("error-save_a ${e.toString()}");
-      return false;
-    }
-  }
-
-  //حذف الفاتورة
-  bool delete_BIL_MOV(int? GetBMMID, int type) {
-    if (type == 1) {
-      deleteBIL_MOV_D(
-          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
-      deleteBIL_MOV_M(
-          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMMID!);
-      deleteBIL_MOV_A(BMMID!);
-      Get.snackbar('StringDelete'.tr, "${'StringDelete'.tr}-$BMMID",
-          backgroundColor: Colors.green,
-          icon: const Icon(Icons.delete, color: Colors.white),
-          colorText: Colors.white,
-          isDismissible: true,
-          dismissDirection: DismissDirection.horizontal,
-          forwardAnimationCurve: Curves.easeOutBack);
-      update();
-    } else if (type == 2) {
-      if (UPDL == 1) {
+    //حذف الفاتورة
+    bool delete_BIL_MOV(int? GetBMMID, int type) {
+      if (type == 1) {
         deleteBIL_MOV_D(
-            BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GetBMMID!);
+            BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', BMMID!);
         deleteBIL_MOV_M(
-            BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', GetBMMID);
-        deleteBIL_MOV_A(GetBMMID);
-        Get.snackbar('StringDelete'.tr, "${'StringDelete'.tr}-$GetBMMID",
+            BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMMID!);
+        deleteBIL_MOV_A(BMMID!);
+        Get.snackbar('StringDelete'.tr, "${'StringDelete'.tr}-$BMMID",
             backgroundColor: Colors.green,
             icon: const Icon(Icons.delete, color: Colors.white),
             colorText: Colors.white,
@@ -8206,1495 +8241,1690 @@ class Sale_Invoices_Controller extends GetxController {
             dismissDirection: DismissDirection.horizontal,
             forwardAnimationCurve: Curves.easeOutBack);
         update();
-        return true;
-      } else {
-        Get.snackbar('StringUPDL'.tr, 'String_CHK_UPDL'.tr,
-            backgroundColor: Colors.red,
-            icon: const Icon(Icons.error, color: Colors.white),
-            colorText: Colors.white,
-            isDismissible: true,
-            dismissDirection: DismissDirection.horizontal,
-            forwardAnimationCurve: Curves.easeOutBack);
-        return false;
+      } else if (type == 2) {
+        if (UPDL == 1) {
+          deleteBIL_MOV_D(
+              BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', GetBMMID!);
+          deleteBIL_MOV_M(
+              BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', GetBMMID);
+          deleteBIL_MOV_A(GetBMMID);
+          Get.snackbar('StringDelete'.tr, "${'StringDelete'.tr}-$GetBMMID",
+              backgroundColor: Colors.green,
+              icon: const Icon(Icons.delete, color: Colors.white),
+              colorText: Colors.white,
+              isDismissible: true,
+              dismissDirection: DismissDirection.horizontal,
+              forwardAnimationCurve: Curves.easeOutBack);
+          update();
+          return true;
+        } else {
+          Get.snackbar('StringUPDL'.tr, 'String_CHK_UPDL'.tr,
+              backgroundColor: Colors.red,
+              icon: const Icon(Icons.error, color: Colors.white),
+              colorText: Colors.white,
+              isDismissible: true,
+              dismissDirection: DismissDirection.horizontal,
+              forwardAnimationCurve: Curves.easeOutBack);
+          return false;
+        }
       }
+      return true;
     }
-    return true;
-  }
 
-  //حذف الحركة الفرعية عند الخروج من التطبيق
-  Future Delete_BIL_Mov_D_DetectApp() async {
-    GET_BiL_Mov_D_DetectApp(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M').then((data) {
-      if (data.isNotEmpty) {
-        BIF_MOV_D = data;
-        DEL_SMMID = BIF_MOV_D.elementAt(0).BMMID;
-        deleteBIL_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', DEL_SMMID.toString());
-      }
-    });
-  }
-
-  //حفظ سند رئيسي
-  Future<bool> Save_ACC_MOV_M_P() async {
-    try {
-      Acc_Mov_M_Local M = Acc_Mov_M_Local(
-        AMKID: BMKID == 1 ? 2 : 1,
-        AMMID: AMMID,
-        AMMNO: AMMNO,
-        PKID: '1',
-        AMMDO: '$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}',
-        AMMST: 2,
-        AMMRE: BMMREController.text.isEmpty
-            ? AMMNO.toString()
-            : BMMREController.text,
-        AMMCC: 2,
-        SCID: int.parse(SelectDataSCID.toString()),
-        SCEX: SCEXController.text,
-        AMMAM: double.parse(BMMCPController.text),
-        AMMEQ: roundDouble(
-            (double.parse(BMMCPController.text) *
-                double.parse(SCEXController.text.toString())),
-            2),
-        ACID: int.parse(SelectDataACID2.toString()),
-        AMMIN: " سند ناتج عن فاتورة رقم ${BMMNO.toString()}",
-        GUID: GUID_ACC_M.toUpperCase(),
-        SUID: LoginController().SUID,
-        AMMCT: 1,
-        BKID: BMKID,
-        BMMID: BMMID,
-        BDID: SelectDataBDID.toString(),
-        DATEI: DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
-        AMMDOR: DateFormat('dd-MM-yyyy').format(DateTime.now()),
-        DEVI: LoginController().DeviceName,
-        BIID: SelectDataBIID.toString(),
-        AMMBR: 1,
-        BIIDB: SelectDataBIID.toString(),
-        GUID_LNK: GUID.toString().toUpperCase(),
-        ROWN1: 1,
-        JTID_L: LoginController().JTID.toString(),
-        BIID_L: LoginController().BIID,
-        SYID_L: LoginController().SYID,
-        CIID_L: LoginController().CIID,
-      );
-      Save_ACC_MOV_M(M);
-      update();
-      Timer(const Duration(seconds: 10), () {
-        Socket_IP_Connect_Save_ACC_MOV('SyncOnly', AMMID.toString());
-        update();
+    //حذف الحركة الفرعية عند الخروج من التطبيق
+    Future Delete_BIL_Mov_D_DetectApp() async {
+      GET_BiL_Mov_D_DetectApp(
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M').then((data) {
+        if (data.isNotEmpty) {
+          BIF_MOV_D = data;
+          DEL_SMMID = BIF_MOV_D.elementAt(0).BMMID;
+          deleteBIL_MOV_D(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D', DEL_SMMID.toString());
+        }
       });
-      return true;
-    } catch (e) {
-      Fluttertoast.showToast(
-          msg: "${STB_N}-${'StrinError_save_data'.tr}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      return false;
     }
-  }
 
-  //حفظ الحركه الفرعيه
-  Future<bool> Save_ACC_MOV_D_P() async {
-    try {
-      GUID_ACC_M = uuid.v4();
-      Acc_Mov_D_Local e = Acc_Mov_D_Local(
-        AMKID: BMKID == 1 ? 2 : 1,
-        AMMID: AMMID,
-        AMDID: 1,
-        AANO: AANOController.text,
-        AMDRE: BMMREController.text,
-        AMDIN: AMMIN,
-        SCID: SelectDataSCID,
-        SCEX: SCEXController.text,
-        AMDDA: BMKID == 1
-            ? 0.0
-            : roundDouble(double.parse(BMMCPController.text.toString()), 2),
-        AMDMD: BMKID == 1
-            ? roundDouble(double.parse(BMMCPController.text.toString()), 2)
-            : 0.0,
-        AMDEQ: roundDouble(
-            (double.parse(BMMCPController.text.toString()) *
-                double.parse(SCEXController.text)),
-            2),
-        AMDTY: '1',
-        AMDST: '1',
-        GUID: uuid.v4().toUpperCase(),
-        GUIDF: GUID_ACC_M.toUpperCase(),
-        AMDKI: 'O',
-        AMDVW: 1,
-        SYST_L: 2,
-        BIID: SelectDataBIID.toString(),
-        SUID: LoginController().SUID,
-        DATEI: DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
-        DEVI: LoginController().DeviceName,
-        JTID_L: LoginController().JTID,
-        BIID_L: LoginController().BIID,
-        SYID_L: LoginController().SYID,
-        CIID_L: LoginController().CIID,
-      );
-      print(e);
-      Save_ACC_MOV_D(e);
-      Save_ACC_MOV_M_P();
-      return true;
-    } catch (e) {
-      print("Save_ACC_MOV_D_P-${e}");
-      Fluttertoast.showToast(
-          msg: "Save_ACC_MOV_D_P${'StrinError_save_data'.tr}${e}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      return false;
-    }
-  }
-
-  //جلب رقم
-  Future GET_BCDID_P() async {
-    GET_BCDID().then((data) {
-      BCDID = data
-          .elementAt(0)
-          .BCDID
-          .toString();
-    });
-  }
-
-  //حفظ العميل
-  bool Save_BIF_CUS_D_P() {
-    try {
-      STB_N = 'S1';
-      if (BCDNAController.text
-          .trim()
-          .isEmpty || BCDMOController.text
-          .trim()
-          .isEmpty) {
-        Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
-            backgroundColor: Colors.red,
-            icon: const Icon(Icons.error, color: Colors.white),
-            colorText: Colors.white,
-            isDismissible: true,
-            dismissDirection: DismissDirection.horizontal,
-            forwardAnimationCurve: Curves.easeOutBack);
-        STB_N = 'S2';
-        return false;
-      } else {
-        GUIDC2 = uuid.v4().toString();
-        GET_BCDID_P();
-        Timer(const Duration(seconds: 1), () {
-          if (edit == false) {
-            Bif_Cus_D_Local B = Bif_Cus_D_Local(
-              BCDID: int.parse(BCDID.toString()),
-              BCDNA: BCDNAController.text,
-              BCDNE: BCDNAController.text,
-              BCDDO: DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()),
-              BCDMO: BCDMOController.text,
-              BCDAD: BCDADController.text,
-              CWID: SelectDataCWID.toString(),
-              CTID: SelectDataCTID.toString(),
-              BAID: SelectDataBAID == null ? null : int.parse(
-                  SelectDataBAID.toString()),
-              BCDSN: BCDSNController.text,
-              BCDBN: BCDBNController.text,
-              BCDFN: BCDFNController.text,
-              BCDST: 1,
-              SUID: LoginController().SUID,
-              GUID: GUIDC2.toString().toUpperCase(),
-              SYST_L: 2,
-              BCDDL_L: 2,
-              DATEI: DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()),
-              DEVI: LoginController().DeviceName,
-              JTID_L: LoginController().JTID,
-              BIID_L: LoginController().BIID,
-              SYID_L: LoginController().SYID,
-              CIID_L: LoginController().CIID,
-            );
-            STB_N = 'S3';
-            Save_BIF_CUS_D(B);
-          }
-          else {
-            STB_N = 'S4';
-            UpdateBIF_CUS_D(
-                int.parse(BCDID.toString()),
-                BCDNAController.text,
-                BCDMOController.text,
-                BCDADController.text
-                ,
-                SelectDataCWID,
-                SelectDataCTID,
-                SelectDataBAID,
-                BCDSNController.text,
-                BCDBNController.text,
-                BCDBNController.text,
-                2);
-          }
-          Fluttertoast.showToast(
-              msg: 'StringAD'.tr,
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.green);
-          Socket_IP_Connect_Save_BIF_CUS_D();
+    //حفظ سند رئيسي
+    Future<bool> Save_ACC_MOV_M_P() async {
+      try {
+        Acc_Mov_M_Local M = Acc_Mov_M_Local(
+          AMKID: BMKID == 1 ? 2 : 1,
+          AMMID: AMMID,
+          AMMNO: AMMNO,
+          PKID: '1',
+          AMMDO: '$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}',
+          AMMST: 2,
+          AMMRE: BMMREController.text.isEmpty
+              ? AMMNO.toString()
+              : BMMREController.text,
+          AMMCC: 2,
+          SCID: int.parse(SelectDataSCID.toString()),
+          SCEX: SCEXController.text,
+          AMMAM: double.parse(BMMCPController.text),
+          AMMEQ: roundDouble(
+              (double.parse(BMMCPController.text) *
+                  double.parse(SCEXController.text.toString())),
+              2),
+          ACID: int.parse(SelectDataACID2.toString()),
+          AMMIN: " سند ناتج عن فاتورة رقم ${BMMNO.toString()}",
+          GUID: GUID_ACC_M.toUpperCase(),
+          SUID: LoginController().SUID,
+          AMMCT: 1,
+          BKID: BMKID,
+          BMMID: BMMID,
+          BDID: SelectDataBDID.toString(),
+          DATEI: DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
+          AMMDOR: DateFormat('dd-MM-yyyy').format(DateTime.now()),
+          DEVI: LoginController().DeviceName,
+          BIID: SelectDataBIID.toString(),
+          AMMBR: 1,
+          BIIDB: SelectDataBIID.toString(),
+          GUID_LNK: GUID.toString().toUpperCase(),
+          ROWN1: 1,
+          JTID_L: LoginController().JTID.toString(),
+          BIID_L: LoginController().BIID,
+          SYID_L: LoginController().SYID,
+          CIID_L: LoginController().CIID,
+        );
+        Save_ACC_MOV_M(M);
+        update();
+        Timer(const Duration(seconds: 10), () {
+          Socket_IP_Connect_Save_ACC_MOV('SyncOnly', AMMID.toString());
+          update();
         });
         return true;
+      } catch (e) {
+        Fluttertoast.showToast(
+            msg: "${STB_N}-${'StrinError_save_data'.tr}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        return false;
       }
     }
-    catch (e) {
-      Fluttertoast.showToast(
-          msg: "${STB_N}-${'StrinError_save_data'.tr}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      return false;
+
+    //حفظ الحركه الفرعيه
+    Future<bool> Save_ACC_MOV_D_P() async {
+      try {
+        GUID_ACC_M = uuid.v4();
+        Acc_Mov_D_Local e = Acc_Mov_D_Local(
+          AMKID: BMKID == 1 ? 2 : 1,
+          AMMID: AMMID,
+          AMDID: 1,
+          AANO: AANOController.text,
+          AMDRE: BMMREController.text,
+          AMDIN: AMMIN,
+          SCID: SelectDataSCID,
+          SCEX: SCEXController.text,
+          AMDDA: BMKID == 1
+              ? 0.0
+              : roundDouble(double.parse(BMMCPController.text.toString()), 2),
+          AMDMD: BMKID == 1
+              ? roundDouble(double.parse(BMMCPController.text.toString()), 2)
+              : 0.0,
+          AMDEQ: roundDouble(
+              (double.parse(BMMCPController.text.toString()) *
+                  double.parse(SCEXController.text)),
+              2),
+          AMDTY: '1',
+          AMDST: '1',
+          GUID: uuid.v4().toUpperCase(),
+          GUIDF: GUID_ACC_M.toUpperCase(),
+          AMDKI: 'O',
+          AMDVW: 1,
+          SYST_L: 2,
+          BIID: SelectDataBIID.toString(),
+          SUID: LoginController().SUID,
+          DATEI: DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
+          DEVI: LoginController().DeviceName,
+          JTID_L: LoginController().JTID,
+          BIID_L: LoginController().BIID,
+          SYID_L: LoginController().SYID,
+          CIID_L: LoginController().CIID,
+        );
+        print(e);
+        Save_ACC_MOV_D(e);
+        Save_ACC_MOV_M_P();
+        return true;
+      } catch (e) {
+        print("Save_ACC_MOV_D_P-${e}");
+        Fluttertoast.showToast(
+            msg: "Save_ACC_MOV_D_P${'StrinError_save_data'.tr}${e}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        return false;
+      }
     }
-  }
 
-  void DataGrid() {
-    DataGridPageInvoice();
-    update();
-  }
+    //جلب رقم
+    Future GET_BCDID_P() async {
+      GET_BCDID().then((data) {
+        BCDID = data
+            .elementAt(0)
+            .BCDID
+            .toString();
+      });
+    }
+
+    //حفظ العميل
+    bool Save_BIF_CUS_D_P() {
+      try {
+        STB_N = 'S1';
+        if (BCDNAController.text
+            .trim()
+            .isEmpty || BCDMOController.text
+            .trim()
+            .isEmpty) {
+          Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
+              backgroundColor: Colors.red,
+              icon: const Icon(Icons.error, color: Colors.white),
+              colorText: Colors.white,
+              isDismissible: true,
+              dismissDirection: DismissDirection.horizontal,
+              forwardAnimationCurve: Curves.easeOutBack);
+          STB_N = 'S2';
+          return false;
+        } else {
+          GUIDC2 = uuid.v4().toString();
+          GET_BCDID_P();
+          Timer(const Duration(seconds: 1), () {
+            if (edit == false) {
+              Bif_Cus_D_Local B = Bif_Cus_D_Local(
+                BCDID: int.parse(BCDID.toString()),
+                BCDNA: BCDNAController.text,
+                BCDNE: BCDNAController.text,
+                BCDDO: DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()),
+                BCDMO: BCDMOController.text,
+                BCDAD: BCDADController.text,
+                CWID: SelectDataCWID.toString(),
+                CTID: SelectDataCTID.toString(),
+                BAID: SelectDataBAID == null ? null : int.parse(
+                    SelectDataBAID.toString()),
+                BCDSN: BCDSNController.text,
+                BCDBN: BCDBNController.text,
+                BCDFN: BCDFNController.text,
+                BCDST: 1,
+                SUID: LoginController().SUID,
+                GUID: GUIDC2.toString().toUpperCase(),
+                SYST_L: 2,
+                BCDDL_L: 2,
+                DATEI: DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()),
+                DEVI: LoginController().DeviceName,
+                JTID_L: LoginController().JTID,
+                BIID_L: LoginController().BIID,
+                SYID_L: LoginController().SYID,
+                CIID_L: LoginController().CIID,
+              );
+              STB_N = 'S3';
+              Save_BIF_CUS_D(B);
+            }
+            else {
+              STB_N = 'S4';
+              UpdateBIF_CUS_D(
+                  int.parse(BCDID.toString()),
+                  BCDNAController.text,
+                  BCDMOController.text,
+                  BCDADController.text
+                  ,
+                  SelectDataCWID,
+                  SelectDataCTID,
+                  SelectDataBAID,
+                  BCDSNController.text,
+                  BCDBNController.text,
+                  BCDBNController.text,
+                  2);
+            }
+            Fluttertoast.showToast(
+                msg: 'StringAD'.tr,
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.green);
+            Socket_IP_Connect_Save_BIF_CUS_D();
+          });
+          return true;
+        }
+      }
+      catch (e) {
+        Fluttertoast.showToast(
+            msg: "${STB_N}-${'StrinError_save_data'.tr}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.redAccent);
+        return false;
+      }
+    }
+
+    void DataGrid() {
+      DataGridPageInvoice();
+      update();
+    }
 
 
-  scanBarcodeNormal() async {
-    String barcodeScanRes;
-    barcodeScanRes = await BarcodeService().scanBarcode();
-    _scanBarcode = barcodeScanRes;
-    print(barcodeScanRes);
-    print('_scanBarcode');
-    FetchBarcodData(_scanBarcode);
-    Timer(const Duration(milliseconds: 400), () {
-      Additem().displayAddItemsWindo();
-      myFocusNode.requestFocus();
-    });
-  }
+    scanBarcodeNormal() async {
+      String barcodeScanRes;
+      barcodeScanRes = await BarcodeService().scanBarcode();
+      _scanBarcode = barcodeScanRes;
+      print(barcodeScanRes);
+      print('_scanBarcode');
+      FetchBarcodData(_scanBarcode);
+      Timer(const Duration(milliseconds: 400), () {
+        Additem().displayAddItemsWindo();
+        myFocusNode.requestFocus();
+      });
+    }
 
 
-  List<int> pendingActions = []; // 1 = إضافة، 0 = إنقاص
-  bool isProcessing = false;
+    List<int> pendingActions = []; // 1 = إضافة، 0 = إنقاص
+    bool isProcessing = false;
 
-  // تضيف الطلب وتبدأ التنفيذ إن لم يكن قيد التنفيذ
-  Future<void> enqueueUpdate(Bil_Mov_D_Local food, int TYPE) async {
-    pendingActions.add(TYPE);
-    await processQueue(food);
-  }
+    // تضيف الطلب وتبدأ التنفيذ إن لم يكن قيد التنفيذ
+    Future<void> enqueueUpdate(Bil_Mov_D_Local food, int TYPE) async {
+      pendingActions.add(TYPE);
+      await processQueue(food);
+    }
 
 // تنفذ الطلبات واحدة تلو الأخرى
-  Future<void> processQueue(Bil_Mov_D_Local food) async {
-    if (isProcessing) return;
+    Future<void> processQueue(Bil_Mov_D_Local food) async {
+      if (isProcessing) return;
 
-    isProcessing = true;
+      isProcessing = true;
 
-    while (pendingActions.isNotEmpty) {
-      int currentType = pendingActions.removeAt(0);
-      await UPDATE_BIF_MOV_D_ORD(food, currentType);
+      while (pendingActions.isNotEmpty) {
+        int currentType = pendingActions.removeAt(0);
+        await UPDATE_BIF_MOV_D_ORD(food, currentType);
+      }
+
+      isProcessing = false;
     }
 
-    isProcessing = false;
-  }
+    Future<void> UPDATE_BIF_MOV_D_ORD(Bil_Mov_D_Local food, int TYPE) async {
+      try {
+        if (food.SYST != 1) {
+          print('STP-1');
+          print(BMDIDController.text.toString());
+          BMDIDController.text = food.BMDID.toString();
+          print('STP-10');
+          print(BMDIDController.text.toString());
+          MGNOController.text = food.MGNO.toString();
+          SelectDataMINO = food.MINO.toString();
+          SelectDataMUID = food.MUID.toString();
+          BMDNOController.text = food.BMDNO.toString();
+          await GET_COUNT_MINO_P();
+          await GET_COUNT_NO_P(food.MGNO.toString(), food.MINO.toString(), food.MUID!);
+          BMDNO_V = food.BMDNO;
+          BMDNFController.text = food.BMDNF.toString();
+          BMDAMController.text = food.BMDAMO.toString();
+          BMDDIController.text = food.BMDDI.toString();
+          BMDDIRController.text = food.BMDDIR.toString();
+          SelectDataSNED = food.BMDED.toString();
+          BMDTXAController.text = food.BMDTXA.toString();
+          BMDTX = food.BMDTX;
+          BMDTXController.text = food.BMDTX1.toString();
+          BMDTX2Controller.text = food.BMDTX2.toString();
+          BMDTX3Controller.text = food.BMDTX3.toString();
+          BMDTXA = food.BMDTXA1;
+          BMDTXA2 = food.BMDTXA2;
+          BMDTXA3 = food.BMDTXA3;
+          BMDTXT1 = food.BMDTXT1;
+          BMDTXT2 = food.BMDTXT2;
+          BMDTXT3 = food.BMDTXT3;
 
-  Future<void> UPDATE_BIF_MOV_D_ORD(Bil_Mov_D_Local food, int TYPE) async {
-    try {
-      if (food.SYST != 1) {
-        print('STP-1');
-        print(BMDIDController.text.toString());
-        BMDIDController.text = food.BMDID.toString();
-        print('STP-10');
-        print(BMDIDController.text.toString());
-        MGNOController.text = food.MGNO.toString();
-        SelectDataMINO = food.MINO.toString();
-        SelectDataMUID = food.MUID.toString();
-        BMDNOController.text = food.BMDNO.toString();
-        await GET_COUNT_MINO_P();
-        await GET_COUNT_NO_P(food.MGNO.toString(), food.MINO.toString(), food.MUID!);
-        BMDNO_V = food.BMDNO;
-        BMDNFController.text = food.BMDNF.toString();
-        BMDAMController.text = food.BMDAMO.toString();
-        BMDDIController.text = food.BMDDI.toString();
-        BMDDIRController.text = food.BMDDIR.toString();
-        SelectDataSNED = food.BMDED.toString();
-        BMDTXAController.text = food.BMDTXA.toString();
-        BMDTX = food.BMDTX;
-        BMDTXController.text = food.BMDTX1.toString();
-        BMDTX2Controller.text = food.BMDTX2.toString();
-        BMDTX3Controller.text = food.BMDTX3.toString();
-        BMDTXA = food.BMDTXA1;
-        BMDTXA2 = food.BMDTXA2;
-        BMDTXA3 = food.BMDTXA3;
-        BMDTXT1 = food.BMDTXT1;
-        BMDTXT2 = food.BMDTXT2;
-        BMDTXT3 = food.BMDTXT3;
-
-        if (TTID1 != null) {
-          await GET_TAX_LIN_P('MAT', food.MGNO.toString(), food.MINO.toString());
-        }
-
-        if (TYPE == 1) {
-          // زيادة
-          BMDNOController.text = (double.parse(food.BMDNO.toString()) + 1).toString();
-          await Calculate_BMD_NO_AM();
-          update();
-          bool isValid = await Save_BIL_MOV_D_ORD_P();
-          if (isValid) {
-            // ClearBil_Mov_D_Data();
+          if (TTID1 != null) {
+            await GET_TAX_LIN_P('MAT', food.MGNO.toString(), food.MINO.toString());
           }
-        } else {
-          // نقصان
-          if ((food.BMDNO! - 1) < 1) {
-            await deleteBIL_MOV_D_ONE('BIF_MOV_D', food.BMMID.toString(), food.BMDID.toString());
-            cartFood.removeWhere((element) => element == food);
-            await GET_SUMBIL_P();
-            update();
-          } else {
-            BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();
+
+          if (TYPE == 1) {
+            // زيادة
+            BMDNOController.text = (double.parse(food.BMDNO.toString()) + 1).toString();
             await Calculate_BMD_NO_AM();
             update();
             bool isValid = await Save_BIL_MOV_D_ORD_P();
             if (isValid) {
               // ClearBil_Mov_D_Data();
             }
-            update();
+          } else {
+            // نقصان
+            if ((food.BMDNO! - 1) < 1) {
+              await deleteBIL_MOV_D_ONE('BIF_MOV_D', food.BMMID.toString(), food.BMDID.toString());
+              cartFood.removeWhere((element) => element == food);
+              await GET_SUMBIL_P();
+              update();
+            } else {
+              BMDNOController.text = (double.parse(food.BMDNO.toString()) - 1).toString();
+              await Calculate_BMD_NO_AM();
+              update();
+              bool isValid = await Save_BIL_MOV_D_ORD_P();
+              if (isValid) {
+                // ClearBil_Mov_D_Data();
+              }
+              update();
+            }
           }
-        }
-        update();
-      }
-    } catch (e) {
-      print("حدث خطأ أثناء التحديث: $e");
-    }
-  }
-
-
-  //جلب عدد السجلات على حسب المجموعة والصبف والوحدة من الفاتورة
-  Future GET_COUNT_NO_P(String GETMGNO, String GETMINO, int GETMUID) async {
-    var GET_COUNT = await GET_COUNT_NO(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        BMMID.toString(), GETMGNO, GETMINO, GETMUID);
-    if (GET_COUNT.isNotEmpty) {
-      COUNT_NO = GET_COUNT.elementAt(0).COUNT_MINO!;
-    } else {
-      COUNT_NO = 0;
-    }
-  }
-
-  //دوال المزامنة
-  //التي لم تزامن  جلب عدد السجلات
-  Future GET_COUNT_SYNC() async {
-    GET_SYNC_DATA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-        DateFormat('dd-MM-yyyy').format(DateTime.now())).then((data) {
-      BIL_MOV_M = data;
-      if (BIL_MOV_M.isNotEmpty) {
-        COUNT_SYNC = BIL_MOV_M
-            .elementAt(0)
-            .SYNC_COUNT!;
-        update();
-      }
-    });
-  }
-
-  void configloading(String MES_ERR) {
-    EasyLoading.instance
-      ..displayDuration = const Duration(milliseconds: 2000)
-      ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-      ..loadingStyle = EasyLoadingStyle.custom
-      ..indicatorSize = 45.0
-      ..radius = 10.0
-      ..backgroundColor = Colors.redAccent
-      ..indicatorColor = Colors.white
-      ..textColor = Colors.white
-      ..maskColor = Colors.blue.withOpacity(0.5)
-      ..userInteractions = true
-      ..dismissOnTap = false;
-    EasyLoading.showError(MES_ERR);
-  }
-
-  Socket_IP_Connect(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
-    EasyLoading.instance
-      ..displayDuration = const Duration(milliseconds: 2000)
-      ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-      ..loadingStyle = EasyLoadingStyle.custom
-      ..indicatorSize = 45.0
-      ..radius = 10.0
-      ..progressColor = Colors.white
-      ..backgroundColor = Colors.green
-      ..indicatorColor = Colors.white
-      ..textColor = Colors.white
-      ..maskColor = Colors.blue.withOpacity(0.5)
-      ..userInteractions = true
-      ..dismissOnTap = false;
-    TypeAuto == true ? EasyLoading.show(status: 'StringWeAreSync'.tr) : false;
-    Socket.connect(LoginController().IP, int.parse(LoginController().PORT),
-        timeout: const Duration(seconds: 5)).then((socket) async {
-      print("Success");
-      await SyncCustomerData(TypeSync, GetBMMID, TypeAuto, BMMST2);
-      socket.destroy();
-    }).catchError((error) {
-      Get.snackbar('StringCHK_Err_Con'.tr, 'StringCHK_Con'.tr,
-          backgroundColor: Colors.red,
-          icon: const Icon(Icons.error, color: Colors.white),
-          colorText: Colors.white,
-          isDismissible: true,
-          dismissDirection: DismissDirection.horizontal,
-          forwardAnimationCurve: Curves.easeOutBack);
-      configloading("StrinError_Sync".tr);
-      Fluttertoast.showToast(
-          msg: "${error.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.red);
-      print("Exception on Socket $error");
-    });
-  }
-
-  GetCheckCustomerData() async {
-    ArrLengthCus = await Get_CustomerData_Check();
-    update();
-  }
-
-  AwaitFunc(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
-    for (var i = 0; i <= 200; i++) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      {
-        print(i);
-        print(ArrLengthCus);
-        print('arrlength');
-        if (ArrLengthCus == 0) {
-          await Future.delayed(const Duration(seconds: 1));
-          await SyncBIL_MOV_D_P(TypeSync, GetBMMID, TypeAuto, BMMST2);
-          ArrLengthCus = 0;
-          break; // Exit the loop instead of setting i = 200 manually
-        }
-        else {
-          await GetCheckCustomerData();
           update();
         }
+      } catch (e) {
+        print("حدث خطأ أثناء التحديث: $e");
       }
     }
-  }
 
-  Future SyncCustomerData(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
-    var CustomerList = await SyncronizationData().FetchCustomerData('SyncAll', '0');
-    if (CustomerList.isNotEmpty && CustomerList.length > 0) {
-      await SyncronizationData().SyncCustomerToSystem(CustomerList, 'SyncAll', '0', 0, TypeAuto); // GET_COUNT_SYNC();
-      update();
-      await AwaitFunc(TypeSync, GetBMMID, TypeAuto, BMMST2);
-    }
-    else {
-      await SyncBIL_MOV_D_P(TypeSync, GetBMMID, TypeAuto, BMMST2);
-    }
-  }
 
-  Future<void> SyncBIL_MOV_D_P(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
-    if (STMID == "EORD") {
-      Socket_IP_Connect_Save_BIF_CUS_D();
-    }
-    print('STEP----1');
-
-    // Fetch Data
-    var listD = await SyncronizationData().fetchAll_BIL_D(TypeSync, BMKID!, GetBMMID, '', '', '');
-
-    if (listD.isNotEmpty) {
-      // // Ensure correct type if needed
-      // List<BIL_MOV_D> typedList = listD.cast<BIL_MOV_D>();
-      await SyncronizationData().SyncBIL_MOV_DToSystem(
-        TypeSync,
-        BMKID!,
-        GetBMMID,
-        listD, // Pass the correctly casted list
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
-        TypeAuto,
-        BMMST2,
-        '',
-        '',
-      );
-
-      await Future.delayed(const Duration(seconds: 3));
-      GET_BIL_MOV_M_P("DateNow");
-
-    } else {
-      if (TypeAuto) {
-        configloading("StringNoDataSync".tr);
+    //جلب عدد السجلات على حسب المجموعة والصبف والوحدة من الفاتورة
+    Future GET_COUNT_NO_P(String GETMGNO, String GETMINO, int GETMUID) async {
+      var GET_COUNT = await GET_COUNT_NO(
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+          BMMID.toString(), GETMGNO, GETMINO, GETMUID);
+      if (GET_COUNT.isNotEmpty) {
+        COUNT_NO = GET_COUNT.elementAt(0).COUNT_MINO!;
+      } else {
+        COUNT_NO = 0;
       }
     }
-  }
 
-  Future GET_ECO_ACC_P(String AANO) async {
-    ECO_ACC=await GET_ECO_ACC(AANO);
-    if(ECO_ACC.isNotEmpty){
-      BCDMOController.text= ECO_ACC.elementAt(0).EATL.toString();
-    }
-  }
-
-  Future<void> Socket_IP_Connect_Save_ACC_MOV(String TypeSync, String GetAMMID) async {
-    try {
-      final socket = await Socket.connect(
-        LoginController().IP,
-        int.parse(LoginController().PORT),
-        timeout: const Duration(seconds: 5),
-      );
-
-      print("Socket Connection Successful");
-      await SyncACC_MOV_D_AUTO(TypeSync, GetAMMID);
-
-      socket.destroy();
-    } catch (error) {
-      print("Socket Connection Failed: $error");
-    }
-  }
-
-  Future<void> Socket_IP_Connect_Save_BIF_CUS_D() async {
-    try {
-      final socket = await Socket.connect(
-        LoginController().IP,
-        int.parse(LoginController().PORT),
-        timeout: const Duration(seconds: 5),
-      );
-
-      print("Socket Connection Successful");
-
-      var customerList = await SyncronizationData().FetchBIF_CUS_D('SyncAll', '0');
-
-      if (customerList.isNotEmpty) {
-        TAB_N = 'BIF_CUS_D';
-        await SyncronizationData().SyncBIF_CUS_D_ToSystem(customerList, 'SyncAll', '0', 0);
-
-        Timer(const Duration(seconds: 5), () {
-          GET_BIF_CUS_D_P();
-          GET_BIF_CUS_D_ONE_P(GUIDC2.toString());
+    //دوال المزامنة
+    //التي لم تزامن  جلب عدد السجلات
+    Future GET_COUNT_SYNC() async {
+      GET_SYNC_DATA(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+          DateFormat('dd-MM-yyyy').format(DateTime.now())).then((data) {
+        BIL_MOV_M = data;
+        if (BIL_MOV_M.isNotEmpty) {
+          COUNT_SYNC = BIL_MOV_M
+              .elementAt(0)
+              .SYNC_COUNT!;
           update();
-        });
-
-        update();
-      }
-
-      socket.destroy();
-    } catch (error) {
-      print("Socket Connection Failed: $error");
-    }
-  }
-
-  Future<void> SyncACC_MOV_D_AUTO(String TypeSync, String GetAMMID) async {
-    var listD = await SyncronizationData().FetchACC_MOV_DData(TypeSync, '1', GetAMMID, '', '', '');
-    if (listD.isNotEmpty) {
-      await SyncronizationData().SyncACC_MOV_DToSystem(TypeSync, '1', GetAMMID, listD, false, '', '', '');
-    }
-  }
-
-//الطاولات------------------------------
-  Future<void> Socket_IP_Connect_BIF_TRA_TAB(GetGUID) async {
-    try {
-      final socket = await Socket.connect(
-        LoginController().IP,
-        int.parse(LoginController().PORT),
-        timeout: const Duration(seconds: 5),
-      );
-      print("Socket Connection Successful");
-      await SyncBIF_TRA_TAB_P(GetGUID);
-      socket.destroy();
-    } catch (error) {
-      print("Socket Connection Failed: $error");
-    }
-  }
-
-  Future<void> SyncBIF_TRA_TAB_P( String GetGUID) async {
-    var listD = await SyncronizationData().FetchBIF_TRA_TAB(GetGUID);
-    print(listD);
-    print('listD');
-    if (listD.isNotEmpty) {
-      await SyncronizationData().SyncBIF_TRA_TABToSystem(listD);
-    }
-  }
-//الطاولات------------------------------
-
-  //----------- التصميم -------------
-  Future<void> selectDateFromDays2(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: dateTimeDays,
-        firstDate: DateTime(2022, 5),
-        lastDate: DateTime(2050));
-
-    if (picked != null) {
-      dateTimeDays = picked;
-      BMDEDController.text = dateTimeDays.toString().split(" ")[0];
-      update();
-    }
-  }
-
-
-  FutureBuilder<List<Bil_Cus_Local>> DropdownBIL_CUSBuilder() {
-    return FutureBuilder<List<Bil_Cus_Local>>(
-      future: GET_BIL_CUS(),
-      builder: (BuildContext context, AsyncSnapshot<List<Bil_Cus_Local>> snapshot) {
-        double height = MediaQuery.of(context).size.height;
-        // حالة التحميل
-        if (!snapshot.hasData) {
-          return Dropdown(
-            josnStatus: josnStatus,
-            GETSTRING: 'StringBCID',
-          );
         }
-        // Dropdown الرئيسي
-        return IgnorePointer(
-          ignoring: _isIgnoringDropdown(),
-          child: DropdownButtonFormField2(
-            decoration: _buildInputDecoration(context, height),
-            isDense: true,
-            isExpanded: true,
-            hint: ThemeHelper().buildText(context, 'StringBCID', Colors.grey, 'S'),
-            iconStyleData: _buildIconStyle(context,snapshot),
-            items: _buildDropdownItems(snapshot.data!,context),
-            value: SelectDataBCID2,
-            onChanged: (value) => _onDropdownChanged(value),
-            dropdownStyleData: const DropdownStyleData(maxHeight: 300),
-            dropdownSearchData: _buildSearchData(context),
-            onMenuStateChange: (isOpen) {
-              if (!isOpen) TextEditingSercheController.clear();
-            },
-          ),
-        );
-      },
-    );
-  }
-
-// دالة للتحقق من حالة الـ IgnorePointer
-  bool _isIgnoringDropdown() {
-    if (edit == true && (BMKID == 12 || BMKID == 4)) {
-      return true;
+      });
     }
 
-    if (BMKID == 4 && LoginController().Return_Type == '2') {
-      return true;
+    void configloading(String MES_ERR) {
+      EasyLoading.instance
+        ..displayDuration = const Duration(milliseconds: 2000)
+        ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+        ..loadingStyle = EasyLoadingStyle.custom
+        ..indicatorSize = 45.0
+        ..radius = 10.0
+        ..backgroundColor = Colors.redAccent
+        ..indicatorColor = Colors.white
+        ..textColor = Colors.white
+        ..maskColor = Colors.blue.withOpacity(0.5)
+        ..userInteractions = true
+        ..dismissOnTap = false;
+      EasyLoading.showError(MES_ERR);
     }
 
-    return false;
-  }
-
-
-  bool _isIgnoringDropdown_IMP() {
-    if (edit == true && BMKID == 2) {
-      return true;
-    }
-    if (BMKID == 2 && LoginController().Return_Type == '2') {
-      return true;
-    }
-
-    return false;
-  }
-
-// دالة لإنشاء InputDecoration
-  InputDecoration _buildInputDecoration(BuildContext context, double height) {
-    return InputDecoration(
-      isDense: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
-      labelText: "${'StringBCID'.tr}  ${'StringCUS_BAL'.tr} ${formatter.format(BACBA).toString()} ",
-      labelStyle: const TextStyle(color: Colors.black54),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(0.015 * height)),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(0.015 * height),
-        borderSide: BorderSide(color: Colors.grey.shade400),
-      ),
-      prefixIconColor: Colors.black45,
-      suffixIconColor: Colors.black45,
-      prefixIcon:_isIgnoringDropdown()?null: _buildPrefixIcon(context),
-      suffixIcon:_isIgnoringDropdown()?null:
-      LoginController().Return_Type == '2'? null:_buildSuffixIcon(),
-    );
-  }
-
-// دالة لإنشاء أيقونة البداية
-  Widget _buildPrefixIcon(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.group_add, size: 23),
-      onPressed: () {
-        if (UPINCUS == 1) {
-          Get.to(() => Add_Ed_Customer(), arguments: 1);
-        } else {
-          Get.snackbar(
-            'StringUPIN'.tr,
-            'String_CHK_UPIN'.tr,
+    Socket_IP_Connect(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
+      EasyLoading.instance
+        ..displayDuration = const Duration(milliseconds: 2000)
+        ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+        ..loadingStyle = EasyLoadingStyle.custom
+        ..indicatorSize = 45.0
+        ..radius = 10.0
+        ..progressColor = Colors.white
+        ..backgroundColor = Colors.green
+        ..indicatorColor = Colors.white
+        ..textColor = Colors.white
+        ..maskColor = Colors.blue.withOpacity(0.5)
+        ..userInteractions = true
+        ..dismissOnTap = false;
+      TypeAuto == true ? EasyLoading.show(status: 'StringWeAreSync'.tr) : false;
+      Socket.connect(LoginController().IP, int.parse(LoginController().PORT),
+          timeout: const Duration(seconds: 5)).then((socket) async {
+        print("Success");
+        await SyncCustomerData(TypeSync, GetBMMID, TypeAuto, BMMST2);
+        socket.destroy();
+      }).catchError((error) {
+        Get.snackbar('StringCHK_Err_Con'.tr, 'StringCHK_Con'.tr,
             backgroundColor: Colors.red,
             icon: const Icon(Icons.error, color: Colors.white),
             colorText: Colors.white,
             isDismissible: true,
             dismissDirection: DismissDirection.horizontal,
-            forwardAnimationCurve: Curves.easeOutBack,
-          );
-        }
-      },
-    );
-  }
-
-// دالة لإنشاء أيقونة النهاية
-  Widget _buildSuffixIcon() {
-    return  IconButton(
-      icon: const Icon(Icons.cancel, size: 23),
-      onPressed: () {
-        SelectDataBCID = null;
-        SelectDataBCID2 = null;
-        BACBA = 0;
-        if (int.parse(CountRecodeController.text) == 0) {
-          //  BCPR = BPPR;
-          GET_MAT_INF_DATE(
-            SelectDataMGNO.toString(),
-            SelectDataSCID.toString(),
-            SelectDataBIID.toString(),
-            BCPR!,
-          );
-        }
-        update();
-      },
-    );
-  }
-
-  IconStyleData _buildIconStyle(BuildContext context,snapshot) {
-    return IconStyleData(
-      icon: SelectDataBCID == null
-          ? snapshot.connectionState == ConnectionState.waiting
-          ? const SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Colors.black45,
-        ),
-      )
-          :const Icon(
-        Icons.arrow_drop_down,
-        color: Colors.black45,
-      )
-          : InkWell(
-        onTap: () {
-          buildShowBIL_ACC_C(context);
-        },
-        child: const Icon(
-          Icons.error_outline,
-          color: Colors.black45,
-          // يمكن التحكم بحجم الأيقونة هنا
-        ),
-      ),
-    );
-  }
-
-// دالة لإنشاء العناصر في Dropdown
-  List<DropdownMenuItem<String>> _buildDropdownItems(List<Bil_Cus_Local> data,context) {
-    return data.map(
-          (item) => DropdownMenuItem<String>(
-        onTap: () => _onItemTap(item),
-        value: "${item.BCID.toString()} +++ ${item.BCNA_D.toString()}",
-        child: Text(
-          "${item.BCID.toString()} - ${item.BCNA_D.toString()}",
-          style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-        ),
-      ),
-    ).toList();
-  }
-
-// دالة للبحث في Dropdown
-  DropdownSearchData _buildSearchData(context) {
-    return DropdownSearchData(
-      searchController: TextEditingSercheController,
-      searchInnerWidget: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        child: TextFormField(
-          controller: TextEditingSercheController,
-          decoration: InputDecoration(
-            isDense: true,
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.clear, size: 20),
-              onPressed: () {
-                TextEditingSercheController.clear();
-                update();
-              },
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            hintText: 'StringSearch_for_BCID'.tr,
-            hintStyle: ThemeHelper().buildTextStyle(context, Colors.grey, 'S'),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        ),
-      ),
-      searchMatchFn: (DropdownMenuItem item, searchValue) {
-        return (item.value.toString().toLowerCase().contains(searchValue.toLowerCase()));
-      },
-      searchInnerWidgetHeight: 50,
-    );
-  }
-
-// عند تغيير قيمة Dropdown
-  void _onDropdownChanged(String? value) {
-    print(value);
-    SelectDataBCID2 = value.toString();
-    SelectDataBCID = value.toString().split(" +++ ")[0];
-    update();
-    print('SelectDataBCID');
-    print(SelectDataBCID);
-  }
-
-// عند اختيار عنصر
-  Future<void> _onItemTap(Bil_Cus_Local item) async {
-    BCNAController.text = item.BCNA.toString();
-    AANOController.text = item.AANO.toString();
-    GUIDC = item.GUID.toString();
-    BCMOController.text = item.BCMO.toString();
-    BIIDB = item.BIID;
-    PKID_C = item.PKID;
-    BCCT = item.BCCT;
-    SCID_C = item.SCID;
-    BCBL = item.BCBL;
-    BCPR = item.BCPR;
-    BCAD_D = item.BCAD.toString();
-    BCLON = item.BCLON.toString() == 'null' ? '0' : item.BCLON.toString();
-    BCLAT = item.BCLAT.toString() == 'null' ? '0' : item.BCLAT.toString();
-    SelectDataBCID3 = "${item.BCID.toString()} +++ ${item.BCNA.toString()}";
-    await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
-    await GET_BIL_ACC_C_P(AANOController.text,GUIDC,SelectDataBIID.toString(),
-        SelectDataSCID.toString(),PKID.toString(),GETBMMID: BMMID.toString());
-    await GET_TAX_LIN_CUS_IMP_P('CUS', item.AANO.toString(), item.BCID.toString());
-    await GET_ECO_ACC_P(item.AANO.toString());
-    STMID == 'MOB' ?  await calculateDistanceBetweenLocations() : null;
-    print('BCPR');
-    print(BCPR);
-    if(StteingController().ALR_CUS_DEBT_SAL==true && [3,5,11].contains(BMKID) && BACBA!>0){
-      Get.snackbar('StringCUS_DEBT'.tr, "${'StringCUS_UNPAID_DEBT'.tr}       $BACBA",
-          backgroundColor: Colors.red,
-          icon: Icon(Icons.warning, color: Colors.white),
-          colorText: Colors.white,
-          isDismissible: true,
-          dismissDirection: DismissDirection.horizontal,
-          animationDuration: Duration(seconds: 1),
-          forwardAnimationCurve: Curves.easeOutBack);
+            forwardAnimationCurve: Curves.easeOutBack);
+        configloading("StrinError_Sync".tr);
+        Fluttertoast.showToast(
+            msg: "${error.toString()}",
+            toastLength: Toast.LENGTH_LONG,
+            textColor: Colors.white,
+            backgroundColor: Colors.red);
+        print("Exception on Socket $error");
+      });
     }
-    update();
-  }
 
-  FutureBuilder<List<Bif_Cus_D_Local>> DropdownBIF_CUS_DBuilder() {
-    return FutureBuilder<List<Bif_Cus_D_Local>>(
-        future: GET_BIF_CUS_D(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Bif_Cus_D_Local>> snapshot) {
+    GetCheckCustomerData() async {
+      ArrLengthCus = await Get_CustomerData_Check();
+      update();
+    }
+
+    AwaitFunc(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
+      for (var i = 0; i <= 200; i++) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        {
+          print(i);
+          print(ArrLengthCus);
+          print('arrlength');
+          if (ArrLengthCus == 0) {
+            await Future.delayed(const Duration(seconds: 1));
+            await SyncBIL_MOV_D_P(TypeSync, GetBMMID, TypeAuto, BMMST2);
+            ArrLengthCus = 0;
+            break; // Exit the loop instead of setting i = 200 manually
+          }
+          else {
+            await GetCheckCustomerData();
+            update();
+          }
+        }
+      }
+    }
+
+    Future SyncCustomerData(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
+      var CustomerList = await SyncronizationData().FetchCustomerData('SyncAll', '0');
+      if (CustomerList.isNotEmpty && CustomerList.length > 0) {
+        await SyncronizationData().SyncCustomerToSystem(CustomerList, 'SyncAll', '0', 0, TypeAuto); // GET_COUNT_SYNC();
+        update();
+        await AwaitFunc(TypeSync, GetBMMID, TypeAuto, BMMST2);
+      }
+      else {
+        await SyncBIL_MOV_D_P(TypeSync, GetBMMID, TypeAuto, BMMST2);
+      }
+    }
+
+    Future<void> SyncBIL_MOV_D_P(String TypeSync, String GetBMMID, bool TypeAuto, int BMMST2) async {
+      if (STMID == "EORD") {
+        Socket_IP_Connect_Save_BIF_CUS_D();
+      }
+      print('STEP----1');
+
+      // Fetch Data
+      var listD = await SyncronizationData().fetchAll_BIL_D(TypeSync, BMKID!, GetBMMID, '', '', '');
+
+      if (listD.isNotEmpty) {
+        // // Ensure correct type if needed
+        // List<BIL_MOV_D> typedList = listD.cast<BIL_MOV_D>();
+        await SyncronizationData().SyncBIL_MOV_DToSystem(
+          TypeSync,
+          BMKID!,
+          GetBMMID,
+          listD, // Pass the correctly casted list
+          BMKID == 11 || BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',
+          TypeAuto,
+          BMMST2,
+          '',
+          '',
+        );
+
+        await Future.delayed(const Duration(seconds: 3));
+        GET_BIL_MOV_M_P("DateNow");
+
+      } else {
+        if (TypeAuto) {
+          configloading("StringNoDataSync".tr);
+        }
+      }
+    }
+
+    Future GET_ECO_ACC_P(String AANO) async {
+      ECO_ACC=await GET_ECO_ACC(AANO);
+      if(ECO_ACC.isNotEmpty){
+        BCDMOController.text= ECO_ACC.elementAt(0).EATL.toString();
+      }
+    }
+
+    Future<void> Socket_IP_Connect_Save_ACC_MOV(String TypeSync, String GetAMMID) async {
+      try {
+        final socket = await Socket.connect(
+          LoginController().IP,
+          int.parse(LoginController().PORT),
+          timeout: const Duration(seconds: 5),
+        );
+
+        print("Socket Connection Successful");
+        await SyncACC_MOV_D_AUTO(TypeSync, GetAMMID);
+
+        socket.destroy();
+      } catch (error) {
+        print("Socket Connection Failed: $error");
+      }
+    }
+
+    Future<void> Socket_IP_Connect_Save_BIF_CUS_D() async {
+      try {
+        final socket = await Socket.connect(
+          LoginController().IP,
+          int.parse(LoginController().PORT),
+          timeout: const Duration(seconds: 5),
+        );
+
+        print("Socket Connection Successful");
+
+        var customerList = await SyncronizationData().FetchBIF_CUS_D('SyncAll', '0');
+
+        if (customerList.isNotEmpty) {
+          TAB_N = 'BIF_CUS_D';
+          await SyncronizationData().SyncBIF_CUS_D_ToSystem(customerList, 'SyncAll', '0', 0);
+
+          Timer(const Duration(seconds: 5), () {
+            GET_BIF_CUS_D_P();
+            GET_BIF_CUS_D_ONE_P(GUIDC2.toString());
+            update();
+          });
+
+          update();
+        }
+
+        socket.destroy();
+      } catch (error) {
+        print("Socket Connection Failed: $error");
+      }
+    }
+
+    Future<void> SyncACC_MOV_D_AUTO(String TypeSync, String GetAMMID) async {
+      var listD = await SyncronizationData().FetchACC_MOV_DData(TypeSync, '1', GetAMMID, '', '', '');
+      if (listD.isNotEmpty) {
+        await SyncronizationData().SyncACC_MOV_DToSystem(TypeSync, '1', GetAMMID, listD, false, '', '', '');
+      }
+    }
+
+//الطاولات------------------------------
+    Future<void> Socket_IP_Connect_BIF_TRA_TAB(GetGUID) async {
+      try {
+        final socket = await Socket.connect(
+          LoginController().IP,
+          int.parse(LoginController().PORT),
+          timeout: const Duration(seconds: 5),
+        );
+        print("Socket Connection Successful");
+        await SyncBIF_TRA_TAB_P(GetGUID);
+        socket.destroy();
+      } catch (error) {
+        print("Socket Connection Failed: $error");
+      }
+    }
+
+    Future<void> SyncBIF_TRA_TAB_P( String GetGUID) async {
+      var listD = await SyncronizationData().FetchBIF_TRA_TAB(GetGUID);
+      print(listD);
+      print('listD');
+      if (listD.isNotEmpty) {
+        await SyncronizationData().SyncBIF_TRA_TABToSystem(listD);
+      }
+    }
+//الطاولات------------------------------
+
+    //----------- التصميم -------------
+    Future<void> selectDateFromDays2(BuildContext context) async {
+      final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: dateTimeDays,
+          firstDate: DateTime(2022, 5),
+          lastDate: DateTime(2050));
+
+      if (picked != null) {
+        dateTimeDays = picked;
+        BMDEDController.text = dateTimeDays.toString().split(" ")[0];
+        update();
+      }
+    }
+
+
+    FutureBuilder<List<Bil_Cus_Local>> DropdownBIL_CUSBuilder() {
+      return FutureBuilder<List<Bil_Cus_Local>>(
+        future: GET_BIL_CUS(),
+        builder: (BuildContext context, AsyncSnapshot<List<Bil_Cus_Local>> snapshot) {
           double height = MediaQuery.of(context).size.height;
+          // حالة التحميل
           if (!snapshot.hasData) {
             return Dropdown(
               josnStatus: josnStatus,
               GETSTRING: 'StringBCID',
             );
           }
-          return DropdownButtonFormField2(
+          // Dropdown الرئيسي
+          return IgnorePointer(
+            ignoring: _isIgnoringDropdown(),
+            child: DropdownButtonFormField2(
+              decoration: _buildInputDecoration(context, height),
+              isDense: true,
+              isExpanded: true,
+              hint: ThemeHelper().buildText(context, 'StringBCID', Colors.grey, 'S'),
+              iconStyleData: _buildIconStyle(context,snapshot),
+              items: _buildDropdownItems(snapshot.data!,context),
+              value: SelectDataBCID2,
+              onChanged: (value) => _onDropdownChanged(value),
+              dropdownStyleData: const DropdownStyleData(maxHeight: 300),
+              dropdownSearchData: _buildSearchData(context),
+              onMenuStateChange: (isOpen) {
+                if (!isOpen) TextEditingSercheController.clear();
+              },
+            ),
+          );
+        },
+      );
+    }
+
+// دالة للتحقق من حالة الـ IgnorePointer
+    bool _isIgnoringDropdown() {
+      if (edit == true && (BMKID == 12 || BMKID == 4)) {
+        return true;
+      }
+
+      if (BMKID == 4 && LoginController().Return_Type == '2') {
+        return true;
+      }
+
+      return false;
+    }
+
+
+    bool _isIgnoringDropdown_IMP() {
+      if (edit == true && BMKID == 2) {
+        return true;
+      }
+      if (BMKID == 2 && LoginController().Return_Type == '2') {
+        return true;
+      }
+
+      return false;
+    }
+
+// دالة لإنشاء InputDecoration
+    InputDecoration _buildInputDecoration(BuildContext context, double height) {
+      return InputDecoration(
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
+        labelText: "${'StringBCID'.tr}  ${'StringCUS_BAL'.tr} ${formatter.format(BACBA).toString()} ",
+        labelStyle: const TextStyle(color: Colors.black54),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(0.015 * height)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0.015 * height),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        prefixIconColor: Colors.black45,
+        suffixIconColor: Colors.black45,
+        prefixIcon:_isIgnoringDropdown()?null: _buildPrefixIcon(context),
+        suffixIcon:_isIgnoringDropdown()?null:
+        LoginController().Return_Type == '2'? null:_buildSuffixIcon(),
+      );
+    }
+
+// دالة لإنشاء أيقونة البداية
+    Widget _buildPrefixIcon(BuildContext context) {
+      return IconButton(
+        icon: const Icon(Icons.group_add, size: 23),
+        onPressed: () {
+          if (UPINCUS == 1) {
+            Get.to(() => Add_Ed_Customer(), arguments: 1);
+          } else {
+            Get.snackbar(
+              'StringUPIN'.tr,
+              'String_CHK_UPIN'.tr,
+              backgroundColor: Colors.red,
+              icon: const Icon(Icons.error, color: Colors.white),
+              colorText: Colors.white,
+              isDismissible: true,
+              dismissDirection: DismissDirection.horizontal,
+              forwardAnimationCurve: Curves.easeOutBack,
+            );
+          }
+        },
+      );
+    }
+
+// دالة لإنشاء أيقونة النهاية
+    Widget _buildSuffixIcon() {
+      return  IconButton(
+        icon: const Icon(Icons.cancel, size: 23),
+        onPressed: () {
+          SelectDataBCID = null;
+          SelectDataBCID2 = null;
+          BACBA = 0;
+          if (int.parse(CountRecodeController.text) == 0) {
+            //  BCPR = BPPR;
+            GET_MAT_INF_DATE(
+              SelectDataMGNO.toString(),
+              SelectDataSCID.toString(),
+              SelectDataBIID.toString(),
+              BCPR!,
+            );
+          }
+          update();
+        },
+      );
+    }
+
+    IconStyleData _buildIconStyle(BuildContext context,snapshot) {
+      return IconStyleData(
+        icon: SelectDataBCID == null
+            ? snapshot.connectionState == ConnectionState.waiting
+            ? const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.black45,
+          ),
+        )
+            :const Icon(
+          Icons.arrow_drop_down,
+          color: Colors.black45,
+        )
+            : InkWell(
+          onTap: () {
+            buildShowBIL_ACC_C(context);
+          },
+          child: const Icon(
+            Icons.error_outline,
+            color: Colors.black45,
+            // يمكن التحكم بحجم الأيقونة هنا
+          ),
+        ),
+      );
+    }
+
+// دالة لإنشاء العناصر في Dropdown
+    List<DropdownMenuItem<String>> _buildDropdownItems(List<Bil_Cus_Local> data,context) {
+      return data.map(
+            (item) => DropdownMenuItem<String>(
+          onTap: () => _onItemTap(item),
+          value: "${item.BCID.toString()} +++ ${item.BCNA_D.toString()}",
+          child: Text(
+            "${item.BCID.toString()} - ${item.BCNA_D.toString()}",
+            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+          ),
+        ),
+      ).toList();
+    }
+
+// دالة للبحث في Dropdown
+    DropdownSearchData _buildSearchData(context) {
+      return DropdownSearchData(
+        searchController: TextEditingSercheController,
+        searchInnerWidget: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: TextFormField(
+            controller: TextEditingSercheController,
             decoration: InputDecoration(
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                  vertical: 13, horizontal: 8),
-              labelText: "${'StringBCID'.tr}",
-              labelStyle: const TextStyle(color: Colors.black54),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(0.015 * height),
-              ),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(0.015 * height),
-                  borderSide: BorderSide(color: Colors.grey.shade400)),
-              prefixIconColor: Colors.black45,
-              suffixIconColor: Colors.black45,
-              prefixIcon: IconButton(
-                icon: const Icon(Icons.error, color: Colors.black,),
-                onPressed: () {
-                  print('controller.SelectDataCWID');
-                  print(SelectDataCWID);
-                  if (BCDID.toString() != 'null') {
-                    Get.defaultDialog(
-                      title: '${BCDNAController.text}',
-                      backgroundColor: Colors.white,
-                      radius: 30,
-                      content: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${'StringBCDMO'.tr}:",
-                              style: ThemeHelper().buildTextStyle(
-                                  context, Colors.black87, 'M'),
-                            ),
-                            SizedBox(width: 0.01 * height),
-                            Text(
-                                BCDMOController.text,
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black, 'M')
-                            ),
-                          ],
-                        ),
-                        SelectDataCWID != 'null' ?
-                        SizedBox(height: 0.02 * height) :
-                        Container(),
-                        SelectDataCWID != 'null' || SelectDataCWID != null
-                            ? Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${'StringCountry'.tr}:",
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black87, 'M')),
-                            SizedBox(width: 0.01 * height),
-                            Text(CWNA.toString(),
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black, 'M')
-                            ),
-                          ],
-                        )
-                            :
-                        Container(),
-                        SelectDataCWID != 'null' ? SizedBox(height: 0.02 *
-                            height) :
-                        Container(),
-                        SelectDataCTID != 'null' || SelectDataCTID != null
-                            ? Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${'StringCity'.tr}:",
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black87, 'M')
-                            ),
-                            SizedBox(width: 0.01 * height),
-                            Text(CTNA.toString(),
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black, 'M')
-                            ),
-                          ],
-                        )
-                            :
-                        Container(),
-                        BCDADController.text.isEmpty ||
-                            BCDADController.text == 'null' ? Container() :
-                        SizedBox(height: 0.02 * height),
-                        BCDADController.text.isEmpty ||
-                            BCDADController.text == 'null' ? Container() :
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${'StringAddress'.tr}:",
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black87, 'M')),
-                            SizedBox(width: 0.01 * height),
-                            Text(BCDADController.text,
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black, 'M')
-                            ),
-                          ],
-                        ),
-                        BCDSNController.text.isEmpty ||
-                            BCDSNController.text == 'null' ? Container() :
-                        SizedBox(height: 0.02 * height),
-                        BCDSNController.text.isEmpty ||
-                            BCDSNController.text == 'null' ? Container() :
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${'StringStreetNo'.tr}:",
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black87, 'M')),
-                            SizedBox(width: 0.01 * height),
-                            Text(BCDSNController.text,
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black, 'M')
-                            ),
-                          ],
-                        ),
-                        BCDBNController.text.isEmpty ||
-                            BCDBNController.text == 'null' ? Container() :
-                        SizedBox(height: 0.02 * height),
-                        BCDBNController.text.isEmpty ||
-                            BCDBNController.text == 'null' ? Container() :
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text("${'StringBuildingNo'.tr}:",
-                              style: ThemeHelper().buildTextStyle(
-                                  context, Colors.black87, 'M'),
-                            ),
-                            SizedBox(width: 0.01 * height),
-                            Text(BCDBNController.text,
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black, 'M')
-                            ),
-                          ],
-                        ),
-                        BCDFNController.text.isEmpty ||
-                            BCDFNController.text == 'null' ? Container() :
-                        SizedBox(height: 0.02 * height),
-                        BCDFNController.text.isEmpty ||
-                            BCDFNController.text == 'null' ? Container() :
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text("${'StringBCDFN'.tr}:",
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black87, 'M')
-                            ),
-                            SizedBox(width: 0.01 * height),
-                            Text(BCDFNController.text,
-                                style: ThemeHelper().buildTextStyle(
-                                    context, Colors.black87, 'M')
-                            ),
-                          ],
-                        ),
-                      ]),
-                      textCancel: 'StringHide'.tr,
-                      cancelTextColor: Colors.blueAccent,
-                      // barrierDismissible: false,
-                    );
-                  }
-                },
-              ),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.clear, color: Colors.black,),
+                icon: const Icon(Icons.clear, size: 20),
                 onPressed: () {
-                  BCDNAController.clear();
-                  BCDID = null;
-                  SelectDataBCDID = null;
-                  GUIDC2 = null;
-                  BCDMOController.clear();
-                  SelectDataCWID = null;
-                  SelectDataBAID = null;
-                  SelectDataCTID = null;
-                  SelectDataCWID2 = null;
-                  SelectDataBAID2 = null;
-                  SelectDataCTID2 = null;
-                  BCDADController.clear();
-                  BCDSNController.clear();
-                  BCDFNController.clear();
-                  BCDBNController.clear();
+                  TextEditingSercheController.clear();
                   update();
                 },
               ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              hintText: 'StringSearch_for_BCID'.tr,
+              hintStyle: ThemeHelper().buildTextStyle(context, Colors.grey, 'S'),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            isDense: true,
-            isExpanded: true,
-            hint: ThemeHelper().buildText(
-                context, 'StringBCID', Colors.grey, 'S'),
-            iconStyleData: IconStyleData(
-              icon: SelectDataBCID == null ? const Icon(
-                Icons.arrow_drop_down,
-                color: Colors.black45,
-              ) : IconButton(icon: Icon(Icons.error_outline), iconSize: 21,
-                  onPressed: () {
-                    buildShowBIL_ACC_C(context);
-                  },
-                  padding: EdgeInsets.only(right: 25)),
-            ),
-            items: snapshot.data!.map((item) =>
-                DropdownMenuItem<String>(
-                  onTap: () async {
-                    print(item.BCDID.toString());
-                    print('BCDID');
-                    BCDID = item.BCDID.toString();
-                    GUIDC2 = item.GUID.toString();
-                    BCDNAController.text = item.BCDNA_D.toString();
-                    BCDMOController.text = item.BCDMO.toString();
-                    SelectDataCWID = item.CWID.toString();
-                    SelectDataBAID = item.BAID.toString();
-                    SelectDataCTID = item.CTID.toString();
-                    GET_BIF_CUS_D_ONE_P(item.GUID.toString());
-                  },
-                  value: "${item.BCDNA.toString() + " +++ " +
-                      item.BCDMO.toString()}",
-                  child: Text(
-                    "${item.BCDNA.toString() == 'null' ? '' : item.BCDNA
-                        .toString()}-${item.BCDMO.toString() == 'null'
-                        ? ''
-                        : item.BCDMO.toString()}",
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
-                  ),
-                ))
-                .toList()
-                .obs,
-            value: SelectDataBCDID,
-            onChanged: (value) {
-              SelectDataBCDID = value.toString();
-              update();
-              print('SelectDataBCID');
-              print(BCDID);
-              print(SelectDataBCDID);
-            },
-            dropdownStyleData: const DropdownStyleData(
-              maxHeight: 200,
-            ),
-            dropdownSearchData: DropdownSearchData(
-                searchController: TextEditingSercheController,
-                searchInnerWidget: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 8,
-                    bottom: 4,
-                    right: 8,
-                    left: 8,
-                  ),
-                  child: TextFormField(
-                    controller: TextEditingSercheController,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      suffixIcon: IconButton(icon: const Icon(
-                        Icons.clear,
-                        size: 20,
-                      ),
-                        onPressed: () {
-                          TextEditingSercheController.clear();
-                          update();
-                        },),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
-                      ),
-                      hintText: 'StringSearch_for_BCID'.tr,
-                      hintStyle: ThemeHelper().buildTextStyle(
-                          context, Colors.grey, 'S'),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
+          ),
+        ),
+        searchMatchFn: (DropdownMenuItem item, searchValue) {
+          return (item.value.toString().toLowerCase().contains(searchValue.toLowerCase()));
+        },
+        searchInnerWidgetHeight: 50,
+      );
+    }
+
+// عند تغيير قيمة Dropdown
+    void _onDropdownChanged(String? value) {
+      print(value);
+      SelectDataBCID2 = value.toString();
+      SelectDataBCID = value.toString().split(" +++ ")[0];
+      update();
+      print('SelectDataBCID');
+      print(SelectDataBCID);
+    }
+
+// عند اختيار عنصر
+    Future<void> _onItemTap(Bil_Cus_Local item) async {
+      BCNAController.text = item.BCNA.toString();
+      AANOController.text = item.AANO.toString();
+      GUIDC = item.GUID.toString();
+      BCMOController.text = item.BCMO.toString();
+      BIIDB = item.BIID;
+      PKID_C = item.PKID;
+      BCCT = item.BCCT;
+      SCID_C = item.SCID;
+      BCBL = item.BCBL;
+      BCPR = item.BCPR;
+      BCAD_D = item.BCAD.toString();
+      BCLON = item.BCLON.toString() == 'null' ? '0' : item.BCLON.toString();
+      BCLAT = item.BCLAT.toString() == 'null' ? '0' : item.BCLAT.toString();
+      SelectDataBCID3 = "${item.BCID.toString()} +++ ${item.BCNA.toString()}";
+      await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
+      await GET_BIL_ACC_C_P(AANOController.text,GUIDC,SelectDataBIID.toString(),
+          SelectDataSCID.toString(),PKID.toString(),GETBMMID: BMMID.toString());
+      await GET_TAX_LIN_CUS_IMP_P('CUS', item.AANO.toString(), item.BCID.toString());
+      await GET_ECO_ACC_P(item.AANO.toString());
+      STMID == 'MOB' ?  await calculateDistanceBetweenLocations() : null;
+      print('BCPR');
+      print(BCPR);
+      if(StteingController().ALR_CUS_DEBT_SAL==true && [3,5,11].contains(BMKID) && BACBA!>0){
+        Get.snackbar('StringCUS_DEBT'.tr, "${'StringCUS_UNPAID_DEBT'.tr}       $BACBA",
+            backgroundColor: Colors.red,
+            icon: Icon(Icons.warning, color: Colors.white),
+            colorText: Colors.white,
+            isDismissible: true,
+            dismissDirection: DismissDirection.horizontal,
+            animationDuration: Duration(seconds: 1),
+            forwardAnimationCurve: Curves.easeOutBack);
+      }
+      update();
+    }
+
+    FutureBuilder<List<Bif_Cus_D_Local>> DropdownBIF_CUS_DBuilder() {
+      return FutureBuilder<List<Bif_Cus_D_Local>>(
+          future: GET_BIF_CUS_D(),
+          builder: (BuildContext context,
+              AsyncSnapshot<List<Bif_Cus_D_Local>> snapshot) {
+            double height = MediaQuery.of(context).size.height;
+            if (!snapshot.hasData) {
+              return Dropdown(
+                josnStatus: josnStatus,
+                GETSTRING: 'StringBCID',
+              );
+            }
+            return DropdownButtonFormField2(
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 13, horizontal: 8),
+                labelText: "${'StringBCID'.tr}",
+                labelStyle: const TextStyle(color: Colors.black54),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(0.015 * height),
                 ),
-                searchMatchFn: (DropdownMenuItem item, searchValue) {
-                  // print(controller.TextEditingSercheController.text);
-                  return (item.value.toString().toLowerCase().contains(
-                      searchValue.toLowerCase()));
-                },
-                searchInnerWidgetHeight: 50),
-            //This to clear the search value when you close the menu
-            onMenuStateChange: (isOpen) {
-              if (!isOpen) {
-                TextEditingSercheController.clear();
-              }
-            },
-          );
-        });
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownBIL_CRE_CBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Bil_Cre_C_Local>>(
-                future: GET_BIL_CRE_C(controller.SelectDataBIID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Bil_Cre_C_Local>> snapshot) {
-                  double height = MediaQuery
-                      .of(context)
-                      .size
-                      .height;
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringBilCrec',
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 13, horizontal: 8),
-                      labelText: 'StringCreditCard'.tr,
-                      labelStyle: const TextStyle(color: Colors.black54),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0.015 * height),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(0.015 * height),
-                          borderSide: BorderSide(color: Colors.grey.shade400)),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(0.015 * height),
+                    borderSide: BorderSide(color: Colors.grey.shade400)),
+                prefixIconColor: Colors.black45,
+                suffixIconColor: Colors.black45,
+                prefixIcon: IconButton(
+                  icon: const Icon(Icons.error, color: Colors.black,),
+                  onPressed: () {
+                    print('controller.SelectDataCWID');
+                    print(SelectDataCWID);
+                    if (BCDID.toString() != 'null') {
+                      Get.defaultDialog(
+                        title: '${BCDNAController.text}',
+                        backgroundColor: Colors.white,
+                        radius: 30,
+                        content: Column(children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${'StringBCDMO'.tr}:",
+                                style: ThemeHelper().buildTextStyle(
+                                    context, Colors.black87, 'M'),
+                              ),
+                              SizedBox(width: 0.01 * height),
+                              Text(
+                                  BCDMOController.text,
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black, 'M')
+                              ),
+                            ],
+                          ),
+                          SelectDataCWID != 'null' ?
+                          SizedBox(height: 0.02 * height) :
+                          Container(),
+                          SelectDataCWID != 'null' || SelectDataCWID != null
+                              ? Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "${'StringCountry'.tr}:",
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black87, 'M')),
+                              SizedBox(width: 0.01 * height),
+                              Text(CWNA.toString(),
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black, 'M')
+                              ),
+                            ],
+                          )
+                              :
+                          Container(),
+                          SelectDataCWID != 'null' ? SizedBox(height: 0.02 *
+                              height) :
+                          Container(),
+                          SelectDataCTID != 'null' || SelectDataCTID != null
+                              ? Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "${'StringCity'.tr}:",
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black87, 'M')
+                              ),
+                              SizedBox(width: 0.01 * height),
+                              Text(CTNA.toString(),
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black, 'M')
+                              ),
+                            ],
+                          )
+                              :
+                          Container(),
+                          BCDADController.text.isEmpty ||
+                              BCDADController.text == 'null' ? Container() :
+                          SizedBox(height: 0.02 * height),
+                          BCDADController.text.isEmpty ||
+                              BCDADController.text == 'null' ? Container() :
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "${'StringAddress'.tr}:",
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black87, 'M')),
+                              SizedBox(width: 0.01 * height),
+                              Text(BCDADController.text,
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black, 'M')
+                              ),
+                            ],
+                          ),
+                          BCDSNController.text.isEmpty ||
+                              BCDSNController.text == 'null' ? Container() :
+                          SizedBox(height: 0.02 * height),
+                          BCDSNController.text.isEmpty ||
+                              BCDSNController.text == 'null' ? Container() :
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "${'StringStreetNo'.tr}:",
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black87, 'M')),
+                              SizedBox(width: 0.01 * height),
+                              Text(BCDSNController.text,
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black, 'M')
+                              ),
+                            ],
+                          ),
+                          BCDBNController.text.isEmpty ||
+                              BCDBNController.text == 'null' ? Container() :
+                          SizedBox(height: 0.02 * height),
+                          BCDBNController.text.isEmpty ||
+                              BCDBNController.text == 'null' ? Container() :
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text("${'StringBuildingNo'.tr}:",
+                                style: ThemeHelper().buildTextStyle(
+                                    context, Colors.black87, 'M'),
+                              ),
+                              SizedBox(width: 0.01 * height),
+                              Text(BCDBNController.text,
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black, 'M')
+                              ),
+                            ],
+                          ),
+                          BCDFNController.text.isEmpty ||
+                              BCDFNController.text == 'null' ? Container() :
+                          SizedBox(height: 0.02 * height),
+                          BCDFNController.text.isEmpty ||
+                              BCDFNController.text == 'null' ? Container() :
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text("${'StringBCDFN'.tr}:",
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black87, 'M')
+                              ),
+                              SizedBox(width: 0.01 * height),
+                              Text(BCDFNController.text,
+                                  style: ThemeHelper().buildTextStyle(
+                                      context, Colors.black87, 'M')
+                              ),
+                            ],
+                          ),
+                        ]),
+                        textCancel: 'StringHide'.tr,
+                        cancelTextColor: Colors.blueAccent,
+                        // barrierDismissible: false,
+                      );
+                    }
+                  },
+                ),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.black,),
+                  onPressed: () {
+                    BCDNAController.clear();
+                    BCDID = null;
+                    SelectDataBCDID = null;
+                    GUIDC2 = null;
+                    BCDMOController.clear();
+                    SelectDataCWID = null;
+                    SelectDataBAID = null;
+                    SelectDataCTID = null;
+                    SelectDataCWID2 = null;
+                    SelectDataBAID2 = null;
+                    SelectDataCTID2 = null;
+                    BCDADController.clear();
+                    BCDSNController.clear();
+                    BCDFNController.clear();
+                    BCDBNController.clear();
+                    update();
+                  },
+                ),
+              ),
+              isDense: true,
+              isExpanded: true,
+              hint: ThemeHelper().buildText(
+                  context, 'StringBCID', Colors.grey, 'S'),
+              iconStyleData: IconStyleData(
+                icon: SelectDataBCID == null ? const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black45,
+                ) : IconButton(icon: Icon(Icons.error_outline), iconSize: 21,
+                    onPressed: () {
+                      buildShowBIL_ACC_C(context);
+                    },
+                    padding: EdgeInsets.only(right: 25)),
+              ),
+              items: snapshot.data!.map((item) =>
+                  DropdownMenuItem<String>(
+                    onTap: () async {
+                      print(item.BCDID.toString());
+                      print('BCDID');
+                      BCDID = item.BCDID.toString();
+                      GUIDC2 = item.GUID.toString();
+                      BCDNAController.text = item.BCDNA_D.toString();
+                      BCDMOController.text = item.BCDMO.toString();
+                      SelectDataCWID = item.CWID.toString();
+                      SelectDataBAID = item.BAID.toString();
+                      SelectDataCTID = item.CTID.toString();
+                      GET_BIF_CUS_D_ONE_P(item.GUID.toString());
+                    },
+                    value: "${item.BCDNA.toString() + " +++ " +
+                        item.BCDMO.toString()}",
+                    child: Text(
+                      "${item.BCDNA.toString() == 'null' ? '' : item.BCDNA
+                          .toString()}-${item.BCDMO.toString() == 'null'
+                          ? ''
+                          : item.BCDMO.toString()}",
+                      style: ThemeHelper().buildTextStyle(
+                          context, Colors.black, 'M'),
                     ),
-                    isDense: true,
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringCreditCard', Colors.grey, 'S'),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          onTap: () {
-                            print('BCCPK');
-                            print(item.BCCPK);
-                            print(controller.SelectDataBCCID);
-                            print(item.BCCID.toString());
-                            if (item.BCCPK == 1) {
-                              if (int.parse(CountRecodeController.text) == 0) {
-                                BCPR = item.BCCSP;
-                                BCCSP = item.BCCSP;
-                                GET_MAT_INF_DATE(SelectDataMGNO.toString(),
-                                    SelectDataSCID.toString(),
-                                    SelectDataBIID.toString(), BCCSP!);
+                  ))
+                  .toList()
+                  .obs,
+              value: SelectDataBCDID,
+              onChanged: (value) {
+                SelectDataBCDID = value.toString();
+                update();
+                print('SelectDataBCID');
+                print(BCDID);
+                print(SelectDataBCDID);
+              },
+              dropdownStyleData: const DropdownStyleData(
+                maxHeight: 200,
+              ),
+              dropdownSearchData: DropdownSearchData(
+                  searchController: TextEditingSercheController,
+                  searchInnerWidget: Padding(
+                    padding: const EdgeInsets.only(
+                      top: 8,
+                      bottom: 4,
+                      right: 8,
+                      left: 8,
+                    ),
+                    child: TextFormField(
+                      controller: TextEditingSercheController,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        suffixIcon: IconButton(icon: const Icon(
+                          Icons.clear,
+                          size: 20,
+                        ),
+                          onPressed: () {
+                            TextEditingSercheController.clear();
+                            update();
+                          },),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        hintText: 'StringSearch_for_BCID'.tr,
+                        hintStyle: ThemeHelper().buildTextStyle(
+                            context, Colors.grey, 'S'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  searchMatchFn: (DropdownMenuItem item, searchValue) {
+                    // print(controller.TextEditingSercheController.text);
+                    return (item.value.toString().toLowerCase().contains(
+                        searchValue.toLowerCase()));
+                  },
+                  searchInnerWidgetHeight: 50),
+              //This to clear the search value when you close the menu
+              onMenuStateChange: (isOpen) {
+                if (!isOpen) {
+                  TextEditingSercheController.clear();
+                }
+              },
+            );
+          });
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownBIL_CRE_CBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Bil_Cre_C_Local>>(
+                  future: GET_BIL_CRE_C(controller.SelectDataBIID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Bil_Cre_C_Local>> snapshot) {
+                    double height = MediaQuery
+                        .of(context)
+                        .size
+                        .height;
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringBilCrec',
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 13, horizontal: 8),
+                        labelText: 'StringCreditCard'.tr,
+                        labelStyle: const TextStyle(color: Colors.black54),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(0.015 * height),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0.015 * height),
+                            borderSide: BorderSide(color: Colors.grey.shade400)),
+                      ),
+                      isDense: true,
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(
+                          context, 'StringCreditCard', Colors.grey, 'S'),
+                      items: snapshot.data!.map((item) =>
+                          DropdownMenuItem<String>(
+                            onTap: () {
+                              print('BCCPK');
+                              print(item.BCCPK);
+                              print(controller.SelectDataBCCID);
+                              print(item.BCCID.toString());
+                              if (item.BCCPK == 1) {
+                                if (int.parse(CountRecodeController.text) == 0) {
+                                  BCPR = item.BCCSP;
+                                  BCCSP = item.BCCSP;
+                                  GET_MAT_INF_DATE(SelectDataMGNO.toString(),
+                                      SelectDataSCID.toString(),
+                                      SelectDataBIID.toString(), BCCSP!);
+                                }
                               }
-                            }
-                          },
-                          value: item.BCCID.toString(),
-                          child: Text("${item.BCCID.toString()} - ${item.BCCNA_D
-                              .toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),),
-                        ))
-                        .toList()
-                        .obs,
-                    value: controller.SelectDataBCCID,
-                    onChanged: (value) {
-                      controller.SelectDataBCCID = value as String;
-                      controller.update();
-                    },
-                    dropdownStyleData: const DropdownStyleData(
-                      maxHeight: 200,
-                    ),
-                  );
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownBIL_DISBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Bil_Dis_Local>>(
-                future: GET_BIL_DIS(controller.SelectDataBIID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Bil_Dis_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringCollector'.tr,
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown(
-                        'StringCollector'.tr),
-                    isDense: true,
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringCollector', Colors.grey, 'S'),
-                    items: snapshot.data!
-                        .map((item) =>
-                        DropdownMenuItem<String>(
-                          onTap: () {
-                            controller.SelectDataBDID = item.BDID.toString();
-                            controller.update();
-                          },
-                          value: item.BDNA.toString(),
-                          child: Text(
-                            "${item.BDID.toString()} - ${item.BDNA.toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        ))
-                        .toList()
-                        .obs,
-                    value: controller.SelectDataBDID2,
-                    onChanged: (value) {
-                      controller.SelectDataBDID2 = value.toString();
-                      controller.update();
-                    },
-                    dropdownStyleData: const DropdownStyleData(
-                      maxHeight: 250,
-                    ),
-                    dropdownSearchData: DropdownSearchData(
-                        searchController: controller
-                            .TextEditingSercheController,
-                        searchInnerWidget: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
-                          ),
-                          child: TextFormField(
-                            controller: controller.TextEditingSercheController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              suffixIcon: IconButton(icon: const Icon(
-                                Icons.clear,
-                                size: 20,
-                              ),
-                                onPressed: () {
-                                  controller.TextEditingSercheController
-                                      .clear();
-                                  controller.update();
-                                },),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'StringSearch_for_BDID'.tr,
-                              hintStyle: ThemeHelper().buildTextStyle(
-                                  context, Colors.grey, 'S'),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ),
-                        searchMatchFn: (item, searchValue) {
-                          return (item.value
-                              .toString()
-                              .toLowerCase()
-                              .contains(searchValue));
-                        },
-                        searchInnerWidgetHeight: 50),
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        controller.TextEditingSercheController.clear();
-                      }
-                    },
-                  );
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownBIL_DIS_ORDBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Bil_Dis_Local>>(
-                future: GET_BIL_DIS(controller.SelectDataBIID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Bil_Dis_Local>> snapshot) {
-                  double height = MediaQuery
-                      .of(context)
-                      .size
-                      .height;
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringCollector_Ord'.tr,
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 13, horizontal: 8),
-                      labelText: 'StringCollector_Ord'.tr,
-                      labelStyle: TextStyle(color: Colors.grey.shade800),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0.015 * height),
+                            },
+                            value: item.BCCID.toString(),
+                            child: Text("${item.BCCID.toString()} - ${item.BCCNA_D
+                                .toString()}",
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'M'),),
+                          ))
+                          .toList()
+                          .obs,
+                      value: controller.SelectDataBCCID,
+                      onChanged: (value) {
+                        controller.SelectDataBCCID = value as String;
+                        controller.update();
+                      },
+                      dropdownStyleData: const DropdownStyleData(
+                        maxHeight: 200,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(0.015 * height),
-                          borderSide: BorderSide(color: Colors.grey.shade400)),
-                    ),
-                    isDense: true,
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringCollector_Ord', Colors.grey, 'S'),
-                    items: snapshot.data!
-                        .map((item) =>
-                        DropdownMenuItem<String>(
-                          onTap: () {
-                            controller.SelectDataBDID_ORD =
-                                item.BDID.toString();
-                            controller.update();
-                          },
-                          value: item.BDNA.toString(),
-                          child: Text(
-                            item.BDNA.toString(),
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'S'),
-                          ),
-                        ))
-                        .toList()
-                        .obs,
-                    value: controller.SelectDataBDID2_ORD,
-                    onChanged: (value) {
-                      controller.SelectDataBDID2_ORD = value.toString();
-                      controller.update();
-                    },
-                    dropdownStyleData: const DropdownStyleData(
-                      maxHeight: 250,
-                    ),
-                    dropdownSearchData: DropdownSearchData(
-                        searchController: controller
-                            .TextEditingSercheController,
-                        searchInnerWidget: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
-                          ),
-                          child: TextFormField(
-                            controller: controller.TextEditingSercheController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              suffixIcon: IconButton(icon: const Icon(
-                                Icons.clear,
-                                size: 20,
-                              ),
-                                onPressed: () {
-                                  controller.TextEditingSercheController
-                                      .clear();
-                                  controller.update();
-                                },),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'StringSearch_for_BDID'.tr,
-                              hintStyle: ThemeHelper().buildTextStyle(
-                                  context, Colors.grey, 'S'),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                    );
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownBIL_DISBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Bil_Dis_Local>>(
+                  future: GET_BIL_DIS(controller.SelectDataBIID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Bil_Dis_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringCollector'.tr,
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: ThemeHelper().InputDecorationDropDown(
+                          'StringCollector'.tr),
+                      isDense: true,
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(
+                          context, 'StringCollector', Colors.grey, 'S'),
+                      items: snapshot.data!
+                          .map((item) =>
+                          DropdownMenuItem<String>(
+                            onTap: () {
+                              controller.SelectDataBDID = item.BDID.toString();
+                              controller.update();
+                            },
+                            value: item.BDNA.toString(),
+                            child: Text(
+                              "${item.BDID.toString()} - ${item.BDNA.toString()}",
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'M'),
+                            ),
+                          ))
+                          .toList()
+                          .obs,
+                      value: controller.SelectDataBDID2,
+                      onChanged: (value) {
+                        controller.SelectDataBDID2 = value.toString();
+                        controller.update();
+                      },
+                      dropdownStyleData: const DropdownStyleData(
+                        maxHeight: 250,
+                      ),
+                      dropdownSearchData: DropdownSearchData(
+                          searchController: controller
+                              .TextEditingSercheController,
+                          searchInnerWidget: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                              bottom: 4,
+                              right: 8,
+                              left: 8,
+                            ),
+                            child: TextFormField(
+                              controller: controller.TextEditingSercheController,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                suffixIcon: IconButton(icon: const Icon(
+                                  Icons.clear,
+                                  size: 20,
+                                ),
+                                  onPressed: () {
+                                    controller.TextEditingSercheController
+                                        .clear();
+                                    controller.update();
+                                  },),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                hintText: 'StringSearch_for_BDID'.tr,
+                                hintStyle: ThemeHelper().buildTextStyle(
+                                    context, Colors.grey, 'S'),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        searchMatchFn: (item, searchValue) {
-                          return (item.value.toString().toLowerCase().contains(
-                              searchValue));
-                        },
-                        searchInnerWidgetHeight: 50),
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        controller.TextEditingSercheController.clear();
-                      }
-                    },
-                  );
-                })));
-  }
-
-  final List<Map> items_ACCOUNTING_EFFECT = [
-    {"id": '1', "name": 'StringBMMBR1'.tr},
-    {"id": '2', "name": 'StringBMMBR2'.tr}
-  ].obs;
-
-  GetBuilder<Sale_Invoices_Controller> DropdownBra_InfBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Bra_Inf_Local>>(
-                future: GET_BRA(1),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Bra_Inf_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringBrach',
+                          searchMatchFn: (item, searchValue) {
+                            return (item.value
+                                .toString()
+                                .toLowerCase()
+                                .contains(searchValue));
+                          },
+                          searchInnerWidgetHeight: 50),
+                      //This to clear the search value when you close the menu
+                      onMenuStateChange: (isOpen) {
+                        if (!isOpen) {
+                          controller.TextEditingSercheController.clear();
+                        }
+                      },
                     );
-                  }
-                  return IgnorePointer(
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownBIL_DIS_ORDBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Bil_Dis_Local>>(
+                  future: GET_BIL_DIS(controller.SelectDataBIID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Bil_Dis_Local>> snapshot) {
+                    double height = MediaQuery
+                        .of(context)
+                        .size
+                        .height;
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringCollector_Ord'.tr,
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 13, horizontal: 8),
+                        labelText: 'StringCollector_Ord'.tr,
+                        labelStyle: TextStyle(color: Colors.grey.shade800),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(0.015 * height),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0.015 * height),
+                            borderSide: BorderSide(color: Colors.grey.shade400)),
+                      ),
+                      isDense: true,
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(
+                          context, 'StringCollector_Ord', Colors.grey, 'S'),
+                      items: snapshot.data!
+                          .map((item) =>
+                          DropdownMenuItem<String>(
+                            onTap: () {
+                              controller.SelectDataBDID_ORD =
+                                  item.BDID.toString();
+                              controller.update();
+                            },
+                            value: item.BDNA.toString(),
+                            child: Text(
+                              item.BDNA.toString(),
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'S'),
+                            ),
+                          ))
+                          .toList()
+                          .obs,
+                      value: controller.SelectDataBDID2_ORD,
+                      onChanged: (value) {
+                        controller.SelectDataBDID2_ORD = value.toString();
+                        controller.update();
+                      },
+                      dropdownStyleData: const DropdownStyleData(
+                        maxHeight: 250,
+                      ),
+                      dropdownSearchData: DropdownSearchData(
+                          searchController: controller
+                              .TextEditingSercheController,
+                          searchInnerWidget: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                              bottom: 4,
+                              right: 8,
+                              left: 8,
+                            ),
+                            child: TextFormField(
+                              controller: controller.TextEditingSercheController,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                suffixIcon: IconButton(icon: const Icon(
+                                  Icons.clear,
+                                  size: 20,
+                                ),
+                                  onPressed: () {
+                                    controller.TextEditingSercheController
+                                        .clear();
+                                    controller.update();
+                                  },),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                hintText: 'StringSearch_for_BDID'.tr,
+                                hintStyle: ThemeHelper().buildTextStyle(
+                                    context, Colors.grey, 'S'),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                          searchMatchFn: (item, searchValue) {
+                            return (item.value.toString().toLowerCase().contains(
+                                searchValue));
+                          },
+                          searchInnerWidgetHeight: 50),
+                      //This to clear the search value when you close the menu
+                      onMenuStateChange: (isOpen) {
+                        if (!isOpen) {
+                          controller.TextEditingSercheController.clear();
+                        }
+                      },
+                    );
+                  })));
+    }
+
+    final List<Map> items_ACCOUNTING_EFFECT = [
+      {"id": '1', "name": 'StringBMMBR1'.tr},
+      {"id": '2', "name": 'StringBMMBR2'.tr}
+    ].obs;
+
+    GetBuilder<Sale_Invoices_Controller> DropdownBra_InfBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Bra_Inf_Local>>(
+                  future: GET_BRA(1),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Bra_Inf_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringBrach',
+                      );
+                    }
+                    return IgnorePointer(
+                        ignoring: controller.edit == true ||
+                            controller.BMKID == 11
+                            || controller.BMKID == 12
+                            ? true
+                            : controller.CheckBack == 1
+                            ? true
+                            : false,
+                        child: DropdownButtonFormField2(
+                          decoration: ThemeHelper().InputDecorationDropDown(
+                              'StringBIIDlableText'.tr),
+                          isExpanded: true,
+                          hint: ThemeHelper().buildText(
+                              context, 'StringBrach', Colors.grey, 'S'),
+                          value: controller.SelectDataBIID,
+                          style: ThemeHelper().buildTextStyle(
+                              context, Colors.black, 'M'),
+                          items: snapshot.data!.map((item) =>
+                              DropdownMenuItem<String>(
+                                value: item.BIID.toString(),
+                                child: Text("${item.BIID.toString()} - ${item
+                                    .BINA_D.toString()}",
+                                  style: ThemeHelper().buildTextStyle(context,
+                                      Colors.black, 'M'),
+                                ),
+                              ))
+                              .toList()
+                              .obs,
+                          validator: (v) {
+                            if (v == null) {
+                              return 'StringBrach'.tr;
+                            }
+                            return null;
+                          },
+                          onChanged: (value) {
+                            //Do something when changing the item if you want.
+                            controller.SelectDataBIID = value.toString();
+                            controller.SelectDataSIID = null;
+                            controller.SelectDataACID = null;
+                            controller.SelectDataABID = null;
+                            controller.SelectDataBCCID = null;
+                            controller.update();
+                          },
+                        ));
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownSto_InfBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Sto_Inf_Local>>(
+                  future: Get_STO_INF(
+                      controller.BMKID!, controller.SelectDataBIID.toString(),
+                      controller.SelectDataBPID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Sto_Inf_Local>> snapshot) {
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringStoch',
+                      );
+                    } else if (snapshot.hasError) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringStoch',
+                      );
+                    }
+                    return IgnorePointer(
+                        ignoring: controller.edit == true ? true : controller
+                            .CheckBack == 1 ? true : false,
+                        child: DropdownButtonFormField2(
+                          decoration: ThemeHelper().InputDecorationDropDown(
+                              'StringSIIDlableText'.tr),
+                          isExpanded: true,
+                          hint: ThemeHelper().buildText(
+                              context, 'StringStoch', Colors.grey, 'S'),
+                          value: snapshot.data!.any((item) =>
+                          item.SIID.toString() == controller.SelectDataSIID)
+                              ? controller.SelectDataSIID : null,
+                          style: ThemeHelper().buildTextStyle(
+                              context, Colors.black, 'M'),
+                          items: snapshot.data!.map((item) =>
+                              DropdownMenuItem<String>(
+                                value: item.SIID.toString(),
+                                child: Text(
+                                  "${item.SIID.toString()} - ${item.SINA_D
+                                      .toString()}",
+                                  style: ThemeHelper().buildTextStyle(context,
+                                      Colors.black, 'M'),
+                                ),
+                              ))
+                              .toList()
+                              .obs,
+                          validator: (value) {
+                            if (value == null) {
+                              return 'StringStoch'.tr;
+                            }
+                            return null;
+                          },
+                          onChanged: (value) {
+                            //Do something when changing the item if you want.
+                            controller.SelectDataSIID = value.toString();
+                            controller.update();
+                          },
+                          dropdownStyleData: const DropdownStyleData(
+                            maxHeight: 400,
+                          ),
+                        ));
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownSTO_INF_DBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Sto_Inf_Local>>(
+                  future: Get_STO_INF(
+                      controller.BMKID!,
+                      controller.SelectDataBIID.toString(),
+                      controller.SelectDataBPID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Sto_Inf_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringStoch',
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: ThemeHelper().InputDecorationDropDown(
+                          'StringSIIDlableText'.tr),
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(
+                          context, 'StringStoch', Colors.grey, 'S'),
+                      value: controller.SIID_V2,
+                      style: ThemeHelper().buildTextStyle(
+                          context, Colors.black, 'M'),
+                      items: snapshot.data!
+                          .map((item) =>
+                          DropdownMenuItem<String>(
+                            value: item.SIID.toString(),
+                            child: Text(
+                              item.SINA_D.toString(),
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'M'),
+                            ),
+                          )).toList().obs,
+                      validator: (value) {
+                        if (value == null) {
+                          return 'StringStoch'.tr;
+                        }
+                        return null;
+                      },
+                      onChanged: (value) async {
+                        //Do something when changing the item if you want.
+                        SIID_V2 = value.toString();
+                        await GETSNDE_ONE();
+                        controller.update();
+                      },
+                      dropdownStyleData: const DropdownStyleData(
+                        maxHeight: 400,
+                      ),
+                    );
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownBil_PoiBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Bil_Poi_Local>>(
+                  future: GET_BIL_POI(controller.SelectDataBIID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Bil_Poi_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: '',
+                      );
+                    }
+                    return IgnorePointer(
                       ignoring: controller.edit == true ||
-                          controller.BMKID == 11
-                          || controller.BMKID == 12
+                          controller.BMKID == 11 || controller.BMKID == 12
                           ? true
                           : controller.CheckBack == 1
                           ? true
                           : false,
                       child: DropdownButtonFormField2(
-                        decoration: ThemeHelper().InputDecorationDropDown(
-                            'StringBIIDlableText'.tr),
+                        decoration: ThemeHelper().InputDecorationDropDown('StringBPIDlableText'.tr),
                         isExpanded: true,
-                        hint: ThemeHelper().buildText(
-                            context, 'StringBrach', Colors.grey, 'S'),
-                        value: controller.SelectDataBIID,
-                        style: ThemeHelper().buildTextStyle(
-                            context, Colors.black, 'M'),
-                        items: snapshot.data!.map((item) =>
+                        hint: ThemeHelper().buildText(context, 'StringBrach', Colors.grey, 'S'),
+                        value: controller.SelectDataBPID,
+                        style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                        items: snapshot.data!
+                            .map((item) =>
                             DropdownMenuItem<String>(
-                              value: item.BIID.toString(),
-                              child: Text("${item.BIID.toString()} - ${item
-                                  .BINA_D.toString()}",
+                              onTap: () {
+                                controller.PKIDL == item.PKIDL;
+                              },
+                              value: item.BPID.toString(),
+                              child: Text(
+                                "${item.BPID.toString()} - ${item.BPNA_D
+                                    .toString()}",
                                 style: ThemeHelper().buildTextStyle(context,
                                     Colors.black, 'M'),
                               ),
-                            ))
-                            .toList()
-                            .obs,
+                            )).toList().obs,
                         validator: (v) {
                           if (v == null) {
                             return 'StringBrach'.tr;
@@ -9702,279 +9932,327 @@ class Sale_Invoices_Controller extends GetxController {
                           return null;
                         },
                         onChanged: (value) {
-                          //Do something when changing the item if you want.
-                          controller.SelectDataBIID = value.toString();
-                          controller.SelectDataSIID = null;
-                          controller.SelectDataACID = null;
-                          controller.SelectDataABID = null;
-                          controller.SelectDataBCCID = null;
-                          controller.update();
+                          controller.SelectDataBPID = value.toString();
                         },
-                      ));
-                })));
-  }
+                      ),
+                    );
+                  })));
+    }
 
-  GetBuilder<Sale_Invoices_Controller> DropdownSto_InfBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Sto_Inf_Local>>(
-                future: Get_STO_INF(
-                    controller.BMKID!, controller.SelectDataBIID.toString(),
-                    controller.SelectDataBPID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Sto_Inf_Local>> snapshot) {
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringStoch',
+    GetBuilder<Sale_Invoices_Controller> DropdownACC_COSBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Acc_Cos_Local>>(
+                  future: GET_ACC_COS(),
+                  builder: (BuildContext context, AsyncSnapshot<List<Acc_Cos_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringChi_ACNO',
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: ThemeHelper().InputDecorationDropDown('StringACNOlableText'.tr),
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(context, 'StringChi_ACNO', Colors.grey, 'S'),
+                      value: controller.SelectDataACNO,
+                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                      items: snapshot.data!.map((item) =>
+                          DropdownMenuItem<String>(
+                            value: item.ACNO.toString(),
+                            child: Text("${item.ACNO.toString()} - ${item.ACNA_D.toString()}",
+                              style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                            ),
+                          )).toList().obs,
+                      onChanged: (value) {
+                        controller.SelectDataACNO = value.toString();
+                        controller.update();
+                      },
                     );
-                  } else if (snapshot.hasError) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringStoch',
+                  })));
+    }
+
+    FutureBuilder<List<Sys_Cur_Local>> DropdownSYS_CURBuilder() {
+      return FutureBuilder<List<Sys_Cur_Local>>(
+          future: GET_SYS_CUR(),
+          builder: (BuildContext context,
+              AsyncSnapshot<List<Sys_Cur_Local>> snapshot) {
+            if (!snapshot.hasData) {
+              return Dropdown(
+                josnStatus: josnStatus,
+                GETSTRING: 'StringChi_currency'.tr,
+              );
+            }
+            return IgnorePointer(
+                ignoring: edit == true || BMKID == 11 || BMKID == 12
+                    ? true
+                    : CheckBack == 1
+                    ? true
+                    : false,
+                child: DropdownButtonFormField2(
+                  decoration: ThemeHelper().InputDecorationDropDown(
+                      "${'StringSCIDlableText'.tr}  ${'Stringexchangerate'
+                          .tr} ${SCEXController.text}"),
+                  isExpanded: true,
+                  hint: ThemeHelper().buildText(
+                      context, 'StringChi_currency', Colors.grey, 'S'),
+                  iconStyleData: IconStyleData(
+                    icon: SelectDataSCID == null || edit == true || CheckBack == 1
+                        || BMKID == 11 || BMKID == 12 ? const Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.black45,
+                    ) : IconButton(icon: Icon(Icons.error_outline), iconSize: 21,
+                        onPressed: () {
+                          GET_SYS_CUR_DAT_P(SelectDataSCID.toString());
+                          buildShowSYS_CUR(context);
+                        },
+                        padding: EdgeInsets.only(bottom: 12, right: 25)),
+                  ),
+                  value: SelectDataSCID,
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                  items: snapshot.data!.map((item) =>
+                      DropdownMenuItem<String>(
+                        value: item.SCID.toString(),
+                        onTap: () {
+                          SCEXController.text = item.SCEX.toString();
+                          SCHRController.text = item.SCHR.toString();
+                          SCLRController.text = item.SCLR.toString();
+                          SCNA = item.SCNA_D.toString();
+                          SCSY = item.SCSY!;
+                          SCSFL = item.SCSFL!;
+                          update();
+                        },
+                        child: Text(
+                          "${item.SCSY.toString()} - ${item.SCNA_D.toString()}",
+                          style: ThemeHelper().buildTextStyle(
+                              context, Colors.black, 'M'),
+                        ),
+                      ))
+                      .toList()
+                      .obs,
+                  validator: (v) {
+                    if (v == null) {
+                      return 'StringBrach'.tr;
+                    };
+                    return null;
+                  },
+                  onChanged: (value)  {
+                    SelectDataSCID = value.toString();
+                    update();
+                    GET_BIL_ACC_C_P(AANOController.text, GUIDC, SelectDataBIID.toString(),
+                        value.toString(),PKID.toString(),GETBMMID: BMMID.toString());
+                    update();
+                  },
+                ));
+          });
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownPAY_KINBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Pay_Kin_Local>>(
+                  future: GET_PAY_KIN(controller.BMKID!,
+                      controller.BMKID == 3 || controller.BMKID == 5 ||
+                          controller.BMKID == 4 || controller.BMKID == 7 ||
+                          controller.BMKID == 10 ? 'BO'
+                          : (controller.BMKID == 1 ||  controller.BMKID == 2)
+                          ? 'BI'
+                          : 'BF',
+                      controller.UPIN_PKID, controller.SelectDataBPID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Pay_Kin_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringChi_PAY'.tr,
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: ThemeHelper().InputDecorationDropDown(
+                          'StringPKIDlableText'.tr),
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(
+                          context, 'StringChi_PAY', Colors.grey, 'S'),
+                      value: controller.PKID.toString(),
+                      style: ThemeHelper().buildTextStyle(
+                          context, Colors.black, 'M'),
+                      items: snapshot.data!.map((item) =>
+                          DropdownMenuItem<String>(
+                            onTap: () {
+                              controller.PKNA = item.PKNA_D.toString();
+                            },
+                            value: item.PKID.toString(),
+                            child: Text(
+                              "${item.PKID.toString()} - ${item.PKNA_D
+                                  .toString()}",
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'M'),
+                            ),
+                          ))
+                          .toList()
+                          .obs,
+                      validator: (v) {
+                        if (v == null) {
+                          return 'StringBrach'.tr;
+                        };
+                        return null;
+                      },
+                      onChanged: (value) {
+                        controller.SelectDataPKID = value.toString();
+                        controller.PKID = int.parse(value.toString());
+                        if (value.toString() == '3') {
+                          String DATEBMMCD = '';
+                          DATEBMMCD = DateFormat('dd-MM-yyyy')
+                              .format(
+                              controller.BMMCD.add(const Duration(days: 3)))
+                              .toString()
+                              .split(" ")[0];
+                          controller.BMMCD.add(const Duration(days: 3))
+                              .toString();
+                          controller.BMMCDController.text =
+                              DATEBMMCD.substring(0, 10);
+                          controller.update();
+                        }
+                        // GET_Allow_give_Free_Quantities();
+                        // GET_Allow_give_Discount();
+                        controller.update();
+                      },
                     );
-                  }
-                  return IgnorePointer(
-                      ignoring: controller.edit == true ? true : controller
-                          .CheckBack == 1 ? true : false,
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownACC_CASBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Acc_Cas_Local>>(
+                  future: GET_ACC_CAS(controller.SelectDataBIID.toString(),
+                      controller.SelectDataSCID.toString(),
+                      (controller.BMKID == 1 || controller.BMKID == 2) ? 'BI' : controller.BMKID == 3
+                          ? 'BO'
+                          : controller.BMKID == 4 ? 'BO' : controller.BMKID == 5
+                          ? 'BS'
+                          : 'BF', controller.BMKID!),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Acc_Cas_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringCashier',
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: ThemeHelper().InputDecorationDropDown(
+                          'StringCashier'.tr),
+                      isDense: true,
+                      isExpanded: true,
+                      hint: ThemeHelper().buildText(
+                          context, 'StringCashier', Colors.grey, 'S'),
+                      items: snapshot.data!.map((item) =>
+                          DropdownMenuItem<String>(
+                            value: item.ACID.toString(),
+                            child: Text(
+                              "${item.ACID.toString()} - ${item.ACNA_D
+                                  .toString()}",
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'M'),
+                            ),
+                          ))
+                          .toList()
+                          .obs,
+                      value: controller.SelectDataACID,
+                      onChanged: (value) {
+                        controller.SelectDataACID = value as String;
+                        update();
+                      },
+                      dropdownStyleData: const DropdownStyleData(
+                        maxHeight: 250,
+                      ),
+                    );
+                  })));
+    }
+
+    GetBuilder<Sale_Invoices_Controller> DropdownDiscountTYPEBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<List_Value>>(
+                  future: GET_LIST_VALUE('BMMDN'),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<List_Value>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringBrach',
+                      );
+                    }
+                    return IgnorePointer(
+                      ignoring: controller.edit == true ||
+                          controller.CheckBack == 1
+                          ? true
+                          : false,
                       child: DropdownButtonFormField2(
                         decoration: ThemeHelper().InputDecorationDropDown(
-                            'StringSIIDlableText'.tr),
+                            'StringDiscount_TYPE'.tr),
                         isExpanded: true,
                         hint: ThemeHelper().buildText(
-                            context, 'StringStoch', Colors.grey, 'S'),
-                        value: snapshot.data!.any((item) =>
-                        item.SIID.toString() == controller.SelectDataSIID)
-                            ? controller.SelectDataSIID : null,
+                            context, 'StringDiscount_TYPE', Colors.grey, 'S'),
+                        value: controller.SelectDataBMMDN,
                         style: ThemeHelper().buildTextStyle(
                             context, Colors.black, 'M'),
-                        items: snapshot.data!.map((item) =>
+                        items: snapshot.data!
+                            .map((item) =>
                             DropdownMenuItem<String>(
-                              value: item.SIID.toString(),
+                              value: item.LVID.toString(),
                               child: Text(
-                                "${item.SIID.toString()} - ${item.SINA_D
-                                    .toString()}",
+                                item.LVNA_D.toString(),
                                 style: ThemeHelper().buildTextStyle(context,
-                                    Colors.black, 'M'),
+                                    Colors.black, 'S'),
                               ),
                             ))
                             .toList()
                             .obs,
-                        validator: (value) {
-                          if (value == null) {
-                            return 'StringStoch'.tr;
-                          }
-                          return null;
-                        },
                         onChanged: (value) {
-                          //Do something when changing the item if you want.
-                          controller.SelectDataSIID = value.toString();
+                          // Do something when changing the item if you want.
+                          if (value.toString() == '0') {
+                            if (controller.SelectDataBMMDN == '1' &&
+                                controller.CheckBack == 1) {
+                              buildShowTotal2(context);
+                            } else {
+                              controller.SelectDataBMMDN = '0';
+                              controller.BMMDIRController.text = '0';
+                              controller.BMMDIController.text = '0';
+                              controller.update();
+                            }
+                          } else {
+                            controller.SelectDataBMMDN = '1';
+                            controller.update();
+                          }
                           controller.update();
                         },
-                        dropdownStyleData: const DropdownStyleData(
-                          maxHeight: 400,
-                        ),
-                      ));
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownSTO_INF_DBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Sto_Inf_Local>>(
-                future: Get_STO_INF(
-                    controller.BMKID!,
-                    controller.SelectDataBIID.toString(),
-                    controller.SelectDataBPID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Sto_Inf_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringStoch',
+                      ),
                     );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown(
-                        'StringSIIDlableText'.tr),
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringStoch', Colors.grey, 'S'),
-                    value: controller.SIID_V2,
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
-                    items: snapshot.data!
-                        .map((item) =>
-                        DropdownMenuItem<String>(
-                          value: item.SIID.toString(),
-                          child: Text(
-                            item.SINA_D.toString(),
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        )).toList().obs,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'StringStoch'.tr;
-                      }
-                      return null;
-                    },
-                    onChanged: (value) async {
-                      //Do something when changing the item if you want.
-                      SIID_V2 = value.toString();
-                      await GETSNDE_ONE();
-                      controller.update();
-                    },
-                    dropdownStyleData: const DropdownStyleData(
-                      maxHeight: 400,
-                    ),
-                  );
-                })));
-  }
+                  })));
+    }
 
-  GetBuilder<Sale_Invoices_Controller> DropdownBil_PoiBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Bil_Poi_Local>>(
-                future: GET_BIL_POI(controller.SelectDataBIID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Bil_Poi_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: '',
-                    );
-                  }
-                  return IgnorePointer(
-                    ignoring: controller.edit == true ||
-                        controller.BMKID == 11 || controller.BMKID == 12
-                        ? true
-                        : controller.CheckBack == 1
-                        ? true
-                        : false,
-                    child: DropdownButtonFormField2(
-                      decoration: ThemeHelper().InputDecorationDropDown('StringBPIDlableText'.tr),
-                      isExpanded: true,
-                      hint: ThemeHelper().buildText(context, 'StringBrach', Colors.grey, 'S'),
-                      value: controller.SelectDataBPID,
-                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                      items: snapshot.data!
-                          .map((item) =>
-                          DropdownMenuItem<String>(
-                            onTap: () {
-                              controller.PKIDL == item.PKIDL;
-                            },
-                            value: item.BPID.toString(),
-                            child: Text(
-                              "${item.BPID.toString()} - ${item.BPNA_D
-                                  .toString()}",
-                              style: ThemeHelper().buildTextStyle(context,
-                                  Colors.black, 'M'),
-                            ),
-                          )).toList().obs,
-                      validator: (v) {
-                        if (v == null) {
-                          return 'StringBrach'.tr;
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        controller.SelectDataBPID = value.toString();
-                      },
-                    ),
-                  );
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownACC_COSBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Acc_Cos_Local>>(
-                future: GET_ACC_COS(),
-                builder: (BuildContext context, AsyncSnapshot<List<Acc_Cos_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringChi_ACNO',
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown('StringACNOlableText'.tr),
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(context, 'StringChi_ACNO', Colors.grey, 'S'),
-                    value: controller.SelectDataACNO,
-                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          value: item.ACNO.toString(),
-                          child: Text("${item.ACNO.toString()} - ${item.ACNA_D.toString()}",
-                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                          ),
-                        )).toList().obs,
-                    onChanged: (value) {
-                      controller.SelectDataACNO = value.toString();
-                      controller.update();
-                    },
-                  );
-                })));
-  }
-
-  FutureBuilder<List<Sys_Cur_Local>> DropdownSYS_CURBuilder() {
-    return FutureBuilder<List<Sys_Cur_Local>>(
-        future: GET_SYS_CUR(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Sys_Cur_Local>> snapshot) {
-          if (!snapshot.hasData) {
-            return Dropdown(
-              josnStatus: josnStatus,
-              GETSTRING: 'StringChi_currency'.tr,
-            );
-          }
-          return IgnorePointer(
-              ignoring: edit == true || BMKID == 11 || BMKID == 12
-                  ? true
-                  : CheckBack == 1
-                  ? true
-                  : false,
-              child: DropdownButtonFormField2(
+    GetBuilder<Sale_Invoices_Controller> DropdownACCOUNTING_EFFECTBuilder(BuildContext context) {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              DropdownButtonFormField2(
                 decoration: ThemeHelper().InputDecorationDropDown(
-                    "${'StringSCIDlableText'.tr}  ${'Stringexchangerate'
-                        .tr} ${SCEXController.text}"),
+                    'StringBMMBR'.tr),
                 isExpanded: true,
-                hint: ThemeHelper().buildText(
-                    context, 'StringChi_currency', Colors.grey, 'S'),
-                iconStyleData: IconStyleData(
-                  icon: SelectDataSCID == null || edit == true || CheckBack == 1
-                      || BMKID == 11 || BMKID == 12 ? const Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.black45,
-                  ) : IconButton(icon: Icon(Icons.error_outline), iconSize: 21,
-                      onPressed: () {
-                        GET_SYS_CUR_DAT_P(SelectDataSCID.toString());
-                        buildShowSYS_CUR(context);
-                      },
-                      padding: EdgeInsets.only(bottom: 12, right: 25)),
-                ),
-                value: SelectDataSCID,
+                value: controller.SelectDataBMMBR,
                 style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                items: snapshot.data!.map((item) =>
+                items: items_ACCOUNTING_EFFECT
+                    .map((item) =>
                     DropdownMenuItem<String>(
-                      value: item.SCID.toString(),
-                      onTap: () {
-                        SCEXController.text = item.SCEX.toString();
-                        SCHRController.text = item.SCHR.toString();
-                        SCLRController.text = item.SCLR.toString();
-                        SCNA = item.SCNA_D.toString();
-                        SCSY = item.SCSY!;
-                        SCSFL = item.SCSFL!;
-                        update();
-                      },
+                      value: item['id'],
                       child: Text(
-                        "${item.SCSY.toString()} - ${item.SCNA_D.toString()}",
+                        item['name'],
                         style: ThemeHelper().buildTextStyle(
                             context, Colors.black, 'M'),
                       ),
@@ -9984,1076 +10262,837 @@ class Sale_Invoices_Controller extends GetxController {
                 validator: (v) {
                   if (v == null) {
                     return 'StringBrach'.tr;
-                  };
+                  }
                   return null;
                 },
-                onChanged: (value)  {
-                  SelectDataSCID = value.toString();
-                  update();
-                  GET_BIL_ACC_C_P(AANOController.text, GUIDC, SelectDataBIID.toString(),
-                      value.toString(),PKID.toString(),GETBMMID: BMMID.toString());
-                  update();
+                onChanged: (value) {
+                  //Do something when changing the item if you want.
+                  controller.SelectDataBMMBR = value.toString();
                 },
-              ));
-        });
-  }
+              )));
+    }
 
-  GetBuilder<Sale_Invoices_Controller> DropdownPAY_KINBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Pay_Kin_Local>>(
-                future: GET_PAY_KIN(controller.BMKID!,
-                    controller.BMKID == 3 || controller.BMKID == 5 ||
-                        controller.BMKID == 4 || controller.BMKID == 7 ||
-                        controller.BMKID == 10 ? 'BO'
-                        : (controller.BMKID == 1 ||  controller.BMKID == 2)
-                        ? 'BI'
-                        : 'BF',
-                    controller.UPIN_PKID, controller.SelectDataBPID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Pay_Kin_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringChi_PAY'.tr,
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown(
-                        'StringPKIDlableText'.tr),
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringChi_PAY', Colors.grey, 'S'),
-                    value: controller.PKID.toString(),
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M'),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          onTap: () {
-                            controller.PKNA = item.PKNA_D.toString();
-                          },
-                          value: item.PKID.toString(),
-                          child: Text(
-                            "${item.PKID.toString()} - ${item.PKNA_D
-                                .toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        ))
-                        .toList()
-                        .obs,
-                    validator: (v) {
-                      if (v == null) {
-                        return 'StringBrach'.tr;
-                      };
-                      return null;
-                    },
-                    onChanged: (value) {
-                      controller.SelectDataPKID = value.toString();
-                      controller.PKID = int.parse(value.toString());
-                      if (value.toString() == '3') {
-                        String DATEBMMCD = '';
-                        DATEBMMCD = DateFormat('dd-MM-yyyy')
-                            .format(
-                            controller.BMMCD.add(const Duration(days: 3)))
-                            .toString()
-                            .split(" ")[0];
-                        controller.BMMCD.add(const Duration(days: 3))
-                            .toString();
-                        controller.BMMCDController.text =
-                            DATEBMMCD.substring(0, 10);
-                        controller.update();
-                      }
-                      // GET_Allow_give_Free_Quantities();
-                      // GET_Allow_give_Discount();
-                      controller.update();
-                    },
-                  );
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownACC_CASBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Acc_Cas_Local>>(
-                future: GET_ACC_CAS(controller.SelectDataBIID.toString(),
-                    controller.SelectDataSCID.toString(),
-                    (controller.BMKID == 1 || controller.BMKID == 2) ? 'BI' : controller.BMKID == 3
-                        ? 'BO'
-                        : controller.BMKID == 4 ? 'BO' : controller.BMKID == 5
-                        ? 'BS'
-                        : 'BF', controller.BMKID!),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Acc_Cas_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringCashier',
-                    );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown(
-                        'StringCashier'.tr),
-                    isDense: true,
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringCashier', Colors.grey, 'S'),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          value: item.ACID.toString(),
-                          child: Text(
-                            "${item.ACID.toString()} - ${item.ACNA_D
-                                .toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        ))
-                        .toList()
-                        .obs,
-                    value: controller.SelectDataACID,
-                    onChanged: (value) {
-                      controller.SelectDataACID = value as String;
-                      update();
-                    },
-                    dropdownStyleData: const DropdownStyleData(
-                      maxHeight: 250,
-                    ),
-                  );
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownDiscountTYPEBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<List_Value>>(
-                future: GET_LIST_VALUE('BMMDN'),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<List_Value>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringBrach',
-                    );
-                  }
-                  return IgnorePointer(
-                    ignoring: controller.edit == true ||
-                        controller.CheckBack == 1
-                        ? true
-                        : false,
-                    child: DropdownButtonFormField2(
-                      decoration: ThemeHelper().InputDecorationDropDown(
-                          'StringDiscount_TYPE'.tr),
+    GetBuilder<Sale_Invoices_Controller> DropdownACC_BANBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: ((controller) =>
+              FutureBuilder<List<Acc_Ban_Local>>(
+                  future: GET_ACC_BAN(controller.SelectDataBIID.toString()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Acc_Ban_Local>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Dropdown(
+                        josnStatus: josnStatus,
+                        GETSTRING: 'StringBrach',
+                      );
+                    }
+                    return DropdownButtonFormField2(
+                      decoration: ThemeHelper().InputDecorationDropDown('StringBank'.tr),
                       isExpanded: true,
                       hint: ThemeHelper().buildText(
-                          context, 'StringDiscount_TYPE', Colors.grey, 'S'),
-                      value: controller.SelectDataBMMDN,
-                      style: ThemeHelper().buildTextStyle(
-                          context, Colors.black, 'M'),
-                      items: snapshot.data!
-                          .map((item) =>
+                          context, 'StringvalidateABID', Colors.grey, 'S'),
+                      value: controller.SelectDataABID,
+                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                      items: snapshot.data!.map((item) =>
                           DropdownMenuItem<String>(
-                            value: item.LVID.toString(),
+                            value: item.ABID.toString(),
                             child: Text(
-                              item.LVNA_D.toString(),
-                              style: ThemeHelper().buildTextStyle(context,
-                                  Colors.black, 'S'),
+                              "${item.ABID.toString()} - ${item.ABNA_D
+                                  .toString()}",
+                              style: ThemeHelper().buildTextStyle(
+                                  context, Colors.black, 'M'),
                             ),
                           ))
                           .toList()
                           .obs,
                       onChanged: (value) {
-                        // Do something when changing the item if you want.
-                        if (value.toString() == '0') {
-                          if (controller.SelectDataBMMDN == '1' &&
-                              controller.CheckBack == 1) {
-                            buildShowTotal2(context);
-                          } else {
-                            controller.SelectDataBMMDN = '0';
-                            controller.BMMDIRController.text = '0';
-                            controller.BMMDIController.text = '0';
-                            controller.update();
-                          }
-                        } else {
-                          controller.SelectDataBMMDN = '1';
-                          controller.update();
-                        }
+                        //Do something when changing the item if you want.
+                        controller.SelectDataABID = value.toString();
                         controller.update();
                       },
-                    ),
-                  );
-                })));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownACCOUNTING_EFFECTBuilder(BuildContext context) {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            DropdownButtonFormField2(
-              decoration: ThemeHelper().InputDecorationDropDown(
-                  'StringBMMBR'.tr),
-              isExpanded: true,
-              value: controller.SelectDataBMMBR,
-              style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-              items: items_ACCOUNTING_EFFECT
-                  .map((item) =>
-                  DropdownMenuItem<String>(
-                    value: item['id'],
-                    child: Text(
-                      item['name'],
-                      style: ThemeHelper().buildTextStyle(
-                          context, Colors.black, 'M'),
-                    ),
-                  ))
-                  .toList()
-                  .obs,
-              validator: (v) {
-                if (v == null) {
-                  return 'StringBrach'.tr;
-                }
-                return null;
-              },
-              onChanged: (value) {
-                //Do something when changing the item if you want.
-                controller.SelectDataBMMBR = value.toString();
-              },
-            )));
-  }
-
-  GetBuilder<Sale_Invoices_Controller> DropdownACC_BANBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: ((controller) =>
-            FutureBuilder<List<Acc_Ban_Local>>(
-                future: GET_ACC_BAN(controller.SelectDataBIID.toString()),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Acc_Ban_Local>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Dropdown(
-                      josnStatus: josnStatus,
-                      GETSTRING: 'StringBrach',
                     );
-                  }
-                  return DropdownButtonFormField2(
-                    decoration: ThemeHelper().InputDecorationDropDown('StringBank'.tr),
-                    isExpanded: true,
-                    hint: ThemeHelper().buildText(
-                        context, 'StringvalidateABID', Colors.grey, 'S'),
-                    value: controller.SelectDataABID,
-                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                    items: snapshot.data!.map((item) =>
-                        DropdownMenuItem<String>(
-                          value: item.ABID.toString(),
-                          child: Text(
-                            "${item.ABID.toString()} - ${item.ABNA_D
-                                .toString()}",
-                            style: ThemeHelper().buildTextStyle(
-                                context, Colors.black, 'M'),
-                          ),
-                        ))
-                        .toList()
-                        .obs,
-                    onChanged: (value) {
-                      //Do something when changing the item if you want.
-                      controller.SelectDataABID = value.toString();
-                      controller.update();
-                    },
-                  );
-                })));
-  }
+                  })));
+    }
 
-  GetBuilder<Sale_Invoices_Controller> DropdownBIL_IMPBuilder() {
-    return GetBuilder<Sale_Invoices_Controller>(
-        init: Sale_Invoices_Controller(),
-        builder: (controller) => FutureBuilder<List<Bil_Imp_Local>>(
-          future: GET_BIL_IMP(),
-          builder: (BuildContext context, AsyncSnapshot<List<Bil_Imp_Local>> snapshot) {
-            if (!snapshot.hasData) {
-              return Dropdown(
-                josnStatus: josnStatus,
-                GETSTRING: 'StringSupplier'.tr,
-              );
-            }
-            return IgnorePointer(
-              ignoring:  _isIgnoringDropdown_IMP(),
-              child: DropdownButtonFormField2(
-                decoration: ThemeHelper().InputDecorationDropDown(
-                    suffixIconColor: Colors.black45,
-                    suffixIcon:_isIgnoringDropdown_IMP()?null: _buildSuffixIcon_IMP(),
-                    "${'StringSupplier'.tr}  ${'StringCUS_BAL'.tr} ${controller.formatter.format(controller.BACBA).toString()}"),
-                isDense: true,
-                isExpanded: true,
-                hint: ThemeHelper().buildText(context, 'StringSupplier', Colors.grey, 'S'),
-                iconStyleData: IconStyleData(
-                  icon: controller.SelectDataBIID2 == null
-                      ?snapshot.connectionState == ConnectionState.waiting
-                      ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.black45,
-                    ),
-                  )
-                      : const Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.black45,
-                  )
-                      : InkWell(
-                    onTap: () {
-                      controller.buildShowBIL_ACC_C(context);
-                    },
-                    child: const Icon(
-                      Icons.error_outline,
-                      color: Colors.black45,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                items: snapshot.data!.map((item) => DropdownMenuItem<String>(
-                  onTap: () async {
-                    controller.BCNAController.text = item.BINA.toString();
-                    controller.AANOController.text = item.AANO.toString();
-                    controller.GUIDC = item.GUID.toString();
-                    controller.BCMOController.text = item.BIMO.toString();
-                    controller.BIIDB = item.BIID;
-                    controller.PKID_C = item.PKID;
-                    controller.BCCT = item.BICT;
-                    controller.SCID_C = item.SCID;
-                    controller.BCAD_D = item.BIAD.toString();
-                    controller.GET_BIL_ACC_C_P(
-                        controller.AANOController.text,
-                        controller.GUIDC,
-                        controller.SelectDataBIID.toString(),
-                        controller.SelectDataSCID.toString(),
-                        PKID.toString(),GETBMMID: BMMID.toString());
-                    await controller.GET_TAX_LIN_CUS_IMP_P(
-                        'IMP', item.AANO.toString(), item.BIID.toString());
-                  },
-                  value: "${item.BIID.toString() + " +++ " + item.BINA_D.toString()}",
-                  child: Text(
-                    "${item.BIID.toString()} - ${item.BINA_D.toString()}",
-                    style: ThemeHelper()
-                        .buildTextStyle(context, Colors.black, 'M'),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )).toList().obs,
-                value: controller.SelectDataBIID3,
-                onChanged: (value) {
-                  controller.SelectDataBIID3 = value as String;
-                  controller.SelectDataBIID2 = value.toString().split(" +++ ")[0];
-                  controller.update();
-                },
-                dropdownStyleData: const DropdownStyleData(
-                  maxHeight: 300,
-                ),
-                dropdownSearchData: DropdownSearchData(
-                    searchController: controller.TextEditingSercheController,
-                    searchInnerWidget: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 8,
+    GetBuilder<Sale_Invoices_Controller> DropdownBIL_IMPBuilder() {
+      return GetBuilder<Sale_Invoices_Controller>(
+          init: Sale_Invoices_Controller(),
+          builder: (controller) => FutureBuilder<List<Bil_Imp_Local>>(
+            future: GET_BIL_IMP(),
+            builder: (BuildContext context, AsyncSnapshot<List<Bil_Imp_Local>> snapshot) {
+              if (!snapshot.hasData) {
+                return Dropdown(
+                  josnStatus: josnStatus,
+                  GETSTRING: 'StringSupplier'.tr,
+                );
+              }
+              return IgnorePointer(
+                ignoring:  _isIgnoringDropdown_IMP(),
+                child: DropdownButtonFormField2(
+                  decoration: ThemeHelper().InputDecorationDropDown(
+                      suffixIconColor: Colors.black45,
+                      suffixIcon:_isIgnoringDropdown_IMP()?null: _buildSuffixIcon_IMP(),
+                      "${'StringSupplier'.tr}  ${'StringCUS_BAL'.tr} ${controller.formatter.format(controller.BACBA).toString()}"),
+                  isDense: true,
+                  isExpanded: true,
+                  hint: ThemeHelper().buildText(context, 'StringSupplier', Colors.grey, 'S'),
+                  iconStyleData: IconStyleData(
+                    icon: controller.SelectDataBIID2 == null
+                        ?snapshot.connectionState == ConnectionState.waiting
+                        ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.black45,
                       ),
-                      child: TextFormField(
-                        controller: controller.TextEditingSercheController,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.clear, size: 20),
-                            onPressed: () {
-                              controller.TextEditingSercheController.clear();
-                              controller.update();
-                            },
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
-                          ),
-                          hintText: 'StringSearch_for_BIID'.tr,
-                          hintStyle: ThemeHelper()
-                              .buildTextStyle(context, Colors.grey, 'S'),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    )
+                        : const Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.black45,
+                    )
+                        : InkWell(
+                      onTap: () {
+                        controller.buildShowBIL_ACC_C(context);
+                      },
+                      child: const Icon(
+                        Icons.error_outline,
+                        color: Colors.black45,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  items: snapshot.data!.map((item) => DropdownMenuItem<String>(
+                    onTap: () async {
+                      controller.BCNAController.text = item.BINA.toString();
+                      controller.AANOController.text = item.AANO.toString();
+                      controller.GUIDC = item.GUID.toString();
+                      controller.BCMOController.text = item.BIMO.toString();
+                      controller.BIIDB = item.BIID;
+                      controller.PKID_C = item.PKID;
+                      controller.BCCT = item.BICT;
+                      controller.SCID_C = item.SCID;
+                      controller.BCAD_D = item.BIAD.toString();
+                      controller.GET_BIL_ACC_C_P(
+                          controller.AANOController.text,
+                          controller.GUIDC,
+                          controller.SelectDataBIID.toString(),
+                          controller.SelectDataSCID.toString(),
+                          PKID.toString(),GETBMMID: BMMID.toString());
+                      await controller.GET_TAX_LIN_CUS_IMP_P(
+                          'IMP', item.AANO.toString(), item.BIID.toString());
+                    },
+                    value: "${item.BIID.toString() + " +++ " + item.BINA_D.toString()}",
+                    child: Text(
+                      "${item.BIID.toString()} - ${item.BINA_D.toString()}",
+                      style: ThemeHelper()
+                          .buildTextStyle(context, Colors.black, 'M'),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )).toList().obs,
+                  value: controller.SelectDataBIID3,
+                  onChanged: (value) {
+                    controller.SelectDataBIID3 = value as String;
+                    controller.SelectDataBIID2 = value.toString().split(" +++ ")[0];
+                    controller.update();
+                  },
+                  dropdownStyleData: const DropdownStyleData(
+                    maxHeight: 300,
+                  ),
+                  dropdownSearchData: DropdownSearchData(
+                      searchController: controller.TextEditingSercheController,
+                      searchInnerWidget: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 8,
+                        ),
+                        child: TextFormField(
+                          controller: controller.TextEditingSercheController,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.clear, size: 20),
+                              onPressed: () {
+                                controller.TextEditingSercheController.clear();
+                                controller.update();
+                              },
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            hintText: 'StringSearch_for_BIID'.tr,
+                            hintStyle: ThemeHelper()
+                                .buildTextStyle(context, Colors.grey, 'S'),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    searchMatchFn: (item, searchValue) {
-                      return (item.value
-                          .toString()
-                          .toLowerCase()
-                          .contains(searchValue.toLowerCase()));
-                    },
-                    searchInnerWidgetHeight: 50),
-                onMenuStateChange: (isOpen) {
-                  if (!isOpen) {
-                    controller.TextEditingSercheController.clear();
-                  }
-                },
-              ),
-            );
-          },
-        ));
-  }
+                      searchMatchFn: (item, searchValue) {
+                        return (item.value
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchValue.toLowerCase()));
+                      },
+                      searchInnerWidgetHeight: 50),
+                  onMenuStateChange: (isOpen) {
+                    if (!isOpen) {
+                      controller.TextEditingSercheController.clear();
+                    }
+                  },
+                ),
+              );
+            },
+          ));
+    }
 
-  // دالة لإنشاء أيقونة النهاية
-  Widget _buildSuffixIcon_IMP() {
-    return IconButton(
-      icon: const Icon(Icons.cancel, size: 23),
-      onPressed: () {
-        SelectDataBIID3 = null;
-        SelectDataBIID2 = null;
-        BACBA = 0;
-        update();
-      },
-    );
-  }
-
-  Future<dynamic> buildShowTotal(BuildContext context) {
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    return Get.defaultDialog(
-      title: "StringTotal".tr,
-      content: Padding(
-        padding: EdgeInsets.only(
-            right: 0.002 * height, left: 0.002 * height),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StrinCount_MINO', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: CountRecodeController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringTotal_BMDNO', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: COUNTBMDNOController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringBMMDIF', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: SUMBMMDIFController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringSUMBMMDI', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: BMMDIController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringSUMBMDAMT', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: BMMAMController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StringSUMBMDTXT', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: SUMBMDTXTController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ThemeHelper().buildText(
-                    context, 'StrinSUMBCMAM', Colors.black, 'M'),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: BMMAMTOTController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: Colors.white,
-      radius: 40,
-      // barrierDismissible: false,
-    );
-  }
-
-  Future<dynamic> buildShowTotal2(BuildContext context) {
-    return Get.defaultDialog(
-        title: 'StringMestitle'.tr,
-        middleText: 'StrinErr_BMMDN'.tr,
-        backgroundColor: Colors.white,
-        radius: 40,
-        textCancel: 'StringNo'.tr,
-        cancelTextColor: Colors.red,
-        textConfirm: 'StringYes'.tr,
-        confirmTextColor: Colors.white,
-        onConfirm: () async {
-          Navigator.of(context).pop(false);
-          SelectDataBMMDN = '0';
-          BMMDIRController.text = '0';
-          BMMDIController.text = '0';
-          //الخصم علي مستوى الفاتورة
-          UPDATE_BMMDI();
+    // دالة لإنشاء أيقونة النهاية
+    Widget _buildSuffixIcon_IMP() {
+      return IconButton(
+        icon: const Icon(Icons.cancel, size: 23),
+        onPressed: () {
+          SelectDataBIID3 = null;
+          SelectDataBIID2 = null;
+          BACBA = 0;
           update();
         },
-        onCancel: () {
-          update();
-          SelectDataBMMDN = '1';
-          update();
-        }
-      // barrierDismissible: false,
-    );
-  }
+      );
+    }
 
-  Future<dynamic> buildShowSYS_CUR(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    return Get.defaultDialog(
-      title: "StringAdditional_Data".tr,
-      content: Padding(
-        padding: EdgeInsets.only(right: 0.002 * height, left: 0.002 * height),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("${'String_SCEXS'.tr}  ",
+    Future<dynamic> buildShowTotal(BuildContext context) {
+      double height = MediaQuery
+          .of(context)
+          .size
+          .height;
+      return Get.defaultDialog(
+        title: "StringTotal".tr,
+        content: Padding(
+          padding: EdgeInsets.only(
+              right: 0.002 * height, left: 0.002 * height),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StrinCount_MINO', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: CountRecodeController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StringTotal_BMDNO', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: COUNTBMDNOController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StringBMMDIF', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: SUMBMMDIFController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StringSUMBMMDI', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: BMMDIController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StringSUMBMDAMT', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: BMMAMController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StringSUMBMDTXT', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: SUMBMDTXTController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ThemeHelper().buildText(
+                      context, 'StrinSUMBCMAM', Colors.black, 'M'),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: BMMAMTOTController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: Colors.white,
+        radius: 40,
+        // barrierDismissible: false,
+      );
+    }
+
+    Future<dynamic> buildShowTotal2(BuildContext context) {
+      return Get.defaultDialog(
+          title: 'StringMestitle'.tr,
+          middleText: 'StrinErr_BMMDN'.tr,
+          backgroundColor: Colors.white,
+          radius: 40,
+          textCancel: 'StringNo'.tr,
+          cancelTextColor: Colors.red,
+          textConfirm: 'StringYes'.tr,
+          confirmTextColor: Colors.white,
+          onConfirm: () async {
+            Navigator.of(context).pop(false);
+            SelectDataBMMDN = '0';
+            BMMDIRController.text = '0';
+            BMMDIController.text = '0';
+            //الخصم علي مستوى الفاتورة
+            UPDATE_BMMDI();
+            update();
+          },
+          onCancel: () {
+            update();
+            SelectDataBMMDN = '1';
+            update();
+          }
+        // barrierDismissible: false,
+      );
+    }
+
+    Future<dynamic> buildShowSYS_CUR(BuildContext context) {
+      double height = MediaQuery.of(context).size.height;
+      return Get.defaultDialog(
+        title: "StringAdditional_Data".tr,
+        content: Padding(
+          padding: EdgeInsets.only(right: 0.002 * height, left: 0.002 * height),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("${'String_SCEXS'.tr}  ",
+                    style: ThemeHelper().buildTextStyle(
+                        context, Colors.black, 'M'),),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: edit == true || CheckBack == 1 ? true : false,
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      controller: SCEXSController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 13, horizontal: 8)),
+                      onChanged: (v) {
+                        if (v.isNotEmpty) {
+                          SCEXS = double.parse(v);
+                          update();
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("${'Stringexchangerate'.tr}               ",
+                      style: ThemeHelper().buildTextStyle(
+                          context, Colors.black, 'M')),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: edit == true || CheckBack == 1 ||
+                          SelectDataSCID == '1' ? true : false,
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      controller: SCEXController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 13, horizontal: 8)),
+                      // onChanged: (v) {
+                      //   controller.validateDefault_SNNO(v);
+                      // },
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('StrinSCHR'.tr,
+                      style: ThemeHelper().buildTextStyle(
+                          context, Colors.black, 'M')),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: SCHRController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 13, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("${'StrinSCLR'.tr}  ",
+                      style: ThemeHelper().buildTextStyle(
+                          context, Colors.black, 'M')),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      textAlign: TextAlign.center,
+                      controller: SCLRController,
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 13, horizontal: 8)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: Colors.white,
+        radius: 40,
+        // barrierDismissible: false,
+      );
+    }
+
+    Future<dynamic> buildShowBIL_ACC_C(BuildContext context) {
+      double height = MediaQuery.of(context).size.height;
+      return Get.defaultDialog(
+        title: BMKID == 1 || BMKID == 2 ? 'StringDAT_IMP'.tr : 'StringDAT_CUS'.tr,
+        backgroundColor: Colors.white,
+        radius: 30,
+        content: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                  "${'StringAMDMD'.tr}:",
                   style: ThemeHelper().buildTextStyle(
-                      context, Colors.black, 'M'),),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: edit == true || CheckBack == 1 ? true : false,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    controller: SCEXSController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 13, horizontal: 8)),
-                    onChanged: (v) {
-                      if (v.isNotEmpty) {
-                        SCEXS = double.parse(v);
-                        update();
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("${'Stringexchangerate'.tr}               ",
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M')),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: edit == true || CheckBack == 1 ||
-                        SelectDataSCID == '1' ? true : false,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    controller: SCEXController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 13, horizontal: 8)),
-                    // onChanged: (v) {
-                    //   controller.validateDefault_SNNO(v);
-                    // },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('StrinSCHR'.tr,
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M')),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: SCHRController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 13, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("${'StrinSCLR'.tr}  ",
-                    style: ThemeHelper().buildTextStyle(
-                        context, Colors.black, 'M')),
-                Expanded(
-                  child: TextFormField(
-                    readOnly: true,
-                    textAlign: TextAlign.center,
-                    controller: SCLRController,
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 13, horizontal: 8)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: Colors.white,
-      radius: 40,
-      // barrierDismissible: false,
-    );
-  }
+                      context, Colors.black87, 'M')
+              ),
 
-  Future<dynamic> buildShowBIL_ACC_C(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    return Get.defaultDialog(
-      title: BMKID == 1 || BMKID == 2 ? 'StringDAT_IMP'.tr : 'StringDAT_CUS'.tr,
-      backgroundColor: Colors.white,
-      radius: 30,
-      content: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-                "${'StringAMDMD'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
-
-            Text(formatter.format(BACBMD).toString(),
-              style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "${'StringAMDDA'.tr}:",
-              style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
-            ),
-
-            Text(formatter.format(BACBDA).toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "${'StringBalance_Not_Final'.tr}:",
-              style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
-            ),
-            Text(formatter.format(BACBNF).toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text("${'StringUn_Balance'.tr}:",
-              style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
-            ),
-            Text(formatter.format(SUMBAL).toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text("${'StringOffline_Sync_Balance'.tr}:",
-              style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
-            ),
-            Text(formatter.format(SumBal).toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text("${'StringCurrent_Balance'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
-
-            Text(formatter.format(BACBA).toString(),
-              style: ThemeHelper().buildTextStyle(context,
-                  BACBA == 0 ? Colors.black : BACBAS == 'M'
-                      ? Colors.green
-                      : Colors.red, 'M'),
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text("${'StringOffline_Sync_Balance'.tr}+",
+              Text(formatter.format(BACBMD).toString(),
+                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "${'StringAMDDA'.tr}:",
                 style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
               ),
-            ),
-            Text(formatter.format(SumBal! + BACBA!).toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text("${'StringCurrent_Balance'.tr}:",
+
+              Text(formatter.format(BACBDA).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "${'StringBalance_Not_Final'.tr}:",
                 style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "${'StringBCBL3'.tr}:",
-              style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
-            ),
-            Text(formatter.format(BCBL).toString(),
-                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-                "${'StringBACLBN'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
+              Text(formatter.format(BACBNF).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("${'StringUn_Balance'.tr}:",
+                style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+              ),
+              Text(formatter.format(SUMBAL).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("${'StringOffline_Sync_Balance'.tr}:",
+                style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+              ),
+              Text(formatter.format(SumBal).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("${'StringCurrent_Balance'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
+              ),
 
-            Text(
-                BACLBN.toString(),
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-                "${'StringBACLBD'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
-            Text(
-                BACLBD.toString(),
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black, 'M')
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-                "${'StringAddress'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
+              Text(formatter.format(BACBA).toString(),
+                style: ThemeHelper().buildTextStyle(context,
+                    BACBA == 0 ? Colors.black : BACBAS == 'M'
+                        ? Colors.green
+                        : Colors.red, 'M'),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text("${'StringOffline_Sync_Balance'.tr}+",
+                  style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+                ),
+              ),
+              Text(formatter.format(SumBal! + BACBA!).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text("${'StringCurrent_Balance'.tr}:",
+                  style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "${'StringBCBL3'.tr}:",
+                style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+              ),
+              Text(formatter.format(BCBL).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                  "${'StringBACLBN'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
+              ),
 
-            Expanded(
-              child: Text(BCAD_D.toString() == 'null' ? '' : BCAD_D.toString(),
+              Text(
+                  BACLBN.toString(),
                   style: ThemeHelper().buildTextStyle(
                       context, Colors.black, 'M')
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-                "${'StringLONGITUDE'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
-
-            Expanded(
-              child: Text(BCLON.toString() == 'null' ? '' : BCLON.toString(),
-                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                  "${'StringBACLBD'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-                "${'StringLATITUDE'.tr}:",
-                style: ThemeHelper().buildTextStyle(
-                    context, Colors.black87, 'M')
-            ),
-
-            Expanded(
-              child: Text(BCLAT.toString() == 'null' ? '' : BCLAT.toString(),
-                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              Text(
+                  BACLBD.toString(),
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black, 'M')
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 0.015 * height),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // Text(
-            //     "${'StringLATITUDE'.tr}:",
-            //     style: ThemeHelper().buildTextStyle(
-            //         context, Colors.black87, 'M')
-            // ),
-
-            Expanded(
-              child: Text(distanceStr.toString() == 'null' ? '' : distanceStr.toString(),
-                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                  "${'StringAddress'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
               ),
-            ),
-          ],
-        ),
-      ]),
-      textCancel: 'StringHide'.tr,
-      cancelTextColor: Colors.blueAccent,
-      // barrierDismissible: false,
-    );
-  }
 
-  Future<void> selectDateFromDays(BuildContext context) async {
-    final picked = await DatePickerHelper.pickDate(
-      context: context,
-    );
+              Expanded(
+                child: Text(BCAD_D.toString() == 'null' ? '' : BCAD_D.toString(),
+                    style: ThemeHelper().buildTextStyle(
+                        context, Colors.black, 'M')
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                  "${'StringLONGITUDE'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
+              ),
 
-    if (picked != null) {
-      final difference = dateTimeDays.difference(picked).inDays;
-      if (difference >= 0) {
-        dateTimeDays = picked;
-        SelectDays = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
-        BMMRD = DateFormat('yyyy-MM-dd').format(dateTimeDays).toString().split(" ")[0];
-      } else {
-        Fluttertoast.showToast(
-            msg: "StringCHK_SMMDO".tr,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-      }
-      update();
-    }
-  }
+              Expanded(
+                child: Text(BCLON.toString() == 'null' ? '' : BCLON.toString(),
+                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                  "${'StringLATITUDE'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
+              ),
 
-  Future<void> selectDateBMMDD(BuildContext context) async {
-    final picked = await DatePickerHelper.pickDate(context: context);
-    if (picked != null) {
-      final difference = dateTimeDays.difference(picked).inDays;
-      if (difference <= 0) {
-        dateTimeDays = picked;
-        BMMDDController.text = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
-        update();
-      } else {
-        Fluttertoast.showToast(
-            msg: "StringCHK_BMMDD".tr,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-      }
-      update();
-    }
-  }
+              Expanded(
+                child: Text(BCLAT.toString() == 'null' ? '' : BCLAT.toString(),
+                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.015 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // Text(
+              //     "${'StringLATITUDE'.tr}:",
+              //     style: ThemeHelper().buildTextStyle(
+              //         context, Colors.black87, 'M')
+              // ),
 
-  Future<void> selectDateBMMCD(BuildContext context) async {
-    final picked = await DatePickerHelper.pickDate(context: context);
-
-    if (picked != null) {
-      final difference = dateTimeDays.difference(picked).inDays;
-      if (difference <= 0) {
-        dateTimeDays = picked;
-        BMMCDController.text = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
-        update();
-      } else {
-        Fluttertoast.showToast(
-            msg: "StringCHK_BMMDD".tr,
-            textColor: Colors.white,
-            backgroundColor: Colors.redAccent);
-      }
-      update();
-    }
-  }
-
-
-  //دالة استدعاء الطباعة
-  dynamic generatePdfInvoice({
-    required String typeRep,
-    required String? GetBMKID,
-    required String? GetBMMDO,
-    required String? GetBMMNO,
-    required String? GetPKNA,
-    required ShareMode mode,
-  }) {
-    print('typeRep');
-    print(typeRep);
-    if (['58', '80'].contains(typeRep)) {
-      taxTikcetReportThermal(
-        mode: mode,
-        msg: 'مرحبا',
-        Type_Rep: typeRep,
+              Expanded(
+                child: Text(distanceStr.toString() == 'null' ? '' : distanceStr.toString(),
+                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+                ),
+              ),
+            ],
+          ),
+        ]),
+        textCancel: 'StringHide'.tr,
+        cancelTextColor: Colors.blueAccent,
+        // barrierDismissible: false,
       );
     }
-    else {
-      print(USE_TX != '1');
-      if (USE_TX != '1') {
-        Pdf_Invoices_Samplie(
-          GetBMKID: GetBMKID,
-          GetBMMDO: GetBMMDO,
-          GetBMMNO: GetBMMNO,
-          GetPKNA: GetPKNA,
-          mode: mode,
-        );
-      } else {
-        if ((BCTX.isEmpty || BCTX == 'null') ||
-            (GetBMKID == '7' || GetBMKID == '10')) {
-          return Pdf_Invoices_Samplie(
-            GetBMKID: GetBMKID,
-            GetBMMDO: GetBMMDO,
-            GetBMMNO: GetBMMNO,
-            GetPKNA: GetPKNA,
-            mode: mode,
-          );
+
+    Future<void> selectDateFromDays(BuildContext context) async {
+      final picked = await DatePickerHelper.pickDate(
+        context: context,
+      );
+
+      if (picked != null) {
+        final difference = dateTimeDays.difference(picked).inDays;
+        if (difference >= 0) {
+          dateTimeDays = picked;
+          SelectDays = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
+          BMMRD = DateFormat('yyyy-MM-dd').format(dateTimeDays).toString().split(" ")[0];
+        } else {
+          Fluttertoast.showToast(
+              msg: "StringCHK_SMMDO".tr,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
         }
-        else {
-          return Pdf_Invoices(
+        update();
+      }
+    }
+
+    Future<void> selectDateBMMDD(BuildContext context) async {
+      final picked = await DatePickerHelper.pickDate(context: context);
+      if (picked != null) {
+        final difference = dateTimeDays.difference(picked).inDays;
+        if (difference <= 0) {
+          dateTimeDays = picked;
+          BMMDDController.text = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
+          update();
+        } else {
+          Fluttertoast.showToast(
+              msg: "StringCHK_BMMDD".tr,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+        }
+        update();
+      }
+    }
+
+    Future<void> selectDateBMMCD(BuildContext context) async {
+      final picked = await DatePickerHelper.pickDate(context: context);
+
+      if (picked != null) {
+        final difference = dateTimeDays.difference(picked).inDays;
+        if (difference <= 0) {
+          dateTimeDays = picked;
+          BMMCDController.text = DateFormat('dd-MM-yyyy HH:m').format(dateTimeDays).toString().split(" ")[0];
+          update();
+        } else {
+          Fluttertoast.showToast(
+              msg: "StringCHK_BMMDD".tr,
+              textColor: Colors.white,
+              backgroundColor: Colors.redAccent);
+        }
+        update();
+      }
+    }
+
+
+    //دالة استدعاء الطباعة
+    dynamic generatePdfInvoice({
+      required String typeRep,
+      required String? GetBMKID,
+      required String? GetBMMDO,
+      required String? GetBMMNO,
+      required String? GetPKNA,
+      required ShareMode mode,
+    }) {
+      print('typeRep');
+      print(typeRep);
+      if (['58', '80'].contains(typeRep)) {
+        taxTikcetReportThermal(
+          mode: mode,
+          msg: 'مرحبا',
+          Type_Rep: typeRep,
+        );
+      }
+      else {
+        print(USE_TX != '1');
+        if (USE_TX != '1') {
+          Pdf_Invoices_Samplie(
             GetBMKID: GetBMKID,
             GetBMMDO: GetBMMDO,
             GetBMMNO: GetBMMNO,
             GetPKNA: GetPKNA,
-            Type_Model_A4: typeRep,
             mode: mode,
           );
+        } else {
+          if ((BCTX.isEmpty || BCTX == 'null') ||
+              (GetBMKID == '7' || GetBMKID == '10')) {
+            return Pdf_Invoices_Samplie(
+              GetBMKID: GetBMKID,
+              GetBMMDO: GetBMMDO,
+              GetBMMNO: GetBMMNO,
+              GetPKNA: GetPKNA,
+              mode: mode,
+            );
+          }
+          else {
+            return Pdf_Invoices(
+              GetBMKID: GetBMKID,
+              GetBMMDO: GetBMMDO,
+              GetBMMNO: GetBMMNO,
+              GetPKNA: GetPKNA,
+              Type_Model_A4: typeRep,
+              mode: mode,
+            );
+          }
         }
       }
     }
-  }
 
 
 
-  //دالة استخدام التوقيع
-  dynamic generateSignature({
-    required String typeRep,
-    required String? GetBMKID,
-    required String? GetBMMDO,
-    required String? GetBMMNO,
-    required String? GetPKNA,
-    required ShareMode mode,
-  }) async {
-    print('generateSignature');
-    print(typeRep);
-    print(UseSignature);
-    print(ShowSignatureAlert);
-    if (UseSignature == 0 && ShowSignatureAlert == 0) {
-      generatePdfInvoice(
-          typeRep: typeRep,
-          GetBMKID: GetBMKID,
-          GetBMMDO: GetBMMDO,
-          GetBMMNO: GetBMMNO,
-          GetPKNA: GetPKNA,
-          mode: mode);
-    }
-    else if (UseSignature == 1 && ShowSignatureAlert == 0) {
-      signature = await Get.to(SignatureScreen());
-      if (signature != null) {
+    //دالة استخدام التوقيع
+    dynamic generateSignature({
+      required String typeRep,
+      required String? GetBMKID,
+      required String? GetBMMDO,
+      required String? GetBMMNO,
+      required String? GetPKNA,
+      required ShareMode mode,
+    }) async {
+      print('generateSignature');
+      print(typeRep);
+      print(UseSignature);
+      print(ShowSignatureAlert);
+      if (UseSignature == 0 && ShowSignatureAlert == 0) {
         generatePdfInvoice(
             typeRep: typeRep,
             GetBMKID: GetBMKID,
@@ -11062,34 +11101,9 @@ class Sale_Invoices_Controller extends GetxController {
             GetPKNA: GetPKNA,
             mode: mode);
       }
-    }
-    else {
-      print('ShowSignatureAlert');
-      Get.defaultDialog(
-        title: 'StringMestitle'.tr,
-        middleText: 'StringPrintSureSUID'.tr,
-        backgroundColor: Colors.white,
-        radius: 40,
-        textCancel: 'StringNo'.tr,
-        cancelTextColor: Colors.red,
-        textConfirm: 'StringYes'.tr,
-        confirmTextColor: Colors.white,
-        onConfirm: () async {
-          Get.back();
-          // Navigator.of(context).pop(false);
-          signature = await Get.to(SignatureScreen());
-          //  controller.signature = await Navigator.push(context, MaterialPageRoute(builder: (_) => SignatureScreen()));
-          if (signature != null) {
-            generatePdfInvoice(
-                typeRep: typeRep,
-                GetBMKID: GetBMKID,
-                GetBMMDO: GetBMMDO,
-                GetBMMNO: GetBMMNO,
-                GetPKNA: GetPKNA,
-                mode: mode);
-          }
-        },
-        onCancel: () {
+      else if (UseSignature == 1 && ShowSignatureAlert == 0) {
+        signature = await Get.to(SignatureScreen());
+        if (signature != null) {
           generatePdfInvoice(
               typeRep: typeRep,
               GetBMKID: GetBMKID,
@@ -11097,26 +11111,13 @@ class Sale_Invoices_Controller extends GetxController {
               GetBMMNO: GetBMMNO,
               GetPKNA: GetPKNA,
               mode: mode);
-        },
-      );
-    }
-  }
-
-  Future PRINT_BALANCE_P({
-    BMMID,AANO,SCID,PKID,
-
-    required String typeRep,
-    String? GetBMKID,
-    String? GetBMMDO,
-    String? GetBMMNO,
-    String? GetPKNA,
-    required ShareMode mode}) async {
-    PRINT_BALANCE_ALR=false;
-    if (StteingController().PRINT_BALANCE == true && PKID=='3') {
-      if(StteingController().PRINT_BALANCE_ALERT == true ){
+        }
+      }
+      else {
+        print('ShowSignatureAlert');
         Get.defaultDialog(
           title: 'StringMestitle'.tr,
-          middleText: 'StringPrintSureBalance'.tr,
+          middleText: 'StringPrintSureSUID'.tr,
           backgroundColor: Colors.white,
           radius: 40,
           textCancel: 'StringNo'.tr,
@@ -11125,90 +11126,140 @@ class Sale_Invoices_Controller extends GetxController {
           confirmTextColor: Colors.white,
           onConfirm: () async {
             Get.back();
-            PRINT_BALANCE_ALR=true;
-            await GET_BIL_ACC_C_P(AANO, '', '', SCID,PKID,GETBMMID: BMMID);
-            await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
-                GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
+            // Navigator.of(context).pop(false);
+            signature = await Get.to(SignatureScreen());
+            //  controller.signature = await Navigator.push(context, MaterialPageRoute(builder: (_) => SignatureScreen()));
+            if (signature != null) {
+              generatePdfInvoice(
+                  typeRep: typeRep,
+                  GetBMKID: GetBMKID,
+                  GetBMMDO: GetBMMDO,
+                  GetBMMNO: GetBMMNO,
+                  GetPKNA: GetPKNA,
+                  mode: mode);
+            }
           },
-          onCancel: () async {
-            //  Get.back();
-            print('onCancel');
-            PRINT_BALANCE_ALR=false;
-            await Future.delayed(const Duration(milliseconds: 300));
-            await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
-                GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
-          },
-        );
-      }
-      else{
-        PRINT_BALANCE_ALR=false;
-        await GET_BIL_ACC_C_P(AANO, '', '', SCID,PKID,GETBMMID: BMMID);
-        await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
-            GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
-      }
-    }else{
-      PRINT_BALANCE_ALR=false;
-      await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
-          GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
-    }
-  }
-
-  Future SND_WS_P({
-    String? MSG_WS,
-    String? GetBMKID,
-    String? GetBMMDO,
-    String? GetBMMNO,
-    String? GetPKNA,
-    String? GetPHOEN}) async {
-    INV_RE_TYP INV_RE_R=INV_RE_TYP();
-    if (StteingController().WAT_ACT == true) {
-      if(StteingController().USE_WAT_ALERT == true ){
-        Get.defaultDialog(
-          title: 'StringMestitle'.tr,
-          middleText: "${'StringPrintSureWS'.tr}",
-          backgroundColor: Colors.white,
-          radius: 40,
-          textCancel: 'StringNo'.tr,
-          cancelTextColor: Colors.red,
-          textConfirm: 'StringYes'.tr,
-          confirmTextColor: Colors.white,
-          onConfirm: () async {
-            Get.back();
+          onCancel: () {
             generatePdfInvoice(
-                typeRep: '4',
+                typeRep: typeRep,
                 GetBMKID: GetBMKID,
                 GetBMMDO: GetBMMDO,
                 GetBMMNO: GetBMMNO,
                 GetPKNA: GetPKNA,
-                mode: ShareMode.sendBase64);
-          },
-          onCancel: () {
-            print('onCancel');
+                mode: mode);
           },
         );
       }
-      else{
-        generatePdfInvoice(
-            typeRep: '4',
-            GetBMKID: GetBMKID,
-            GetBMMDO: GetBMMDO,
-            GetBMMNO: GetBMMNO,
-            GetPKNA: GetPKNA,
-            mode: ShareMode.sendBase64);
+    }
 
-        INV_RE_R=await ES_WS_PKG.SND_WS_P(MSG_WS,AANOController.text);
-        print('ERR_TYP_N');
-        print(INV_RE_R.ERR_TYP_N);
-        print(INV_RE_R.ERR_V);
-        if(INV_RE_R.ERR_TYP_N!=1){
-          Fluttertoast.showToast(
-              msg: INV_RE_R.ERR_V.toString(),
-              toastLength: Toast.LENGTH_LONG,
-              textColor: Colors.white,
-              backgroundColor: Colors.redAccent);
+    Future PRINT_BALANCE_P({
+      BMMID,AANO,SCID,PKID,
+
+      required String typeRep,
+      String? GetBMKID,
+      String? GetBMMDO,
+      String? GetBMMNO,
+      String? GetPKNA,
+      required ShareMode mode}) async {
+      PRINT_BALANCE_ALR=false;
+      if (StteingController().PRINT_BALANCE == true && PKID=='3') {
+        if(StteingController().PRINT_BALANCE_ALERT == true ){
+          Get.defaultDialog(
+            title: 'StringMestitle'.tr,
+            middleText: 'StringPrintSureBalance'.tr,
+            backgroundColor: Colors.white,
+            radius: 40,
+            textCancel: 'StringNo'.tr,
+            cancelTextColor: Colors.red,
+            textConfirm: 'StringYes'.tr,
+            confirmTextColor: Colors.white,
+            onConfirm: () async {
+              Get.back();
+              PRINT_BALANCE_ALR=true;
+              await GET_BIL_ACC_C_P(AANO, '', '', SCID,PKID,GETBMMID: BMMID);
+              await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
+                  GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
+            },
+            onCancel: () async {
+              //  Get.back();
+              print('onCancel');
+              PRINT_BALANCE_ALR=false;
+              await Future.delayed(const Duration(milliseconds: 300));
+              await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
+                  GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
+            },
+          );
+        }
+        else{
+          PRINT_BALANCE_ALR=false;
+          await GET_BIL_ACC_C_P(AANO, '', '', SCID,PKID,GETBMMID: BMMID);
+          await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
+              GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
+        }
+      }else{
+        PRINT_BALANCE_ALR=false;
+        await generateSignature(typeRep: typeRep,GetBMKID:GetBMKID,GetBMMDO:GetBMMDO,
+            GetBMMNO:GetBMMNO,GetPKNA:GetPKNA,mode:mode);
+      }
+    }
+
+    Future SND_WS_P({
+      String? MSG_WS,
+      String? GetBMKID,
+      String? GetBMMDO,
+      String? GetBMMNO,
+      String? GetPKNA,
+      String? GetPHOEN}) async {
+      INV_RE_TYP INV_RE_R=INV_RE_TYP();
+      if (StteingController().WAT_ACT == true) {
+        if(StteingController().USE_WAT_ALERT == true ){
+          Get.defaultDialog(
+            title: 'StringMestitle'.tr,
+            middleText: "${'StringPrintSureWS'.tr}",
+            backgroundColor: Colors.white,
+            radius: 40,
+            textCancel: 'StringNo'.tr,
+            cancelTextColor: Colors.red,
+            textConfirm: 'StringYes'.tr,
+            confirmTextColor: Colors.white,
+            onConfirm: () async {
+              Get.back();
+              generatePdfInvoice(
+                  typeRep: '4',
+                  GetBMKID: GetBMKID,
+                  GetBMMDO: GetBMMDO,
+                  GetBMMNO: GetBMMNO,
+                  GetPKNA: GetPKNA,
+                  mode: ShareMode.sendBase64);
+            },
+            onCancel: () {
+              print('onCancel');
+            },
+          );
+        }
+        else{
+          generatePdfInvoice(
+              typeRep: '4',
+              GetBMKID: GetBMKID,
+              GetBMMDO: GetBMMDO,
+              GetBMMNO: GetBMMNO,
+              GetPKNA: GetPKNA,
+              mode: ShareMode.sendBase64);
+
+          INV_RE_R=await ES_WS_PKG.SND_WS_P(MSG_WS,AANOController.text);
+          print('ERR_TYP_N');
+          print(INV_RE_R.ERR_TYP_N);
+          print(INV_RE_R.ERR_V);
+          if(INV_RE_R.ERR_TYP_N!=1){
+            Fluttertoast.showToast(
+                msg: INV_RE_R.ERR_V.toString(),
+                toastLength: Toast.LENGTH_LONG,
+                textColor: Colors.white,
+                backgroundColor: Colors.redAccent);
+          }
         }
       }
     }
   }
 
-}
+

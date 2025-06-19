@@ -1069,6 +1069,8 @@ class LocalString extends Translations{
       'StringPKID_T':'الى الدفع',
       'StringOffline_Sync_Balance':'رصيد على حسب اخر مزامنة اوفلاين',
       'StringReq_BMDAM':'يجب ان يكون السعر اكبر من الصفر',
+      'StringAMDMD_off':'مدين/عليه اوفلاين',
+      'StringAMDDA_off':'دائن/له اوفلاين',
 
     },
     'en':{
@@ -2125,6 +2127,8 @@ class LocalString extends Translations{
       'StringPKID_T':'To Payment',
       'StringOffline_Sync_Balance':'Balance based on the last offline sync',
       'StringReq_BMDAM':'The price must be greater than zero.',
+      'StringAMDMD_off':'Amount/debit offline',
+      'StringAMDDA_off':'Amount/credit',
     }
   };
 }

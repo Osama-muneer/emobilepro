@@ -14587,8 +14587,11 @@ CREATE TABLE SYS_REP(
   }
 
   Future OnUpgradeV449_18 (Database db) async{
+  //  await db.execute('''DROP TABLE BIF_TRA_TAB''');
+    await db.execute('''DROP TABLE IF EXISTS BIF_TRA_TBL''');
+    await db.execute('''DROP TABLE IF EXISTS BIF_TRA_TAB''');
     await db.execute(CreateBIF_TRA_TAB);
-    await db.execute('''DROP TABLE BIF_TRA_TBL''');
+   // await db.execute('''DROP TABLE BIF_TRA_TBL''');
   }
 
   Future<List<Map<String, dynamic>>> query(String sql, [List<dynamic>? arguments]) async {
