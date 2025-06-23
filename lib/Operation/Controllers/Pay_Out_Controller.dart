@@ -2109,7 +2109,7 @@ class Pay_Out_Controller extends GetxController {
                                       Expanded(
                                           child: TextFormField(
                                             controller: AMDEQSController,
-                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            keyboardType:TYPEPHONE=='ANDROID'? TextInputType.numberWithOptions(decimal: true):TextInputType.text,
                                             textAlign: TextAlign.center,
                                             inputFormatters: [
                                               //  FilteringTextInputFormatter.digitsOnly, // للسماح بالأرقام فقط
@@ -2233,7 +2233,7 @@ class Pay_Out_Controller extends GetxController {
     return Expanded(
         child: TextFormField(
           controller: AMDMOSController,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType:TYPEPHONE=='ANDROID'? TextInputType.numberWithOptions(decimal: true):TextInputType.text,
           textAlign: TextAlign.center,
           focusNode: myFocusNode,
           inputFormatters: [

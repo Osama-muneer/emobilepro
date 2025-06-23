@@ -2703,7 +2703,6 @@ class SyncController extends GetxController {
     if (CheckSync(true) && round == true) {
       if (TypeCheckSync == 1 && SyncOneTable == false) {
         await GetCountSYN_ORD();
-        await DeleteGEN_VAR_ALL();
         TAB_N = "GEN_VAR";
         await ApiProvider().GetAllGEN_VAR();
         await AwaitFuncBasicData();

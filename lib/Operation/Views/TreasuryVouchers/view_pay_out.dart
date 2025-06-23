@@ -679,7 +679,8 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                 .toString()
                                                 .substring(10, 19),
                                             style: ThemeHelper().buildTextStyle(context, Colors.black,'M')),
-                                        InkWell(
+                                        '${controller.ACC_MOV_M_List[index].AMMST}' == '4'
+                                            ? Text(''): InkWell(
                                           onTap: () async {
                                             controller.GET_ACC_MOV_M_PRINT_P(
                                                 controller.ACC_MOV_M_List[index].AMMID!,
@@ -737,7 +738,7 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                     Expanded(
                                       child: Column(
                                         children: [
-                                          '${controller.ACC_MOV_M_List[index].AMMST}' != '1'
+                                          '${controller.ACC_MOV_M_List[index].AMMST}' == '4'
                                               ? Expanded(
                                             child: IconButton(
                                               onPressed: () async {
@@ -775,9 +776,9 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                             ),
                                           )
                                               : Expanded(child: Container()),
-                                          '${controller.ACC_MOV_M_List[index].AMMST}' !=
-                                              '1'
-                                              ? Expanded(
+                                          '${controller.ACC_MOV_M_List[index].AMMST}' != '1'
+                                              ?   '${controller.ACC_MOV_M_List[index].AMMST}' != '4'
+                                              ? Expanded(child: Container()) : Expanded(
                                             child: IconButton(
                                                 icon: Icon(
                                                     Icons.delete,
@@ -877,7 +878,8 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                                                   );
                                                 }),
                                           ),
-                                          Expanded(
+                                   '${controller.ACC_MOV_M_List[index].AMMST}' == '4'
+                                   ? Expanded(child: Container()): Expanded(
                                             child: controller.ACC_MOV_M_List[index].AMKID == 1 ||
                                                 controller.ACC_MOV_M_List[index].AMKID == 2 ||
                                                 controller.ACC_MOV_M_List[index].AMKID == 3
