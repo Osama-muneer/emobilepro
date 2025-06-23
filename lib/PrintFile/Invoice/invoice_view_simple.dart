@@ -319,21 +319,25 @@ Pdf_Invoices_Samplie({
           Table(border: TableBorder.all(),
           columnWidths: controller.Show_Items_Expire_Date=='2'? {
             0: const FlexColumnWidth(1.7),
-            1: const FlexColumnWidth(0.9),
-            2: const FlexColumnWidth(0.7),
-            3: const FlexColumnWidth(0.9),
+            1:  (item.BMMDI! + item.BMMDIA! > 0 ||  item.BMMDIF! > 0)?const FlexColumnWidth(0.8):
+            const FlexColumnWidth(0),
+            2: const FlexColumnWidth(0.9),
+            3: const FlexColumnWidth(0.7),
+            4: const FlexColumnWidth(0.9),
+            5: const FlexColumnWidth(0.7),
+            6: const FlexColumnWidth(2),
+            7: const FlexColumnWidth(0.8),
+            8: const FlexColumnWidth(0.4),
+          }: {
+            0: const FlexColumnWidth(1.7),
+            1:  (item.BMMDI! + item.BMMDIA! > 0 ||  item.BMMDIF! > 0)?const FlexColumnWidth(0.8):
+            const FlexColumnWidth(0),
+            2: const FlexColumnWidth(1),
+            3: const FlexColumnWidth(0.7),
             4: const FlexColumnWidth(0.7),
             5: const FlexColumnWidth(2),
             6: const FlexColumnWidth(0.8),
             7: const FlexColumnWidth(0.4),
-          }: {
-          0: const FlexColumnWidth(1.7),
-          1: const FlexColumnWidth(1),
-          2: const FlexColumnWidth(0.7),
-          3: const FlexColumnWidth(0.7),
-          4: const FlexColumnWidth(2),
-          5: const FlexColumnWidth(0.8),
-          6: const FlexColumnWidth(0.4),
           },
               children: [
             TableRow(
@@ -341,7 +345,8 @@ Pdf_Invoices_Samplie({
                 color: PdfColors.MyColors,
               ),
               children: [
-                _buildlabel(controller.SVVL_TAX != '2'?'String_Item_Subtotal_IncludingVAT'.tr:'StrinCount_SMDFN'.tr),
+                _buildlabel(controller.SVVL_TAX != '2'?'String_Item_Subtotal_IncludingVAT'.tr:'StrinlChice_item_Total'.tr),
+                _buildlabel('String_Discount'.tr),
                 _buildlabel('StringMPCO'.tr),
                 _buildlabel('StringSNNO'.tr),
                 if (controller.Show_Items_Expire_Date=='2') _buildlabel('StringSMDED'.tr),
@@ -356,28 +361,37 @@ Pdf_Invoices_Samplie({
               border: pw.TableBorder.all(),
               columnWidths: controller.Show_Items_Expire_Date=='2'? {
                 0: const FlexColumnWidth(1.7),
-                1: const FlexColumnWidth(0.9),
-                2: const FlexColumnWidth(0.7),
-                3: const FlexColumnWidth(0.9),
+                1:  (item.BMMDI! + item.BMMDIA! > 0 ||  item.BMMDIF! > 0)?const FlexColumnWidth(0.8):
+                const FlexColumnWidth(0),
+                2: const FlexColumnWidth(0.9),
+                3: const FlexColumnWidth(0.7),
+                4: const FlexColumnWidth(0.9),
+                5: const FlexColumnWidth(0.7),
+                6: const FlexColumnWidth(2),
+                7: const FlexColumnWidth(0.8),
+                8: const FlexColumnWidth(0.4),
+              }: {
+                0: const FlexColumnWidth(1.7),
+                1:  (item.BMMDI! + item.BMMDIA! > 0 ||  item.BMMDIF! > 0)?const FlexColumnWidth(0.8):
+                const FlexColumnWidth(0),
+                2: const FlexColumnWidth(1),
+                3: const FlexColumnWidth(0.7),
                 4: const FlexColumnWidth(0.7),
                 5: const FlexColumnWidth(2),
                 6: const FlexColumnWidth(0.8),
                 7: const FlexColumnWidth(0.4),
-              }: {
-                0: const FlexColumnWidth(1.7),
-                1: const FlexColumnWidth(1),
-                2: const FlexColumnWidth(0.7),
-                3: const FlexColumnWidth(0.7),
-                4: const FlexColumnWidth(2),
-                5: const FlexColumnWidth(0.8),
-                6: const FlexColumnWidth(0.4),
               },
               children: List.generate(controller.InvoiceList.length, (index) {
                 Bil_Mov_D_Local product = controller.InvoiceList[index];
                 return pw.TableRow(
                   children: [
-                    _buildCell(controller.formatter.format(((product.BMDAM! - product.BMDDI!) *
-                        product.BMDNO!) + product.BMDTXT1!).toString()),
+                    controller.SVVL_TAX != '2'?
+                    _buildCell(controller.formatter.format(((product.BMDAM!- product.BMDDI!) *
+                        product.BMDNO!) + (product.BMDTXT1! + product.BMDTXT2!)).toString())
+                    :_buildCell(controller.formatter.format(((product.BMDAM!) *
+                        product.BMDNO!) + (product.BMDTXT1! + product.BMDTXT2!)).toString()),
+                    _buildCell(controller.formatter.format((product.BMDDI!+((product.BMDDIA!/100)*product.BMDAM!))*product.BMDNO!+
+                        (product.BMDDIF!*product.BMDNF!)).toString()),
                     _buildCell(controller.formatter.format(product.BMDAM).toString()),
                     _buildCell(controller.formatter.format(product.BMDNO! + product.BMDNF!).toString()),
                     if (controller.Show_Items_Expire_Date=='2') _buildCell(product.BMDED.toString()),

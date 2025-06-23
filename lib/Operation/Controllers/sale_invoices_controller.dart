@@ -379,7 +379,8 @@ class Sale_Invoices_Controller extends GetxController {
       BACBNFN='0',
       BACLU='',
       LastBAL_ACC_C='',
-      BPPRV='';
+      BPPRV='',
+      query = '';
   int
   ADD_T = 1,
       SCSFL = 2,
@@ -1153,6 +1154,7 @@ class Sale_Invoices_Controller extends GetxController {
         TYPE_SER!,
         pageIndex: pageKey,
         pageSize: _pageSize,
+        searchQuery: query,
       );
 
 

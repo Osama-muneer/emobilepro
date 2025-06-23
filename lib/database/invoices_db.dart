@@ -430,7 +430,7 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
 Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYPE,String GETDateNow,
     int GETBMKID2,int GETBMMST,String BIID_F,String BIID_T,String BMMDO_F,String BMMDO_T,String SCID_V,
     String PKID_V,int REUTEN_T,int TYPE_SER,
-    {int? pageIndex=1, int? pageSize=20})
+    {int? pageIndex=1, int? pageSize=20,String? searchQuery})
 async {
   var dbClient = await conn.database;
   String sql;
@@ -457,6 +457,25 @@ async {
   String sqlBIID2='';
   String sqlPKID='';
   REUTEN_T==1?sql_R="  ":sql_R='';
+
+  // 1. بناء جملة WHERE لشرط البحث
+  String whereSearch = '';
+  if (searchQuery != null && searchQuery.isNotEmpty) {
+    final sq = searchQuery.replaceAll("'", "''"); // تفادي مشاكل الفواصل
+    whereSearch = """
+      AND (
+        A.BMMNO   LIKE '%$sq%' OR
+        A.BMMDO   LIKE '%$sq%' OR
+        A.BMMNA   LIKE '%$sq%' OR
+        A.BMMMT   LIKE '%$sq%' OR
+        A.BMMDI   LIKE '%$sq%' OR
+        B.BINA    LIKE '%$sq%' OR
+        D.PKNA    LIKE '%$sq%' OR
+        S.SINA    LIKE '%$sq%'
+      )
+    """;
+  }
+
 
 
   sql2=" (A.BMMDOR BETWEEN '$BMMDO_F' AND '$BMMDO_T')  AND";
@@ -564,7 +583,7 @@ async {
       " CASE WHEN ${LoginController().LAN}=2 AND S.SINE IS NOT NULL THEN S.SINE ELSE S.SINA END  SINA_D,"
       " CASE WHEN ${LoginController().LAN}=2 AND C.SCNE IS NOT NULL THEN C.SCNE ELSE C.SCNA END  SCNA_D  $sql3"
       " FROM $TAB_N A,BRA_INF B ,PAY_KIN D ,STO_INF S,SYS_CUR C $SqlTable "
-      " WHERE A.BMKID=$GETBMKID $sqlBMMST $sqlBIID2 $sqlSCID $sqlPKID $sql_R AND $sql2  A.JTID_L=${LoginController().JTID} "
+      " WHERE A.BMKID=$GETBMKID $sqlBMMST $whereSearch  $sqlBIID2 $sqlSCID $sqlPKID $sql_R AND $sql2  A.JTID_L=${LoginController().JTID} "
       " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql "
       " AND B.BIID=A.BIID2 AND B.JTID_L=${LoginController().JTID} "
       " AND B.SYID_L=A.SYID_L AND B.CIID_L=A.CIID_L $Wheresql2 "

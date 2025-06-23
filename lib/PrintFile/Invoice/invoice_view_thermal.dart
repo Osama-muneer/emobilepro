@@ -573,7 +573,7 @@ taxTikcetReportThermal({
                           return pw.TableRow(
                             children: [
                               isTaxCondition?
-                                buildContent_Data(controller.formatter.format(controller.roundDouble(((product.BMDAM! - product.BMDDI!) *
+                              buildContent_Data(controller.formatter.format(controller.roundDouble(((product.BMDAM! - product.BMDDI!) *
                               product.BMDNO!) +(product.BMDTXT1!+product.BMDTXT2!),controller.SCSFL)),8.5):
                               buildContent_Data(controller.formatter.format(controller.roundDouble(((product.BMDAM!) *
                               product.BMDNO!),controller.SCSFL)),8.5),

@@ -30,7 +30,7 @@ Future<List<Acc_Tax_T_Local>> GET_ACC_TAX_T() async {
 }
 
 Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST,
-    {int? pageIndex=1, int? pageSize=20}) async {
+    {int? pageIndex=1, int? pageSize=20, String? searchQuery}) async {
   return await ErrorHandlerService.run(() async {
     var dbClient = await conn.database;
     String sql;
@@ -50,6 +50,20 @@ Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST,
     LoginController().BIID_ALL_V=='1'? Wheresql5= " AND  R.BIID_L=A.BIID_L":Wheresql5='';
     LoginController().BIID_ALL_V=='1'? Wheresql6= " AND  S.BIID_L=A.BIID_L":Wheresql6='';
     LoginController().BIID_ALL_V=='1'? Wheresql7= " AND  F.BIID_L=A.BIID_L":Wheresql7='';
+
+    String whereSearch = '';
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      final sq = searchQuery.replaceAll("'", "''"); // تفادي مشاكل الفواصل
+      whereSearch = """
+      AND (
+        A.BCID   LIKE '%$sq%' OR
+        A.BCNA   LIKE '%$sq%' OR
+        A.BCNE    LIKE '%$sq%' OR
+        A.AANO    LIKE '%$sq%'
+      )
+    """;
+    }
+
     if(TYPE=='DateNow' || TYPE=='FromDate'){
       sql2=" A.BCDO like'%$GETDateNow%' AND";
     }
@@ -74,7 +88,7 @@ Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST,
         " AND R.SYID_L=A.SYID_L AND R.CIID_L=A.CIID_L $Wheresql5 "
         " left join BIL_DIS F on A.BDID=F.BDID  AND F.JTID_L=A.JTID_L "
         " AND F.SYID_L=A.SYID_L AND F.CIID_L=A.CIID_L $Wheresql4 "
-        " WHERE $sql2 D.BIID=A.BIID $sql3 AND A.BCTY=2 "
+        " WHERE $sql2  D.BIID=A.BIID  $whereSearch $sql3 AND A.BCTY=2 "
         " AND (A.BIID IS NULL OR EXISTS(SELECT 1 FROM SYS_USR_B S WHERE A.BIID=S.BIID AND S.SUID=${LoginController().SUID} "
         " AND S.SUBST=1 AND(S.SUBIN=1 OR S.SUBPR=1) AND S.JTID_L=A.JTID_L AND S.SYID_L=A.SYID_L "
         " AND S.CIID_L=A.CIID_L $Wheresql6)) "

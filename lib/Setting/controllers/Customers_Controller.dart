@@ -46,7 +46,7 @@ class CustomersController extends GetxController {
   String? SelectDataBIID,titleScreen,SelectDataCWID,selectedValue,SelectDataCTID,SelectDataBAID,SelectDataATTID,
       SelectDataBCTID,SelectDataBCST,SelectDataBCPR,SelectDataCTID2,SelectDataCWID2,SelectDataBAID2,SelectDataBDID,SelectDataBDID2;
   String Type='1',STB_N='', SelectNumberOfDays='',AANO='',location_of_account_application='',Update_location_account='',
-      TYPE_SHOW = "ALL";
+      TYPE_SHOW = "ALL",query = '';
   int? BCID,UPIN=1,UPCH=1,UPQR=1,UPDL=1,UPPR=1,BYST=1,CheckBack=0,AANO_D=0,PKID=4,Allow_to_location_of_account_application,
       Allow_Update_location_account;
     int  currentIndex=0;
@@ -283,7 +283,7 @@ class CustomersController extends GetxController {
         TYPE_SHOW,TYPE_SHOW=="DateNow"?DateFormat('dd-MM-yyyy').format(DateTime.now()):
       TYPE_SHOW=="FromDate"?SelectNumberOfDays:'',currentIndex,
          pageIndex: pageKey,
-        pageSize: _pageSize,);
+        pageSize: _pageSize,searchQuery: query,);
 
 
       // 2) إذا لا توجد عناصر، نخبر الـ controller بأن الصفحات انتهت

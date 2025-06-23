@@ -23,7 +23,6 @@ class _ViewCustomersState extends State<ViewCustomers> {
   final CustomersController controller = Get.find();
   static const Color grey_5 = Color(0xFFf2f2f2);
   late search.SearchBar searchBar;
-  String query = '';
   DateTime DateDays = DateTime.now();
   DateTime DateDays_last = DateTime.now();
   static const MaterialColor buttonTextColor = MaterialColor(
@@ -70,7 +69,14 @@ class _ViewCustomersState extends State<ViewCustomers> {
     }
   }
 
-  void searchRequestData(String query) {
+  void searchRequestData(String q) {
+    setState(() {
+      controller.query = q;                     // خزّن النص
+      controller.pagingController.refresh();  // أعد تحميل الصفحات بالفلتر الجديد
+    });
+  }
+
+  void searchRequestData2(String query) {
     final listDatacustmoerRequest = controller.BIL_CUS_List.where((list) {
       final titleLower = list.BCID.toString().toLowerCase();
       final authorLower = list.BCNA_D.toString().toLowerCase();
@@ -80,7 +86,7 @@ class _ViewCustomersState extends State<ViewCustomers> {
     }).toList();
 
     setState(() {
-      this.query = query;
+      controller.query = query;
       controller.BIL_CUS_List = listDatacustmoerRequest;
       if (query == '') {
         controller.GET_BIL_CUS_P("ALL");
@@ -502,8 +508,8 @@ class _ViewCustomersState extends State<ViewCustomers> {
                 child: Center(child: Text('لا مزيد من العملاء')),
               ),
             ),
-          );
-                })),
+           );
+            })),
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: AppColors.MainColor,
           onPressed: () {

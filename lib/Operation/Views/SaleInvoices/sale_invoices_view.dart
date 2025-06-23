@@ -45,13 +45,10 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
   final Sale_Invoices_Controller controller = Get.find();
   // final Sale_Invoices_Controller controller = Get.put(Sale_Invoices_Controller());
   late search.SearchBar searchBar;
-  String query = '';
   DateTime DateDays = DateTime.now();
   DateTime DateDays_last = DateTime.now();
   final txtController = TextEditingController();
   static const Color grey_5 = Color(0xFFf2f2f2);
-
-
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
@@ -146,13 +143,18 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
     );
   }
 
-
-
   void onSubmitted(String value) {
     setState(() => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You wrote $value!'))));
   }
 
-  void searchRequestData(String query) {
+  void searchRequestData(String q) {
+    setState(() {
+      controller.query = q;                     // خزّن النص
+      controller.pagingController.refresh();  // أعد تحميل الصفحات بالفلتر الجديد
+    });
+  }
+
+  void searchRequestData2(String query) {
     final listDatacustmoerRequest = controller.BIL_MOV_M_List.where((list) {
       final titleLower = list.BMMNO.toString().toLowerCase();
       final authorLower = list.BMMDO.toString().toLowerCase();
@@ -173,7 +175,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
           author5Lower.contains(searchLower);
     }).toList();
     setState(() {
-      this.query = query;
+      controller.query = query;
       controller.pagingController.itemList = listDatacustmoerRequest;
       if (query == '') {
         controller.GET_BIL_MOV_M_P("DateNow");
@@ -1101,11 +1103,11 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                     ),
                     firstPageErrorIndicatorBuilder: (_) =>
                         Center(child: Text('خطأ في التحميل، أعد المحاولة')),
-                    noMoreItemsIndicatorBuilder: (_) =>
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: Text('لا مزيد من الفواتير')),
-                    ),
+                    // noMoreItemsIndicatorBuilder: (_) =>
+                    // const Padding(
+                    //   padding: EdgeInsets.symmetric(vertical: 16),
+                    //   child: Center(child: Text('لا مزيد من الفواتير')),
+                    // ),
                   ),
                   );
             })),
