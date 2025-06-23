@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:emobilepro/Widgets/app_extension.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import '../../../Operation/Controllers/sale_invoices_controller.dart';
 import '../../../Operation/Views/SaleInvoices/return_sale_invoices_view.dart';
@@ -30,6 +31,7 @@ import '../../../Widgets/config.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart' as search;
 import 'package:intl/intl.dart';
 import '../../models/bil_mov_d.dart';
+import '../../models/bil_mov_m.dart';
 import 'Filter_Sale.dart';
 
 class Sale_Invoices_view extends StatefulWidget {
@@ -172,7 +174,7 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
     }).toList();
     setState(() {
       this.query = query;
-      controller.BIL_MOV_M_List = listDatacustmoerRequest;
+      controller.pagingController.itemList = listDatacustmoerRequest;
       if (query == '') {
         controller.GET_BIL_MOV_M_P("DateNow");
       }
@@ -350,748 +352,762 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
       child: Scaffold(
         backgroundColor: grey_5,
         appBar: searchBar.build(context),
+       // body:
         body:  GetBuilder<Sale_Invoices_Controller>(
-            init: Sale_Invoices_Controller(),
+           // init: Sale_Invoices_Controller(),
             builder: ((value) {
-              if (controller.BIL_MOV_M_List.isEmpty){
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "${ImagePath}no_data.png",
-                        height: 0.1 * height,
-                      ),
-                      Text('StringNoData'.tr,
-                          style: ThemeHelper().buildTextStyle(context, Colors.black,'L')
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return ListView.builder(
-                  itemCount: controller.BIL_MOV_M_List.length,
-                //  controller: controller.scrollController,
-                  itemBuilder: (BuildContext context, int index) {
-                    var item =  controller.BIL_MOV_M_List[index];
-                    if (index == controller.BIL_MOV_M_List.length) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    return  InkWell(
-                      onTap: () async {
-                        controller.BIL_MOV_D_SHOW.clear();
-                        controller.update();
-                        controller.GET_BIF_MOV_D_SHOW(item.BMMID.toString());
-                        controller.update();
-                        controller.BMMID_L = item.BMMID;
-                        controller.update();
-                        await Future.delayed(const Duration(milliseconds: 800));
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            fullscreenDialog: true,
-                            transitionDuration: Duration(milliseconds: 1000),
-                            pageBuilder: (BuildContext context,
-                                Animation<double> animation,
-                                Animation<double> secondaryAnimation) {
-                              return Scaffold(
-                                appBar: AppBar(
-                                  title: ThemeHelper().buildText(
-                                      context, 'StringDetails', Colors.black,
-                                      'L'),
-                                  backgroundColor: Colors.grey[100],
-                                ),
-                                body: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      double screenHeight = constraints.maxHeight;
-                                      double firstSectionHeight = screenHeight / 6;
-                                      double secondSectionHeight = (screenHeight / 3) * 2;
-                                      return Hero(
-                                        tag: 'osa',
-                                        child: Card(
-                                          elevation: 2,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                0.02 * height),
-                                          ),
-                                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                                          child: Container(
-                                            color: Colors.white,
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  width: double.infinity,
-                                                  color: AppColors.MainColor,
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 0.02 * height),
-                                                  child: Center(
-                                                    child: Text(STMID == 'EORD'
-                                                        ? item.BMATY.toString() == '1'
-                                                        ? 'StrinLocal'.tr
-                                                        :
-                                                    item.BMATY.toString() == '2'
-                                                        ? 'StrinExternal'.tr
-                                                        : 'StrinDelivery'.tr
-                                                        : item.BMMNA.toString(),
-                                                        style: ThemeHelper()
-                                                            .buildTextStyle(
-                                                            context, Colors.white,
-                                                            'L')),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  height: firstSectionHeight,
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: <Widget>[
-                                                      Column(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              return PagedListView<int, Bil_Mov_M_Local>(
+                 pagingController: controller.pagingController,
+                  // ⚠️ بناء العناصر وحالات الخطأ والنهاية
+                  builderDelegate: PagedChildBuilderDelegate<Bil_Mov_M_Local>(
+                      itemBuilder: (context, invoice, index) {
+                        //var item =  controller.BIL_MOV_M_List[index];
+                        var item =  invoice;
+                        return  InkWell(
+                          onTap: () async {
+                            controller.BIL_MOV_D_SHOW.clear();
+                            controller.update();
+                            controller.GET_BIF_MOV_D_SHOW(item.BMMID.toString());
+                            controller.update();
+                            controller.BMMID_L = item.BMMID;
+                            controller.update();
+                            await Future.delayed(const Duration(milliseconds: 800));
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                fullscreenDialog: true,
+                                transitionDuration: Duration(milliseconds: 1000),
+                                pageBuilder: (BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation) {
+                                  return Scaffold(
+                                    appBar: AppBar(
+                                      title: ThemeHelper().buildText(context, 'StringDetails', Colors.black, 'L'),
+                                      backgroundColor: Colors.grey[100],
+                                    ),
+                                    body: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          double screenHeight = constraints.maxHeight;
+                                          double firstSectionHeight = screenHeight / 6;
+                                          double secondSectionHeight = (screenHeight / 3) * 2;
+                                          return Hero(
+                                            tag: 'osa',
+                                            child: Card(
+                                              elevation: 2,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    0.02 * height),
+                                              ),
+                                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                                              child: Container(
+                                                color: Colors.white,
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      width: double.infinity,
+                                                      color: AppColors.MainColor,
+                                                      padding: EdgeInsets.symmetric(
+                                                          horizontal: 0.02 * height),
+                                                      child: Center(
+                                                        child: Text(STMID == 'EORD'
+                                                            ? item.BMATY.toString() == '1'
+                                                            ? 'StrinLocal'.tr
+                                                            :
+                                                        item.BMATY.toString() == '2'
+                                                            ? 'StrinExternal'.tr
+                                                            : 'StrinDelivery'.tr
+                                                            : item.BMMNA.toString(),
+                                                            style: ThemeHelper()
+                                                                .buildTextStyle(
+                                                                context, Colors.white,
+                                                                'L')),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      height: firstSectionHeight,
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                         children: <Widget>[
-                                                          Text(
-                                                            item.BINA_D.toString(),
-                                                            style: ThemeHelper().buildTextStyle(
-                                                                context, Colors.black,
-                                                                item.BINA_D.toString().length >= 30 ? 'S' : 'M'),
+                                                          Column(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: <Widget>[
+                                                              Text(
+                                                                item.BINA_D.toString(),
+                                                                style: ThemeHelper().buildTextStyle(
+                                                                    context, Colors.black,
+                                                                    item.BINA_D.toString().length >= 30 ? 'S' : 'M'),
+                                                              ),
+                                                              Text(
+                                                                  STMID == 'EORD'
+                                                                      ? item.BMMDO.toString().substring(0, 10)
+                                                                      : item.SINA_D.toString(),
+                                                                  style: ThemeHelper().buildTextStyle(
+                                                                      context,
+                                                                      Colors.black,
+                                                                      STMID != 'EORD' ?
+                                                                      item.SINA_D.toString().length >= 30 ? 'S' : 'M' : 'M')),
+                                                              item.BMATY.toString() == '1' ?
+                                                              Text(STMID == 'EORD'
+                                                                  ? item.RSNA_D.toString()
+                                                                  : item.PKNA_D.toString(),
+                                                                style: ThemeHelper().buildTextStyle(
+                                                                    context,Colors.black, 'M'),) :
+                                                              Text(STMID == 'EORD'
+                                                                  ? '' :item.PKNA_D.toString(),
+                                                                style: ThemeHelper().buildTextStyle(
+                                                                    context, Colors.black, 'M'),),
+                                                              Text(
+                                                                STMID == 'EORD'
+                                                                    ? item.PKNA_D.toString()
+                                                                    : item.SCNA_D.toString(),
+                                                                style: ThemeHelper().buildTextStyle(
+                                                                    context, Colors.black, 'M'),),
+                                                            ],
                                                           ),
-                                                          Text(
-                                                              STMID == 'EORD'
-                                                                  ? item.BMMDO.toString().substring(0, 10)
-                                                                  : item.SINA_D.toString(),
-                                                              style: ThemeHelper().buildTextStyle(
-                                                                  context,
-                                                                  Colors.black,
-                                                                  STMID != 'EORD' ?
-                                                                  item.SINA_D.toString().length >= 30 ? 'S' : 'M' : 'M')),
-                                                          item.BMATY.toString() == '1' ?
-                                                          Text(STMID == 'EORD'
-                                                              ? item.RSNA_D.toString()
-                                                              : item.PKNA_D.toString(),
-                                                            style: ThemeHelper().buildTextStyle(
-                                                                context,Colors.black, 'M'),) :
-                                                          Text(STMID == 'EORD'
-                                                              ? '' :item.PKNA_D.toString(),
-                                                            style: ThemeHelper().buildTextStyle(
-                                                                context, Colors.black, 'M'),),
-                                                          Text(
-                                                            STMID == 'EORD'
-                                                                ? item.PKNA_D.toString()
-                                                                : item.SCNA_D.toString(),
-                                                            style: ThemeHelper().buildTextStyle(
-                                                                context, Colors.black, 'M'),),
+                                                          Column(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: <Widget>[
+                                                              Text(item.BMMNO.toString(),
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                                              ),
+                                                              Text(STMID == 'EORD' ?
+                                                              "${item.BMMDO.toString().substring(10, 17)} " :
+                                                              "${item.BMMDO.toString()} ",
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),),
+                                                              item.BMATY.toString() == '1' ?
+                                                              Text(STMID == 'EORD' ?
+                                                              item.RTNA_D.toString() == 'null' ? '' :
+                                                              item.RTNA_D.toString() : item.BMMDI.toString(),
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),) :
+                                                              Text(STMID == 'EORD' ? '' : item.BMMDI.toString(),
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),),
+                                                              item.SCSY.toString()=='SAR'?
+                                                              Row(children: [
+                                                                Text(STMID == 'EORD' ?
+                                                                ('${controller.formatter.format(item.BMMMT).toString() } ') :
+                                                                controller.formatter.format(item.BMMMT).toString(),
+                                                                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')),
+                                                                SizedBox(width: 5,),
+                                                                Image.asset("${ImagePath}Saudi_Riyal_Symbol.png",
+                                                                  //child: Image.asset("/data/data/com.elitesoftsys.emobilepro/app_flutter/2023_05_13_11_53_28.png",
+                                                                  fit: BoxFit.cover,
+                                                                  height: 0.02 * height,
+                                                                ),
+                                                              ],):
+                                                              Text(STMID == 'EORD' ?
+                                                              ('${controller.formatter.format(item.BMMMT).toString() } ${item.SCSY}') :
+                                                              controller.formatter.format(item.BMMMT).toString(),
+                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),),
+                                                            ],
+                                                          ),
                                                         ],
                                                       ),
-                                                      Column(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        children: <Widget>[
-                                                          Text(item.BMMNO.toString(),
-                                                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                                                          ),
-                                                          Text(STMID == 'EORD' ?
-                                                            "${item.BMMDO.toString().substring(10, 17)} " :
-                                                            "${item.BMMDO.toString()} ",
-                                                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),),
-                                                          item.BMATY.toString() == '1' ?
-                                                          Text(STMID == 'EORD' ?
-                                                          item.RTNA_D.toString() == 'null' ? '' :
-                                                          item.RTNA_D.toString() : item.BMMDI.toString(),
-                                                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),) :
-                                                          Text(STMID == 'EORD' ? '' : item.BMMDI.toString(),
-                                                            style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),),
-                                                          item.SCSY.toString()=='SAR'?
-                                                          Row(children: [
-                                                            Text(STMID == 'EORD' ?
-                                                            ('${controller.formatter.format(item.BMMMT).toString() } ') :
-                                                            controller.formatter.format(item.BMMMT).toString(),
-                                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')),
-                                                            SizedBox(width: 5,),
-                                                            Image.asset("${ImagePath}Saudi_Riyal_Symbol.png",
-                                                              //child: Image.asset("/data/data/com.elitesoftsys.emobilepro/app_flutter/2023_05_13_11_53_28.png",
-                                                              fit: BoxFit.cover,
-                                                              height: 0.02 * height,
-                                                            ),
-                                                          ],):
-                                                          Text(STMID == 'EORD' ?
-                                                          ('${controller.formatter.format(item.BMMMT).toString() } ${item.SCSY}') :
-                                                          controller.formatter.format(item.BMMMT).toString(),
-                                                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Expanded(child: Container(
-                                                  child: ListView.builder(
-                                                      itemCount: controller.BIL_MOV_D_SHOW.length,
-                                                      itemBuilder: (
-                                                          BuildContext context,
-                                                          int index) {
-                                                        return Card(
-                                                          elevation: 2,
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius
-                                                                .circular(
-                                                                0.02 * height),
-                                                          ),
-                                                          clipBehavior: Clip
-                                                              .antiAliasWithSaveLayer,
-                                                          child: Container(
-                                                            color: Colors
-                                                                .grey[100],
-                                                            child: ListTile(
-                                                              leading: const Icon(
-                                                                  Icons
-                                                                      .assignment_rounded,
-                                                                  color: Colors
-                                                                      .black),
-                                                              title: Text(
-                                                                controller
-                                                                    .BIL_MOV_D_SHOW[index]
-                                                                    .NAM
-                                                                    .toString(),
-                                                                style: ThemeHelper()
-                                                                    .buildTextStyle(
-                                                                    context,
-                                                                    Colors.black,
-                                                                    'M'),),
-                                                              subtitle: Text(
-                                                                "${controller
-                                                                    .formatter
-                                                                    .format(
+                                                    ),
+                                                    Expanded(child: Container(
+                                                      child: ListView.builder(
+                                                          itemCount: controller.BIL_MOV_D_SHOW.length,
+                                                          itemBuilder: (
+                                                              BuildContext context,
+                                                              int index) {
+                                                            return Card(
+                                                              elevation: 2,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius
+                                                                    .circular(
+                                                                    0.02 * height),
+                                                              ),
+                                                              clipBehavior: Clip
+                                                                  .antiAliasWithSaveLayer,
+                                                              child: Container(
+                                                                color: Colors
+                                                                    .grey[100],
+                                                                child: ListTile(
+                                                                  leading: const Icon(
+                                                                      Icons
+                                                                          .assignment_rounded,
+                                                                      color: Colors
+                                                                          .black),
+                                                                  title: Text(
                                                                     controller
                                                                         .BIL_MOV_D_SHOW[index]
-                                                                        .BMDNO)
-                                                                    .toString()} (${controller
-                                                                    .formatter
-                                                                    .format(
-                                                                    controller
-                                                                        .BIL_MOV_D_SHOW[index]
-                                                                        .BMDAM)
-                                                                    .toString()})",
-                                                                style: ThemeHelper()
-                                                                    .buildTextStyle(
-                                                                    context,
-                                                                    Colors.black,
-                                                                    'M'),),
-                                                              trailing: Text(
-                                                                controller
-                                                                    .formatter
-                                                                    .format(
-                                                                    controller
-                                                                        .roundDouble(
+                                                                        .NAM
+                                                                        .toString(),
+                                                                    style: ThemeHelper()
+                                                                        .buildTextStyle(
+                                                                        context,
+                                                                        Colors.black,
+                                                                        'M'),),
+                                                                  subtitle: Text(
+                                                                    "${controller
+                                                                        .formatter
+                                                                        .format(
                                                                         controller
                                                                             .BIL_MOV_D_SHOW[index]
-                                                                            .BMDAMT! +
+                                                                            .BMDNO)
+                                                                        .toString()} (${controller
+                                                                        .formatter
+                                                                        .format(
+                                                                        controller
+                                                                            .BIL_MOV_D_SHOW[index]
+                                                                            .BMDAM)
+                                                                        .toString()})",
+                                                                    style: ThemeHelper()
+                                                                        .buildTextStyle(
+                                                                        context,
+                                                                        Colors.black,
+                                                                        'M'),),
+                                                                  trailing: Text(
+                                                                    controller
+                                                                        .formatter
+                                                                        .format(
+                                                                        controller
+                                                                            .roundDouble(
                                                                             controller
                                                                                 .BIL_MOV_D_SHOW[index]
-                                                                                .BMDTXT!,
-                                                                        3))
-                                                                    .toString(),
-                                                                style: ThemeHelper()
-                                                                    .buildTextStyle(
-                                                                    context,
-                                                                    Colors.red,
-                                                                    'M'),),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }),
-                                                ),)
+                                                                                .BMDAMT! +
+                                                                                controller
+                                                                                    .BIL_MOV_D_SHOW[index]
+                                                                                    .BMDTXT!,
+                                                                            3))
+                                                                        .toString(),
+                                                                    style: ThemeHelper()
+                                                                        .buildTextStyle(
+                                                                        context,
+                                                                        Colors.red,
+                                                                        'M'),),
+                                                                ),
+                                                              ),
+                                                            );
+                                                          }),
+                                                    ),)
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                    )
+                                    ,
+                                  );
+                                },
+                                transitionsBuilder: (BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child) {
+                                  return FadeTransition(
+                                    opacity:
+                                    animation,
+                                    // CurvedAnimation(parent: animation, curve: Curves.elasticInOut),
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Card(
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.02 * height),),
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                child: Container(
+                                  color: Colors.white,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        color: AppColors.MainColor,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 0.02 * height),
+                                        child: Center(
+
+                                          child: Text(STMID == 'EORD' ? item.BMATY.toString() ==
+                                              '1' ? '${'StrinLocal'.tr}  ${item.RTNA_D.toString() == 'null' ? '' :
+                                          ' - ${item.RTNA_D.toString()}' }'
+                                              :
+                                          item.BMATY
+                                              .toString() == '2'
+                                              ? 'StrinExternal'.tr
+                                              : 'StrinDelivery'.tr
+                                              : item.BMMNA
+                                              .toString(),
+                                            style: ThemeHelper().buildTextStyle(
+                                                context, Colors.white, 'L'),),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 0.2 * height,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: <Widget>[
+                                                  item.BINA_D.toString().length > 20? AnimatedTextWidget(
+                                                    text: item.BINA_D.toString(),)
+                                                      :Text(
+                                                    item.BINA_D.toString(),
+                                                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                                  ),
+                                                  item.SINA_D.toString().length > 20 ?
+                                                  AnimatedTextWidget(
+                                                    text: STMID == 'EORD' ? item.BMMDO.toString().substring(0, 10) :
+                                                    STMID == 'COU' ?item.BPNA_D.toString() :
+                                                    item.SINA_D.toString(),):
+                                                  Text(
+                                                      STMID == 'EORD' ? item.BMMDO.toString().substring(0, 10) :
+                                                      STMID == 'COU' ?item.BPNA_D.toString() :
+                                                      item.SINA_D.toString(),
+                                                      style: ThemeHelper().buildTextStyle(
+                                                          context, Colors.black,
+                                                          STMID != 'EORD' ?
+                                                          STMID == 'COU' ? item.BPNA_D.toString().length >= 30 ?
+                                                          'S' : 'M' :
+                                                          item.SINA_D.toString().length >= 30 ?
+                                                          'S' : 'M' : 'M')),
+                                                  item.BMATY.toString() == '1' ?
+                                                  Text(STMID == 'EORD' ?
+                                                  item.RSNA_D.toString() :
+                                                  STMID == 'COU' ? item.CTMNA_D.toString() :
+                                                  item.PKNA_D.toString(),
+                                                      style: ThemeHelper().buildTextStyle(
+                                                          context, Colors.black, 'M')) :
+                                                  Text(STMID == 'EORD' ? '' :
+                                                  STMID == 'COU' ? item.CTMNA_D.toString() :
+                                                  item.PKNA_D.toString(),
+                                                      style: ThemeHelper().buildTextStyle(
+                                                          context, Colors.black, 'M')),
+                                                  Text(
+                                                      STMID == 'EORD' || STMID == 'COU'
+                                                          ? item.PKNA_D.toString()
+                                                          : item.SCNA_D.toString(),
+                                                      style: ThemeHelper().buildTextStyle(
+                                                          context, Colors.black, 'M')),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      if (STMID == 'EORD' && item.BMMST2 == 2) {
+                                                        controller.BMMST = item.BMMST2!;
+                                                        buildShowDialogState(context, item.BMKID!, item.BMMID!);
+                                                      }
+                                                    },
+                                                    child: Text('${item.BMMST2}'.toString() == '2'
+                                                        ? 'StringNotfinal'.tr
+                                                        : '${item.BMMST2}'.toString() == '4'
+                                                        ? 'StringPending'.tr
+                                                        : 'Stringfinal'.tr,
+                                                        style: '${item.BMMST2}'.toString() == '2'
+                                                            ? ThemeHelper().buildTextStyle(context, Colors.red, STMID == 'EORD'?'L':'M')
+                                                            : '${item.BMMST2}'.toString() == '3'
+                                                            ? ThemeHelper().buildTextStyle(context, Colors.blueAccent, STMID == 'EORD'?'L':'M')
+                                                            : '${item.BMMST2}'.toString() == '4'
+                                                            ? ThemeHelper().buildTextStyle(context, Colors.blueAccent, STMID == 'EORD'?'L':'M')
+                                                            : ThemeHelper().buildTextStyle(context, Colors.green, STMID == 'EORD'?'L':'M')),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: <Widget>[
+                                                Text(
+                                                  item.BMMNO.toString(),
+                                                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+                                                ),
+                                                Text(
+                                                    STMID == 'EORD' ?
+                                                    "${item.BMMDO.toString().substring(10, 17)} " :
+                                                    "${item.BMMDO.toString()} ",
+                                                    style: ThemeHelper().buildTextStyle(
+                                                        context, Colors.black, 'M')),
+                                                item.BMATY.toString() == '1' ?
+                                                Text(STMID == 'EORD' ?
+                                                item.RTNA_D.toString() == 'null' ? '' :
+                                                item.RTNA_D.toString() :
+                                                STMID == 'COU' ? controller.formatter.format(
+                                                    item.BMDNO).toString()
+                                                    : controller.formatter.format(
+                                                    item.BMMDI).toString(),
+                                                    style: ThemeHelper().buildTextStyle(
+                                                        context, Colors.black, 'M')) :
+                                                Text(STMID == 'EORD' ? '' :
+                                                STMID == 'COU' ? controller.formatter.format(item.BMDNO).toString()
+                                                    : controller.formatter.format(item.BMMDI).toString(),
+                                                    style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')),
+                                                item.SCSY.toString()=='SAR'?
+                                                Row(children: [
+                                                  Text(STMID == 'EORD' ?
+                                                  ('${controller.formatter.format(item.BMMMT).toString() } ') :
+                                                  controller.formatter.format(item.BMMMT).toString(),
+                                                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')),
+                                                  SizedBox(width: 5,),
+                                                  Image.asset("${ImagePath}Saudi_Riyal_Symbol.png",
+                                                    fit: BoxFit.cover,height: 0.02 * height,
+                                                  ),
+                                                ],):
+                                                Text(STMID == 'EORD' ?
+                                                ('${controller.formatter.format(item.BMMMT).toString() } ') :
+                                                controller.formatter.format(
+                                                    item.BMMMT).toString(),
+                                                    style: ThemeHelper().buildTextStyle(
+                                                        context, Colors.black, 'M')),
+                                                '${item
+                                                    .BMMST}' != '4'
+                                                    ? InkWell(
+                                                  onTap: () async {
+                                                    print('BMMFST');
+                                                    print(item.BMMFST);
+                                                    print(item.BMMST);
+                                                    await controller.GET_BIL_MOV_M_PRINT_P(item.BMMID!);
+                                                    await controller.GET_BIF_MOV_D_P(item.BMMID.toString(), controller.RINT_RELATED_ITEMS_DETAIL.toString());
+                                                    await controller.GET_Sys_Own_P(item.BIID2.toString());
+                                                    await controller.GET_BIL_CUS_IMP_INF_P(controller.BMKID == 1 ? item.BIID.toString() : item.BCID.toString());
+                                                    await controller.GET_COUNT_BMDNO_P(item.BMMID!);
+                                                    await controller.GET_CountRecode(item.BMMID!);
+                                                    await controller.GET_BIL_ACC_C_P(
+                                                        item.AANO.toString(),
+                                                        item.GUIDC.toString(),
+                                                        item.BIID2.toString(),
+                                                        item.SCID.toString(),
+                                                        item.PKID.toString(),
+                                                        GETBMMID: item.BMMID.toString());
+                                                    buildShowDialogLang(context,
+                                                        item.BMKID.toString(),
+                                                        item.BMMID.toString(),
+                                                        item.BMMDO.toString(),
+                                                        item.BMMNO.toString(),
+                                                        item.PKNA_D.toString(),
+                                                        item.AANO.toString(),
+                                                        item.SCID.toString(),
+                                                        item.PKID.toString());
+                                                  },
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        Icons.picture_as_pdf,
+                                                        size: 0.026 * height,
+                                                        color: Colors.blue,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 0.002 * height,
+                                                      ),
+                                                      Text(
+                                                          'StringPrint'.tr,
+                                                          style: ThemeHelper()
+                                                              .buildTextStyle(
+                                                              context, Colors.blueAccent,
+                                                              'M')
+                                                      )
+                                                    ],
+                                                  ),
+                                                ) :
+                                                Text(''),
                                               ],
                                             ),
-                                          ),
+                                            Expanded(
+                                              child: Column(
+                                                children: [
+                                                  if(('${item.BMMFST}' == '3' || '${item.BMMFST}' == '5') || '${item.BMMST}' == '4' ||
+                                                      (STMID == 'EORD' && ('${item.BMMST2}' == '2' || '${item.BMMST2}' == '4')))
+                                                    Expanded(
+                                                      child: IconButton(
+                                                        onPressed: () async {
+                                                          LoginController().SET_P('Return_Type', '1');
+                                                          controller.EditSales_Invoices(item);
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.edit,
+                                                          size: 0.026 * height,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  '${item.BMMST}' == '1' || (STMID == 'EORD' && ('${item.BMMST2}' == '2' || '${item.BMMST2}' == '1'))
+                                                      ? Expanded(
+                                                    child: IconButton(
+                                                        icon: Icon(
+                                                          Icons.settings_backup_restore,
+                                                          color: Colors.black,
+                                                          size: 0.026 * height,
+                                                        ),
+                                                        onPressed: () async {
+                                                          controller.GET_CountRecode(item.BMMID!);
+                                                          Get.defaultDialog(
+                                                            title: 'StringMestitle'.tr,
+                                                            middleText: 'StringSuresyn'.tr,
+                                                            backgroundColor: Colors.white,
+                                                            radius: 40,
+                                                            textCancel: 'StringNo'.tr,
+                                                            cancelTextColor: Colors.red,
+                                                            textConfirm: 'StringYes'.tr,
+                                                            confirmTextColor: Colors.white,
+                                                            onConfirm: () {
+                                                              Get.back();
+                                                              controller.Socket_IP_Connect('SyncOnly', item.BMMID.toString(), true,
+                                                                  item.BMMST2.toString() == '1' ? 1 : 2);
+                                                            },
+                                                          );
+                                                        }),
+                                                  )
+                                                      : '${item.BMMST2}' == '4'
+                                                      ? Expanded(
+                                                    child: IconButton(
+                                                        icon: Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red,
+                                                          size: 0.026 * height,
+                                                        ),
+                                                        onPressed: () async {
+                                                          Get.defaultDialog(
+                                                            title: 'StringMestitle'.tr,
+                                                            middleText: 'StringDeleteMessage'
+                                                                .tr,
+                                                            backgroundColor: Colors.white,
+                                                            radius: 40,
+                                                            textCancel: 'StringNo'.tr,
+                                                            cancelTextColor: Colors.red,
+                                                            textConfirm: 'StringYes'.tr,
+                                                            confirmTextColor: Colors
+                                                                .white,
+                                                            onConfirm: () {
+                                                              if (item.BMMST2.toString() == '4') {
+                                                                bool isValid = controller.delete_BIL_MOV(item.BMMID, 2);
+                                                                if (isValid) {
+                                                                  controller.GET_BIL_MOV_M_P("DateNow");
+                                                                }
+                                                                Get.back();
+                                                              } else {
+                                                                Get.snackbar(
+                                                                    'StringUPDL'.tr,
+                                                                    'String_CHK_UPDL'.tr,
+                                                                    backgroundColor: Colors
+                                                                        .red,
+                                                                    icon: const Icon(
+                                                                        Icons.error,
+                                                                        color: Colors
+                                                                            .white),
+                                                                    colorText: Colors
+                                                                        .white,
+                                                                    isDismissible: true,
+                                                                    dismissDirection: DismissDirection
+                                                                        .horizontal,
+                                                                    forwardAnimationCurve: Curves
+                                                                        .easeOutBack);
+                                                              }
+                                                            },
+                                                          );
+                                                        }),
+                                                  )
+                                                      : Expanded(child: Container()),
+                                                  if('${item.BMMST2}' != '4')
+                                                    Expanded(
+                                                      child: IconButton(
+                                                        onPressed: () async {
+                                                          // await FileHelper().initPlatformState();
+                                                          await  controller.GET_BIL_MOV_M_PRINT_P(item.BMMID!);
+                                                          await  controller.GET_BIF_MOV_D_P(item.BMMID.toString(), controller.RINT_RELATED_ITEMS_DETAIL.toString());
+                                                          await  controller.GET_Sys_Own_P(item.BIID2.toString());
+                                                          await  controller.GET_BIL_CUS_IMP_INF_P(controller.BMKID == 1 ? item.BIID.toString() : item.BCID.toString());
+                                                          await  controller.GET_COUNT_BMDNO_P(item.BMMID!);
+                                                          await  controller.GET_CountRecode(item.BMMID!);
+                                                          await  controller.GET_BIL_ACC_C_P(
+                                                              item.AANO.toString(),
+                                                              item.GUIDC.toString(),
+                                                              item.BIID2.toString(),
+                                                              item.SCID.toString(),
+                                                              item.PKID.toString(),
+                                                              GETBMMID: item.BMMID.toString());
+                                                          // await Future.delayed(const Duration(seconds: 1));
+                                                          await controller.PRINT_BALANCE_P(
+                                                              BMMID: item.BMMID.toString(),
+                                                              AANO:item.AANO.toString(),
+                                                              SCID:item.SCID.toString(),
+                                                              PKID:item.PKID.toString(),
+                                                              typeRep: controller.typeRep,
+                                                              GetBMKID: item.BMKID.toString(),
+                                                              GetBMMDO: item.BMMDO.toString(),
+                                                              GetBMMNO: item.BMMNO.toString(),
+                                                              GetPKNA: item.PKNA_D.toString(),
+                                                              mode: ShareMode.print
+                                                          );
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.print,
+                                                          color: Colors.black,
+                                                          size: 0.026 * height,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  //  if('${item.BMMFST}' != '10' && LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
+                                                  if(LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
+                                                    Expanded(
+                                                        child: GestureDetector(
+                                                          onTap: () async {
+                                                            print(item.BMMFST);
+                                                            if ('${item.BMMFST}' != '1') {
+                                                              var FAT_CHK = await ES_FAT_PKG.MAIN_FAT_SND_INV(
+                                                                  item.BMKID,
+                                                                  item.BMMID,
+                                                                  item.BIID2,
+                                                                  item.BMMDO.toString(),
+                                                                  item.GUID.toString(),
+                                                                  item.BMMST,
+                                                                  LoginController().SSID_N,
+                                                                  item.BMMFST,
+                                                                  LoginController().SIGN_N,
+                                                                  controller.ST_O_N,
+                                                                  controller.MSG_O);
+                                                              print(controller.MSG_O);
+                                                              print(controller.ST_O_N);
+                                                              print(FAT_CHK);
+                                                              print('FAT_CHK');
+                                                              if (await FAT_CHK) {
+                                                                print(controller.MSG_O);
+                                                                print(controller.ST_O_N);
+                                                                controller.update();
+                                                              }
+                                                              StteingController().isActivateAutoMoveSync == true
+                                                                  ? await controller.Socket_IP_Connect(
+                                                                  'SyncOnly', item.BMMID.toString(), false, 2) : false;
+                                                              controller.update();
+                                                              await controller.GET_BIL_MOV_M_P("FromDate");
+                                                              controller.update();
+                                                            }
+                                                            // هنا تضع الإجراء الذي تريده عند الضغط
+                                                            print('تم الضغط على الصورة!');
+                                                          },
+                                                          child: Image.asset(
+                                                            '${item.BMMFST}' == '1' ?
+                                                            '${ImagePath}TAX_S.png' :
+                                                            '${item.BMMFST}' == '5' ||
+                                                                '${item.BMMFST}' == '10' ?
+                                                            '${ImagePath}TAX_I.png' :
+                                                            '${item.BMMFST}' == '4' ?
+                                                            '${ImagePath}TAX4.png'
+                                                                : '${ImagePath}TAX_E.png', // استبدل بهذا المسار الصحيح للصورة
+                                                          ),
+                                                        )
+                                                    ),
+                                                  if('${item.BMMST}' != '4' && StteingController().WAT_ACT == true)
+                                                    Expanded(
+                                                        child: GestureDetector(
+                                                          onTap: () async {
+                                                            // هنا تضع الإجراء الذي تريده عند الضغط
+                                                            print('تم الضغط على الصورة!');
+                                                          },
+                                                          child: Image.asset(
+                                                            '${ImagePath}WhatsApp.png', // استبدل بهذا المسار الصحيح للصورة
+                                                          ),
+                                                        )
+                                                    ),
+                                                  STMID=='EORD' && item.RTNA_D.toString() != 'null' && '${item.BMMST2}' == '2' ?
+                                                  Expanded(
+                                                    child: IconButton(
+                                                        icon: Icon(
+                                                          Icons.table_bar_sharp,
+                                                          color: Colors.black,
+                                                          size: 0.026 * height,
+                                                        ),
+                                                        onPressed: () async {
+                                                          controller.GET_RES_SEC_P(controller.SelectDataBIID.toString()=='null'?
+                                                          LoginController().BIID.toString() :controller.SelectDataBIID.toString());
+                                                          controller.update();
+                                                          controller.BMMID=item.BMMID;
+                                                          controller.SelectDataRTID=item.RTID.toString();
+                                                          controller.SelectDataRTIDO=item.RTID.toString();
+                                                          controller.SelectDataRSIDO=item.RSID.toString();
+                                                          controller.SelectDataGETTYPE=item.BMATY.toString();
+                                                          showTableSheet('ED',item.GUID.toString());
+                                                        }),
+                                                  ):Container(),
+                                                  ('${item.BMMFST}' == '1' || '${item.BMMFST}' == '10') && ('${item.BMMST}' == '2')
+                                                      ? Expanded(
+                                                    child: IconButton(
+                                                        icon: Icon(
+                                                          Icons.sync,
+                                                          color: Colors.black,
+                                                          size: 0.026 * height,
+                                                        ),
+                                                        onPressed: () async {
+                                                          Get.defaultDialog(
+                                                            title: 'StringMestitle'.tr,
+                                                            middleText: 'StringSuresyn'
+                                                                .tr,
+                                                            backgroundColor: Colors.white,
+                                                            radius: 40,
+                                                            textCancel: 'StringNo'.tr,
+                                                            cancelTextColor: Colors.red,
+                                                            textConfirm: 'StringYes'.tr,
+                                                            confirmTextColor: Colors
+                                                                .white,
+                                                            onConfirm: () {
+                                                              Get.back();
+                                                              controller.Socket_IP_Connect('SyncOnly', item.BMMID.toString(),true, 2);
+                                                            },
+                                                          );
+                                                        }),
+                                                  )
+                                                      : '${item.BMMST}' == '4'
+                                                      ? Expanded(child: Container()) :
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 0.001 * height),
+                                                      child: Text(
+                                                        [2, 3, 4, 5, 6].contains(item.BMMFST) ? '' :
+                                                        "${'StringDoSync'.tr} (${item.BMMNR.toString()})",
+                                                        style: ThemeHelper()
+                                                            .buildTextStyle(
+                                                            context, Colors.green, 'M'),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    }
-                                )
-                                ,
-                              );
-                            },
-                            transitionsBuilder: (BuildContext context,
-                                Animation<double> animation,
-                                Animation<double> secondaryAnimation,
-                                Widget child) {
-                              return FadeTransition(
-                                opacity:
-                                animation,
-                                // CurvedAnimation(parent: animation, curve: Curves.elasticInOut),
-                                child: child,
-                              );
-                            },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              BIL_MOV_D_SHOW(item.BMKID == 11 || item.BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',item.BMMID.toString()),
+                            ],
                           ),
                         );
                       },
+                    firstPageProgressIndicatorBuilder: (_) =>
+                    const Center(child: CircularProgressIndicator()),
+                    newPageProgressIndicatorBuilder: (_) =>
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    // عندما لا توجد عناصر بعد تحميل الصفحة الأولى:
+                    noItemsFoundIndicatorBuilder: (_) => Center(
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Card(
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.02 * height),),
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            child: Container(
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    color: AppColors.MainColor,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 0.02 * height),
-                                    child: Center(
-
-                                      child: Text(STMID == 'EORD' ? item.BMATY.toString() ==
-                                          '1' ? '${'StrinLocal'.tr}  ${item.RTNA_D.toString() == 'null' ? '' :
-                                      ' - ${item.RTNA_D.toString()}' }'
-                                                :
-                                      item.BMATY
-                                          .toString() == '2'
-                                          ? 'StrinExternal'.tr
-                                          : 'StrinDelivery'.tr
-                                          : item.BMMNA
-                                          .toString(),
-                                        style: ThemeHelper().buildTextStyle(
-                                            context, Colors.white, 'L'),),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 0.2 * height,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: <Widget>[
-                                              item.BINA_D.toString().length > 20? AnimatedTextWidget(
-                                                text: item.BINA_D.toString(),)
-                                                  :Text(
-                                                item.BINA_D.toString(),
-                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                                              ),
-                                              item.SINA_D.toString().length > 20 ?
-                                              AnimatedTextWidget(
-                                                text: STMID == 'EORD' ? item.BMMDO.toString().substring(0, 10) :
-                                                STMID == 'COU' ?item.BPNA_D.toString() :
-                                                item.SINA_D.toString(),):
-                                              Text(
-                                                  STMID == 'EORD' ? item.BMMDO.toString().substring(0, 10) :
-                                                  STMID == 'COU' ?item.BPNA_D.toString() :
-                                                  item.SINA_D.toString(),
-                                                  style: ThemeHelper().buildTextStyle(
-                                                      context, Colors.black,
-                                                      STMID != 'EORD' ?
-                                                      STMID == 'COU' ? item.BPNA_D.toString().length >= 30 ?
-                                                      'S' : 'M' :
-                                                      item.SINA_D.toString().length >= 30 ?
-                                                      'S' : 'M' : 'M')),
-                                              item.BMATY.toString() == '1' ?
-                                              Text(STMID == 'EORD' ?
-                                              item.RSNA_D.toString() :
-                                              STMID == 'COU' ? item.CTMNA_D.toString() :
-                                              item.PKNA_D.toString(),
-                                                  style: ThemeHelper().buildTextStyle(
-                                                      context, Colors.black, 'M')) :
-                                              Text(STMID == 'EORD' ? '' :
-                                              STMID == 'COU' ? item.CTMNA_D.toString() :
-                                              item.PKNA_D.toString(),
-                                                  style: ThemeHelper().buildTextStyle(
-                                                      context, Colors.black, 'M')),
-                                              Text(
-                                                  STMID == 'EORD' || STMID == 'COU'
-                                                      ? item.PKNA_D.toString()
-                                                      : item.SCNA_D.toString(),
-                                                  style: ThemeHelper().buildTextStyle(
-                                                      context, Colors.black, 'M')),
-                                              InkWell(
-                                                onTap: () {
-                                                  if (STMID == 'EORD' && item.BMMST2 == 2) {
-                                                    controller.BMMST = item.BMMST2!;
-                                                    buildShowDialogState(context, item.BMKID!, item.BMMID!);
-                                                  }
-                                                },
-                                                child: Text('${item.BMMST2}'.toString() == '2'
-                                                    ? 'StringNotfinal'.tr
-                                                    : '${item.BMMST2}'.toString() == '4'
-                                                    ? 'StringPending'.tr
-                                                    : 'Stringfinal'.tr,
-                                                    style: '${item.BMMST2}'.toString() == '2'
-                                                        ? ThemeHelper().buildTextStyle(context, Colors.red, STMID == 'EORD'?'L':'M')
-                                                        : '${item.BMMST2}'.toString() == '3'
-                                                        ? ThemeHelper().buildTextStyle(context, Colors.blueAccent, STMID == 'EORD'?'L':'M')
-                                                        : '${item.BMMST2}'.toString() == '4'
-                                                        ? ThemeHelper().buildTextStyle(context, Colors.blueAccent, STMID == 'EORD'?'L':'M')
-                                                        : ThemeHelper().buildTextStyle(context, Colors.green, STMID == 'EORD'?'L':'M')),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: <Widget>[
-                                            Text(
-                                              item.BMMNO.toString(),
-                                              style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
-                                            ),
-                                            Text(
-                                                STMID == 'EORD' ?
-                                                "${item.BMMDO.toString().substring(10, 17)} " :
-                                                "${item.BMMDO.toString()} ",
-                                                style: ThemeHelper().buildTextStyle(
-                                                    context, Colors.black, 'M')),
-                                            item.BMATY.toString() == '1' ?
-                                            Text(STMID == 'EORD' ?
-                                            item.RTNA_D.toString() == 'null' ? '' :
-                                            item.RTNA_D.toString() :
-                                            STMID == 'COU' ? controller.formatter.format(
-                                                item.BMDNO).toString()
-                                                : controller.formatter.format(
-                                                item.BMMDI).toString(),
-                                                style: ThemeHelper().buildTextStyle(
-                                                    context, Colors.black, 'M')) :
-                                            Text(STMID == 'EORD' ? '' :
-                                            STMID == 'COU' ? controller.formatter.format(item.BMDNO).toString()
-                                                : controller.formatter.format(item.BMMDI).toString(),
-                                                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')),
-                                            item.SCSY.toString()=='SAR'?
-                                            Row(children: [
-                                              Text(STMID == 'EORD' ?
-                                              ('${controller.formatter.format(item.BMMMT).toString() } ') :
-                                              controller.formatter.format(item.BMMMT).toString(),
-                                                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')),
-                                              SizedBox(width: 5,),
-                                              Image.asset("${ImagePath}Saudi_Riyal_Symbol.png",
-                                                fit: BoxFit.cover,height: 0.02 * height,
-                                              ),
-                                            ],):
-                                            Text(STMID == 'EORD' ?
-                                            ('${controller.formatter.format(item.BMMMT).toString() } ') :
-                                            controller.formatter.format(
-                                                item.BMMMT).toString(),
-                                                style: ThemeHelper().buildTextStyle(
-                                                    context, Colors.black, 'M')),
-                                            '${item
-                                                .BMMST}' != '4'
-                                                ? InkWell(
-                                              onTap: () async {
-                                                print('BMMFST');
-                                                print(item.BMMFST);
-                                                print(item.BMMST);
-                                                await controller.GET_BIL_MOV_M_PRINT_P(item.BMMID!);
-                                                await controller.GET_BIF_MOV_D_P(item.BMMID.toString(), controller.RINT_RELATED_ITEMS_DETAIL.toString());
-                                                await controller.GET_Sys_Own_P(item.BIID2.toString());
-                                                await controller.GET_BIL_CUS_IMP_INF_P(controller.BMKID == 1 ? item.BIID.toString() : item.BCID.toString());
-                                                await controller.GET_COUNT_BMDNO_P(item.BMMID!);
-                                                await controller.GET_CountRecode(item.BMMID!);
-                                                await controller.GET_BIL_ACC_C_P(
-                                                    item.AANO.toString(),
-                                                    item.GUIDC.toString(),
-                                                    item.BIID2.toString(),
-                                                    item.SCID.toString(),
-                                                    item.PKID.toString(),
-                                                    GETBMMID: item.BMMID.toString());
-                                                buildShowDialogLang(context,
-                                                    item.BMKID.toString(),
-                                                    item.BMMID.toString(),
-                                                    item.BMMDO.toString(),
-                                                    item.BMMNO.toString(),
-                                                    item.PKNA_D.toString(),
-                                                    item.AANO.toString(),
-                                                    item.SCID.toString(),
-                                                    item.PKID.toString());
-                                              },
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.picture_as_pdf,
-                                                    size: 0.026 * height,
-                                                    color: Colors.blue,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 0.002 * height,
-                                                  ),
-                                                  Text(
-                                                      'StringPrint'.tr,
-                                                      style: ThemeHelper()
-                                                          .buildTextStyle(
-                                                          context, Colors.blueAccent,
-                                                          'M')
-                                                  )
-                                                ],
-                                              ),
-                                            ) :
-                                            Text(''),
-                                          ],
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            children: [
-                                              if(('${item.BMMFST}' == '3' || '${item.BMMFST}' == '5') || '${item.BMMST}' == '4' ||
-                                                  (STMID == 'EORD' && ('${item.BMMST2}' == '2' || '${item.BMMST2}' == '4')))
-                                                Expanded(
-                                                  child: IconButton(
-                                                    onPressed: () async {
-                                                      LoginController().SET_P('Return_Type', '1');
-                                                      controller.EditSales_Invoices(item);
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.edit,
-                                                      size: 0.026 * height,
-                                                    ),
-                                                  ),
-                                                ),
-                                              '${item.BMMST}' == '1' || (STMID == 'EORD' && ('${item.BMMST2}' == '2' || '${item.BMMST2}' == '1'))
-                                                  ? Expanded(
-                                                child: IconButton(
-                                                    icon: Icon(
-                                                      Icons.settings_backup_restore,
-                                                      color: Colors.black,
-                                                      size: 0.026 * height,
-                                                    ),
-                                                    onPressed: () async {
-                                                      controller.GET_CountRecode(item.BMMID!);
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'.tr,
-                                                        middleText: 'StringSuresyn'.tr,
-                                                        backgroundColor: Colors.white,
-                                                        radius: 40,
-                                                        textCancel: 'StringNo'.tr,
-                                                        cancelTextColor: Colors.red,
-                                                        textConfirm: 'StringYes'.tr,
-                                                        confirmTextColor: Colors.white,
-                                                        onConfirm: () {
-                                                          Get.back();
-                                                          controller.Socket_IP_Connect('SyncOnly', item.BMMID.toString(), true,
-                                                              item.BMMST2.toString() == '1' ? 1 : 2);
-                                                        },
-                                                      );
-                                                    }),
-                                              )
-                                                  : '${item.BMMST2}' == '4'
-                                                  ? Expanded(
-                                                child: IconButton(
-                                                    icon: Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                      size: 0.026 * height,
-                                                    ),
-                                                    onPressed: () async {
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'.tr,
-                                                        middleText: 'StringDeleteMessage'
-                                                            .tr,
-                                                        backgroundColor: Colors.white,
-                                                        radius: 40,
-                                                        textCancel: 'StringNo'.tr,
-                                                        cancelTextColor: Colors.red,
-                                                        textConfirm: 'StringYes'.tr,
-                                                        confirmTextColor: Colors
-                                                            .white,
-                                                        onConfirm: () {
-                                                          if (item.BMMST2.toString() == '4') {
-                                                            bool isValid = controller.delete_BIL_MOV(item.BMMID, 2);
-                                                            if (isValid) {
-                                                              controller.GET_BIL_MOV_M_P("DateNow");
-                                                            }
-                                                            Get.back();
-                                                          } else {
-                                                            Get.snackbar(
-                                                                'StringUPDL'.tr,
-                                                                'String_CHK_UPDL'.tr,
-                                                                backgroundColor: Colors
-                                                                    .red,
-                                                                icon: const Icon(
-                                                                    Icons.error,
-                                                                    color: Colors
-                                                                        .white),
-                                                                colorText: Colors
-                                                                    .white,
-                                                                isDismissible: true,
-                                                                dismissDirection: DismissDirection
-                                                                    .horizontal,
-                                                                forwardAnimationCurve: Curves
-                                                                    .easeOutBack);
-                                                          }
-                                                        },
-                                                      );
-                                                    }),
-                                              )
-                                                  : Expanded(child: Container()),
-                                              if('${item.BMMST2}' != '4')
-                                                Expanded(
-                                                  child: IconButton(
-                                                    onPressed: () async {
-                                                      // await FileHelper().initPlatformState();
-                                                      await  controller.GET_BIL_MOV_M_PRINT_P(item.BMMID!);
-                                                      await  controller.GET_BIF_MOV_D_P(item.BMMID.toString(), controller.RINT_RELATED_ITEMS_DETAIL.toString());
-                                                      await  controller.GET_Sys_Own_P(item.BIID2.toString());
-                                                      await  controller.GET_BIL_CUS_IMP_INF_P(controller.BMKID == 1 ? item.BIID.toString() : item.BCID.toString());
-                                                      await  controller.GET_COUNT_BMDNO_P(item.BMMID!);
-                                                      await  controller.GET_CountRecode(item.BMMID!);
-                                                      await  controller.GET_BIL_ACC_C_P(
-                                                          item.AANO.toString(),
-                                                          item.GUIDC.toString(),
-                                                          item.BIID2.toString(),
-                                                          item.SCID.toString(),
-                                                          item.PKID.toString(),
-                                                          GETBMMID: item.BMMID.toString());
-                                                        // await Future.delayed(const Duration(seconds: 1));
-                                                        await controller.PRINT_BALANCE_P(
-                                                            BMMID: item.BMMID.toString(),
-                                                            AANO:item.AANO.toString(),
-                                                            SCID:item.SCID.toString(),
-                                                            PKID:item.PKID.toString(),
-                                                            typeRep: controller.typeRep,
-                                                            GetBMKID: item.BMKID.toString(),
-                                                            GetBMMDO: item.BMMDO.toString(),
-                                                            GetBMMNO: item.BMMNO.toString(),
-                                                            GetPKNA: item.PKNA_D.toString(),
-                                                            mode: ShareMode.print
-                                                        );
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.print,
-                                                      color: Colors.black,
-                                                      size: 0.026 * height,
-                                                    ),
-                                                  ),
-                                                ),
-                                            //  if('${item.BMMFST}' != '10' && LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
-                                              if(LoginController().USE_VAT_N == '1' && LoginController().USE_FAT_P_N == 1)
-                                                Expanded(
-                                                    child: GestureDetector(
-                                                      onTap: () async {
-                                                        print(item.BMMFST);
-                                                        if ('${item.BMMFST}' != '1') {
-                                                          var FAT_CHK = await ES_FAT_PKG.MAIN_FAT_SND_INV(
-                                                              item.BMKID,
-                                                              item.BMMID,
-                                                              item.BIID2,
-                                                              item.BMMDO.toString(),
-                                                              item.GUID.toString(),
-                                                              item.BMMST,
-                                                              LoginController().SSID_N,
-                                                              item.BMMFST,
-                                                              LoginController().SIGN_N,
-                                                              controller.ST_O_N,
-                                                              controller.MSG_O);
-                                                          print(controller.MSG_O);
-                                                          print(controller.ST_O_N);
-                                                          print(FAT_CHK);
-                                                          print('FAT_CHK');
-                                                          if (await FAT_CHK) {
-                                                            print(controller.MSG_O);
-                                                            print(controller.ST_O_N);
-                                                            controller.update();
-                                                          }
-                                                          StteingController().isActivateAutoMoveSync == true
-                                                              ? await controller.Socket_IP_Connect(
-                                                              'SyncOnly', item.BMMID.toString(), false, 2) : false;
-                                                          controller.update();
-                                                          await controller.GET_BIL_MOV_M_P("FromDate");
-                                                          controller.update();
-                                                        }
-                                                        // هنا تضع الإجراء الذي تريده عند الضغط
-                                                        print('تم الضغط على الصورة!');
-                                                      },
-                                                      child: Image.asset(
-                                                        '${item.BMMFST}' == '1' ?
-                                                        '${ImagePath}TAX_S.png' :
-                                                        '${item.BMMFST}' == '5' ||
-                                                        '${item.BMMFST}' == '10' ?
-                                                        '${ImagePath}TAX_I.png' :
-                                                        '${item.BMMFST}' == '4' ?
-                                                        '${ImagePath}TAX4.png'
-                                                        : '${ImagePath}TAX_E.png', // استبدل بهذا المسار الصحيح للصورة
-                                                      ),
-                                                    )
-                                                ),
-                                              if('${item.BMMST}' != '4' && StteingController().WAT_ACT == true)
-                                                Expanded(
-                                                    child: GestureDetector(
-                                                      onTap: () async {
-                                                        // هنا تضع الإجراء الذي تريده عند الضغط
-                                                        print('تم الضغط على الصورة!');
-                                                      },
-                                                      child: Image.asset(
-                                                        '${ImagePath}WhatsApp.png', // استبدل بهذا المسار الصحيح للصورة
-                                                      ),
-                                                    )
-                                                ),
-                                             STMID=='EORD' && item.RTNA_D.toString() != 'null' && '${item.BMMST2}' == '2' ?
-                                              Expanded(
-                                                child: IconButton(
-                                                    icon: Icon(
-                                                      Icons.table_bar_sharp,
-                                                      color: Colors.black,
-                                                      size: 0.026 * height,
-                                                    ),
-                                                    onPressed: () async {
-                                                      controller.GET_RES_SEC_P(controller.SelectDataBIID.toString()=='null'?
-                                                      LoginController().BIID.toString() :controller.SelectDataBIID.toString());
-                                                      controller.update();
-                                                      controller.BMMID=item.BMMID;
-                                                      controller.SelectDataRTID=item.RTID.toString();
-                                                      controller.SelectDataRTIDO=item.RTID.toString();
-                                                      controller.SelectDataRSIDO=item.RSID.toString();
-                                                      controller.SelectDataGETTYPE=item.BMATY.toString();
-                                                      showTableSheet('ED',item.GUID.toString());
-                                                    }),
-                                              ):Container(),
-                                              ('${item.BMMFST}' == '1' || '${item.BMMFST}' == '10') && ('${item.BMMST}' == '2')
-                                                  ? Expanded(
-                                                child: IconButton(
-                                                    icon: Icon(
-                                                      Icons.sync,
-                                                      color: Colors.black,
-                                                      size: 0.026 * height,
-                                                    ),
-                                                    onPressed: () async {
-                                                      Get.defaultDialog(
-                                                        title: 'StringMestitle'.tr,
-                                                        middleText: 'StringSuresyn'
-                                                            .tr,
-                                                        backgroundColor: Colors.white,
-                                                        radius: 40,
-                                                        textCancel: 'StringNo'.tr,
-                                                        cancelTextColor: Colors.red,
-                                                        textConfirm: 'StringYes'.tr,
-                                                        confirmTextColor: Colors
-                                                            .white,
-                                                        onConfirm: () {
-                                                          Get.back();
-                                                          controller.Socket_IP_Connect('SyncOnly', item.BMMID.toString(),true, 2);
-                                                        },
-                                                      );
-                                                    }),
-                                              )
-                                                  : '${item.BMMST}' == '4'
-                                                  ? Expanded(child: Container()) :
-                                              Expanded(
-                                                child: Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: 0.001 * height),
-                                                  child: Text(
-                                                    [2, 3, 4, 5, 6].contains(item.BMMFST) ? '' :
-                                                    "${'StringDoSync'.tr} (${item.BMMNR.toString()})",
-                                                    style: ThemeHelper()
-                                                        .buildTextStyle(
-                                                        context, Colors.green, 'M'),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          Image.asset(
+                            "${ImagePath}no_data.png",
                           ),
-                          BIL_MOV_D_SHOW(item.BMKID == 11 || item.BMKID == 12 ? 'BIF_MOV_D' : 'BIL_MOV_D',item.BMMID.toString()),
+                          const SizedBox(height: 16),
+                          Text(
+                            'StringNoData'.tr,
+                            style: ThemeHelper().buildTextStyle(context, Colors.black, 'L'),
+                          ),
                         ],
                       ),
-                    );
-                  });
+                    ),
+                    firstPageErrorIndicatorBuilder: (_) =>
+                        Center(child: Text('خطأ في التحميل، أعد المحاولة')),
+                    noMoreItemsIndicatorBuilder: (_) =>
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: Text('لا مزيد من الفواتير')),
+                    ),
+                  ),
+                  );
             })),
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: AppColors.MainColor,
@@ -1239,25 +1255,25 @@ class _Sale_Invoices_viewState extends State<Sale_Invoices_view> {
                   /// Home
                   SalomonBottomBarItem(
                     icon: Icon(Icons.thermostat, color: Colors.black),
-                    title: Text("${'StringAll'.tr} (${controller.BIL_MOV_M_List.length})"),
+                    title: Text("${'StringAll'.tr} (${(controller.pagingController.itemList??[]).length})"),
                     selectedColor: Colors.black,
                   ),
                   /// Operation
                   SalomonBottomBarItem(
                     icon: Icon(Icons.thermostat, color: Colors.green),
-                    title: Text("${'Stringfinal'.tr} (${controller.BIL_MOV_M_List.length})"),
+                    title: Text("${'Stringfinal'.tr} (${(controller.pagingController.itemList??[]).length})"),
                     selectedColor: Colors.green,
                   ),
                   /// Reports
                   SalomonBottomBarItem(
                     icon: Icon(Icons.thermostat, color: Colors.red),
-                    title: Text("${'StringNotfinal'.tr} (${controller.BIL_MOV_M_List.length})"),
+                    title: Text("${'StringNotfinal'.tr} (${(controller.pagingController.itemList??[]).length})"),
                     selectedColor: Colors.red,
                   ),
                   /// Settings
                   SalomonBottomBarItem(
                     icon: Icon(Icons.thermostat, color: Colors.blueAccent),
-                    title: Text("${'StringPending'.tr} (${controller.BIL_MOV_M_List.length})"),
+                    title: Text("${'StringPending'.tr} (${(controller.pagingController.itemList??[]).length})"),
                     selectedColor: Colors.blueAccent,
                   ),
                 ],

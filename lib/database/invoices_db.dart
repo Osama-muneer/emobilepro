@@ -430,7 +430,8 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
 Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYPE,String GETDateNow,
     int GETBMKID2,int GETBMMST,String BIID_F,String BIID_T,String BMMDO_F,String BMMDO_T,String SCID_V,
     String PKID_V,int REUTEN_T,int TYPE_SER,
-    {int? pageIndex=1, int? pageSize=20}) async {
+    {int? pageIndex=1, int? pageSize=20})
+async {
   var dbClient = await conn.database;
   String sql;
   String sql2='';
@@ -457,31 +458,32 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
   String sqlPKID='';
   REUTEN_T==1?sql_R="  ":sql_R='';
 
-  // if( TYPE=='DateNow' || TYPE=='FromDate' ){
-  //   sql2=" A.BMMDO like'%$GETDateNow%' AND";
-  // }
 
   sql2=" (A.BMMDOR BETWEEN '$BMMDO_F' AND '$BMMDO_T')  AND";
 
   if( GETBMMST==1){
     if(STMID == 'EORD'){
       sqlBMMST=" AND A.BMMST2=1 ";
-    }else{
+    }
+    else{
       sqlBMMST=" AND A.BMMST=1 ";
     }
-  }else if( GETBMMST==2){
+  }
+  else if( GETBMMST==2){
     if(STMID == 'EORD'){
       sqlBMMST=" AND A.BMMST2=2 ";
     }else{
     sqlBMMST=" AND A.BMMST=2 ";
     }
-  }else if( GETBMMST==3){
+  }
+  else if( GETBMMST==3) {
     if(STMID == 'EORD'){
       sqlBMMST=" AND A.BMMST2=4 ";
     }else{
     sqlBMMST=" AND A.BMMST=4 ";
     }
-  }else{
+  }
+  else{
     sqlBMMST='';
   }
 
@@ -572,12 +574,16 @@ Future<List<Bil_Mov_M_Local>> GET_BIL_MOV_M(String TAB_N,int GETBMKID,String TYP
       " AND D.SYID_L=A.SYID_L AND D.CIID_L=A.CIID_L $Wheresql4 "
       " AND S.SIID=A.SIID AND S.JTID_L=A.JTID_L "
       " AND S.SYID_L=A.SYID_L AND S.CIID_L=A.CIID_L $Wheresql7"
-    //  " $SqlORD ORDER BY A.BMMID DESC LIMIT $pageSize OFFSET ${(pageIndex! - 1) * pageSize!}";
-      " $SqlORD ORDER BY A.BMMID DESC ";
+      " $SqlORD ORDER BY A.BMMID DESC LIMIT $pageSize OFFSET ${(pageIndex! - 1) * pageSize!}";
+     // " $SqlORD ORDER BY A.BMMID DESC ";
 
   var result = await dbClient!.rawQuery(sql);
+  //  printLongText(pageIndex);
+  //  printLongText(pageSize);
     printLongText(sql);
-   // print(result);
+    print(result);
+    print('AMJAD');
+    print(result.length);
   // print(GETBMKID.toString());
   List<Bil_Mov_M_Local> list = result.map((item) {return Bil_Mov_M_Local.fromMap(item);
   }).toList();

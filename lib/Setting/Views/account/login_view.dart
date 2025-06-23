@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Services/ApiService.dart';
+import '../../../Core/Services/ApiService.dart';
 import '../../../Widgets/colors.dart';
 import '../../controllers/login_controller.dart';
 import '../../controllers/setting_controller.dart';

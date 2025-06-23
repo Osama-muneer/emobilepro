@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../../Widgets/config.dart';
 import '../Views/Customers/add_ed_customer.dart';
 import '../controllers/login_controller.dart';
@@ -60,11 +61,16 @@ class CustomersController extends GetxController {
   RxDouble? longitude=0.0.obs;
   RxDouble? latitude=0.0.obs;
   double distanceInMeters=0;
+  static const _pageSize = 20;
 
   late List<Bil_Cus_Local> BIL_CUS_List = [];
   late List<Usr_Pri_Local> USR_PRI;
   late List<Bil_Cus_Local> BIL_CUS;
-
+  late final PagingController<int, Bil_Cus_Local> pagingController =
+  PagingController<int, Bil_Cus_Local>(
+    // تُرجع null عندما لا تكون هناك صفحة قادمة
+    firstPageKey: 1,
+  );
   void onInit() async {
     super.onInit();
     BCIDController = TextEditingController();
@@ -133,7 +139,8 @@ class CustomersController extends GetxController {
     BCLONController.text=='0.0';
     GET_location_of_account_application();
     Update_location_of_account_application();
-    GET_BIL_CUS_P("ALL");
+    pagingController.addPageRequestListener(_fetchPage);
+   // GET_BIL_CUS_P("ALL");
     GET_PRIVLAGE();
     _addFocusListeners();
     update();
@@ -207,6 +214,7 @@ class CustomersController extends GetxController {
     BCBLFocus.dispose();
     BCDMFocus.dispose();
     BCCRFocus.dispose();
+    pagingController.dispose();
   }
 
   void _addFocusListeners() {
@@ -265,13 +273,61 @@ class CustomersController extends GetxController {
    }
   }
 
+
+  Future<void> _fetchPage(int pageKey) async {
+    try {
+      print('pageKey');
+      print(pageKey);
+      // 1) جلب الدفعة
+      BIL_CUS_List = await  GET_BIL_CUS(
+        TYPE_SHOW,TYPE_SHOW=="DateNow"?DateFormat('dd-MM-yyyy').format(DateTime.now()):
+      TYPE_SHOW=="FromDate"?SelectNumberOfDays:'',currentIndex,
+         pageIndex: pageKey,
+        pageSize: _pageSize,);
+
+
+      // 2) إذا لا توجد عناصر، نخبر الـ controller بأن الصفحات انتهت
+      if (BIL_CUS_List.isEmpty) {
+        pagingController.appendLastPage([]);
+        return;
+      }
+
+      // 3) حدد إذا كانت هذه آخر صفحة
+      // 2) صفٍّ الدفعة لإزالة المكرّرات
+      final existing = pagingController.itemList ?? <Bil_Cus_Local>[];
+      final filtered = BIL_CUS_List.where((item) => !existing.any((e) => e.BCID == item.BCID)).toList();
+
+      // 3) إذا لا توجد عناصر بعد التصفية، نُخبر الـ controller بانتهاء الصفحات
+      if (filtered.isEmpty) {
+        pagingController.appendLastPage([]);
+        return;
+      }
+
+      // 4) حدد إذا كانت هذه آخر صفحة بناءً على حجم الأصل (ليس حجم المفلترة)
+      final isLastPage = BIL_CUS_List.length < _pageSize;
+      if (isLastPage) {
+        pagingController.appendLastPage(filtered);
+      } else {
+        pagingController.appendPage(filtered, pageKey + 1);
+      }
+      // BIL_MOV_M_List=newItems;
+      update();
+
+    } catch (error) {
+      // في حالة الخطأ
+      pagingController.error = error;
+    }
+  }
   //اظهار البيانات +البحث
   GET_BIL_CUS_P(String type) async {
-      BIL_CUS_List=await GET_BIL_CUS(TYPE_SHOW,TYPE_SHOW=="DateNow"?DateFormat('dd-MM-yyyy').format(DateTime.now()):
-      TYPE_SHOW=="FromDate"?SelectNumberOfDays:'',currentIndex);
-    update();
+    pagingController.refresh();
+    //   BIL_CUS_List=await GET_BIL_CUS(
+    //   TYPE_SHOW,TYPE_SHOW=="DateNow"?DateFormat('dd-MM-yyyy').format(DateTime.now()):
+    //   TYPE_SHOW=="FromDate"?SelectNumberOfDays:'',currentIndex,
+    //    // pageIndex: pageKey,
+    //     pageSize: _pageSize,);
+    // update();
   }
-
 
   //يجب تحديد الموقع عند اضافة حساب جديد من التطبيق
   Future GET_location_of_account_application() async {

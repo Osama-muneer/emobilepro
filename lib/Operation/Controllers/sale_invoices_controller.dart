@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import '../../Core/Services/BarcodeService.dart';
 import '../../Packages/ES_MAT_PKG.dart';
 import '../../Packages/ES_WS_PKG.dart';
-import '../../Services/BarcodeService.dart';
 import '../../Setting/Views/Customers/add_ed_customer.dart';
 import '../../Setting/models/eco_acc.dart';
 import '../../Setting/models/pay_kin.dart';
@@ -747,9 +748,24 @@ class Sale_Invoices_Controller extends GetxController {
   RxList<Bil_Mov_M_Local> invoices = <Bil_Mov_M_Local>[].obs;
   RxBool isLoading = false.obs;
   RxBool hasMoreData = true.obs;
-  int currentPage = 1;
-  int pageSize = 20;
+ // int currentPage = 1;
   final ScrollController scrollController = ScrollController();
+  static const _pageSize = 20;
+  // late final pagingController = PagingController<int, Bil_Mov_M_Local>(
+  //   getNextPageKey: (state) => state.lastPageIsEmpty ? null : state.nextIntPageKey,
+  //   fetchPage: (pageKey) => GET_BIL_MOV_M_P("DateNow",pageKey),
+  // );
+
+  /// مفتاح الترحيل (page key) يبدأ من 1
+  //late final PagingController<int, Bil_Mov_M_Local> pagingController;
+
+  /// هذا هو الـ PagingController في الإصدار 5.x
+  late final PagingController<int, Bil_Mov_M_Local> pagingController =
+  PagingController<int, Bil_Mov_M_Local>(
+    // تُرجع null عندما لا تكون هناك صفحة قادمة
+    firstPageKey: 1,
+  );
+
   void updateDetailsField() {
     detailsField = selectedDetails.map((detail) => '< $detail >').join(' ');
     update(); // تحديث واجهة المستخدم
@@ -759,7 +775,8 @@ class Sale_Invoices_Controller extends GetxController {
     super.onInit();
     if(STMID=='EORD'){
       BMKID = 11;
-    }else{
+    }
+    else{
       if (Get.arguments is int) {
         (Get.arguments == 3 || BMKID == 3) ? BMKID = 3
             : (Get.arguments == 1 || BMKID == 1) ? BMKID = 1
@@ -878,17 +895,20 @@ class Sale_Invoices_Controller extends GetxController {
     autocompleteFocusNode = FocusNode();
     FromDaysController.text = SER_DA;
     ToDaysController.text = SER_DA;
+    // يبدأ المحرك بتحميل الصفحة الأولى أوتوماتيكيًا
+   // pagingController.refresh();
     GET_USR_PRI();
     GET_BRA_YEA_P();
     SyncBIL_MOV_D_P('SyncOnly', '-1', false, 2);
-    GET_BIL_MOV_M_P("DateNow");
-    get_RETURN_SALE("DateNow");
-    // // إضافة listener للتمرير عند الوصول إلى أسفل القائمة
-    // scrollController.addListener(() {
-    //   if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-    //     GET_BIL_MOV_M_P("DateNow");
-    //   }
-    // });
+   // GET_BIL_MOV_M_P("DateNow");
+    // 2) استمع لطلبات الصفحات الجديدة
+    pagingController.addPageRequestListener(_fetchPage);
+
+    // late final _pagingController = PagingController<int, Photo>(
+    //   getNextPageKey: (state) => state.lastPageIsEmpty ? null : state.nextIntPageKey,
+    //   fetchPage: (pageKey) => RemoteApi.getPhotos(pageKey),
+    // );
+    //get_RETURN_SALE("DateNow");
 
     await ES_FAT_PKG.GET_P();
     UpdateDataGUID_P();
@@ -1079,6 +1099,7 @@ class Sale_Invoices_Controller extends GetxController {
     BCLATController.dispose();
     BCLONController.dispose();
     autocompleteFocusNode.dispose();
+    pagingController.dispose();
     if(isTablet && STMID=='EORD') {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
@@ -1087,6 +1108,126 @@ class Sale_Invoices_Controller extends GetxController {
     }
   }
 
+
+  //اظهار البيانات +البحث
+  GET_BIL_MOV_M_P(String type,{pageKey=0}) async {
+    print('GET_BIL_MOV_M_P');
+    // BIL_MOV_M_List = await GET_BIL_MOV_M(
+    //     BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMKID!, TYPE_SHOW,
+    //     TYPE_SHOW == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
+    //     TYPE_SHOW == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
+    //     selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
+    //     ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),2,TYPE_SER!,
+    //     pageIndex: currentPage,
+    //     pageSize: _pageSize);
+  //  pagingController.refresh();
+   // update();
+   // pagingController.addPageRequestListener((pageKey) {
+    pagingController.refresh();
+   // });
+  }
+
+  Future<void> _fetchPage(int pageKey) async {
+    try {
+      print('pageKey');
+      print(pageKey);
+      // 1) جلب الدفعة
+      BIL_MOV_M_List = await GET_BIL_MOV_M(
+        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+        BMKID!,
+        TYPE_SHOW,
+        TYPE_SHOW == "DateNow"
+            ? DateFormat('dd-MM-yyyy').format(DateTime.now())
+            : TYPE_SHOW == "FromDate"
+            ? SelectNumberOfDays
+            : '',
+        BMKID!,
+        currentIndex,
+        selectedBranchFrom.toString(),
+        selectedBranchTo.toString(),
+        FromDaysController.text,
+        ToDaysController.text,
+        SelectDataSCID_S.toString(),
+        SelectDataPKID_S.toString(),
+        2,
+        TYPE_SER!,
+        pageIndex: pageKey,
+        pageSize: _pageSize,
+      );
+
+
+      // 2) إذا لا توجد عناصر، نخبر الـ controller بأن الصفحات انتهت
+      if (BIL_MOV_M_List.isEmpty) {
+        pagingController.appendLastPage([]);
+        return;
+      }
+
+      // 3) حدد إذا كانت هذه آخر صفحة
+      // 2) صفٍّ الدفعة لإزالة المكرّرات
+      final existing = pagingController.itemList ?? <Bil_Mov_M_Local>[];
+      final filtered = BIL_MOV_M_List.where((item) => !existing.any((e) => e.BMMID == item.BMMID)).toList();
+
+      // 3) إذا لا توجد عناصر بعد التصفية، نُخبر الـ controller بانتهاء الصفحات
+      if (filtered.isEmpty) {
+        pagingController.appendLastPage([]);
+        return;
+      }
+
+      // 4) حدد إذا كانت هذه آخر صفحة بناءً على حجم الأصل (ليس حجم المفلترة)
+      final isLastPage = BIL_MOV_M_List.length < _pageSize;
+      if (isLastPage) {
+        pagingController.appendLastPage(filtered);
+      } else {
+        pagingController.appendPage(filtered, pageKey + 1);
+      }
+     // BIL_MOV_M_List=newItems;
+      update();
+
+    } catch (error) {
+      // في حالة الخطأ
+      pagingController.error = error;
+    }
+  }
+
+
+  Future<List<Bil_Mov_M_Local>> _fetchPage2(String type, int pageKey) async {
+    //currentPage=pageKey;
+    final newList = await GET_BIL_MOV_M(
+        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMKID!, TYPE_SHOW,
+        TYPE_SHOW == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
+        TYPE_SHOW == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
+        selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
+        ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),2,TYPE_SER!,
+        pageIndex: pageKey,
+        pageSize: _pageSize);
+    BIL_MOV_M_List = newList;
+   // pagingController.refresh();
+  //  update();
+    return newList;
+  }
+
+  //اظهار البيانات +البحث
+  get_RETURN_SALE(String type) async {
+    print('BMKID == 2 ? 1:BMKID!');
+    print(BMKID);
+    print(BMKID == 2 ? 1:BMKID!);
+    RETURN_SALE_INV = await GET_BIL_MOV_M(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
+        BMKID == 4 ? 3 : BMKID == 12 ? 11 : BMKID == 2 ? 1 : BMKID!, type,
+        type == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
+        type == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
+        selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
+        ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),1,TYPE_SER!);
+    update();
+  }
+
+
+  onFilterChanged(int type) async {
+    TYPE_SER=type;
+    pagingController.refresh();
+    //currentPage = 1;
+  //  GET_BIL_MOV_M_P("DateNow");
+   // get_RETURN_SALE("DateNow");
+  }
 
   Future<void> selectDateFromDays_F(BuildContext context) async {
     final picked = await DatePickerHelper.pickDate(
@@ -2375,11 +2516,6 @@ class Sale_Invoices_Controller extends GetxController {
         Allow_give_Free_Pay_due = '2';
         Allow_give_Free_Pay_Cash = '2';
       }
-      print('GET_Allow_give_Free_Quantities');
-      print(Allow_give_Free_Quantities);
-      print(Allow_give_Free_Pay_Not_Cash_Due);
-      print(Allow_give_Free_Pay_due);
-      print(Allow_give_Free_Pay_Cash);
       update();
     });
   }
@@ -2390,7 +2526,6 @@ class Sale_Invoices_Controller extends GetxController {
       SYS_VAR = data;
       if (SYS_VAR.isNotEmpty) {
         Allow_give_Discount = SYS_VAR.elementAt(0).SVVL;
-        update();
         if (SYS_VAR.elementAt(0).SVVL == '1') {
           await PRIVLAGE(LoginController().SUID,
               BMKID == 3 || BMKID == 4 || BMKID == 7 || BMKID == 10
@@ -2492,12 +2627,6 @@ class Sale_Invoices_Controller extends GetxController {
             update();
           }
 
-          print('GET_Allow_give_Discount');
-          print(UPIN_BMMDI);
-          print(Allow_give_Discount);
-          print(Allow_give_discount_Pay_Cash);
-          print(Allow_give_discount_Pay_due);
-          print(Allow_give_discount_Pay_Not_Cash_Due);
         }
       } else {
         if (LoginController().SUID == '1') {
@@ -5071,93 +5200,6 @@ class Sale_Invoices_Controller extends GetxController {
     });
   }
 
-
-
-  Future<void> GET_BIL_MOV_M_P2(String type) async {
-    if (!isLoading.value && hasMoreData.value) {
-      isLoading.value = true;
-      update(); // تحديث الشاشة
-
-      // جلب البيانات
-      List<Bil_Mov_M_Local> newInvoices = await GET_BIL_MOV_M(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-        BMKID!,
-        TYPE_SHOW,
-        TYPE_SHOW == "DateNow"
-            ? DateFormat('dd-MM-yyyy').format(DateTime.now())
-            : TYPE_SHOW == "FromDate"
-            ? SelectNumberOfDays
-            : '',
-        BMKID!,
-        currentIndex,
-        selectedBranchFrom.toString(),
-        selectedBranchTo.toString(),
-        FromDaysController.text,
-        ToDaysController.text,
-        SelectDataSCID_S.toString(),
-        SelectDataPKID_S.toString(),
-        2,
-        TYPE_SER!,
-        pageIndex: currentPage,
-        pageSize: pageSize,
-      );
-
-      if (newInvoices.isNotEmpty) {
-        if (newInvoices.length < pageSize) {
-          hasMoreData.value = false; // لا توجد المزيد من البيانات
-        }
-
-        // إضافة البيانات فقط إذا كانت جديدة
-        BIL_MOV_M_List.addAll(newInvoices); // إضافة البيانات
-        currentPage++; // تحديث الصفحة
-      } else {
-        // في حالة عدم وجود بيانات جديدة
-        hasMoreData.value = false;
-      }
-
-      isLoading.value = false;
-      update(); // تحديث الشاشة بعد التحديثات
-    }
-  }
-
-
-
-  //اظهار البيانات +البحث
-  GET_BIL_MOV_M_P(String type) async {
-    BIL_MOV_M_List = await GET_BIL_MOV_M(
-        BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M', BMKID!, TYPE_SHOW,
-        TYPE_SHOW == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
-        TYPE_SHOW == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
-        selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
-        ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),2,TYPE_SER!,
-      pageIndex: currentPage,
-      pageSize: pageSize);
-    update();
-  }
-
-
-
-  //اظهار البيانات +البحث
-  get_RETURN_SALE(String type) async {
-    print('BMKID == 2 ? 1:BMKID!');
-    print(BMKID);
-    print(BMKID == 2 ? 1:BMKID!);
-    RETURN_SALE_INV = await GET_BIL_MOV_M(BMKID == 11 || BMKID == 12 ? 'BIF_MOV_M' : 'BIL_MOV_M',
-        BMKID == 4 ? 3 : BMKID == 12 ? 11 : BMKID == 2 ? 1 : BMKID!, type,
-        type == "DateNow" ? DateFormat('dd-MM-yyyy').format(DateTime.now()) :
-        type == "FromDate" ? SelectNumberOfDays : '', BMKID!,currentIndex,
-        selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
-        ToDaysController.text,SelectDataSCID_S.toString(),SelectDataPKID_S.toString(),1,TYPE_SER!);
-    update();
-  }
-
-
-  onFilterChanged(int type) async {
-    TYPE_SER=type;
-    currentPage = 1;
-    GET_BIL_MOV_M_P("DateNow");
-    get_RETURN_SALE("DateNow");
-  }
 
     //جلب الباركود
     Future FetchBarcodData(String barcod) async {

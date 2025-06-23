@@ -1,4 +1,4 @@
-import '../Services/ErrorHandlerService.dart';
+import '../Core/Services/ErrorHandlerService.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/models/acc_acc.dart';
 import '../Setting/models/acc_tax_c.dart';
@@ -29,7 +29,8 @@ Future<List<Acc_Tax_T_Local>> GET_ACC_TAX_T() async {
   },Err: 'GET_ACC_TAX_T');
 }
 
-Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST) async {
+Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST,
+    {int? pageIndex=1, int? pageSize=20}) async {
   return await ErrorHandlerService.run(() async {
     var dbClient = await conn.database;
     String sql;
@@ -85,7 +86,7 @@ Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST) asyn
         " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql "
         " AND D.JTID_L=${LoginController().JTID} "
         " AND D.SYID_L=${LoginController().SYID} AND D.CIID_L='${LoginController().CIID}' $Wheresql2 "
-        " ORDER BY A.BCID DESC";
+        " ORDER BY A.BCID DESC LIMIT $pageSize OFFSET ${(pageIndex! - 1) * pageSize!}";
     var result = await dbClient!.rawQuery(sql);
     printLongText(sql);
     List<Bil_Cus_Local> list = result.map((item) {return Bil_Cus_Local.fromMap(item);}).toList();
