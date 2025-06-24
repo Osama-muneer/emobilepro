@@ -1,3 +1,4 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../Setting/controllers/Customers_Controller.dart';
@@ -9,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../Widgets/theme_helper.dart';
 import '../../../routes/routes.dart';
+import '../../models/bil_cus.dart';
 
 class ViewCustomers extends StatefulWidget {
   const ViewCustomers({Key? key}) : super(key: key);
@@ -21,7 +23,6 @@ class _ViewCustomersState extends State<ViewCustomers> {
   final CustomersController controller = Get.find();
   static const Color grey_5 = Color(0xFFf2f2f2);
   late search.SearchBar searchBar;
-  String query = '';
   DateTime DateDays = DateTime.now();
   DateTime DateDays_last = DateTime.now();
   static const MaterialColor buttonTextColor = MaterialColor(
@@ -68,7 +69,14 @@ class _ViewCustomersState extends State<ViewCustomers> {
     }
   }
 
-  void searchRequestData(String query) {
+  void searchRequestData(String q) {
+    setState(() {
+      controller.query = q;                     // خزّن النص
+      controller.pagingController.refresh();  // أعد تحميل الصفحات بالفلتر الجديد
+    });
+  }
+
+  void searchRequestData2(String query) {
     final listDatacustmoerRequest = controller.BIL_CUS_List.where((list) {
       final titleLower = list.BCID.toString().toLowerCase();
       final authorLower = list.BCNA_D.toString().toLowerCase();
@@ -78,7 +86,7 @@ class _ViewCustomersState extends State<ViewCustomers> {
     }).toList();
 
     setState(() {
-      this.query = query;
+      controller.query = query;
       controller.BIL_CUS_List = listDatacustmoerRequest;
       if (query == '') {
         controller.GET_BIL_CUS_P("ALL");
@@ -139,7 +147,6 @@ class _ViewCustomersState extends State<ViewCustomers> {
           backgroundColor: Colors.redAccent, colorText: Colors.white);
     }
   }
-
 
   void showCustomerActionsSheet(item) {
     Get.bottomSheet(
@@ -353,31 +360,34 @@ class _ViewCustomersState extends State<ViewCustomers> {
         body: GetBuilder<CustomersController>(
             init: CustomersController(),
             builder: ((value) {
-          if (controller.loading.value == true) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (controller.BIL_CUS_List.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    "${ImagePath}no_data.png",
-                    height: 0.1 * height,
-                  ),
-                  ThemeHelper().buildText(context,'StringNoData', Colors.black,'L'),
-                ],
-              ),
-            );
-          }
-          return  ListView.builder(
-            itemCount: controller.BIL_CUS_List.length,
-            itemBuilder: (BuildContext context, int index) =>
-                InkWell(
+          // if (controller.loading.value == true) {
+          //   return const Center(
+          //     child: CircularProgressIndicator(),
+          //   );
+          // }
+          // if (controller.BIL_CUS_List.isEmpty) {
+          //   return Center(
+          //     child: Column(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         Image.asset(
+          //           "${ImagePath}no_data.png",
+          //           height: 0.1 * height,
+          //         ),
+          //         ThemeHelper().buildText(context,'StringNoData', Colors.black,'L'),
+          //       ],
+          //     ),
+          //   );
+          // }
+          return  PagedListView<int, Bil_Cus_Local>(
+            pagingController: controller.pagingController,
+            builderDelegate: PagedChildBuilderDelegate<Bil_Cus_Local>(
+              itemBuilder: (context, cus, index) {
+                //var item =  controller.BIL_MOV_M_List[index];
+                var item =  cus;
+                return  InkWell(
                   onTap: (){
-                    showCustomerActionsSheet(controller.BIL_CUS_List[index]);
+                    showCustomerActionsSheet(cus);
                   },
                   child: Card(
                     elevation: 5,
@@ -393,9 +403,9 @@ class _ViewCustomersState extends State<ViewCustomers> {
                             color: AppColors.MainColor,
                             padding: EdgeInsets.symmetric(horizontal: 0.002 * height),
                             child: Center(
-                              child: Text(  controller.BIL_CUS_List[index].BCNA_D.toString()!=''?
-                              controller.BIL_CUS_List[index].BCNA_D.toString():controller.BIL_CUS_List[index].BCNA.toString(),
-                                  style: ThemeHelper().buildTextStyle(context, Colors.white,'L'),),
+                              child: Text(  cus.BCNA_D.toString()!=''?
+                              cus.BCNA_D.toString():cus.BCNA.toString(),
+                                style: ThemeHelper().buildTextStyle(context, Colors.white,'L'),),
                             ),
                           ),
                           SizedBox(
@@ -407,54 +417,54 @@ class _ViewCustomersState extends State<ViewCustomers> {
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
-                                    Text(controller.BIL_CUS_List[index].BINA_D.toString(),
+                                    Text(cus.BINA_D.toString(),
                                         style: ThemeHelper().buildTextStyle(context, Colors.black,'M')),
-                                    Text(controller.BIL_CUS_List[index].BANA_D.toString()!='null' ?
-                                    controller.BIL_CUS_List[index].BANA_D.toString() : controller.BIL_CUS_List[index].BCAD.toString()!='null' ?
-                                    controller.BIL_CUS_List[index].BCAD.toString():'' ,
+                                    Text(cus.BANA_D.toString()!='null' ?
+                                    cus.BANA_D.toString() : cus.BCAD.toString()!='null' ?
+                                    cus.BCAD.toString():'' ,
                                       style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),
                                     ),
-                                    Text(controller.BIL_CUS_List[index].BCMO.toString()=='null'?'':
-                                    controller.BIL_CUS_List[index].BCMO.toString(),
+                                    Text(cus.BCMO.toString()=='null'?'':
+                                    cus.BCMO.toString(),
                                         style: ThemeHelper().buildTextStyle(context, Colors.black,'M')),
                                   ],
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    Text(controller.BIL_CUS_List[index].BCID.toString(),style: ThemeHelper().buildTextStyle(context, Colors.black,'M')),
+                                    Text(cus.BCID.toString(),style: ThemeHelper().buildTextStyle(context, Colors.black,'M')),
                                     Expanded(
                                       child: IconButton(
-                                              icon: Icon(
-                                                Icons.sync,
-                                                color: Colors.black,
-                                                size: 0.026 * height,
-                                              ),
-                                              onPressed: () async {
-                                                Get.defaultDialog(
-                                                  title: 'StringMestitle'.tr,
-                                                  middleText: 'StringSuresyn'.tr,
-                                                  backgroundColor: Colors.white,
-                                                  radius: 40,
-                                                  textCancel: 'StringNo'.tr,
-                                                  cancelTextColor: Colors.red,
-                                                  textConfirm: 'StringYes'.tr,
-                                                  confirmTextColor:
-                                                  Colors.white,
-                                                  onConfirm: () {
-                                                    Navigator.of(context).pop(false);
-                                                    controller.Socket_IP_Connect('SyncOnly',
-                                                        controller.BIL_CUS_List[index].BCID.toString());
-                                                    controller.GET_BIL_CUS_P("ALL");
-                                                  },
-                                                );
-                                              }),
+                                          icon: Icon(
+                                            Icons.sync,
+                                            color: Colors.black,
+                                            size: 0.026 * height,
+                                          ),
+                                          onPressed: () async {
+                                            Get.defaultDialog(
+                                              title: 'StringMestitle'.tr,
+                                              middleText: 'StringSuresyn'.tr,
+                                              backgroundColor: Colors.white,
+                                              radius: 40,
+                                              textCancel: 'StringNo'.tr,
+                                              cancelTextColor: Colors.red,
+                                              textConfirm: 'StringYes'.tr,
+                                              confirmTextColor:
+                                              Colors.white,
+                                              onConfirm: () {
+                                                Navigator.of(context).pop(false);
+                                                controller.Socket_IP_Connect('SyncOnly',
+                                                    cus.BCID.toString());
+                                                controller.GET_BIL_CUS_P("ALL");
+                                              },
+                                            );
+                                          }),
                                     ),
                                     Expanded(
                                       child: Padding(
-                                            padding:  EdgeInsets.only(bottom: 0.002 * height),
-                                            child:ThemeHelper().buildText(context,'StringDoSync', Colors.green,'M'),
-                                          ),
+                                        padding:  EdgeInsets.only(bottom: 0.002 * height),
+                                        child:ThemeHelper().buildText(context,'StringDoSync', Colors.green,'M'),
+                                      ),
                                     ),
                                   ],
                                 )
@@ -465,10 +475,41 @@ class _ViewCustomersState extends State<ViewCustomers> {
                       ),
                     ),
                   ),
+                );
+              },
+              firstPageProgressIndicatorBuilder: (_) =>
+              const Center(child: CircularProgressIndicator()),
+              newPageProgressIndicatorBuilder: (_) =>
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              // عندما لا توجد عناصر بعد تحميل الصفحة الأولى:
+              noItemsFoundIndicatorBuilder: (_) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "${ImagePath}no_data.png",
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'StringNoData'.tr,
+                      style: ThemeHelper().buildTextStyle(context, Colors.black, 'L'),
+                    ),
+                  ],
                 ),
-
-          );
-                })),
+              ),
+              firstPageErrorIndicatorBuilder: (_) =>
+                  Center(child: Text('خطأ في التحميل، أعد المحاولة')),
+              noMoreItemsIndicatorBuilder: (_) =>
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: Text('لا مزيد من العملاء')),
+              ),
+            ),
+           );
+            })),
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: AppColors.MainColor,
           onPressed: () {

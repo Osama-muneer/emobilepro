@@ -15,8 +15,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../database/setting_db.dart';
-import '../Widgets/theme_helper.dart';
+import '../../Widgets/theme_helper.dart';
+import '../../database/setting_db.dart';
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -173,8 +173,6 @@ void onStart(ServiceInstance service) async {
       "device": device,
     },);
   });
-
-
 
   Timer.periodic(const Duration(hours: 24), (timer) async {
     await LoginController().initHive();

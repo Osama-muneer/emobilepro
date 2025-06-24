@@ -1,4 +1,4 @@
-import '../Widgets/config.dart';
+import '../../Widgets/config.dart';
 import 'ToastService.dart';
 
 class ErrorHandlerService {

@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:http/http.dart' as http;
-import '../Setting/controllers/login_controller.dart';
-import '../Widgets/snack_bar.dart';
+import '../../Setting/controllers/login_controller.dart';
+import '../../Widgets/snack_bar.dart';
 import 'EasyLoadingService.dart';
 import 'ToastService.dart'; // استيراد خدمة حفظ السجلات
 

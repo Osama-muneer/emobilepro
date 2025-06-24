@@ -1,4 +1,4 @@
-import '../Services/ErrorHandlerService.dart';
+import '../Core/Services/ErrorHandlerService.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/models/acc_acc.dart';
 import '../Setting/models/acc_tax_c.dart';
@@ -29,7 +29,8 @@ Future<List<Acc_Tax_T_Local>> GET_ACC_TAX_T() async {
   },Err: 'GET_ACC_TAX_T');
 }
 
-Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST) async {
+Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST,
+    {int? pageIndex=1, int? pageSize=20, String? searchQuery}) async {
   return await ErrorHandlerService.run(() async {
     var dbClient = await conn.database;
     String sql;
@@ -49,6 +50,20 @@ Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST) asyn
     LoginController().BIID_ALL_V=='1'? Wheresql5= " AND  R.BIID_L=A.BIID_L":Wheresql5='';
     LoginController().BIID_ALL_V=='1'? Wheresql6= " AND  S.BIID_L=A.BIID_L":Wheresql6='';
     LoginController().BIID_ALL_V=='1'? Wheresql7= " AND  F.BIID_L=A.BIID_L":Wheresql7='';
+
+    String whereSearch = '';
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      final sq = searchQuery.replaceAll("'", "''"); // تفادي مشاكل الفواصل
+      whereSearch = """
+      AND (
+        A.BCID   LIKE '%$sq%' OR
+        A.BCNA   LIKE '%$sq%' OR
+        A.BCNE    LIKE '%$sq%' OR
+        A.AANO    LIKE '%$sq%'
+      )
+    """;
+    }
+
     if(TYPE=='DateNow' || TYPE=='FromDate'){
       sql2=" A.BCDO like'%$GETDateNow%' AND";
     }
@@ -73,7 +88,7 @@ Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST) asyn
         " AND R.SYID_L=A.SYID_L AND R.CIID_L=A.CIID_L $Wheresql5 "
         " left join BIL_DIS F on A.BDID=F.BDID  AND F.JTID_L=A.JTID_L "
         " AND F.SYID_L=A.SYID_L AND F.CIID_L=A.CIID_L $Wheresql4 "
-        " WHERE $sql2 D.BIID=A.BIID $sql3 AND A.BCTY=2 "
+        " WHERE $sql2  D.BIID=A.BIID  $whereSearch $sql3 AND A.BCTY=2 "
         " AND (A.BIID IS NULL OR EXISTS(SELECT 1 FROM SYS_USR_B S WHERE A.BIID=S.BIID AND S.SUID=${LoginController().SUID} "
         " AND S.SUBST=1 AND(S.SUBIN=1 OR S.SUBPR=1) AND S.JTID_L=A.JTID_L AND S.SYID_L=A.SYID_L "
         " AND S.CIID_L=A.CIID_L $Wheresql6)) "
@@ -85,7 +100,7 @@ Future<List<Bil_Cus_Local>> GET_BIL_CUS(String TYPE,String GETDateNow,SYST) asyn
         " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql "
         " AND D.JTID_L=${LoginController().JTID} "
         " AND D.SYID_L=${LoginController().SYID} AND D.CIID_L='${LoginController().CIID}' $Wheresql2 "
-        " ORDER BY A.BCID DESC";
+        " ORDER BY A.BCID DESC LIMIT $pageSize OFFSET ${(pageIndex! - 1) * pageSize!}";
     var result = await dbClient!.rawQuery(sql);
     printLongText(sql);
     List<Bil_Cus_Local> list = result.map((item) {return Bil_Cus_Local.fromMap(item);}).toList();
