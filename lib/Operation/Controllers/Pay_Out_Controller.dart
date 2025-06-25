@@ -1175,7 +1175,7 @@ class Pay_Out_Controller extends GetxController {
 
   //حفظ سند رئيسي
   Future<bool> Save_ACC_MOV_M_P(bool TypeSave,BuildContext context) async {
-    try {
+    // try {
       STB_N='S1';
       if (SelectDataBIID == null || SelectDataSCID == null ){
         Get.snackbar('StringErrorMes'.tr, 'StringError_MESSAGE'.tr,
@@ -1284,7 +1284,7 @@ class Pay_Out_Controller extends GetxController {
         }
         else{
           UpdateACC_MOV_M(AMKID!,AMMID!,AMMST!,'$SelectDays ${DateFormat('HH:mm:ss').format(DateTime.now())}'
-              ,SelectDataPKID.toString(),PKID==1?int.parse(SelectDataACID.toString()):null,
+              ,SelectDataPKID.toString(),AMKID != 15 && PKID==1 ? int.parse(SelectDataACID.toString()):null,
               PKID==9 || PKID==2?int.parse(SelectDataABID.toString()):null,
               PKID==8?int.parse(SelectDataBCCID.toString()):null,
               SelectDataACNO.toString().isEmpty || SelectDataACNO.toString().contains('null') ? null : SelectDataACNO,
@@ -1333,15 +1333,15 @@ class Pay_Out_Controller extends GetxController {
         }
         return true;
       }
-    }
-    catch (e) {
-      Fluttertoast.showToast(
-          msg: "${STB_N}-${'StrinError_save_data'.tr}",
-          toastLength: Toast.LENGTH_LONG,
-          textColor: Colors.white,
-          backgroundColor: Colors.redAccent);
-      return false;
-    }
+    // }
+    // catch (e) {
+    //   Fluttertoast.showToast(
+    //       msg: "${STB_N}-${'StrinError_save_data'.tr}",
+    //       toastLength: Toast.LENGTH_LONG,
+    //       textColor: Colors.white,
+    //       backgroundColor: Colors.redAccent);
+    //   return false;
+    // }
   }
 
   //حفظ الحركه الفرعيه
