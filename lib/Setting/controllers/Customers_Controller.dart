@@ -37,7 +37,7 @@ class CustomersController extends GetxController {
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  late FocusNode BCNAFocus, BCNEFocus, BCMOFocus,BCTLFocus, BCADFocus, BCHNFocus, BCTXFocus, BCSNFocus,
+  late FocusNode BCNAFocus, BCNEFocus, BCMOFocus,BCTLFocus, BCADFocus, BCHNFocus, BCTXFocus, BCSNDFocus,
       BCQNDFocus,BCAD2Focus,BCPCFocus,BCJTFocus, BCBNFocus, BCONFocus,
       BCC1Focus, BCINFocus, BIIDFocus, ATTIDFocus, ACIDFocus, PKIDFocus, BAIDFocus, BDIDFocus,
       CWIDFocus, BCPRFocus, BCTIDFocus,BCBLFocus,BCDMFocus,BCCRFocus;
@@ -53,7 +53,7 @@ class CustomersController extends GetxController {
   FocusNode contentFocusNode = FocusNode();
   late TextEditingController BCNAController,BCNEController,BCIDController,CWIDController,CWNAController,CTIDController,CTNAController,
       BAIDController,BANAController,BCTIDController,BCTNAController,ATTIDController,ATTNAController,
-       BCMOController,BCADController,BCTXController,BCSNController,BCC1Controller,BCBNController,BCHNController,
+       BCMOController,BCADController,BCTXController,BCSNDController,BCC1Controller,BCBNController,BCHNController,
       BCONController,TextEditingSercheController,BCINController,BCC3Controller,BCLONController,
       BCLATController,BCQNDController,BCAD2Controller,BCPCController,BCJTController,BCBLController,
       BCDMController,BCCRController,BCTLController;
@@ -90,7 +90,7 @@ class CustomersController extends GetxController {
     BCTLController = TextEditingController();
     BCADController = TextEditingController();
     BCTXController = TextEditingController();
-    BCSNController = TextEditingController();
+    BCSNDController = TextEditingController();
     BCC1Controller = TextEditingController();
     BCBNController = TextEditingController();
     BCONController = TextEditingController();
@@ -114,7 +114,7 @@ class CustomersController extends GetxController {
     BCADFocus = FocusNode();
     BCHNFocus = FocusNode();
     BCTXFocus = FocusNode();
-    BCSNFocus = FocusNode();
+    BCSNDFocus = FocusNode();
     BCBNFocus = FocusNode();
     BCONFocus = FocusNode();
     BCC1Focus = FocusNode();
@@ -169,7 +169,7 @@ class CustomersController extends GetxController {
     BCTLController.dispose();
     BCADController.dispose();
     BCTXController.dispose();
-    BCSNController.dispose();
+    BCSNDController.dispose();
     BCC1Controller.dispose();
     BCBNController.dispose();
     BCONController.dispose();
@@ -193,7 +193,7 @@ class CustomersController extends GetxController {
     BCADFocus.dispose();
     BCHNFocus.dispose();
     BCTXFocus.dispose();
-    BCSNFocus.dispose();
+    BCSNDFocus.dispose();
     BCBNFocus.dispose();
     BCONFocus.dispose();
     BCC1Focus.dispose();
@@ -225,7 +225,7 @@ class CustomersController extends GetxController {
     BCADFocus.addListener(update);
     BCHNFocus.addListener(update);
     BCTXFocus.addListener(update);
-    BCSNFocus.addListener(update);
+    BCSNDFocus.addListener(update);
     BCBNFocus.addListener(update);
     BCONFocus.addListener(update);
     BCC1Focus.addListener(update);
@@ -487,11 +487,11 @@ class CustomersController extends GetxController {
         BCTXController.text= note.BCTX.toString()=='null'?'':note.BCTX.toString();
         print(note.BCTX.toString());
         print('note.BCTX.toString()');
-        BCSNController.text= note.BCSN.toString()=='null'?'':note.BCSN.toString();
         BCINController.text= note.BCIN.toString()=='null'?'':note.BCIN.toString();
         BCHNController.text= note.BCHN.toString()=='null'?'':note.BCHN.toString();
-        // BCSNDController.text= note.BCSND.toString()=='null'?'':'${note.BCSND.toString()} ';
+        BCSNDController.text= note.BCSND.toString()=='null'?'':'${note.BCSND.toString()} ';
         BCBNController.text= note.BCBN.toString()=='null'?'':note.BCBN.toString();
+        BCTLController.text= note.BCTL.toString()=='null'?'':note.BCTL.toString();
         BCONController.text= note.BCON.toString()=='null'?'':note.BCON.toString();
         BCC3Controller.text= note.BCC3.toString()=='null'?'':note.BCC3.toString();
         BCLATController.text= note.BCLAT.toString()=='null'?'':note.BCLAT.toString();
@@ -624,7 +624,7 @@ class CustomersController extends GetxController {
             BCTL:BCTLController.text,
             BCMO:BCMOController.text,
             BCTX:BCTXController.text,
-            BCSND:BCSNController.text,
+            BCSND:BCSNDController.text,
             BCHN:BCHNController.text,
             BCBN:BCBNController.text,
             BCON:BCONController.text,
@@ -636,6 +636,7 @@ class CustomersController extends GetxController {
             BCAD2:BCAD2Controller.text,
             BCPC:BCPCController.text,
             BCJT:BCJTController.text,
+            BCC1:BCC1Controller.text,
             BCBL:BCBLController.text.isEmpty?0: double.parse(BCBLController.text),
             BCDM:BCDMController.text.isEmpty?0:int.parse(BCDMController.text),
             BCCR:BCCRController.text.isEmpty?0:int.parse(BCCRController.text),
@@ -729,7 +730,7 @@ class CustomersController extends GetxController {
               SelectDataCWID2 == null ? null : SelectDataCWID2.toString(),SelectDataCTID2 == null ? null : SelectDataCTID2.toString(),
               SelectDataBAID2 == null ? null : SelectDataBAID2.toString(),
               BCNAController.text,BCNEController.text,BCMOController.text,BCTLController.text,BCADController.text,BCTXController.text,
-              BCSNController.text, BCBNController.text,BCONController.text,BCC1Controller.text,BCINController.text,
+              BCSNDController.text, BCBNController.text,BCONController.text,BCC1Controller.text,BCINController.text,
               LoginController().JTID,LoginController().SYID,LoginController().BIID,LoginController().CIID,
               LoginController().SUID,DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now()),2,SelectDataBDID,BCC3Controller.text,
               BCHNController.text,BCLONController.text,BCLATController.text,
@@ -861,13 +862,18 @@ class CustomersController extends GetxController {
     BCMOController.clear();
     BCTLController.clear();
     BCTXController.clear();
-    BCSNController.clear();
+    BCSNDController.clear();
     BCINController.clear();
     BCBNController.clear();
     BCONController.clear();
     BCHNController.clear();
     BCLATController.clear();
     BCLONController.clear();
+    BCAD2Controller.clear();
+    BCPCController.clear();
+    BCC1Controller.clear();
+    BCJTController.clear();
+    BCQNDController.clear();
     CompareBCNAChanged=false;
   }
 

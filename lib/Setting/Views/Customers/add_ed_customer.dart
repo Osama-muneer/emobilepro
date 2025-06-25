@@ -477,14 +477,14 @@ class _Add_Ed_CustomerState extends State<Add_Ed_Customer> {
                         //Street No
                         TextFormField(
                           style: TextStyle(fontWeight: FontWeight.bold),
-                          controller: controller.BCSNController,
-                            focusNode: controller.BCSNFocus,
+                          controller: controller.BCSNDController,
+                            focusNode: controller.BCSNDFocus,
                           // keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
                               labelText: 'StringStreetNo'.tr,
                               labelStyle: TextStyle(
-                                color: controller.BCSNFocus.hasFocus ? Colors.red :Colors.grey.shade500,
+                                color: controller.BCSNDFocus.hasFocus ? Colors.red :Colors.grey.shade500,
                               ),
                               focusedBorder: OutlineInputBorder(
                                   borderRadius:

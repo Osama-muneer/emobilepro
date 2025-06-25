@@ -147,46 +147,50 @@ class _Show_Acc_StatementState extends State<Show_Acc_Statement> {
         ),
         body: GetBuilder<Account_Statement_Controller>(
             init: Account_Statement_Controller(),
-            builder: ((value) =>Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-              return Expanded(
-                  child: controller.TYPY==2?Show_Statment_offline():Show_Acc_Statment());
-            }),
-            Card(
+            builder: ((value) =>SafeArea(
               child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+              StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                return Expanded(
+                    child: controller.TYPY==2?Show_Statment_offline():Show_Acc_Statment());
+              }),
+              Card(
+                child: SafeArea(
+                  child: Column(
                     children: [
-                      Text("StringCurrent_Balance".tr,
-                        style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),),
-                      Text(controller.AMBAL.toString(),
-                        style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text("StringCurrent_Balance".tr,
+                            style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),),
+                          Text(controller.AMBAL.toString(),
+                            style: ThemeHelper().buildTextStyle(context, Colors.black,'M'),),
+                        ],
+                      ),
+                      Text(controller.AMBALN.toString()=='null'?'':controller.AMBALN.toString(),
+                        textAlign: TextAlign.center,
+                        style:  ThemeHelper().buildTextStyle(context, Colors.black,'M')),
+                      controller.TYPY==2?const Divider(color: Colors.black):Container(),
+                      controller.TYPY==2 && StteingController().SHOW_ALTER_REP==false?
+                      Text("Stringdetails_Sto_Num".tr,
+                        style:  TextStyle(
+                          color: Colors.red,
+                          fontSize: height*0.02,
+                        ),):Container(),
+                      controller.TYPY==2?
+                      Text("${'StringlastSync'.tr} :${controller.LastBAL_ACC_M}   ",
+                        style:  TextStyle(
+                          color: Colors.red,
+                          fontSize: height*0.02,
+                        ),):Container(),
                     ],
                   ),
-                  Text(controller.AMBALN.toString()=='null'?'':controller.AMBALN.toString(),
-                    textAlign: TextAlign.center,
-                    style:  ThemeHelper().buildTextStyle(context, Colors.black,'M')),
-                  controller.TYPY==2?const Divider(color: Colors.black):Container(),
-                  controller.TYPY==2 && StteingController().SHOW_ALTER_REP==false?
-                  Text("Stringdetails_Sto_Num".tr,
-                    style:  TextStyle(
-                      color: Colors.red,
-                      fontSize: height*0.02,
-                    ),):Container(),
-                  controller.TYPY==2?
-                  Text("${'StringlastSync'.tr} :${controller.LastBAL_ACC_M}   ",
-                    style:  TextStyle(
-                      color: Colors.red,
-                      fontSize: height*0.02,
-                    ),):Container(),
-                ],
+                ),
               ),
-            ),
-          ],
-        )))
+                        ],
+                      ),
+            )))
       ),
     );
   }

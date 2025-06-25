@@ -8980,7 +8980,7 @@ class Sale_Invoices_Controller extends GetxController {
       return InputDecoration(
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
-        labelText: "${'StringBCID'.tr}  ${'StringCUS_BAL'.tr} ${formatter.format(BACBA! + SumBal!).toString()} ",
+        labelText: "${'StringBCID'.tr}  ${'StringCUS_BAL'.tr}  ${formatter.format(BACBA! + SumBal!).toString()} ",
         labelStyle: const TextStyle(color: Colors.black54),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(0.015 * height)),
         focusedBorder: OutlineInputBorder(

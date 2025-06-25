@@ -2815,16 +2815,26 @@ Future<List<Bil_Mov_M_Local>> SUM_BAL(TYPE,TYPE2,GETID,AANO,SCID,Last_Asyn) asyn
   print('Last_Asyn: $Last_Asyn');
   // → Last_Asyn: 01-06-2025 22:37:14
 
-  // 2. نصّحّح نمط القراءة ليتطابق مع "dd-MM-yyyy HH:mm:ss":
-  final inputFormat = DateFormat('dd-MM-yyyy hh:mm:ss');
-  final dt = inputFormat.parse(Last_Asyn);
-  // dt الآن يساوي DateTime(2025, 6, 1, 22, 37, 14)
-
-  // 3. نختار نمط الإخراج ليكون "يوم-شهر-سنة" ثم "ساعة:دقيقة" (دون ثواني):
-  final outputFormat2 = DateFormat('yyyy-MM-dd hh:mm');
-  final lastSyncIso = outputFormat2.format(dt);
-
-  print('lastSyncIso: $lastSyncIso');
+  // // 2. نصّحّح نمط القراءة ليتطابق مع "dd-MM-yyyy HH:mm:ss":
+  // final inputFormat = DateFormat('dd-MM-yyyy hh:mm:ss');
+  // final dt = inputFormat.parse(Last_Asyn);
+  // // dt الآن يساوي DateTime(2025, 6, 1, 22, 37, 14)
+  //
+  // // 3. نختار نمط الإخراج ليكون "يوم-شهر-سنة" ثم "ساعة:دقيقة" (دون ثواني):
+  // final outputFormat2 = DateFormat('yyyy-MM-dd hh:mm');
+  // final lastSyncIso = outputFormat2.format(dt);
+  var lastSyncIso;
+  if (Last_Asyn != 'null' && Last_Asyn.isNotEmpty) {
+    final inputFormat = DateFormat('dd-MM-yyyy hh:mm:ss');
+    final dt = inputFormat.parse(Last_Asyn);
+    final outputFormat2 = DateFormat('yyyy-MM-dd hh:mm');
+     lastSyncIso = outputFormat2.format(dt);
+    print("Formatted date: $lastSyncIso");
+  } else {
+    print("Last_Asyn is null or empty");
+    // يمكنك تعيين قيمة افتراضية هنا إذا رغبت
+    // final lastSyncIso = 'default_value';
+  }
 
   if(TYPE2==1){
     sqlBMMST='  A.BMMST=2  ';
