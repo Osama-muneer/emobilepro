@@ -94,19 +94,19 @@ dependencies:
   #isar_flutter_libs:
 
     #Windows-specific implementations
-  path_provider_windows:
-  flutter_local_notifications_windows:
-  #sqflite_common_ffi:
-  image_picker_windows:
-  sqlite3_flutter_libs:   # تضمين مكتبة SQLite الأصلية على Windows
-  sqflite_common_ffi:     # واجهة FFI لـ sqflite على Desktop
-
-    #Windows-specific implementations
-  sqflite_common_ffi_web:
-  flutter_spinkit:
+#  path_provider_windows:
+#  flutter_local_notifications_windows:
+#  #sqflite_common_ffi:
+#  image_picker_windows:
+#  sqlite3_flutter_libs:   # تضمين مكتبة SQLite الأصلية على Windows
+#  sqflite_common_ffi:     # واجهة FFI لـ sqflite على Desktop
+#
+#    #Windows-specific implementations
+#  sqflite_common_ffi_web:
+#  flutter_spinkit:
   logger:
   getwidget:
-  workmanager:
+#  workmanager:
   infinite_scroll_pagination: 4.0.0
 
 
