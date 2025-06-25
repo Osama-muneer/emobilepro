@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:share_plus/share_plus.dart';
+import '../Core/Services/shareService.dart';
 import '../Widgets/colors.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -23,8 +24,9 @@ class PdfPerview extends GetWidget {
           actions: [
             IconButton(
                 onPressed: () async {
-                  final xFile = XFile(filePath, mimeType: 'application/pdf');
-                  await Share.shareXFiles([xFile]);
+                  sharePdf(filePath);
+                  // final xFile = XFile(filePath, mimeType: 'application/pdf');
+                  // await Share.shareXFiles([xFile]);
                   // await Share.shareFiles([filePath],
                   //     mimeTypes: ['application/pdf'], text: '');
                 },

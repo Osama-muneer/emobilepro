@@ -2917,6 +2917,7 @@ Future<List<AppPrinterDevice>> loadPrinters() async {
   var dbClient = await conn.database;
   final rows = await dbClient!.query('AppPrinterDevice');
   print(rows);
+  print('loadPrinters');
   return rows.map((m) => AppPrinterDevice.fromMap(m)).toList();
 }
 

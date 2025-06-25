@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   charset_converter
   file_selector_linux
   sqlite3_flutter_libs
+  syncfusion_pdfviewer_linux
   url_launcher_linux
 )
 

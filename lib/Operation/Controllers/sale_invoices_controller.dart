@@ -585,7 +585,9 @@ class Sale_Invoices_Controller extends GetxController {
       TCAMT = 0,
       SUMBAL = 0,
       BIL_MOV_D_BMDNO  = 0,
-      SumBal=0;
+      SumBal=0,
+      MDbal=0,
+      DAbal=0;
   RxDouble? longitude = 0.0.obs;
   RxDouble? latitude = 0.0.obs;
   double distanceInMeters = 0;
@@ -3869,6 +3871,7 @@ class Sale_Invoices_Controller extends GetxController {
   //جلب رصيد العميل
   Future GET_BIL_ACC_C_P(String GETAANO, GETGUID, String GETBIID, String GETSCID,String GETPKID,{GETBMMID}) async {
     BIL_ACC_C = await GET_BIL_ACC_C(GETAANO, GETGUID, GETBIID, GETSCID);
+    await GET_BAL_P(GETBMMID,GETAANO,GETSCID);
     // await PRINT_BALANCE_P(AANO:GETAANO,SCID:GETSCID,TYPE:TYPE,PKID:GETPKID);
     if (BIL_ACC_C.isNotEmpty) {
       //اجمالي مدين كلي
@@ -3914,7 +3917,7 @@ class Sale_Invoices_Controller extends GetxController {
       print(BACBNF);
       print(BACBA);
       print(BACBAR);
-      await GET_BAL_P(GETBMMID,GETAANO,GETSCID);
+
       update();
 
     } else {
@@ -4188,7 +4191,6 @@ class Sale_Invoices_Controller extends GetxController {
     CountRecodeController.text = '0';
     SelectDataRTID = null;
     update();
-    await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
     await GET_BIL_ACC_C_P(AANOController.text, GUIDC,
         SelectDataBIID.toString(),SelectDataSCID.toString(),PKID.toString()
         ,GETBMMID: BMMID.toString());
@@ -4406,7 +4408,6 @@ class Sale_Invoices_Controller extends GetxController {
           await GET_SUMBIL_P();
           await GET_CountRecode(BMMID!);
         }
-        await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
         await GET_BIL_ACC_C_P(AANOController.text, GUIDC,
             SelectDataBIID.toString(),SelectDataSCID.toString(),PKID.toString(),
             GETBMMID: BMMID.toString());
@@ -5900,8 +5901,12 @@ class Sale_Invoices_Controller extends GetxController {
       SUM_M = await SUM_BAL(1,2,BMMID,AANO.toString(), SCID,LastBAL_ACC_C.toString());
       if (SUM_M.isEmpty) {
         SumBal = 0.0;
+        MDbal = 0.0;
+        DAbal = 0.0;
       } else {
         SumBal = SUM_M.elementAt(0).SUM_BAL;
+        MDbal = SUM_M.elementAt(0).SUM_BAL;
+        DAbal = SUM_M.elementAt(0).SUM_BAL;
         update();
       }
       update();
@@ -8975,7 +8980,7 @@ class Sale_Invoices_Controller extends GetxController {
       return InputDecoration(
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
-        labelText: "${'StringBCID'.tr}  ${'StringCUS_BAL'.tr} ${formatter.format(BACBA).toString()} ",
+        labelText: "${'StringBCID'.tr}  ${'StringCUS_BAL'.tr} ${formatter.format(BACBA! + SumBal!).toString()} ",
         labelStyle: const TextStyle(color: Colors.black54),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(0.015 * height)),
         focusedBorder: OutlineInputBorder(
@@ -9135,7 +9140,6 @@ class Sale_Invoices_Controller extends GetxController {
       BCLON = item.BCLON.toString() == 'null' ? '0' : item.BCLON.toString();
       BCLAT = item.BCLAT.toString() == 'null' ? '0' : item.BCLAT.toString();
       SelectDataBCID3 = "${item.BCID.toString()} +++ ${item.BCNA.toString()}";
-      await GET_BAL_P(BMMID,AANOController.text,SelectDataSCID.toString());
       await GET_BIL_ACC_C_P(AANOController.text,GUIDC,SelectDataBIID.toString(),
           SelectDataSCID.toString(),PKID.toString(),GETBMMID: BMMID.toString());
       await GET_TAX_LIN_CUS_IMP_P('CUS', item.AANO.toString(), item.BCID.toString());
@@ -10795,7 +10799,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10809,7 +10813,36 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                  "${'StringAMDMD_off'.tr}:",
+                  style: ThemeHelper().buildTextStyle(
+                      context, Colors.black87, 'M')
+              ),
+
+              Text(formatter.format(MDbal).toString(),
+                style: ThemeHelper().buildTextStyle(context, Colors.black, 'M'),
+              ),
+            ],
+          ),
+          SizedBox(height: 0.010 * height),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "${'StringAMDDA_off'.tr}:",
+                style: ThemeHelper().buildTextStyle(context, Colors.black87, 'M'),
+              ),
+
+              Text(formatter.format(DAbal).toString(),
+                  style: ThemeHelper().buildTextStyle(context, Colors.black, 'M')
+              ),
+            ],
+          ),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10822,7 +10855,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10834,7 +10867,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10846,7 +10879,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10863,7 +10896,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10887,7 +10920,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010* height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10900,7 +10933,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10917,7 +10950,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -10933,7 +10966,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -10951,7 +10984,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -10968,7 +11001,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -10985,7 +11018,7 @@ class Sale_Invoices_Controller extends GetxController {
               ),
             ],
           ),
-          SizedBox(height: 0.015 * height),
+          SizedBox(height: 0.010 * height),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
