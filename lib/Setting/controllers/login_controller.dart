@@ -1178,6 +1178,7 @@ class LoginController extends GetxController {
           textConfirm: 'StringYes'.tr,
           confirmTextColor: Colors.white,
           onConfirm: () async {
+            print(internalBackupPath);
             sharePdf(internalBackupPath);
             // ShareParams(
             //   files: [XFile(internalBackupPath)],
