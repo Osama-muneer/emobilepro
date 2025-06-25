@@ -58,7 +58,6 @@ dependencies:
   network_info_plus:
   syncfusion_flutter_datagrid:
   esc_pos_printer:
-  #flutter_pos_printer_platform_image_3:
   flutter_blue_plus:
   esc_pos_utils:
 

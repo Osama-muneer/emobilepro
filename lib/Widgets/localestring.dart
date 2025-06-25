@@ -1071,7 +1071,6 @@ class LocalString extends Translations{
       'StringReq_BMDAM':'يجب ان يكون السعر اكبر من الصفر',
       'StringAMDMD_off':'مدين/عليه اوفلاين',
       'StringAMDDA_off':'دائن/له اوفلاين',
-
     },
     'en':{
       'Lan_Arabic':'Arabic',

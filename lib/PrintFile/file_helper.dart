@@ -12,6 +12,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:pdf_image_renderer/pdf_image_renderer.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import '../Core/Services/shareService.dart';
 import '../Setting/controllers/setting_controller.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/models/AppPrinterDevice.dart';
@@ -66,7 +67,8 @@ class FileHelper {
     required String fileName,
     required int BMMID,
     String? msg,
-  }) async {
+  })
+  async {
     try {
       final path = await save(bytes, fileName);
       switch (mode) {
@@ -78,8 +80,11 @@ class FileHelper {
           Get.toNamed("/exportedInvoices");
           break;
         case ShareMode.share:
-          final xFile = XFile(path, mimeType: 'application/pdf');// Convert String path to XFile
-          await Share.shareXFiles([xFile], text: msg ?? '');
+         // final xFile = XFile(path, mimeType: 'application/pdf');// Convert String path to XFile
+         // await Share.shareXFiles([xFile], text: msg ?? '');
+        //  final result = await Share.shareXFiles([XFile(path)]);
+         // print('🔹 after shareXFiles: $result');
+          sharePdf(path);
           // await Share.shareXFiles([path], mimeTypes: ['application/pdf'], text: msg ?? '');
           break;
         case ShareMode.print:
@@ -188,7 +193,7 @@ class FileHelper {
   }
 
   // 3) إعادة استخدام دوال تحويل PDF إلى صور
-  static Future<void> _renderAndPrintPdfViaBluetooth2(String path) async {
+  static Future<void> _renderAndPrintPdfViaBluetooth(String path) async {
     final pdf = PdfImageRenderer(path: path);
     await pdf.open();
 
@@ -227,7 +232,7 @@ class FileHelper {
 
     await pdf.close();
   }
-  static Future<void> _renderAndPrintPdfViaBluetooth(String path) async {
+  static Future<void> _renderAndPrintPdfViaBluetooth4(String path) async {
     try {
       final pdf = PdfImageRenderer(path: path);
       await pdf.open();
@@ -331,6 +336,7 @@ class FileHelper {
 
   static Future<void> printToAll(String pdfPath, int copies) async {
     final printers = await loadPrinters();
+    print('printToAll');
     // print(printers.elementAt(0).deviceName);
     // print(printers.elementAt(0).address);
     if (printers.isEmpty) {
@@ -341,6 +347,7 @@ class FileHelper {
     for (var device in printers) {
       print(device.address);
       print(device.deviceName);
+      print(printers.length);
       print('printers.length');
       switch (device.typePrinter) {
         case 'bluetooth':
@@ -387,7 +394,10 @@ class FileHelper {
 
       if (!isConn) {
         final bonded = await bluetooth.getBondedDevices();
+        print(bonded.map((d) => d.address));  // طباعة جميع العناوين في الكونسول
+        print(device.address);  // طباعة جميع العناوين في الكونسول
         final found = bonded.firstWhereOrNull((d) => d.address == device.address);
+        print(found);
 
         if (found == null) {
           _showToast('طابعة Bluetooth غير متصلة: ${device.deviceName}', success: false);
@@ -411,6 +421,7 @@ class FileHelper {
 
       for (int copy = 0; copy < copies; copy++) {
         await _renderAndPrintPdfViaBluetooth(path);
+        await Future.delayed(const Duration(milliseconds: 500));
       }
 
       _showToast("تمت الطباعة بنجاح!", success: true);

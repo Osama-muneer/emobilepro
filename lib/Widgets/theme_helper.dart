@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:share_plus/share_plus.dart';
+import '../Core/Services/shareService.dart';
 import '../Setting/Views/Home/fast_acc_usr_view.dart';
 import '../Setting/controllers/home_controller.dart';
 import '../Setting/controllers/login_controller.dart';
@@ -1428,7 +1429,8 @@ class ThemeHelper {
                       Icon(Icons.share, size: 0.026 * height, color: Colors.black),
                       title: ThemeHelper().buildText(context,'StringShareApp', Colors.black,'M'),
                       onTap: () {
-                        Share.share(ShareApp);
+                        sharePdf(ShareApp);
+                       // Share.share(ShareApp);
                         //
                       },
                     ),

@@ -5,6 +5,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:unique_identifier/unique_identifier.dart';
+import '../../Core/Services/shareService.dart';
 import '../../Setting/models/bra_inf.dart';
 import '../../Setting/models/sys_scr.dart';
 import 'package:file_picker/file_picker.dart';
@@ -1140,30 +1141,24 @@ class LoginController extends GetxController {
           fileName += "_ELITEPRO$acc.db";
       }
 
-      final sourceFile = File('$appPath/$DBNAME');
-      final internalBackupPath = "${internalBackupDir.path}/$fileName";
-      String? externalBackupPath;
-      if (docsAvailable) {
-        externalBackupPath = "${externalDocsDir.path}/$fileName";
-      }
-
-      // 🔄 نسخ الملف داخلياً (دائم)
+      // 4. نسخ الملف من داخل التطبيق
+      final sourceFile = File('${appDocDir.path}/$DBNAME');
+      final internalBackupPath = '${internalBackupDir.path}/$fileName';
       await sourceFile.copy(internalBackupPath);
       print('✅ Backup created at: $internalBackupPath');
-
-      // 🔄 حاول نسخ الملف إلى Documents الخارجي؛ إذا فشل فلا يوقف العملية
-      if (externalBackupPath != null) {
+      // 5. (اختياري) نسخ إضافي إلى Documents لو متاح
+      if (docsAvailable) {
+        final externalBackupPath = '${externalDocsDir.path}/$fileName';
         try {
           await sourceFile.copy(externalBackupPath);
-          print('✅ Backup also saved to Documents: $externalBackupPath');
+          print('✅ Also backed up to Documents: $externalBackupPath');
         } catch (e) {
           print('⚠️ فشل النسخ إلى Documents: $e');
         }
       }
-
       // ✅ حفظ معلومات النسخة في الجدول
-      await insertBackupInfo('نسخة احتياطية',externalBackupPath.toString()=='null'? internalBackupPath :
-      externalBackupPath.toString(), formattedDate, formattedTime);
+      // 6. حفظ معلومات النسخة في جدول النسخ (دائماً من المجلد الداخلي)
+      await insertBackupInfo('نسخة احتياطية',internalBackupPath,formattedDate, formattedTime);
 
       if (type) {
         Fluttertoast.showToast(
@@ -1183,8 +1178,12 @@ class LoginController extends GetxController {
           textConfirm: 'StringYes'.tr,
           confirmTextColor: Colors.white,
           onConfirm: () async {
-            final xFile = XFile(internalBackupPath, mimeType: 'application/db');
-            await Share.shareXFiles([xFile]);
+            sharePdf(internalBackupPath);
+            // ShareParams(
+            //   files: [XFile(internalBackupPath)],
+            // );
+           // final xFile = XFile(internalBackupPath, mimeType: 'application/db');
+           // await Share.shareXFiles([xFile]);
             Get.back();
           },
         );
@@ -1275,8 +1274,9 @@ class LoginController extends GetxController {
           textConfirm: 'StringYes'.tr,
           confirmTextColor: Colors.white,
           onConfirm: () async {
-            final xFile = XFile(backupPathApp, mimeType: 'application/pdf');
-            await Share.shareXFiles([xFile]);
+            sharePdf(backupPathApp);
+            // final xFile = XFile(backupPathApp, mimeType: 'application/pdf');
+            // await Share.shareXFiles([xFile]);
             // await Share.shareFiles([backupPathApp], mimeTypes: ['application/pdf']);
             Get.back();
           },
