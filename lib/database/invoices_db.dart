@@ -418,9 +418,6 @@ Future<List<Bil_Mov_D_Local>> GET_BIL_MOV_D(String TAB_N,String BMMIDNUM,String 
       // " AND D.JTID_L=${LoginController().JTID} "
       // " AND D.SYID_L=${LoginController().SYID} AND D.CIID_L=${LoginController().CIID} $Wheresql4";
   var result = await dbClient!.rawQuery(sql);
-  // printLongText(sql);
-  // print(result);
-  // print('GET_BIL_MOV_D');
   List<Bil_Mov_D_Local> list = result.map((item) {
     return Bil_Mov_D_Local.fromMap(item);
   }).toList();

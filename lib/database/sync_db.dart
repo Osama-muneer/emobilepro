@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Core/Services/ErrorHandlerService.dart';
 import '../Setting/models/con_acc_m.dart';
 import '../Setting/controllers/login_controller.dart';
 import '../Setting/models/acc_acc.dart';
@@ -216,14 +217,16 @@ DeleteALLDataTMP(String GetTableName) async {
 
 
 SaveALLData(String GetTableName) async {
-  var dbClient = await conn.database;
-  String TableNameTmp='$GetTableName''_TMP';
-  String sql;
-  sql= 'INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ';
-  final res = await dbClient!.rawInsert(sql);
-   // print('SaveALLData ${sql} = ${res}');
-   DeleteALLDataTMP(GetTableName);
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String TableNameTmp='$GetTableName''_TMP';
+    String sql;
+    sql= 'INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ';
+    final res = await dbClient!.rawInsert(sql);
+    // print('SaveALLData ${sql} = ${res}');
+    DeleteALLDataTMP(GetTableName);
+    return res;
+  },Err: 'SaveALLData');
 }
 
 

@@ -777,7 +777,13 @@ taxTikcetReportThermal({
                               children: [
                                 buildContent_Data(  controller.Balance_Pay == '1'
                                     && StteingController().Print_Balance_Pay == true? product.BACBA == null ? '0'
-                                    : controller.formatter.format(double.parse(product.BACBA.toString())).toString():
+                                    :product.AMKID.toString() != '2'?controller.formatter.format(double.parse(product.BACBA.toString())+
+                                double.parse(product.BACBNF.toString()) + double.parse(product.balance.toString())-
+                                double.parse(product.AMDDA.toString())) :
+                            controller.formatter.format(double.parse(product.BACBA.toString())+
+                                double.parse(product.BACBNF.toString()) +
+                                double.parse(product.balance.toString()) +
+                                double.parse(product.AMDMD.toString())) :
                                 product.AMDIN.toString()),
                                 Scsy_b? pw.Row(
                                   mainAxisAlignment: pw.MainAxisAlignment.center, // توسيط المحتوى

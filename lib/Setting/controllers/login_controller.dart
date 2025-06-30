@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:unique_identifier/unique_identifier.dart';
 import '../../Core/Services/shareService.dart';
@@ -1094,7 +1095,7 @@ class LoginController extends GetxController {
   }
 
 
-  Future<void> save_path(bool type) async {
+  Future<void> save_path3(bool type) async {
     try {
       final appDocDir = await getApplicationDocumentsDirectory();
       final externalDocsDir = Directory('/storage/emulated/0/Documents/ELITEPRO');
@@ -1201,63 +1202,79 @@ class LoginController extends GetxController {
     }
   }
 
-
-  Future<void> save_path2(bool type) async {
+  Future<void> save_path(bool type) async {
     try {
+      // 1. المجلد الداخلي
       final appDocDir = await getApplicationDocumentsDirectory();
-      final externalDir = Directory('/storage/emulated/0/Documents'); // 📂 مسار مستندات الهاتف
+      final internalBackupDir = Directory('${appDocDir.path}/DataBase');
+      if (!(await internalBackupDir.exists())) {
+        await internalBackupDir.create(recursive: true);
+      }
 
-      String appPath = appDocDir.path;
-      String documentsPath = externalDir.path;
+      // 2. التحقق من صلاحية الكتابة على التخزين الخارجي
+      bool canWriteExternal = false;
+      if (await Permission.storage.request().isGranted) {
+        canWriteExternal = true;
+      }
 
-      File sourceFile = File('$appPath/$DBNAME');
+      // 3. الحصول على مسار المجلد الخارجي (قد يُرجع null على بعض الأجهزة)
+      Directory? externalStorageDir;
+      if (canWriteExternal) {
+        externalStorageDir = await getExternalStorageDirectory();
+      }
+
+      // 4. بناء اسم الملف
+      final now = DateTime.now();
+      final formattedDate = DateFormat('dd-MM-yyyy HH-mm').format(now);
+      final formattedTime = DateFormat('HH:mm:ss').format(now);
       String acc = type == false
           ? '${LoginController().JTID}_${LoginController().BIID}_${LoginController().SYID}'
           : '';
-
-      Directory targetDirectory = Directory("$appPath/DataBase");
-        Directory documentsDirectory = Directory("$documentsPath/ELITEPRO"); // مجلد النسخ الاحتياطي في مستندات الهاتف
-
-      if (!(await targetDirectory.exists())) {
-        await targetDirectory.create(recursive: true);
-      }
-      if (!(await documentsDirectory.exists())) {
-        await documentsDirectory.create(recursive: true);
-      }
-
-      final DateTime now = DateTime.now();
-      final String formattedDate = DateFormat('dd-MM-yyyy HH-mm').format(now);
-      final String formattedTime = DateFormat('HH:mm:ss').format(now);
-
-      String fileName = "${formattedDate}";
-      if (STMID == 'EORD') {
-        fileName += "_ELITEORD$acc.db";
-      }
-      else if (STMID == 'COU') {
-        fileName += "_ESCOU$acc.db";
-      }
-      else if (STMID == 'INVC') {
-        fileName += "_ESINVC$acc.db";
-      }
-      else {
-        fileName += "_ELITEPRO$acc.db";
+      String fileName = formattedDate;
+      switch (STMID) {
+        case 'EORD':
+          fileName += "_ELITEORD$acc.db";
+          break;
+        case 'COU':
+          fileName += "_ESCOU$acc.db";
+          break;
+        case 'INVC':
+          fileName += "_ESINVC$acc.db";
+          break;
+        default:
+          fileName += "_ELITEPRO$acc.db";
       }
 
-      // 🔄 نسخ الملف في مكانين
-      String backupPathApp = "${targetDirectory.path}/$fileName";
-        String backupPathDocs = "${documentsDirectory.path}/$fileName";
+      // 5. نسخ إلى المجلد الداخلي دومًا
+      final sourceFile = File('${appDocDir.path}/$DBNAME');
+      final internalBackupPath = '${internalBackupDir.path}/$fileName';
+      await sourceFile.copy(internalBackupPath);
+      print('✅ Internal backup created at: $internalBackupPath');
 
-      await sourceFile.copy(backupPathApp);
-        await sourceFile.copy(backupPathDocs);
+      // 6. إذا وُجد مسار خارجي وصلاحية كتابة، انسخ إليه
+      if (canWriteExternal && externalStorageDir != null) {
+        final externalDocsDir = Directory('${externalStorageDir.path}/ELITEPRO');
+        if (!(await externalDocsDir.exists())) {
+          await externalDocsDir.create(recursive: true);
+        }
+        final externalBackupPath = '${externalDocsDir.path}/$fileName';
+        try {
+          await sourceFile.copy(externalBackupPath);
+          print('✅ Also backed up to external: $externalBackupPath');
+        } catch (e) {
+          print('⚠️ Failed to copy to external: $e');
+        }
+      }
 
-      // ✅ حفظ معلومات النسخة في الجدول
-      await insertBackupInfo('نسخة احتياطية', backupPathApp, formattedDate, formattedTime);
+      // 7. تسجيل معلومات النسخة في قاعدة البيانات
+      await insertBackupInfo(
+        'نسخة احتياطية',
+        internalBackupPath,
+        formattedDate,
+        formattedTime,
+      );
 
-      //await showBackupNotification(backupPathDocs);
-
-      print('✅ Backup created at: $backupPathApp');
-      // print('📁 Backup also saved to Documents: $backupPathDocs');
-
+      // 8. عرض رسالة ونافذة المشاركة إذا طلب المستخدم ذلك
       if (type) {
         Fluttertoast.showToast(
           msg: '✅ تم حفظ النسخة الاحتياطية بنجاح!',
@@ -1265,104 +1282,31 @@ class LoginController extends GetxController {
           textColor: Colors.white,
           backgroundColor: Colors.green,
         );
-
         Get.defaultDialog(
           title: 'StringMestitle'.tr,
-          middleText: "${'StringShareBK'.tr}",
+          middleText: 'StringShareBK'.tr,
           backgroundColor: Colors.white,
           radius: 40,
           textCancel: 'StringNo'.tr,
           cancelTextColor: Colors.red,
           textConfirm: 'StringYes'.tr,
           confirmTextColor: Colors.white,
-          onConfirm: () async {
-            sharePdf(backupPathApp);
-            // final xFile = XFile(backupPathApp, mimeType: 'application/pdf');
-            // await Share.shareXFiles([xFile]);
-            // await Share.shareFiles([backupPathApp], mimeTypes: ['application/pdf']);
+          onConfirm: () {
+            sharePdf(internalBackupPath);
             Get.back();
           },
         );
       }
-
     } catch (e) {
       print('❌ Error creating backup: $e');
-      Get.snackbar('خطأ', e.toString(),
-          backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar(
+        'خطأ',
+        e.toString(),
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     }
   }
-
-  // Future<void> save_path11(bool Type) async {
-  //   try {
-  //     // Retrieve the application's document directory for both iOS and Android
-  //     final appDocDir = await getApplicationDocumentsDirectory();
-  //     String appPath = appDocDir.path;
-  //
-  //     // Define source and target directories/files
-  //     File sourceFile = File('$appPath/${DBNAME}');
-  //     String ACC = Type == false
-  //         ? '${LoginController().JTID}_${LoginController().BIID}_${LoginController().SYID}'
-  //         : '';
-  //     Directory targetDirectory = Directory("$appPath/DataBase");
-  //
-  //     // Create the target directory if it doesn't exist
-  //     if (!(await targetDirectory.exists())) {
-  //       print("Directory does not exist, creating...");
-  //       await targetDirectory.create(recursive: true);
-  //     }
-  //
-  //     // Define the new backup file name based on STMID and date
-  //     final DateTime time = DateTime.now();
-  //     String newPath = '';
-  //     if (STMID == 'EORD') {
-  //       newPath = "${targetDirectory.path}/${time.day}-${time.month}-${time.year} ELITEORD$ACC.db";
-  //     } else if (STMID == 'COU') {
-  //       newPath = "${targetDirectory.path}/${time.day}-${time.month}-${time.year} ESCOU$ACC.db";
-  //     } else if (STMID == 'INVC') {
-  //       newPath = "${targetDirectory.path}/${time.day}-${time.month}-${time.year} ESINVC$ACC.db";
-  //     } else {
-  //       newPath = "${targetDirectory.path}/${time.day}-${time.month}-${time.year} ELITEPRO$ACC.db";
-  //     }
-  //
-  //     // Copy the source database file to the new path
-  //     await sourceFile.copy(newPath);
-  //     print('Backup created at: $newPath');
-  //
-  //     // Show toast message if Type is true
-  //     if (Type == true) {
-  //       Fluttertoast.showToast(
-  //         msg: 'StringBKMES'.tr,
-  //         toastLength: Toast.LENGTH_LONG,
-  //         textColor: Colors.white,
-  //         backgroundColor: Colors.green,
-  //       );
-  //
-  //       // Show confirmation dialog with sharing option
-  //       Get.defaultDialog(
-  //         title: 'StringMestitle'.tr,
-  //         middleText: "${'StringShareBK'.tr}",
-  //         backgroundColor: Colors.white,
-  //         radius: 40,
-  //         textCancel: 'StringNo'.tr,
-  //         cancelTextColor: Colors.red,
-  //         textConfirm: 'StringYes'.tr,
-  //         confirmTextColor: Colors.white,
-  //         onConfirm: () async {
-  //           await Share.shareFiles([newPath], mimeTypes: ['application/pdf'], text: '');
-  //           Get.back();
-  //         },
-  //       );
-  //     }
-  //
-  //     // Log paths for debugging
-  //     print('AppPath: $appPath');
-  //     print('Backup Path: $newPath');
-  //   } catch (e) {
-  //     // Handle and log any errors
-  //     print('Error creating backup: ${e.toString()}');
-  //     Get.snackbar('ERROR', e.toString());
-  //   }
-  // }
 
   Future<void> importDataBaseFile(int Type) async {
     try {
