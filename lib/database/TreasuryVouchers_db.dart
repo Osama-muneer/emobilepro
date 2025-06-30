@@ -1,3 +1,4 @@
+import 'package:emobilepro/Widgets/config.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../Core/Services/ErrorHandlerService.dart';
@@ -310,13 +311,13 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_M(
     }
 
     if(SCID_V.isNotEmpty && SCID_V.toString()!='null'){
-      sqlSCID=" AND A.SCID=$SCID_V ";
+      sqlSCID="  A.SCID=$SCID_V AND ";
     }else{
       sqlSCID='';
     }
 
     if(BIID_F.isNotEmpty && BIID_F.toString()!='null' && BIID_T.isNotEmpty && BIID_T.toString()!='null'){
-      sqlBIID2=" AND A.BIID2 BETWEEN $BIID_F AND $BIID_T ";
+      sqlBIID2="  A.BIID BETWEEN $BIID_F AND $BIID_T AND ";
     }else{
       sqlBIID2='';
     }
@@ -373,7 +374,7 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_M(
         " left join ACC_CAS F on (A.ACID=F.ACID  AND A.CIID_L=F.CIID_L AND A.JTID_L=F.JTID_L AND A.SYID_L=F.SYID_L $Wheresql6)"
         " left join ACC_BAN G on (A.ABID=G.ABID  AND A.CIID_L=G.CIID_L  AND A.JTID_L=G.JTID_L AND A.SYID_L=G.SYID_L $Wheresql7)"
         " left join BIL_CRE_C C on (A.BCCID=C.BCCID  AND A.CIID_L=C.CIID_L  AND A.JTID_L=C.JTID_L AND A.SYID_L=C.SYID_L $Wheresql3)"
-        " WHERE $sqlAMKID $sqlAMKST $sql2 $sqlBIID2 $sqlSCID A.JTID_L=${LoginController().JTID} "
+        " WHERE $sqlAMKID $sqlAMKST $sql2 $sqlBIID2 $sqlSCID  A.JTID_L=${LoginController().JTID} "
         " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql"
         " AND (A.BIID=B.BIID AND A.CIID_L=B.CIID_L AND A.JTID_L=B.JTID_L AND A.SYID_L=B.SYID_L $Wheresql2)"
         " AND (A.SCID=E.SCID AND A.CIID_L=E.CIID_L AND A.JTID_L=E.JTID_L  AND A.SYID_L=E.SYID_L $Wheresql5)"
@@ -381,7 +382,7 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_M(
         " ORDER BY A.AMMID DESC";
 
     var result = await dbClient!.rawQuery(sql);
-    // printLongText(sql);
+    printLongText(sql);
     print(result);
     List<Acc_Mov_M_Local> list = result.map((item) {
       return Acc_Mov_M_Local.fromMap(item);

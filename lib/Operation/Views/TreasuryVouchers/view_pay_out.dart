@@ -36,55 +36,9 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
   late search.SearchBar searchBar;
   String query = '';
   DateTime DateDays = DateTime.now();
-  static const MaterialColor buttonTextColor = MaterialColor(
-    0xFFEF5350,
-    <int, Color>{
-      50: Color(0xFFFFEBEE),
-      100: Color(0xFFFFCDD2),
-      200: Color(0xFFEF9A9A),
-      300: Color(0xFFE57373),
-      400: Color(0xFFEF5350),
-      500: Color(0xFFF44336),
-      600: Color(0xFFE53935),
-      700: Color(0xFFD32F2F),
-      800: Color(0xFFC62828),
-      900: Color(0xFFB71C1C),
-    },
-  );
   final txtController = TextEditingController();
 
   static const Color grey_5 = Color(0xFFf2f2f5);
-  Future<void> _selectDataFromDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateDays,
-      firstDate: DateTime(2020, 5),
-      lastDate: DateTime(3000),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-              primaryColor: const Color(0xFF4A5BF6),
-              colorScheme:
-              ColorScheme.fromSwatch(primarySwatch: buttonTextColor)
-                  .copyWith(
-                  secondary: const Color(0xFF4A5BF6)) //selection color
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() {
-        DateDays = picked;
-        String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
-        controller.SelectNumberOfDays = formattedDate;
-        setState(() {
-          controller.TYPE_SHOW = "FromDate";
-          controller.GET_ACC_MOV_M_P("FromDate", controller.AMKID!);
-        });
-      });
-    }
-  }
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
@@ -1279,6 +1233,8 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
   }
 
 
+
+
   Widget _buildFilterContent(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return GetBuilder<Pay_Out_Controller>(
@@ -1311,18 +1267,11 @@ class _ViewPay_OutState extends State<ViewPay_Out> {
                   // ),
 
                   // طريقة الدفع والعملة
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                            margin: EdgeInsets.only(left: 0.02 * height),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular( 0.02 * height)),
-                            child:  DropdownSYS_CUR_SBuilder(context)
-                        ),
-                      ),
-                    ],
+                  Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular( 0.02 * height)),
+                      child:  DropdownSYS_CUR_SBuilder(context)
                   ),
 
                   // _buildSectionHeader('طريقة الدفع'),
