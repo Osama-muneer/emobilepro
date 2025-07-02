@@ -174,7 +174,8 @@ class Sale_Invoices_Controller extends GetxController {
       TSQR2 = 2,
       TSQR3 = 2,
       BMMNOR,
-      BMMIDR;
+      BMMIDR,MDbal,
+      DAbal;
   StreamSubscription<Position>? _positionStreamSubscription;
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   String? SelectDataBIID,
@@ -585,9 +586,7 @@ class Sale_Invoices_Controller extends GetxController {
       TCAMT = 0,
       SUMBAL = 0,
       BIL_MOV_D_BMDNO  = 0,
-      SumBal=0,
-      MDbal=0,
-      DAbal=0;
+      SumBal=0;
   RxDouble? longitude = 0.0.obs;
   RxDouble? latitude = 0.0.obs;
   double distanceInMeters = 0;
@@ -5905,8 +5904,8 @@ class Sale_Invoices_Controller extends GetxController {
         DAbal = 0.0;
       } else {
         SumBal = SUM_M.elementAt(0).SUM_BAL;
-        MDbal = SUM_M.elementAt(0).SUM_BAL;
-        DAbal = SUM_M.elementAt(0).SUM_BAL;
+        MDbal = SUM_M.elementAt(0).MD;
+        DAbal = SUM_M.elementAt(0).DA;
         update();
       }
       update();
