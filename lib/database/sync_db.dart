@@ -312,8 +312,8 @@ DeleteDataByGUID(String GetTableName,String GETGUID) async {
   GETGUID= '$GETGUID''';
   String sql="DELETE FROM $GetTableName WHERE GUID='${GETGUID}'" ;
   final  res = await dbClient!.rawDelete(sql);
-  // print('${sql} = ${res}');
-  // print('DeleteDataByGUID');
+  print('${sql} = ${res}');
+  print('DeleteDataByGUID');
   if(GetTableName=='BIL_CUS'){
     await SaveDataByGUID(GetTableName,GETGUID);
   }else {
@@ -335,6 +335,8 @@ SaveDataByGUID(String GetTableName,String GETGUID) async {
   await UpdateDataByGUID('ACC_MOV_D',GETGUID);
   await UpdateDataByGUID('BIL_MOV_M',GETGUID);
   await UpdateDataByGUID('BIF_MOV_M',GETGUID);
+  print(sql);
+  print(res);
   return res;
 }
 
@@ -346,7 +348,7 @@ UpdateDataByGUID(String GetTableName,String GETGUID) async {
       ? ",BCID=(SELECT BCID FROM BIL_CUS B WHERE B.GUID='$GETGUID'),BMMNA=(SELECT BCNA FROM BIL_CUS B WHERE B.GUID='$GETGUID')":'';
   sql= "UPDATE $GetTableName SET AANO=(SELECT AANO FROM BIL_CUS B WHERE B.GUID='$GETGUID') $SQL2  WHERE AANO='${GETGUID}'";
   final res = await dbClient!.rawUpdate(sql);
-  // print('UpdateDataByGUID ${sql} : ${res}');
+  print('UpdateDataByGUID ${sql} : ${res}');
   return res;
 }
 

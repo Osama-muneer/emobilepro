@@ -101,7 +101,7 @@ class Pay_Out_Controller extends GetxController {
   DateTime dateFromDays1 = DateTime.now();
   DateTime dateFromYear1 = DateTime.now();
   DateTime dateTimeToDays2 = DateTime.now();
-  String SER_DA = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  String SER_DA = DateFormat('yyyy-MM-dd').format(DateTime.now());
   late List<Acc_Acc_Local> autoCompleteData;
   late List<Bil_Cre_C_Local> BIL_CRE_C_List = [];
   late List<Acc_Ban_Local> ACC_BAN_List = [];
@@ -301,7 +301,8 @@ class Pay_Out_Controller extends GetxController {
       },
     );
     if (picked != null) {
-      FromDaysController.text =  DateFormat("dd-MM-yyyy").format(picked);
+      //
+      FromDaysController.text =  DateFormat("yyyy-MM-dd").format(picked);
     }
     update();
   }
@@ -323,7 +324,7 @@ class Pay_Out_Controller extends GetxController {
       },
     );
     if (picked != null) {
-      ToDaysController.text = DateFormat("dd-MM-yyyy").format(picked);
+      ToDaysController.text = DateFormat("yyyy-MM-dd").format(picked);
     }
     update();
   }
@@ -334,8 +335,11 @@ class Pay_Out_Controller extends GetxController {
 
   //اظهار البيانات +البحث
   GET_ACC_MOV_M_P(String type,int GETAMKID) async {
+    //DateFormat("yyyy-MM-dd").format(picked)
+    print(ToDaysController.text);
+    print('ToDaysController.text');
     ACC_MOV_M_List=await GET_ACC_MOV_M(
-        TYPE_SHOW,TYPE_SHOW=="DateNow"?DateFormat('dd-MM-yyyy').format(DateTime.now())
+        TYPE_SHOW,TYPE_SHOW=="DateNow"?DateFormat('yyyy-MM-dd').format(DateTime.now())
         :TYPE_SHOW=="FromDate"?SelectNumberOfDays:'',GETAMKID,currentIndex,
         selectedBranchFrom.toString(),selectedBranchTo.toString(),FromDaysController.text,
         ToDaysController.text,SelectDataSCID_S.toString(),TYPE_SER);
@@ -1269,7 +1273,7 @@ class Pay_Out_Controller extends GetxController {
             SUID:   LoginController().SUID,
             AMMCT:  1,
             DATEI:  DateFormat('dd-MM-yyyy HH:m').format(DateTime.now()),
-            AMMDOR: DateFormat('dd-MM-yyyy').format(DateTime.now()),
+            AMMDOR: SelectDays,
             DEVI:   LoginController().DeviceName,
             BIID:   SelectDataBIID.toString(),
             BCCID:  PKID == 8 ? int.parse(SelectDataBCCID.toString()): null,

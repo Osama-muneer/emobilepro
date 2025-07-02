@@ -120,7 +120,7 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  Timer.periodic(const Duration(minutes: 20), (timer) async {
+  Timer.periodic(const Duration(minutes: 5), (timer) async {
     print('Socket_IP_Connect');
     await LoginController().initHive();
     DeleteSYN_ORD_L();

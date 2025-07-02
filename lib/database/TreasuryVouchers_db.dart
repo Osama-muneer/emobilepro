@@ -288,7 +288,10 @@ Future<List<Acc_Mov_M_Local>> GET_ACC_MOV_M(
     String sqlSCID='';
     String sqlBIID2='';
 
-    sql2=" (A.AMMDOR BETWEEN '$BMMDO_F' AND '$BMMDO_T')  AND";
+   // sql2=" (A.AMMDOR BETWEEN '$BMMDO_F' AND '$BMMDO_T')  AND";
+
+    sql2=" ( strftime('%Y-%m-%d', substr(A.AMMDOR, 7, 4) || '-' || substr(A.AMMDOR, 4, 2) || '-' || substr(A.AMMDOR, 1, 2))"
+      " BETWEEN '$BMMDO_F' AND '$BMMDO_T' )  AND";
 
     // if (TYPE == 'DateNow' || TYPE == 'FromDate') {
     //   sql2 = " A.AMMDOR like'%$GETDateNow%' AND";

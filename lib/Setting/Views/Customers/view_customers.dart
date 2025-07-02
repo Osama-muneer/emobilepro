@@ -463,9 +463,12 @@ class _ViewCustomersState extends State<ViewCustomers> {
                                     Expanded(
                                       child: Padding(
                                         padding:  EdgeInsets.only(bottom: 0.002 * height),
-                                        child:ThemeHelper().buildText(context,'StringDoSync', Colors.green,'M'),
+                                        child:ThemeHelper().buildText(context,cus.SYST_L.toString()=='1'?
+                                        'StringDoSync' : 'StringNotApprove',
+                                            cus.SYST_L.toString()=='1'? Colors.green:Colors.red
+                                            ,'M'),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 )
                               ],
