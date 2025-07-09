@@ -38,7 +38,7 @@ class Inv_Rep_Controller extends GetxController {
   String? SelectDataFromBIID='',SelectDataToBIID='',SelectDataFromBPID,SelectDataToBPID,
           SelectDataFromBINA, SelectDataToBINA,SelectDataFromMGNO,SelectDataToMGNO,
           SelectDataSCID,PKID,SelectDataFromMINO,SelectDataToMINO,SelectDataBMKID,SelectDataST='1',
-      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T,PKID_T;
+      SelectDataST_T='2', SelectDataBMKID_T,SelectDataSCID_T,PKID_T,SelectDataToMINO2,SelectDataFromMINO2;
   int BMKID=11;
   double SUMBMDNO=0,SUMBMDMT=0;
   List<Bil_Mov_M_Local> Bil_Mov_M = [];
@@ -115,7 +115,9 @@ class Inv_Rep_Controller extends GetxController {
     SelectDataToBIID = LoginController().BIID.toString();
     TextEditingSercheController = TextEditingController();
     SelectDataFromMINO=null;
+    SelectDataFromMINO2=null;
     SelectDataToMINO=null;
+    SelectDataToMINO2=null;
     SelectDataToMGNO=null;
     SelectDataFromMGNO=null;
     GET_SYS_OWN_P();
@@ -128,7 +130,9 @@ class Inv_Rep_Controller extends GetxController {
     SelectDataBMKID=null;
     SelectDataBMKID_T=null;
     SelectDataFromMINO=null;
+    SelectDataFromMINO2=null;
     SelectDataToMINO=null;
+    SelectDataToMINO2=null;
     SelectDataToMGNO=null;
     SelectDataFromMGNO=null;
     SelectDataFromBIID =LoginController().BIID.toString();

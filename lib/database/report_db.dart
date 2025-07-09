@@ -50,12 +50,13 @@ Future<List<Mat_Inf_Local>> Get_Mat_Inf_REP(String MGNO_F,String MGNO_T) async {
   String Wheresql='';
   LoginController().BIID_ALL_V=='1'? Wheresql= " AND BIID_L=${LoginController().BIID}":Wheresql='';
   MGNO_T=MGNO_T=='null'?MGNO_F:MGNO_T;
-  sql ="SELECT *,CASE WHEN ${LoginController().LAN}=2 AND MINE IS NOT NULL THEN MINE ELSE MINA END  MINA_D"
+  sql ="SELECT MGNO,MINO,CASE WHEN ${LoginController().LAN}=2 AND MINE IS NOT NULL THEN MINE ELSE MINA END  MINA_D"
       " FROM MAT_INF WHERE MGNO BETWEEN '$MGNO_F' AND '$MGNO_T' AND MIST=1"
       " AND JTID_L=${LoginController().JTID} "
       " AND SYID_L=${LoginController().SYID} AND CIID_L=${LoginController().CIID} $Wheresql ORDER BY MGNO,MINO";
   final result = await dbClient!.rawQuery(sql);
-  // print(sql);
+   print(sql);
+   print(result);
   return result.map((json) => Mat_Inf_Local.fromMap(json)).toList();
 }
 
@@ -2620,7 +2621,7 @@ async {
     extraWhere2 = " AND M.BIID_L = C.BIID_L ";
     extraWhere3 = " AND B.BIID_L = D.BIID_L ";
     extraWhere4 = " AND E.BIID_L = D.BIID_L ";
-    extraWhere5 = " AND K.BIID_L = M.BIID_L ";
+    extraWhere5 = " AND M.BIID_L = K.BIID_L ";
   }
 
   // الاستعلام المصحح
@@ -2798,6 +2799,7 @@ async {
       AND M.CIID_L = K.CIID_L
       AND M.JTID_L = K.JTID_L
       AND M.SYID_L = K.SYID_L
+      $extraWhere5
       LEFT JOIN SYS_CUR AS C 
       ON M.SCID = C.SCID
       AND M.CIID_L = C.CIID_L
@@ -2860,6 +2862,7 @@ async {
       AND M.CIID_L = K.CIID_L
       AND M.JTID_L = K.JTID_L
       AND M.SYID_L = K.SYID_L
+      $extraWhere5
       LEFT JOIN SYS_CUR AS C 
       ON M.SCID = C.SCID
       AND M.CIID_L = C.CIID_L

@@ -219,7 +219,9 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
               print('value');
               controller.SelectDataFromMGNO = value.toString();
               controller.SelectDataFromMINO = null;
+              controller.SelectDataFromMINO2 = null;
               controller.SelectDataToMINO = null;
+              controller.SelectDataToMINO2 = null;
               controller.update();
               //controller.SelectDataMINO = value as String;
             },
@@ -299,7 +301,9 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
               print('value');
               controller.SelectDataToMGNO = value.toString();
               controller.SelectDataFromMINO = null;
+              controller.SelectDataFromMINO2 = null;
               controller.SelectDataToMINO = null;
+              controller.SelectDataToMINO2 = null;
               controller.update();
             },
             dropdownSearchData: DropdownSearchData(
@@ -369,11 +373,10 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                 item.MINA_D.toString(),
                 style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),
               ),
-            ))
-                .toList()
-                .obs,
-            value: controller.SelectDataFromMINO,
+            )).toList(),
+            value: controller.SelectDataFromMINO2,
             onChanged: (value) {
+              print(value);
               print('value');
               //controller.SelectDataMINO = value as String;
             },
@@ -434,8 +437,7 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
             dropdownStyleData: const DropdownStyleData(
               maxHeight: 300,
             ),
-            items: snapshot.data!
-                .map((item) => DropdownMenuItem<String>(
+            items: snapshot.data!.map((item) => DropdownMenuItem<String>(
               onTap: () {
                 controller.SelectDataToMINO = item.MINO.toString();
               },
@@ -444,10 +446,8 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
                 item.MINA_D.toString(),
                 style:  ThemeHelper().buildTextStyle(context, Colors.black,'M'),
               ),
-            ))
-                .toList()
-                .obs,
-            value: controller.SelectDataToMINO,
+            )).toList(),
+            value: controller.SelectDataToMINO2,
             onChanged: (value) {
               print('value');
               //controller.SelectDataMINO = value as String;
@@ -1209,18 +1209,18 @@ class _Show_Inv_RepState extends State<Show_Inv_Rep> {
               }
             }):
             Timer(const Duration(seconds: 3), () async {
-              if(controller.SelectDataBMKID==null ){
-                Get.snackbar('StringMestitle'.tr, 'StringChooseTheType'.tr,
-                    backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
-                    colorText:Colors.white,
-                    isDismissible: true,
-                    dismissDirection: DismissDirection.horizontal,
-                    forwardAnimationCurve: Curves.easeOutBack);
-                controller.isloading.value=false;
-              }
-              else {
-                await controller.GET_TotalDetailedItem_REP_P();
-              }
+              // if(controller.SelectDataBMKID==null ){
+              //   Get.snackbar('StringMestitle'.tr, 'StringChooseTheType'.tr,
+              //       backgroundColor: Colors.red, icon: const Icon(Icons.error,color:Colors.white),
+              //       colorText:Colors.white,
+              //       isDismissible: true,
+              //       dismissDirection: DismissDirection.horizontal,
+              //       forwardAnimationCurve: Curves.easeOutBack);
+              //   controller.isloading.value=false;
+              // }
+              // else {
+               // await controller.GET_TotalDetailedItem_REP_P();
+             // }
             });
           },
           child: Container(
