@@ -52,8 +52,7 @@ class Pdf {
       String GETSUNA) async {
     final image = await SimplePdf.loadImage();
 
-    var arabicFont =
-        Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"));
+    var arabicFont = Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"));
     final pdf = Document();
     pdf.addPage(MultiPage(
       maxPages: 500,
@@ -525,8 +524,7 @@ class Pdf {
       int GetSUMDefernt,
       int GetSUMEquil,
       String GETSUNA) async {
-    var arabicFont =
-        Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"));
+    var arabicFont = Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"));
     final pdf = Document();
     final image = await SimplePdf.loadImage();
 
@@ -534,16 +532,12 @@ class Pdf {
       maxPages: 500,
       textDirection: TextDirection.rtl,
       crossAxisAlignment: CrossAxisAlignment.center,
-      theme: ThemeData.withFont(
-          base:
-              Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"))),
+      theme: ThemeData.withFont(base: Font.ttf(await rootBundle.load("Assets/fonts/HacenTunisia.ttf"))),
       pageFormat: PdfPageFormat.standard,
       build: (context) => [
-        PdfPakage.buildHeader(
-            GETREPTYE, '', GETSONA, GETSONE, GETSORN, GETSOLN, image),
+        PdfPakage.buildHeader(GETREPTYE, '', GETSONA, GETSONE, GETSORN, GETSOLN, image),
         //SizedBox(height: 1 * PdfPageFormat.cm),
-        buildTitleMAT_MOVReport(GetFromBINA, GetToBINA, GetFromDays, GetToDays,
-            arabicFont, context),
+        buildTitleMAT_MOVReport(GetFromBINA, GetToBINA, GetFromDays, GetToDays, arabicFont, context),
         buildMAT_MOVReport(arabicFont, USE_SNDE),
         SizedBox(height: 2.h),
         buildSUM_Tra_Rep(GetSUMSNNO, GetCount_RECODE, arabicFont, context),

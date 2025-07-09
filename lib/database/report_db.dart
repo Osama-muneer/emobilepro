@@ -2278,9 +2278,6 @@ Future<List<Bif_Cou_C_Local>> GET_BIF_COU_REP(String GETBIID_F,String GETBIID_T,
   List<Bif_Cou_C_Local> list = result.map((item) {
     return Bif_Cou_C_Local.fromMap(item);
   }).toList();
-  print(result);
-  print(sql);
-  print('sql122222222');
   return list;
 }
 
@@ -2325,9 +2322,6 @@ Future<List<Bif_Cou_C_Local>> GET_BIF_COU_REP_SUM(String GETBIID_F,String GETBII
   List<Bif_Cou_C_Local> list = result.map((item) {
     return Bif_Cou_C_Local.fromMap(item);
   }).toList();
-  print(result);
-  print(sql);
-  print('sql122222222');
   return list;
 }
 
@@ -2470,6 +2464,7 @@ Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BIF_REP2(String GETBIID_F,String GETB
   }).toList();
   return list;
 }
+
 Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BIF_REP3(String GETBIID_F,String GETBIID_T,String GETBMMDO_F,String GETBMMDO_T
     ,String GETCTMID_F,String GETCTMID_T, String GETBPID_F,String GETBPID_T,String GETCIMID_F,String GETCIMID_T) async {
   var dbClient = await conn.database;
@@ -2495,6 +2490,7 @@ Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BIF_REP3(String GETBIID_F,String GETB
   }).toList();
   return list;
 }
+
 Future<List<Bil_Mov_M_Local>>  GET_COUNTER_BCCAM1(String GETBIID_F,String GETBIID_T,String GETBMMDO_F,String GETBMMDO_T
     ,String GETCTMID_F,String GETCTMID_T, String GETBPID_F,String GETBPID_T,String GETCIMID_F,String GETCIMID_T,
     String GETBCCID) async {
@@ -2617,12 +2613,14 @@ async {
   String extraWhere2 = '';
   String extraWhere3 = '';
   String extraWhere4 = '';
+  String extraWhere5 = '';
   if (LoginController().BIID_ALL_V == '1') {
     extraJoin = " AND D.BIID_L = M.BIID_L";
     extraWhere = "AND M.BIID_L = ${LoginController().BIID}";
     extraWhere2 = " AND M.BIID_L = C.BIID_L ";
     extraWhere3 = " AND B.BIID_L = D.BIID_L ";
     extraWhere4 = " AND E.BIID_L = D.BIID_L ";
+    extraWhere5 = " AND K.BIID_L = M.BIID_L ";
   }
 
   // الاستعلام المصحح
@@ -2670,6 +2668,7 @@ async {
       AND M.CIID_L = K.CIID_L
       AND M.JTID_L = K.JTID_L
       AND M.SYID_L = K.SYID_L
+      $extraWhere5
       LEFT JOIN SYS_CUR AS C 
       ON M.SCID = C.SCID
       AND M.CIID_L = C.CIID_L
@@ -2738,6 +2737,7 @@ async {
       AND M.CIID_L = K.CIID_L
       AND M.JTID_L = K.JTID_L
       AND M.SYID_L = K.SYID_L
+      $extraWhere5
       LEFT JOIN SYS_CUR AS C 
       ON M.SCID = C.SCID
       AND M.CIID_L = C.CIID_L
