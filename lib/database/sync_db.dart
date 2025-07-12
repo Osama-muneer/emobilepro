@@ -226,6 +226,21 @@ DeleteALLDataTMP(String GetTableName) async {
 }
 
 
+
+SaveALLData(String GetTableName) async {
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String TableNameTmp='$GetTableName''_TMP';
+    String sql;
+    sql= 'INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ';
+    final res = await dbClient!.rawInsert(sql);
+    // print('SaveALLData ${sql} = ${res}');
+    DeleteALLDataTMP(GetTableName);
+    return res;
+  },Err: 'SaveALLData');
+
+}
+
 //جلب البيانات الفاشله
 
 DeleteSYN_ORD_L() async {
