@@ -674,9 +674,8 @@ Future<List<Fas_Acc_Usr_Local>> GET_FAS_ACC_USR(String GETFAUST) async {
   LoginController().BIID_ALL_V == '1'
       ? Wheresql2 = " AND  B.BIID_L=${LoginController().BIID}"
       : Wheresql2 = '';
-
-  sql =
-  " SELECT A.SSID,A.FAUST2,A.FAUST,CASE WHEN ${LoginController().LAN}=2 AND B.SSDE IS NOT NULL THEN B.SSDE ELSE B.SSDA END  SSDA_D "
+  sql = " SELECT A.SSID,A.FAUST2,A.FAUST,CASE WHEN ${LoginController().LAN}=2 AND "
+      " B.SSDE IS NOT NULL THEN B.SSDE ELSE B.SSDA END  SSDA_D "
       " FROM FAS_ACC_USR A,SYS_SCR B WHERE A.FAUST=$GETFAUST AND A.SSID=B.SSID AND A.SUID='${LoginController().SUID}' "
       " AND A.JTID_L=${LoginController().JTID} "
       " AND A.SYID_L=${LoginController().SYID} AND A.CIID_L='${LoginController().CIID}' $Wheresql"

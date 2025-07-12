@@ -138,34 +138,41 @@ String SQLBIID=  LoginController().BIID_ALL_V=='1'? SQLBIID= " AND  BIID_L=${Log
 
 
 DeleteSYN_ORD() async {
-  var dbClient = await conn.database;
-  String sql= "DELETE FROM SYN_ORD WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
-      " AND CIID_L=${LoginController().CIID} $SQLBIID";
-  final res = await dbClient!.rawDelete(sql);
-  // print('DeleteSyn_ord ${sql} = ${res}');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql= "DELETE FROM SYN_ORD WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
+        " AND CIID_L=${LoginController().CIID} $SQLBIID";
+    final res = await dbClient!.rawDelete(sql);
+    // print('DeleteSyn_ord ${sql} = ${res}');
+    return res;
+  },Err: 'DeleteSYN_ORD');
 }
 
 DeleteSYN_ORD_NULL() async {
-  var dbClient = await conn.database;
-  String sql= "DELETE FROM SYN_ORD WHERE JTID_L is NULL AND SYID_L is NULL AND CIID_L is NULL";
-  final res = await dbClient!.rawDelete(sql);
-  // print('DeleteSYN_ORD_NULL ${sql} = ${res}');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql= "DELETE FROM SYN_ORD WHERE JTID_L is NULL AND SYID_L is NULL AND CIID_L is NULL";
+    final res = await dbClient!.rawDelete(sql);
+    // print('DeleteSYN_ORD_NULL ${sql} = ${res}');
+    return res;
+  },Err: 'DeleteSYN_ORD_NULL');
 }
 
 Future<int> DeleteFAS_ACC_USR() async {
-  var dbClient = await conn.database;
-  String sql =" DELETE FROM FAS_ACC_USR WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
-      " AND CIID_L=${LoginController().CIID} $SQLBIID";
-  final res = await dbClient!.rawDelete(sql);
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql =" DELETE FROM FAS_ACC_USR WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID} "
+        " AND CIID_L=${LoginController().CIID} $SQLBIID";
+    final res = await dbClient!.rawDelete(sql);
+    return res;
+  },Err: 'DeleteFAS_ACC_USR');
 }
 
 DeleteALLData(String GetTableName,bool TypeSync) async {
-  var dbClient = await conn.database;
-  String TableNameTmp='$GetTableName''_TMP';
-  String GUID='';
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String TableNameTmp='$GetTableName''_TMP';
+    String GUID='';
 
     if(['FAT_CSID_INF', 'FAT_CSID_SEQ', 'FAT_CSID_ST'].contains(GetTableName)){
       GUID='FCIGU';
@@ -177,201 +184,204 @@ DeleteALLData(String GetTableName,bool TypeSync) async {
       GUID='GUID';
     }
 
-  String SqlBIIDTMP=LoginController().BIID_ALL_V=='1'?  " AND  $GetTableName.BIID_L=BIID_L":'';
-  String sql='';
+    String SqlBIIDTMP=LoginController().BIID_ALL_V=='1'?  " AND  $GetTableName.BIID_L=BIID_L":'';
+    String sql='';
 
     if(['BIL_CUS', 'ACC_ACC','ACC_USR'].contains(GetTableName)) {
-    sql="DELETE FROM $GetTableName WHERE SYST_L=1 and JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID}"
-        "  AND CIID_L=${LoginController().CIID} $SQLBIID";
-  }
+      sql="DELETE FROM $GetTableName WHERE SYST_L=1 and JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID}"
+          "  AND CIID_L=${LoginController().CIID} $SQLBIID";
+    }
     else{
-    sql= "DELETE FROM $GetTableName WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID}"
-       "  AND CIID_L=${LoginController().CIID} $SQLBIID ";
-  }
+      sql= "DELETE FROM $GetTableName WHERE JTID_L=${LoginController().JTID} AND SYID_L=${LoginController().SYID}"
+          "  AND CIID_L=${LoginController().CIID} $SQLBIID ";
+    }
 
-   String sql2="DELETE FROM $GetTableName  WHERE EXISTS(SELECT 1 FROM $TableNameTmp B WHERE  $GetTableName.$GUID=B.$GUID )";
+    String sql2="DELETE FROM $GetTableName  WHERE EXISTS(SELECT 1 FROM $TableNameTmp B WHERE  $GetTableName.$GUID=B.$GUID )";
 
-  String SQL_CSID_SEQ="DELETE FROM FAT_CSID_SEQ   WHERE EXISTS(SELECT 1 FROM FAT_CSID_SEQ_TMP B WHERE  B.FCIGU=FAT_CSID_SEQ.FCIGU  AND B.FCSNO>=FAT_CSID_SEQ.FCSNO)";
-  String SQL_CSID_SEQ2="DELETE FROM FAT_CSID_SEQ_TMP   WHERE EXISTS(SELECT 1 FROM FAT_CSID_SEQ B WHERE  B.FCIGU=FAT_CSID_SEQ_TMP.FCIGU  AND B.FCSNO>FAT_CSID_SEQ_TMP.FCSNO)";
+    String SQL_CSID_SEQ="DELETE FROM FAT_CSID_SEQ   WHERE EXISTS(SELECT 1 FROM FAT_CSID_SEQ_TMP B WHERE  B.FCIGU=FAT_CSID_SEQ.FCIGU  AND B.FCSNO>=FAT_CSID_SEQ.FCSNO)";
+    String SQL_CSID_SEQ2="DELETE FROM FAT_CSID_SEQ_TMP   WHERE EXISTS(SELECT 1 FROM FAT_CSID_SEQ B WHERE  B.FCIGU=FAT_CSID_SEQ_TMP.FCIGU  AND B.FCSNO>FAT_CSID_SEQ_TMP.FCSNO)";
 
-  // print(sql);
-  // print(sql2);
-  // print('DeleteALLData');
-  final res = await dbClient!.rawDelete(GetTableName=='FAT_CSID_SEQ' ? SQL_CSID_SEQ2 : TypeSync==true?sql:sql2);
-  final res2 = GetTableName=='FAT_CSID_SEQ' ? await dbClient.rawDelete( SQL_CSID_SEQ ):null;
- // print('DeleteALLData ${GetTableName=='FAT_CSID_SEQ' ? SQL_CSID_SEQ : TypeSync==true?sql:sql2} = ${res}');
- // print('DeleteALLData $SQL_CSID_SEQ2');
-  INSERT_SYN_LOG(TAB_N,'تم الدخول الى دالة حذف البيانات السابقه ','D');
-  return res;
+    // print(sql);
+    // print(sql2);
+    // print('DeleteALLData');
+    final res = await dbClient!.rawDelete(GetTableName=='FAT_CSID_SEQ' ? SQL_CSID_SEQ2 : TypeSync==true?sql:sql2);
+    final res2 = GetTableName=='FAT_CSID_SEQ' ? await dbClient.rawDelete( SQL_CSID_SEQ ):null;
+    // print('DeleteALLData ${GetTableName=='FAT_CSID_SEQ' ? SQL_CSID_SEQ : TypeSync==true?sql:sql2} = ${res}');
+    // print('DeleteALLData $SQL_CSID_SEQ2');
+    INSERT_SYN_LOG(TAB_N,'تم الدخول الى دالة حذف البيانات السابقه ','D');
+    return res;
+  },Err: 'DeleteALLData');
 }
 
 
 DeleteALLDataTMP(String GetTableName) async {
-  var dbClient = await conn.database;
-  String GetTableNameTMP= '$GetTableName''_TMP';
-  String sql= "Delete FROM $GetTableNameTMP";
-  final res = await dbClient!.rawDelete(sql);
-  // print('${sql} = ${res}');
-  return res;
-}
-
-
-SaveALLData(String GetTableName) async {
   return await ErrorHandlerService.run(() async {
     var dbClient = await conn.database;
-    String TableNameTmp='$GetTableName''_TMP';
-    String sql;
-    sql= 'INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ';
-    final res = await dbClient!.rawInsert(sql);
-    // print('SaveALLData ${sql} = ${res}');
-    DeleteALLDataTMP(GetTableName);
+    String GetTableNameTMP= '$GetTableName''_TMP';
+    String sql= "Delete FROM $GetTableNameTMP";
+    final res = await dbClient!.rawDelete(sql);
+    // print('${sql} = ${res}');
     return res;
-  },Err: 'SaveALLData');
+  },Err: 'DeleteALLDataTMP');
 }
 
 
 //جلب البيانات الفاشله
 
 DeleteSYN_ORD_L() async {
-  var dbClient = await conn.database;
-  String sql= "DELETE FROM SYN_ORD_L ";
-  final res = await dbClient!.rawDelete(sql);
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql= "DELETE FROM SYN_ORD_L ";
+    final res = await dbClient!.rawDelete(sql);
+    return res;
+  },Err: 'DeleteSYN_ORD_L');
 }
 
 late List<Syn_Ord_L_Local> Syn_Ord_LList=[];
 
 Future<List<Syn_Ord_L_Local>> Get_SYN_ORD_L_ROW() async {
-  var dbClient = await conn.database;
-  String sql;
-  sql =" SELECT * FROM SYN_ORD_L  WHERE SYDV_NO=${LoginController().SYDV_NO}  ";
-  var result = await dbClient!.rawQuery(sql);
-  List<Syn_Ord_L_Local> list = result.map((item) {
-    return Syn_Ord_L_Local.fromMap(item);
-  }).toList();
-  return list;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    sql =" SELECT * FROM SYN_ORD_L  WHERE SYDV_NO=${LoginController().SYDV_NO}  ";
+    var result = await dbClient!.rawQuery(sql);
+    List<Syn_Ord_L_Local> list = result.map((item) {
+      return Syn_Ord_L_Local.fromMap(item);
+    }).toList();
+    return list;
+  },Err: 'Get_SYN_ORD_L_ROW');
 }
 
 Future SYN_ORD_L_ROW() async {
-  try{
-  Get_SYN_ORD_L_ROW().then((data) {
-    Syn_Ord_LList = data;
-    if (Syn_Ord_LList.isNotEmpty) {
-      // print(Syn_Ord_LList.length);
-      // print('Syn_Ord_LList.length');
-      for (var i = 0; i < Syn_Ord_LList.length; i++) {
-        Update_SYN_ORD_L(Syn_Ord_LList[i].SOET.toString(),Syn_Ord_LList[i].SOLGU.toString());
-        // print(Syn_Ord_LList[i].SOET.toString());
-      }
-    }
-  });
-  } catch (e, stackTrace) {
-    // التعامل مع أي أخطاء أثناء العملية
-    print('Error in SYN_ORD_L_ROW: $e\n$stackTrace');
-    Get.snackbar(
-      'Error',
-      'Error in SYN_ORD_L_ROW $e',
-      backgroundColor: Colors.red,
-      icon: const Icon(Icons.error, color: Colors.white),
-      colorText: Colors.white,
-    );
+  return await ErrorHandlerService.run(() async {
+    try{
+      Get_SYN_ORD_L_ROW().then((data) {
+        Syn_Ord_LList = data;
+        if (Syn_Ord_LList.isNotEmpty) {
+          // print(Syn_Ord_LList.length);
+          // print('Syn_Ord_LList.length');
+          for (var i = 0; i < Syn_Ord_LList.length; i++) {
+            Update_SYN_ORD_L(Syn_Ord_LList[i].SOET.toString(),Syn_Ord_LList[i].SOLGU.toString());
+            // print(Syn_Ord_LList[i].SOET.toString());
+          }
+        }
+      });
+    } catch (e, stackTrace) {
+      // التعامل مع أي أخطاء أثناء العملية
+      print('Error in SYN_ORD_L_ROW: $e\n$stackTrace');
+      Get.snackbar(
+        'Error',
+        'Error in SYN_ORD_L_ROW $e',
+        backgroundColor: Colors.red,
+        icon: const Icon(Icons.error, color: Colors.white),
+        colorText: Colors.white,
+      );
 
-  }
+    }
+  },Err: 'SYN_ORD_L_ROW');
 }
 
 Future<int> Update_SYN_ORD_L(String GetTableName,String GETGUID) async {
-  var dbClient = await conn.database;
-  GETGUID= '$GETGUID''';
-  String sql=GetTableName=='ACC_MOV_M' ? 'AMMST=2' : 'BMMST=2';
-  String sqlupdate="UPDATE  $GetTableName SET $sql WHERE GUID='${GETGUID}'" ;
-  final result = await dbClient!.rawUpdate(sqlupdate);
-  // print(sqlupdate);
-  // print(result);
-  // print('Update_SYN_ORD_L');
-  Update_SYN_ORD_L_D(GetTableName=='ACC_MOV_M'?'ACC_MOV_D':GetTableName=='BIL_MOV_M'?'BIL_MOV_D':'BIF_MOV_D',GETGUID);
-  return result;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    GETGUID= '$GETGUID''';
+    String sql=GetTableName=='ACC_MOV_M' ? 'AMMST=2' : 'BMMST=2';
+    String sqlupdate="UPDATE  $GetTableName SET $sql WHERE GUID='${GETGUID}'" ;
+    final result = await dbClient!.rawUpdate(sqlupdate);
+    Update_SYN_ORD_L_D(GetTableName=='ACC_MOV_M'?'ACC_MOV_D':GetTableName=='BIL_MOV_M'?'BIL_MOV_D':'BIF_MOV_D',GETGUID);
+    return result;
+  },Err: 'Update_SYN_ORD_L');
 }
 
 Future<int> Update_SYN_ORD_L_D(String GetTableName,String GETGUID) async {
-  var dbClient = await conn.database;
-  GETGUID= '$GETGUID''';
-  String sql=GetTableName=='ACC_MOV_D' ? 'SYST_L=2 WHERE GUIDF' : 'SYST=2 WHERE GUIDM';
-  String sqlupdate="UPDATE  $GetTableName SET $sql='${GETGUID}'" ;
-  final result = await dbClient!.rawUpdate(sqlupdate);
-  // print(sqlupdate);
-  // print(result);
-  // print('Update_SYN_ORD_L_D');
-  return result;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    GETGUID= '$GETGUID''';
+    String sql=GetTableName=='ACC_MOV_D' ? 'SYST_L=2 WHERE GUIDF' : 'SYST=2 WHERE GUIDM';
+    String sqlupdate="UPDATE  $GetTableName SET $sql='${GETGUID}'" ;
+    final result = await dbClient!.rawUpdate(sqlupdate);
+    return result;
+  },Err: 'Update_SYN_ORD_L_D');
 }
 //جلب البيانات الفاشله
 
 
 // NUM 1
 DeleteDataByGUID(String GetTableName,String GETGUID) async {
-  var dbClient = await conn.database;
-  GETGUID= '$GETGUID''';
-  String sql="DELETE FROM $GetTableName WHERE GUID='${GETGUID}'" ;
-  final  res = await dbClient!.rawDelete(sql);
-  print('${sql} = ${res}');
-  print('DeleteDataByGUID');
-  if(GetTableName=='BIL_CUS'){
-    await SaveDataByGUID(GetTableName,GETGUID);
-  }else {
-    await SaveDataACC(GetTableName);
-  }
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    GETGUID= '$GETGUID''';
+    String sql="DELETE FROM $GetTableName WHERE GUID='${GETGUID}'" ;
+    final  res = await dbClient!.rawDelete(sql);
+    print('${sql} = ${res}');
+    print('DeleteDataByGUID');
+    if(GetTableName=='BIL_CUS'){
+      await SaveDataByGUID(GetTableName,GETGUID);
+    }else {
+      await SaveDataACC(GetTableName);
+    }
+    return res;
+  },Err: 'DeleteDataByGUID');
 }
 
 // NUM 2
 SaveDataByGUID(String GetTableName,String GETGUID) async {
-  var dbClient = await conn.database;
-  String TableNameTmp='$GetTableName''_TMP';
-  String sql;
-  sql= "INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp WHERE GUID='${GETGUID}'";
-  final res = await dbClient!.rawInsert(sql);
-  await DeleteALLDataTMP(GetTableName);
-  await Update_TABLE_ALL(GetTableName);
-  await UpdateDataByGUID('ACC_TAX_C',GETGUID);
-  await UpdateDataByGUID('ACC_MOV_D',GETGUID);
-  await UpdateDataByGUID('BIL_MOV_M',GETGUID);
-  await UpdateDataByGUID('BIF_MOV_M',GETGUID);
-  print(sql);
-  print(res);
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String TableNameTmp='$GetTableName''_TMP';
+    String sql;
+    sql= "INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp WHERE GUID='${GETGUID}'";
+    final res = await dbClient!.rawInsert(sql);
+    await DeleteALLDataTMP(GetTableName);
+    await Update_TABLE_ALL(GetTableName);
+    await UpdateDataByGUID('ACC_TAX_C',GETGUID);
+    await UpdateDataByGUID('ACC_MOV_D',GETGUID);
+    await UpdateDataByGUID('BIL_MOV_M',GETGUID);
+    await UpdateDataByGUID('BIF_MOV_M',GETGUID);
+    print(sql);
+    print(res);
+    return res;
+  },Err: 'SaveDataByGUID');
 }
 
 // NUM 3
 UpdateDataByGUID(String GetTableName,String GETGUID) async {
-  var dbClient = await conn.database;
-  String sql;
-  String SQL2=GetTableName=='BIL_MOV_M' || GetTableName=='BIF_MOV_M'
-      ? ",BCID=(SELECT BCID FROM BIL_CUS B WHERE B.GUID='$GETGUID'),BMMNA=(SELECT BCNA FROM BIL_CUS B WHERE B.GUID='$GETGUID')":'';
-  sql= "UPDATE $GetTableName SET AANO=(SELECT AANO FROM BIL_CUS B WHERE B.GUID='$GETGUID') $SQL2  WHERE AANO='${GETGUID}'";
-  final res = await dbClient!.rawUpdate(sql);
-  print('UpdateDataByGUID ${sql} : ${res}');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String sql;
+    String SQL2=GetTableName=='BIL_MOV_M' || GetTableName=='BIF_MOV_M'
+        ? ",BCID=(SELECT BCID FROM BIL_CUS B WHERE B.GUID='$GETGUID'),BMMNA=(SELECT BCNA FROM BIL_CUS B WHERE B.GUID='$GETGUID')":'';
+    sql= "UPDATE $GetTableName SET AANO=(SELECT AANO FROM BIL_CUS B WHERE B.GUID='$GETGUID') $SQL2  WHERE AANO='${GETGUID}'";
+    final res = await dbClient!.rawUpdate(sql);
+    print('UpdateDataByGUID ${sql} : ${res}');
+    return res;
+  },Err: 'UpdateDataByGUID');
 }
 
 SaveDataACC(String GetTableName) async {
-  var dbClient = await conn.database;
-  String TableNameTmp='$GetTableName''_TMP';
-  String sql;
-  sql= "INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ";
-  final res = await dbClient!.rawInsert(sql);
-  DeleteALLDataTMP(GetTableName);
-  Update_TABLE_ALL(GetTableName);
-  Update_SYN_ORD(GetTableName);
-  DeleteROWID('ACC_ACC','GUID');
-  DeleteROWID('ACC_USR','GUID');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    String TableNameTmp='$GetTableName''_TMP';
+    String sql;
+    sql= "INSERT INTO  $GetTableName SELECT * FROM $TableNameTmp ";
+    final res = await dbClient!.rawInsert(sql);
+    DeleteALLDataTMP(GetTableName);
+    Update_TABLE_ALL(GetTableName);
+    Update_SYN_ORD(GetTableName);
+    DeleteROWID('ACC_ACC','GUID');
+    DeleteROWID('ACC_USR','GUID');
+    return res;
+  },Err: 'SaveDataACC');
 }
 
 DeleteDataBySYN_DATA(String GetTableName,String GETGUID) async {
-  var dbClient = await conn.database;
-  GETGUID= '$GETGUID''';
-  final  res = await dbClient!.rawDelete("DELETE FROM $GetTableName WHERE GUID='${GETGUID}' ");
-  INSERT_SYN_LOG(GetTableName,'DELETE DATA','U');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    GETGUID= '$GETGUID''';
+    final  res = await dbClient!.rawDelete("DELETE FROM $GetTableName WHERE GUID='${GETGUID}' ");
+    INSERT_SYN_LOG(GetTableName,'DELETE DATA','U');
+    return res;
+  },Err: 'DeleteDataBySYN_DATA');
 }
 
 // SaveSyncData(Map<String,dynamic> GetList,TableName) async {
@@ -381,23 +391,29 @@ DeleteDataBySYN_DATA(String GetTableName,String GETGUID) async {
 // }
 
 Future<int> DeleteBRA_INF_ACC_ALL() async {
-  var dbClient = await conn.database;
-  final res = await dbClient!.rawDelete('DELETE FROM BRA_INF_ACC');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    final res = await dbClient!.rawDelete('DELETE FROM BRA_INF_ACC');
+    return res;
+  },Err: 'DeleteBRA_INF_ACC_ALL');
 }
 
 
 SaveBRA_INF_ACC(Bra_Inf_Local BRA_INF_ACC) async {
-  await DeleteBRA_INF_ACC_ALL();
-  var dbClient = await conn.database;
-  final res = await dbClient!.insert('BRA_INF_ACC', BRA_INF_ACC.toMap());
-  return res;
+  return await ErrorHandlerService.run(() async {
+    await DeleteBRA_INF_ACC_ALL();
+    var dbClient = await conn.database;
+    final res = await dbClient!.insert('BRA_INF_ACC', BRA_INF_ACC.toMap());
+    return res;
+  },Err: 'SaveBRA_INF_ACC');
 }
 
 Future<int> DeleteCON_ACC_M_ALL() async {
-  var dbClient = await conn.database;
-  final res = await dbClient!.rawDelete('DELETE FROM CON_ACC_M');
-  return res;
+  return await ErrorHandlerService.run(() async {
+    var dbClient = await conn.database;
+    final res = await dbClient!.rawDelete('DELETE FROM CON_ACC_M');
+    return res;
+  },Err: 'SaveBRA_INF_ACC');
 }
 
 
